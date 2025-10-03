@@ -1,0 +1,6 @@
+/// <reference types="react-scripts" />
+
+declare module "*.json" {
+    const value: unknown;
+    export default value;
+}
