@@ -1,15 +1,15 @@
 import Lottie from "lottie-react";
 import BoardingScreen from "../assets/journeybeginsnow.json";
 
-const LottieJourneyBeginSnow = () => {
+const LottieJourneyBeginsNow = () => {
     return (
         <Lottie
             animationData={BoardingScreen}
             loop={false}
             autoplay={true}
-            style={{ width: 300, height: 300 }}
+            className="h-1/2"
         />
     );
 };
 
-export default LottieJourneyBeginSnow;
+export default LottieJourneyBeginsNow;

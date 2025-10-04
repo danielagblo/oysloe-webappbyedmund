@@ -7,7 +7,7 @@ const LottieScaleToSuccess = () => {
             animationData={BoardingScreen}
             loop={false}
             autoplay={true}
-            style={{ width: 300, height: 300 }}
+            className="h-1/2"
         />
     );
 };
