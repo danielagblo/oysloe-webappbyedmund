@@ -32,7 +32,7 @@ const VerificationPage = () => {
                 </div>
                 <h2 className="font-extralight mt-20">
                     Don't have an account ?
-                    <Link to="/sign-up" >
+                    <Link to="/signUp" >
                         <h2 className="text-black inline opacity-100"> Sign up</h2>
                     </Link>
                 </h2>

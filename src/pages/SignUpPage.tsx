@@ -4,11 +4,11 @@ import OnboardingScreen from "../components/OnboardingScreen";
 
 const SignInPage = () => {
     return (
-        <div className="h-screen w-screen flex items-center justify-center">
+        <div className="h-screen w-screen flex items-center justify-center overflow-x-auto">
             <div className="flex flex-col items-center justify-center w-[60%] h-full m-8">
                 <div className=" flex flex-col gap-5 items-center justify-center">
-                    <h2 className="text-2xl">Getting started</h2>
-                    <form className="h-6/9 overflow-y-scroll relative">
+                    <h2 className="text-2xl pt-10">Getting started</h2>
+                    <form className="relative">
                         <div className="flex flex-col gap-3">
                             <input type="text" placeholder="Name" className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(name.svg)] rounded-lg focus:border-gray-400  outline-0" />
                             <input type="email" placeholder="Email Address" className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0" />
@@ -23,7 +23,6 @@ const SignInPage = () => {
                                 <Link to="/terms">
                                     <p className="text-black inline"> terms & conditions</p>
                                 </Link>
-                                {/* <input type="checkbox" className="ml-2 h-3 w-3 inline" required /> */}
                                 <label className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline" htmlFor="custom-checkbox">
                                     {/* <!-- Hidden default checkbox --> */}
                                     <input type="checkbox"
@@ -47,7 +46,7 @@ const SignInPage = () => {
                 </div>
                 <h2 className="font-extralight">
                     I have an account already ?
-                    <Link to="/log-in" >
+                    <Link to="/login" >
                         <h2 className="text-black inline opacity-100"> Login</h2>
                     </Link>
                 </h2>
