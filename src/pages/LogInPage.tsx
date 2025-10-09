@@ -6,7 +6,7 @@ const LogInPage = () => {
     const navigate = useNavigate();
     return (
         <div className="h-screen w-screen flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center w-[60%] m-8">
+            <div className="flex flex-col items-center justify-center w-[50%] m-8">
                 <div className="flex flex-col gap-5 items-center justify-center">
                     <h2 className="text-2xl">Welcome!</h2>
                     <form className="relative">
@@ -15,7 +15,7 @@ const LogInPage = () => {
                             <input type="password" placeholder="Password" className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0" />
                         </div>
                         <div className="flex flex-col gap-3 w-full mt-3">
-                            <Button onClick={() => {navigate("/homepage")}} name="Sign In" />
+                            <Button onClick={() => { navigate("/homepage") }} name="Sign In" />
                             <button className="flex items-center justify-center bg-[#F9F9F9] px-3 py-2.5 w-full rounded-lg text-black gap-3">
                                 <img src="https://toppng.com/uploads/preview/google-g-logo-icon-11609362962anodywxeaz.png" alt="Google Logo" className="h-5" />
                                 <h2 className="">Sign in with Google</h2>
