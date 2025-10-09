@@ -6,7 +6,7 @@ import LottieUserSafetyGuarantee from "./LottieUserSafetyGuarantee";
 const OnboardingScreen = () => {
     const [clicked, setClicked] = useState(0);
     return (
-        <div className="flex flex-col items-center justify-center h-full m-8 bg-[#DEFEED] rounded-4xl">
+        <div className="flex flex-col items-center justify-center h-screen bg-[#DEFEED] w-1/2">
             {clicked === 0 ? (
                 <>
                     < LottieUserSafetyGuarantee />

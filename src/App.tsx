@@ -1,11 +1,13 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
+import AdsDetailsPage from './pages/AdsDetailsPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import LogInPage from './pages/LogInPage.tsx'
 import ReferalVerificationPage from './pages/ReferalVerificationPage.tsx'
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx'
 import ResetPasswordWithEmailPage from './pages/ResetPasswordWithEmailPage.tsx'
 import ResetPasswordWithPhonePage from './pages/ResetPasswordWithPhonePage.tsx'
+import ReviewPage from './pages/ReviewPage.tsx'
 import SignUpPage from './pages/SignUpPage.tsx'
 import VerificationPage from './pages/VerificationPage.tsx'
 
@@ -22,6 +24,8 @@ function App() {
         <Route path="/referal-verification" element={<ReferalVerificationPage />} />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
         <Route path="/homepage" element={<HomePage />} />
+        <Route path="/ads/:id" element={<AdsDetailsPage />} />
+        <Route path="/reviews" element={<ReviewPage />} />
       </Routes>
     </>
   )
