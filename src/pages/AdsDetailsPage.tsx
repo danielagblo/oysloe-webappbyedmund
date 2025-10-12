@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import MenuButton from '../components/MenuButton';
 
 const AdsDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -346,6 +347,7 @@ const AdsDetailsPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <MenuButton />
         </div>
     );
 };

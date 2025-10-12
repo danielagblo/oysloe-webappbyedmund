@@ -1,17 +1,16 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 const MenuButton = () => {
     const navigate = useNavigate();
-    const [active, setActive] = useState("home");
+    const location = useLocation();
 
-    const routes: Record<string, string> = {
+    const routes = useMemo<Record<string, string>>(() => ({
         home: "/homepage",
         alerts: "/alerts",
         post: "/post",
         inbox: "/inbox",
         profile: "/profile",
-    };
+    }), []);
 
     const icons: Record<string, string> = {
         home: "/home.svg",
@@ -21,12 +20,25 @@ const MenuButton = () => {
         profile: "/profile.svg",
     };
 
+    const pathToKey = useCallback((path: string) => {
+        const entry = Object.entries(routes).find(([, route]) => path === route || path.startsWith(route));
+        return entry ? entry[0] : "home";
+    }, [routes]);
+
+    const [active, setActive] = useState(() => pathToKey(location.pathname));
+
+    useEffect(() => {
+        setActive(pathToKey(location.pathname));
+    }, [location.pathname, pathToKey]);
+
     const handleClick = (id: string) => {
-        setActive(id);
-        navigate(routes[id]);
-        if (active === id) {
-            location.reload();
+        const target = routes[id];
+        if (location.pathname === target) {
+            window.location.reload();
+            return;
         }
+        navigate(target);
+        setActive(id);
     };
 
     const btnBase = "relative p-2 flex flex-col items-center gap-1 focus:outline-none";
