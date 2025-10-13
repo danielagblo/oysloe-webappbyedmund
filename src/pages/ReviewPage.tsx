@@ -5,7 +5,7 @@ import MenuButton from "../components/MenuButton";
 const ReviewPage = () => {
     const [sendSuccess, setSendSuccess] = useState(false);
     return (
-        <div className="flex gap-6 p-4 px-10 justify-evenly h-screen w-screen items-center">
+        <div className="flex gap-6 p-4 px-10 justify-evenly h-screen w-screen items-center bg-gray-100">
             {
                 sendSuccess && (
                     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
@@ -86,16 +86,18 @@ const ReviewPage = () => {
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-lg w-2/10 h-9/10 flex flex-col items-center justify-around">
-                <div className="flex flex-col items-center gap-2  w-full">
+            <div className=" w-2/10 h-9/10 flex flex-col items-center justify-around p-4 gap-8">
+                <div className="flex p-4 bg-white rounded-lg flex-col items-center gap-2 justify-center w-full h-1/2">
                     <img src="/face.svg" alt="" className="w-24 h-24 border-green-300 border-2 p-2 rounded-full" />
-                    <h3 className="font-semibold">Alexander Kowri</h3>
-                    <div className="flex flex-col items-center gap-0.5 w-full">
-                        <div className="flex px-1 rounded items-center  mr-auto">
-                            <img src="/tick.svg" alt="" className="w-1.5 h-1.5" />
-                            <span className="text-[6px]">High level</span>
+                    <div>
+                        <h3 className="font-medium text-3xl">Alexander Kowri</h3>
+                        <div className="flex flex-col items-center gap-0.5 w-full">
+                            <div className="flex px-1 rounded items-center  mr-auto">
+                                <img src="/tick.svg" alt="" className="w-1.5 h-1.5" />
+                                <span className="text-[6px]">High level</span>
+                            </div>
+                            <div className="bg-green-300 h-1 w-full px-2"></div>
                         </div>
-                        <div className="bg-green-300 h-1 w-full px-2"></div>
                     </div>
                     <div className="flex flex-row-reverse w-full text-center justify-around">
                         <div className="flex flex-col-reverse">
@@ -106,7 +108,7 @@ const ReviewPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center flex-col justify-center gap-1 w-full">
+                <div className="flex bg-white rounded-lg flex-col items-center gap-1 justify-center w-full h-1/2 p-2">
                     <span className="text-3xl text-center font-medium w-full">4.5</span>
                     <div className="flex">
                         <img src="/star.svg" alt="" className="w-3 h-3" />

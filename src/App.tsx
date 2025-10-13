@@ -4,6 +4,7 @@ import MenuButton from './components/MenuButton.tsx'
 import AdsDetailsPage from './pages/AdsDetailsPage.tsx'
 import AlertPage from './pages/AlertPage.tsx'
 import HomePage from './pages/HomePage.tsx'
+import InboxPage from './pages/InboxPage.tsx'
 import LogInPage from './pages/LogInPage.tsx'
 import ReferalVerificationPage from './pages/ReferalVerificationPage.tsx'
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx'
@@ -36,7 +37,8 @@ function App() {
             <MenuButton />
           </div>
         } />
-      </Routes>
+        <Route path='/inbox' element={<InboxPage />} />
+      </Routes >
     </>
   )
 }
