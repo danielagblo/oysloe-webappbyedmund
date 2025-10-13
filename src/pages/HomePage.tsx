@@ -245,7 +245,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Vehicles</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -270,7 +270,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Industry</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -295,7 +295,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Fashion</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -320,7 +320,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Grocery</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -345,7 +345,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Games</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -370,7 +370,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="fflex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Cosmetics</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -395,7 +395,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Property</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
