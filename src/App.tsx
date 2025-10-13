@@ -6,6 +6,7 @@ import AlertPage from './pages/AlertPage.tsx'
 import HomePage from './pages/HomePage.tsx'
 import InboxPage from './pages/InboxPage.tsx'
 import LogInPage from './pages/LogInPage.tsx'
+import ProfilePage from './pages/ProfilePage.tsx'
 import ReferalVerificationPage from './pages/ReferalVerificationPage.tsx'
 import ResetPasswordPage from './pages/ResetPasswordPage.tsx'
 import ResetPasswordWithEmailPage from './pages/ResetPasswordWithEmailPage.tsx'
@@ -38,6 +39,8 @@ function App() {
           </div>
         } />
         <Route path='/inbox' element={<InboxPage />} />
+        <Route path='/profile' element={<ProfilePage />} />
+
       </Routes >
     </>
   )
