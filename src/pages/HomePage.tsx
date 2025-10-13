@@ -78,12 +78,12 @@ const HomePage = () => {
     }
 
     return (
-        <div className="flex flex-col items-center w-screen h-screen p-25 gap-12 overflow-x-auto">
+        <div className="flex flex-col items-center w-screen min-h-screen p-6 gap-6 sm:p-25 sm:gap-12 overflow-x-auto">
             <div className="flex flex-col items-center justify-center gap-10">
-                <h2 className="text-6xl mt-[calc(100vh-34rem)] m-4">Oysloe</h2>
-                <div className="relative flex items-center justify-center">
-                    <input type="text" placeholder="Search anything up for good" className="px-16 py-4 w-120 h-18 bg-[18px_center] bg-[length:24px_24px] bg-no-repeat bg-[url('/search.svg')] rounded-full text-2xl focus:border-gray-400 outline-0 relative bg-white" />
-                    <div className="absolute w-120.5 h-18.5 bg-gradient-to-r from-green-400 via-yellow-500 to-red-500 rounded-full opacity-30 animate-pulse -z-10"></div>
+                <h2 className="text-6xl mt-8 sm:mt-[calc(100vh-34rem)] m-4">Oysloe</h2>
+                <div className="relative flex items-center justify-center w-full">
+                    <input type="text" placeholder="Search anything up for good" className="px-6 py-3 w-11/12 sm:w-120 h-12 sm:h-18 bg-[18px_center] bg-[length:24px_24px] bg-no-repeat bg-[url('/search.svg')] rounded-full text-2xl focus:border-gray-400 outline-0 relative bg-white" />
+                    <div className="absolute w-11/12 sm:w-120.5 h-12 sm:h-18.5 bg-gradient-to-r from-green-400 via-yellow-500 to-red-500 rounded-full opacity-30 animate-pulse -z-10"></div>
                 </div>
             </div>
 
@@ -168,18 +168,21 @@ const HomePage = () => {
             ) : (
                 /* Original Homepage Content */
                 <>
-                    <div className="grid place-items-center grid-cols-5 w-4/7 gap-x-38 gap-y-5 template-columns-5 auto-cols-fr mt-3">
-                        {categories.map((category) => (
-                            <div key={category.id} onClick={() => handleCategoryClick(category.name)} className="flex flex-col items-center justify-center w-34 h-34 gap-2 bg-[#f3f4f6b5] rounded-lg p-3 cursor-pointer hover:bg-gray-300">
-                                <img src={category.icon} alt={category.name} className="w-16 h-16 p-2 bg-white rounded-full object-contain" />
-                                <h3 className="text-center">{category.name}</h3>
-                            </div>
-                        ))}
+                    <div className="w-full sm:w-4/7 mt-3">
+                        {/* Force 5 columns on all sizes; make tiles compact on very small screens */}
+                        <div className="grid grid-cols-4 gap-2 sm:gap-4">
+                            {categories.map((category) => (
+                                <div key={category.id} onClick={() => handleCategoryClick(category.name)} className="flex flex-col items-center justify-center w-full sm:w-32 sm:h-32 gap-1 bg-[#f3f4f6b5] rounded-lg p-2 sm:p-3 cursor-pointer hover:bg-gray-300">
+                                    <img src={category.icon} alt={category.name} className="w-8 h-8 sm:w-14 sm:h-14 p-1 sm:p-2 bg-white rounded-full object-contain" />
+                                    <h3 className="text-center text-xs sm:text-sm truncate">{category.name}</h3>
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="flex items-center justify-center w-5/7">
-                        <div className="grid place-items-center grid-cols-5 gap-x-10 template-columns-5 auto-cols-fr">
+                    <div className="flex items-center justify-center w-full sm:w-5/7">
+                        <div className="grid place-items-center grid-cols-2 sm:grid-cols-5 gap-x-6 sm:gap-x-10 template-columns-5 auto-cols-fr">
                             {categ.map((category) => (
-                                <div key={category.id} className="relative w-24 h-24 rounded-full flex items-center justify-center mb-4 mt-15">
+                                <div key={category.id} className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mb-4 mt-15">
                                     <div className="absolute inset-0 rounded-full"
                                         style={{ background: `conic-gradient(#1e2939 calc(${category.adsCount} / ${sum} * 100%), #e2e8f0 0deg)` }}
                                     ></div>
@@ -192,7 +195,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Electronics</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -205,7 +208,7 @@ const HomePage = () => {
                             {pics.map((pic, index) => (
                                 <div key={index} className="inline-block ">
                                     <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
-                                        <img key={index} src={pic} alt={`Random ${index}`} className="w-48 h-48 object-cover mx-2 inline-block rounded" />
+                                        <img key={index} src={pic} alt={`Random ${index}`} className="w-40 h-40 sm:w-48 sm:h-48 object-cover mx-2 inline-block rounded" />
                                         <div className="flex items-center justify-start px-1 w-48 bg-white">
                                             <img src="/location.svg" alt="" className="w-4 h-2.5" />
                                             <p className="text-center text-[8px] h-3 text-black">{ads[index].location}</p>
@@ -217,7 +220,7 @@ const HomePage = () => {
                             ))}
                         </div>
                     </div>
-                    <div className="flex flex-col w-7/10">
+                    <div className="flex flex-col w-full sm:w-7/10">
                         <div className="flex items-center">
                             <h2>Furniture</h2>
                             <button className="bg-gray-200 px-4 py-2 rounded-full mx-3">Show All</button>
@@ -230,7 +233,7 @@ const HomePage = () => {
                             {pics.map((pic, index) => (
                                 <div key={index} className="inline-block">
                                     <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
-                                        <img key={index} src={pic} alt={`Random ${index}`} className="w-48 h-48 object-cover mx-2 inline-block rounded" />
+                                        <img key={index} src={pic} alt={`Random ${index}`} className="w-40 h-40 sm:w-48 sm:h-48 object-cover mx-2 inline-block rounded" />
                                         <div className="flex items-center justify-start px-1 w-48 bg-white">
                                             <img src="/location.svg" alt="" className="w-4 h-2.5" />
                                             <p className="text-center text-[8px] h-3 text-black">{ads[index].location}</p>

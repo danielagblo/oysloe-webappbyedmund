@@ -3,13 +3,17 @@ import { Link } from "react-router-dom";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
 import OnboardingScreen from "../components/OnboardingScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const ResetPasswordWithEmailPage = () => {
     const [showModal, setShowModal] = useState(false);
 
+    const isSmall = useIsSmallScreen();
+    const shouldShowOnboarding = typeof window !== 'undefined' ? localStorage.getItem('oysloe_onboarding_seen') !== 'true' : true;
+
     return (
         <div className="h-screen w-screen flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center w-[60%] m-8">
+            <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
                 <div className="flex flex-col gap-5 items-center justify-center">
                     <h2 className="text-2xl">Reset Password</h2>
                     <form className="w-3/5 h-4/5 overflow-y-auto relative">
@@ -32,7 +36,7 @@ const ResetPasswordWithEmailPage = () => {
                     </Link>
                 </h2>
             </div>
-            <OnboardingScreen />
+            {isSmall ? (shouldShowOnboarding ? <OnboardingScreen overlay onFinish={() => window.location.assign('/login')} /> : null) : <OnboardingScreen />}
             {showModal && (
                 <div className="h-2/5 w-2/7 flex flex-col justify-center items-center bg-white border-2 border-gray-100 rounded-4xl shadow-lg absolute z-10">
                     <LottieSuccess />

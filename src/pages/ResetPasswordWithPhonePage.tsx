@@ -1,12 +1,16 @@
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const ResetPasswordWithPhonePage = () => {
     const navigate = useNavigate();
+    const isSmall = useIsSmallScreen();
+    const shouldShowOnboarding = typeof window !== 'undefined' ? localStorage.getItem('oysloe_onboarding_seen') !== 'true' : true;
+
     return (
         <div className="h-screen w-screen flex items-center justify-center">
-            <div className="flex flex-col items-center justify-center w-[60%] m-8">
+            <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
                 <div className="flex flex-col gap-5 items-center justify-center">
                     <h2 className="text-2xl">Reset Password</h2>
                     <form className="w-3/5 h-4/5 overflow-y-auto relative">
@@ -29,7 +33,7 @@ const ResetPasswordWithPhonePage = () => {
                     </Link>
                 </h2>
             </div>
-            <OnboardingScreen />
+            {isSmall ? (shouldShowOnboarding ? <OnboardingScreen overlay onFinish={() => navigate('/login')} /> : null) : <OnboardingScreen />}
         </div>
     );
 }

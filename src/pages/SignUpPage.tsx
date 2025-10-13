@@ -1,11 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const SignInPage = () => {
+    const isSmall = useIsSmallScreen();
+    const shouldShowOnboarding = typeof window !== 'undefined' ? localStorage.getItem('oysloe_onboarding_seen') !== 'true' : true;
+    const navigate = useNavigate();
+
     return (
         <div className="h-screen w-screen flex items-center justify-center overflow-x-auto">
-            <div className="flex flex-col items-center justify-center w-[60%] h-full m-8">
+            <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] h-full m-8">
                 <div className=" flex flex-col gap-5 items-center justify-center">
                     <h2 className="text-2xl pt-10">Getting started</h2>
                     <form className="relative">
@@ -51,7 +56,7 @@ const SignInPage = () => {
                     </Link>
                 </h2>
             </div>
-            <OnboardingScreen />
+            {isSmall ? (shouldShowOnboarding ? <OnboardingScreen overlay onFinish={() => navigate('/login')} /> : null) : <OnboardingScreen />}
         </div>
     );
 }
