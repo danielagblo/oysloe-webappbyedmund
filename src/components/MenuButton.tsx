@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
+import "../App.css";
+
 const MenuButton = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -44,7 +47,7 @@ const MenuButton = () => {
     const btnBase = "relative p-2 flex flex-col items-center gap-1 focus:outline-none";
 
     return (
-        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-2/5 bg-white border-t border-gray-300 flex justify-around items-center h-20 rounded-lg shadow-lg z-10 overflow-visible">
+        <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-300 flex justify-around items-center gap-4 h-20 rounded-lg shadow-lg z-10 overflow-visible bottom-nav">
             <button onClick={() => handleClick("home")} id="home" aria-current={active === "home"} className={btnBase}>
                 {active === "home" && (
                     <img src="/active button.svg" alt="" className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-6 h-6 pointer-events-none z-20" />

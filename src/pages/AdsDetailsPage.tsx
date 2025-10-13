@@ -100,7 +100,7 @@ const AdsDetailsPage: React.FC = () => {
                 </div>
 
                 {/* Image Gallery */}
-                <div className="flex flex-row w-9/10 h-64 gap-1 bg-green-500">
+                <div className="flex flex-row w-9/10 h-64 gap-1 ">
                     <div className="flex w-full">
                         <img src="/3d-car-city-street.webp" alt="" className="object-cover  h-full w-full " />
                     </div>

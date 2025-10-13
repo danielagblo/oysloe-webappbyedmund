@@ -5,6 +5,10 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0;
+}
+html{
+  /* padding: 20vw; */
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -13,4 +17,13 @@ body{
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.tempclass {
+  width: 100vw;
+}
+
+.bottom-nav {
+  width: fit-content;
+  padding: 0 2rem;
 }

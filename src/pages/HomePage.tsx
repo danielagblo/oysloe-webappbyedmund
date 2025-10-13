@@ -57,7 +57,7 @@ const HomePage = () => {
   const closeFilterPopup = () => setShowFilterPopup(false);
 
   return (
-    <div className="flex flex-col items-center w-full min-h-screen px-4 sm:px-10 gap-6 sm:gap-12 overflow-x-hidden">
+    <div className="flex flex-col items-center  min-h-screen px-4 sm:px-10 gap-6 sm:gap-12 overflow-x-hidden tempclass">
       <div className="flex flex-col items-center justify-center gap-8 mt-8">
         <h2 className="text-4xl sm:text-6xl font-semibold">Oysloe</h2>
 
