@@ -1,6 +1,8 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import MenuButton from '../components/MenuButton';
 
+import "../App.css";
+
 const AdsDetailsPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
@@ -42,7 +44,7 @@ const AdsDetailsPage: React.FC = () => {
     const currentAdData = adData || ads.find(ad => ad.id === currentId);
 
     return (
-        <div className="flex flex-col items-center w-[calc(100%-0.2rem)] h-screen mt-[35px] px-20 gap-6 text-gray-600 ">
+        <div className="flex flex-col items-center w-[calc(100%-0.2rem)] h-screen mt-[35px] px-20 gap-6 text-gray-600 tempclass">
             {/* Filter Popup */}
             {/* {makeReviewModalOpen && (
                 <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
@@ -122,8 +124,8 @@ const AdsDetailsPage: React.FC = () => {
 
 
             {/* Main Content */}
-            <div className="flex justify-evenly gap-4  px-4 w-9/10">
-                <div className="lg:col-span-2 space-y-6 w-1/2">
+            <div className="flex justify-evenly gap-4  px-4 w-9/10 ad-details-page">
+                <div className="lg:col-span-2 space-y-6 w-1/2 ad-details-desc">
                     {/* Ad Details */}
                     <div className="bg-white p-6 rounded-lg">
                         <h2 className="text-xl font-bold">Ad Details</h2>
@@ -217,7 +219,7 @@ const AdsDetailsPage: React.FC = () => {
                 </div>
 
                 {/* Sidebar */}
-                <div className="space-y-6 w-1/2">
+                <div className="space-y-6 w-1/2 ad-details-desc">
                     {/* Safety Tips */}
                     <div className="bg-white p-6 rounded-lg">
                         <h2 className="text-xl font-bold mb-2">Safety tips</h2>

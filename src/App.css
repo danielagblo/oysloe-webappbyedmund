@@ -21,9 +21,22 @@ html{
 
 .tempclass {
   width: 100vw;
+  padding: 0;
 }
 
 .bottom-nav {
   width: fit-content;
   padding: 0 2rem;
+}
+
+.ad-details-page {
+  flex-wrap: nowrap;
+}
+@media (max-width: 600px) {
+  .ad-details-page {
+    flex-wrap: wrap;
+  }
+  .ad-details-desc {
+    width: fit-content;
+  }
 }
