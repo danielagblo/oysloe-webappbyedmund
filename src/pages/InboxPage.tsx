@@ -10,19 +10,13 @@ export default function InboxPage () {
             <div className="grid grid-cols-12 gap-2 pb-20 lg:pb-0">
 
                 {/* Column 1: Profile Stats */}
-                <div className="col-span-12 lg:col-span-3 rounded-xl z">
-                    <ProfileStats />
-                </div>
+                <ProfileStats />
 
                 {/* Column 2: Support and Cases */}
-                <div className="col-span-12 lg:col-span-5 rounded-xl overflow-hidden shadow-lg border border-gray-100">
-                    <SupportAndCases />
-                </div>
+                <SupportAndCases />
 
                 {/* Column 3: Live Chat */}
-                <div className="col-span-12 lg:col-span-4 rounded-xl overflow-hidden shadow-lg border border-gray-100">
-                    <LiveChat />
-                </div>
+                <LiveChat />
             </div>
         </div>
 

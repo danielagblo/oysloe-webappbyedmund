@@ -63,10 +63,12 @@ export default function SupportAndCases () {
     )
 
     return (
-        <div className="bg-white px-5 py-3 h-full flex flex-col">
-            <HeaderTabs />
-            <GetHelp />
-            <OpenCases />
+        <div className="col-span-12 lg:col-span-5 rounded-xl overflow-hidden shadow-lg border border-gray-100">
+            <div className="bg-white px-5 py-3 h-full flex flex-col">
+                <HeaderTabs />
+                <GetHelp />
+                <OpenCases />
+            </div>
         </div>
     )    
 };

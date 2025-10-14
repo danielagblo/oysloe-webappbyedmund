@@ -62,15 +62,17 @@ export default function LiveChat ()  {
         </div>
     )
     return (
-        <div className="bg-white h-full flex flex-col relative">
-            <div className="flex-1 p-6 overflow-y-auto space-y-4">
-                <p className="text-xs text-gray-400 text-center mb-6">Yesterday</p>
+        <div className="col-span-12 lg:col-span-4 rounded-xl overflow-hidden shadow-lg border border-gray-100">        
+            <div className="bg-white h-full flex flex-col relative">
+                <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                    <p className="text-xs text-gray-400 text-center mb-6">Yesterday</p>
 
-                {messages}
+                    {messages}
 
-                <p className="text-xs text-gray-400 text-center my-6">Today</p>
+                    <p className="text-xs text-gray-400 text-center my-6">Today</p>
+                </div>
+                <ChatInput />
             </div>
-            <ChatInput />
         </div>
     )
 };
