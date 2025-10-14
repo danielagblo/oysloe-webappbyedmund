@@ -68,23 +68,66 @@ const MenuBar = ({
 }: {
   active: RouteKey;
   onClick: (id: RouteKey) => void;
-}) => (
-  <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-300 flex justify-around items-center gap-4 h-20 rounded-lg shadow-lg z-10 overflow-visible bottom-nav hidden lg:flex">
-    {Object.entries(icons).map(([id, icon]) => {
-      const key = id as RouteKey;
-      return (
-        <NavButton
-          key={id}
-          id={key}
-          icon={icon}
-          label={id.charAt(0).toUpperCase() + id.slice(1)}
-          active={active === key}
-          onClick={onClick}
-        />
+  popup?: boolean;
+  isOpen: boolean;
+  toggleOpen: () => void;
+}) => {
+  if (popup) {
+    return (
+      <>
+        {/* floating toggle button */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <button
+            onClick={toggleOpen}
+            className="fixed bottom-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg z-20 transition-all"
+          >
+            {isOpen ? " × " : "☰"}
+          </button>
+        </div>
+
+        {/* popup nav */}
+        {isOpen && (
+            <div  style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <div className="fixed bottom-16 bg-white border border-gray-300 rounded-lg shadow-xl flex flex-row items-center gap-3 px-4 py-1.5 z-10 animate-fadeIn">
+              {Object.entries(icons).map(([id, icon]) => {
+                const key = id as RouteKey;
+                return (
+                  <NavButton
+                    key={id}
+                    id={key}
+                    icon={icon}
+                    label={id.charAt(0).toUpperCase() + id.slice(1)}
+                    active={active === key}
+                    onClick={onClick}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </>
       );
-    })}
-  </div>
-);
+  }
+
+  // normal bottom fixed bar
+  return (
+    <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-white border-t border-gray-300 flex justify-around items-center gap-4 h-20 rounded-lg shadow-lg z-10 overflow-visible bottom-nav hidden sm:flex">
+      {Object.entries(icons).map(([id, icon]) => {
+        const key = id as RouteKey;
+        return (
+          <NavButton
+            key={id}
+            id={key}
+            icon={icon}
+            label={id.charAt(0).toUpperCase() + id.slice(1)}
+            active={active === key}
+            onClick={onClick}
+          />
+        );
+      })}
+    </div>
+  );
+};
 
 // Mobile Footer
 const MobileFooter = ({
@@ -109,8 +152,9 @@ const MobileFooter = ({
         <div
           key={id}
           onClick={() => onClick(key)}
-          className={`flex flex-col items-center text-xs ${active === key ? "text-green-500" : "text-gray-500"
-            }`}
+          className={`flex flex-col items-center text-xs ${
+            active === key ? "text-green-500" : "text-gray-500"
+          }`}
         >
           <img src={icon} alt={id} className="w-6 h-6" />
           {id.charAt(0).toUpperCase() + id.slice(1)}
