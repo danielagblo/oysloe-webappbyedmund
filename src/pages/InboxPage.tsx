@@ -1,11 +1,8 @@
 import {
   ChatBubbleLeftIcon,
-  TagIcon,
-  PlusIcon,
-  UserCircleIcon,
-  HomeIcon,
-  BellIcon,
+  TagIcon
 } from "@heroicons/react/24/outline";
+import MenuButton from "../components/MenuButton"
 
 const ProfileStats = () => {
 
@@ -212,31 +209,6 @@ const LiveChat = () => {
     )
 };
 
-const MobileFooter = () => (
-  <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-white border-t border-gray-200 p-2 flex justify-around items-center">
-    <div className="flex flex-col items-center text-xs text-gray-500">
-        <HomeIcon className="w-6 h-6" />
-        Home
-    </div>
-    <div className="flex flex-col items-center text-xs text-gray-500">
-        <BellIcon className="w-6 h-6" />
-        Alerts
-    </div>
-    <div className="p-3 bg-green-500 rounded-full shadow-lg -translate-y-2">
-        <PlusIcon className="w-8 h-8 text-white" />
-    </div>
-    <div className="flex flex-col items-center text-xs text-gray-500">
-        <ChatBubbleLeftIcon className="w-6 h-6" />
-        Inbox
-    </div>
-    <div className="flex flex-col items-center text-xs text-green-500">
-        <UserCircleIcon className="w-6 h-6" />
-        Profile
-    </div>
-  </div>
-);
-
-
 export default function InboxPage () {
   return (
     <div style={{ backgroundColor:"#EDEDED", height: "100vh", padding: "0.75rem"}}>
@@ -260,8 +232,8 @@ export default function InboxPage () {
             </div>
         </div>
 
-      {/* Mobile Navigation */}
-      <MobileFooter /> 
+      {/* Navigation */}
+      <MenuButton /> 
     </div>
   );
 }
