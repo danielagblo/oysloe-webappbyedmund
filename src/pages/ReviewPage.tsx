@@ -3,9 +3,42 @@ import LottieSuccess from "../components/LottieSuccess";
 import MenuButton from "../components/MenuButton";
 
 const ReviewPage = () => {
+    const [reviewOpen, setReviewOpen] = useState(false);
     const [sendSuccess, setSendSuccess] = useState(false);
+
     return (
-        <div className="flex gap-2 md:flex-nowrap flex-wrap p-4 px-5 justify-evenly h-screen w-screen items-center bg-gray-100">
+        <div className="flex gap-2 md:flex-nowrap flex-wrap md:p-4 p-0 md:px-5 justify-evenly h-screen w-screen items-center bg-gray-100 relative">
+            {
+                reviewOpen && (
+                    <div className="bg-white absolute h-full w-full z-40">
+                        <div className="rounded-4xl flex items-center flex-col justify-center w-full gap-4">
+                            <div className="flex pt-5 px-5 flex-col gap-4 mb-2">
+                                <h3 className="text-center">
+                                    Make A Review
+                                </h3>
+                            </div>
+                            <div className="flex w-full px-12 items-center justify-around">
+                                <img src="/star.svg" alt="" className="w-7 h-7" />
+                                <img src="/star.svg" alt="" className="w-7 h-7" />
+                                <img src="/star.svg" alt="" className="w-7 h-7" />
+                                <img src="/star.svg" alt="" className="w-7 h-7" />
+                                <img src="/star.svg" alt="" className="w-7 h-7" />
+                            </div>
+                            <h2 className="text-center">Excellent</h2>
+                            <textarea placeholder='Comment' className='border border-gray-300 rounded-lg p-2 mt-20 w-11/12 h-20 resize-none ' />
+                            <div className="flex justify-center mb-5 w-full">
+                                <button onClick={() => { setSendSuccess(true) }} className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 ">Send Review</button>
+                            </div>
+                            <button className="bg-gray-100 rounded-full px-4 py-2" onClick={() => setReviewOpen(false)}>Close</button>
+                        </div>
+                    </div>
+
+                )
+            }
+
+            <button onClick={() => setReviewOpen(true)} className="w-fit h-fit md:hidden block absolute bottom-1/6 rounded-4xl  right-1/11 z-10">
+                <img src="/quick chat.svg" className="w-10 h-auto" alt="" />
+            </button>
             {
                 sendSuccess && (
                     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
@@ -14,13 +47,13 @@ const ReviewPage = () => {
                                 <LottieSuccess />
                                 <h2 className="text-lg font-medium pb-6">Submitted</h2>
                             </div>
-                            <button className="bg-gray-100 rounded-full px-4 py-2" onClick={() => setSendSuccess(false)}>Close</button>
+                            <button className="bg-gray-100 rounded-full px-4 py-2" onClick={() => { setSendSuccess(false); setReviewOpen(false); }}>Close</button>
                         </div>
                     </div>
                 )
             }
-            <div className=" w-full h-full flex flex-col items-center justify-around gap-2">
-                <div className="flex p-4 bg-white rounded-4xl flex-col items-center gap-2 justify-center w-full h-1/2">
+            <div className=" md:w-3/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2">
+                <div className="flex p-4 bg-white rounded-4xl flex-col items-center gap-2 justify-center w-full h-1/2 show">
                     <img src="/face.svg" alt="" className="w-24 h-24 border-green-300 border-2 p-2 rounded-full" />
                     <div>
                         <h3 className="font-medium text-3xl">Alexander Kowri</h3>
@@ -67,7 +100,8 @@ const ReviewPage = () => {
             </div>
             <div className="bg-white rounded-4xl w-full h-full overflow-y-auto relative">
                 {/* sticky filter bar inside comments panel */}
-                <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm px-4 py-3 border-b border-gray-100">
+                <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 py-3 border-b border-gray-100">
+
                     <div className="flex gap-2 overflow-x-auto">
                         <button className="flex items-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
                             <img src="/star.svg" alt="" className="w-4 h-4" />All
@@ -78,6 +112,7 @@ const ReviewPage = () => {
                             </button>
                         ))}
                     </div>
+
                 </div>
 
                 <div className="p-4">
@@ -102,7 +137,7 @@ const ReviewPage = () => {
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <button className="flex items-center gap-1 m-2"><img src="/like.svg" alt="" className="w-5 h-5" /><h3>Like</h3></button>
-                                        <span className="text-sm">20</span>
+                                        <span className="text-md">20</span>
                                     </div>
                                 </div>
                                 <p className="text-gray-700">This is a great car with excellent features. I had a wonderful experience driving it around the city.</p>
@@ -110,8 +145,9 @@ const ReviewPage = () => {
                         ))}
                     </div>
                 </div>
+                <div className="h-24" />
             </div>
-            <div className=" flex bg-white rounded-4xl h-full items-center w-full justify-center">
+            <div className=" md:flex bg-white rounded-4xl h-full hidden items-center w-4/6 justify-center">
                 <div className="rounded-4xl flex items-center flex-col justify-center w-full gap-4">
                     <div className="flex pt-5 px-5 flex-col gap-4 mb-2">
                         <h3 className="text-center">
@@ -134,6 +170,7 @@ const ReviewPage = () => {
             </div>
 
             <MenuButton />
+
         </div>
     );
 }
