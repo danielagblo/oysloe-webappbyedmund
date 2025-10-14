@@ -54,7 +54,7 @@ export default function LiveChat ()  {
                     className="flex-1 border-0 focus:ring-0 text-gray-700"
                 />
                 <svg width="16" height="16" viewBox="0 0 18 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1.00391 9C1.65694 20.4026 16.1613 18.8902 16.1667 9.00827" stroke="#374957" stroke-width="2"/>
+                    <path d="M1.00391 9C1.65694 20.4026 16.1613 18.8902 16.1667 9.00827" stroke="#374957" strokeWidth="2"/>
                     <rect x="4.66406" y="0.5" width="7" height="12" rx="3.5" fill="#374957" stroke="#374957"/>
                     <rect x="7.66406" y="19.5" width="2" height="4" fill="#374957" stroke="#374957"/>
                 </svg>
