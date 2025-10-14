@@ -46,6 +46,7 @@ export default function ProfileStats () {
     )
 
     return (
+      <div className="col-span-12 lg:col-span-3 rounded-xl z">
         <div className="flex flex-col" style={{gap:"0.5rem"}}>
             <div style={{ padding: "2rem 1.5rem", borderRadius:"12px", backgroundColor:"#ffffff" }}>
                 <Profile />
@@ -55,5 +56,6 @@ export default function ProfileStats () {
                 <RatingReviews />
             </div>
         </div>
+      </div>
     )
 };
