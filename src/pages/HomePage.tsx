@@ -61,14 +61,28 @@ const HomePage = () => {
       <div className="flex flex-col items-center justify-center gap-8 mt-8">
         <h2 className="text-4xl sm:text-6xl font-semibold">Oysloe</h2>
 
-        <div className="relative flex items-center justify-center w-full max-w-xl">
-          <input
-            type="text"
-            placeholder="Search anything up for good"
-            className="px-6 py-3 w-full h-12 bg-[18px_center] bg-[length:24px_24px] bg-no-repeat bg-[url('/search.svg')] rounded-full text-base sm:text-2xl focus:border-gray-400 outline-0 bg-white"
-          />
-          <div className="absolute w-full h-12 bg-gradient-to-r from-green-400 via-yellow-500 to-red-500 rounded-full opacity-30 animate-pulse -z-10"></div>
+        <div className="relative flex items-center justify-center w-full max-w-md">
+            <div className="absolute inset-0 rounded-full p-[2px] pointer-events-none">
+                <div className="w-full h-full rounded-full 
+                bg-[conic-gradient(from_0deg,#74FFA7,#374957,#74FFA7,#FF6B6B,#74FFA7)] 
+                animate-conicShift opacity-100"></div>
+            </div>
+
+            <div className="absolute inset-[4px] bg-white rounded-full z-0"></div>
+
+            <input
+                type="text"
+                placeholder="Search anything up for good"
+                className="relative z-10 px-6 py-3 w-full h-12 rounded-full text-base sm:text-xl 
+                        bg-transparent border-none outline-none focus:ring-0 
+                        bg-[url('/search.svg')] bg-no-repeat bg-[length:20px_20px] bg-[12px_center]"
+            />
         </div>
+
+
+
+
+
       </div>
       {selectedCategory && (
         <div className="flex gap-4 flex-wrap justify-center">

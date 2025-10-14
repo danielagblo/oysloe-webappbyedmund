@@ -40,3 +40,18 @@ html{
     width: fit-content;
   }
 }
+
+
+@keyframes conicShift {
+  0% {
+    background: conic-gradient(from 0deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
+  }
+  100% {
+    background: conic-gradient(from 360deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
+  }
+}
+
+/* utility helper you can reference in className */
+.animate-conicShift {
+  animation: conicShift 8s linear infinite;
+}
