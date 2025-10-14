@@ -33,7 +33,7 @@ export default function ProfileStats () {
             <p className="text-lg text-gray-600 mb-6">234 Reviews</p>
             <div style={{fontSize:"80%", width:"100%"}}>
                 {[5, 5, 5, 5, 1].map((stars, index) => (
-                    <div key={index} className="flex items-center mb-1.5" style={{ width: '100%' }}>
+                    <div key={index} className="flex items-center mb-1" style={{ width: '100%' }}>
                         <span className="text-black w-8 text-sm">★ {stars}</span>
                             <div className="flex-1 h-1.25 bg-gray-200 rounded mx-2">
                                 <div className="h-full bg-black rounded" style={{ width: '40%' }}></div>
@@ -48,11 +48,11 @@ export default function ProfileStats () {
     return (
       <div className="col-span-12 lg:col-span-3 rounded-xl z">
         <div className="flex flex-col" style={{gap:"0.5rem"}}>
-            <div style={{ padding: "2rem 1.5rem", borderRadius:"12px", backgroundColor:"#ffffff" }}>
+            <div className="shadow-sm" style={{ padding: "2rem 1.5rem", borderRadius:"12px", backgroundColor:"#ffffff" }}>
                 <Profile />
                 <AdStats />
             </div>
-            <div style={{ padding: "1rem 2rem", borderRadius:"12px", backgroundColor:"#ffffff" }}>
+            <div className="shadow-sm" style={{ padding: "1rem 2rem", borderRadius:"12px", backgroundColor:"#ffffff" }}>
                 <RatingReviews />
             </div>
         </div>
