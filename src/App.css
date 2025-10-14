@@ -55,3 +55,17 @@ html{
 .animate-conicShift {
   animation: conicShift 8s linear infinite;
 }
+
+body.no-scroll {
+  overflow: hidden;
+}
+.alerts-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px; /* or whatever */
+  height: 100vh;
+  overflow-y: auto;
+  background: white;
+  z-index: 1000;
+}
