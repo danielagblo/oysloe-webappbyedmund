@@ -27,7 +27,7 @@ export default function InboxPage () {
         </div>
 
       {/* Navigation */}
-      <MenuButton /> 
+      <MenuButton popup /> 
     </div>
   );
 }
