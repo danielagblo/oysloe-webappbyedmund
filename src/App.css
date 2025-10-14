@@ -34,7 +34,6 @@ body {
 }
 
 @media (max-width: 600px) {
-<<<<<<< HEAD
     .ad-details-page {
         flex-wrap: wrap;
     }
@@ -138,27 +137,28 @@ Animated rotating conic gradient that sits behind inputs
         animation: none;
     }
 }
-=======
-  .ad-details-page {
+
+.ad-details-page {
     flex-wrap: wrap;
-  }
-  .ad-details-desc {
+}
+
+.ad-details-desc {
     width: fit-content;
-  }
 }
 
 
+
 @keyframes conicShift {
-  0% {
-    background: conic-gradient(from 0deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
-  }
-  100% {
-    background: conic-gradient(from 360deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
-  }
+    0% {
+        background: conic-gradient(from 0deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
+    }
+
+    100% {
+        background: conic-gradient(from 360deg, #74FFA7, #374957, #74FFA7, #FF6B6B, #74FFA7);
+    }
 }
 
 /* utility helper you can reference in className */
 .animate-conicShift {
-  animation: conicShift 8s linear infinite;
+    animation: conicShift 8s linear infinite;
 }
->>>>>>> ca9b2d047786aa5c313286d2c05a8672beda1803
