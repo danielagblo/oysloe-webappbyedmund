@@ -62,15 +62,57 @@ const HomePage = () => {
     const lastScrollY = useRef(0);
     const headerRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        // detect small screen (Tailwind sm is 640px min, so small screens are <640)
-        const mq = window.matchMedia('(max-width:639px)');
-        const setMatch = (e?: MediaQueryListEvent) => {
-            setIsSmallScreen(e ? e.matches : mq.matches);
-            // reset condensed when leaving small screen
-            if (e && !e.matches) setIsCondensed(false);
-        };
-        setMatch();
+        <div className="relative flex items-center justify-center w-full max-w-md">
+            <div className="absolute inset-0 rounded-full p-[2px] pointer-events-none">
+                <div className="w-full h-full rounded-full 
+                bg-[conic-gradient(from_0deg,#74FFA7,#374957,#74FFA7,#FF6B6B,#74FFA7)] 
+                animate-conicShift opacity-100"></div>
+            </div>
+
+            <div className="absolute inset-[4px] bg-white rounded-full z-0"></div>
+
+            <input
+                type="text"
+                placeholder="Search anything up for good"
+                className="relative z-10 px-6 py-3 w-full h-12 rounded-full text-base sm:text-xl 
+                        bg-transparent border-none outline-none focus:ring-0 
+                        bg-[url('/search.svg')] bg-no-repeat bg-[length:20px_20px] bg-[12px_center]"
+            />
+        </div>
+
+
+
+
+
+      </div>
+      {selectedCategory && (
+        <div className="flex gap-4 flex-wrap justify-center">
+          <button
+            onClick={handleFilterSettings}
+            className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+          >
+            Categories
+            <img
+              onClick={(e) => {
+                e.stopPropagation();
+                handleBackToHome();
+              }}
+              src="/cancel.svg"
+              alt=""
+              className="w-4 h-4"
+            />
+          </button>
+          <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+            Locations <img src="/location.svg" alt="" className="w-4 h-4" />
+          </button>
+          <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+            Ad Purpose <img src="/tag.svg" alt="" className="w-4 h-4" />
+          </button>
+          <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+            Highlight <img src="/highlight.svg" alt="" className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
         // modern API
         mq.addEventListener('change', setMatch);
