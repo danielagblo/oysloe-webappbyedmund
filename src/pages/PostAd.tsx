@@ -2,14 +2,15 @@ import PageLocked from '../components/PageLocked'
 import ProfileStats from '../components/ProfileStats'
 
 function PostAd() {
-
   return (
-    <div className="flex flex-col lg:flex-row items-start justify-center w-full h-screen overflow-hidden -mt-3">
-      <div className="flex-shrink-0 w-[25%] bg-[#f3f4f6]" style={{ padding:"1.5rem 1rem" }}>
+    <div className="flex flex-col lg:flex-row w-full h-screen bg-[#f3f4f6] -mt-3 overflow-hidden">
+
+      <div className="w-full lg:w-[25%] p-2.5 mt-1 flex-shrink-0 overflow-y-auto">
         <ProfileStats />
       </div>
-      <div className="flex-grow w-full h-full bg-[#f3f4f6]">
-        <PageLocked page="Post Ad"/>
+
+      <div className="flex items-center justify-center w-full lg:flex-grow p-4">
+        <PageLocked page="Post Ad" />
       </div>
     </div>
   )
