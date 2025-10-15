@@ -7,7 +7,7 @@ const ReviewPage = () => {
     const [sendSuccess, setSendSuccess] = useState(false);
 
     return (
-        <div className="flex gap-2 md:flex-nowrap flex-wrap md:p-4 p-0 md:px-5 justify-evenly h-screen w-screen items-center bg-gray-100 relative">
+        <div className="flex gap-2 md:flex-nowrap flex-wrap md:p-4 p-0 md:px-5 justify-evenly sm:w-full h-screen w-full items-center bg-gray-100 relative">
             {
                 reviewOpen && (
                     <div className="bg-white absolute h-full w-full z-40">
@@ -36,8 +36,8 @@ const ReviewPage = () => {
                 )
             }
 
-            <button onClick={() => setReviewOpen(true)} className="w-fit h-fit md:hidden block absolute bottom-1/6 rounded-4xl  right-1/11 z-10">
-                <img src="/quick chat.svg" className="w-10 h-auto" alt="" />
+            <button onClick={() => setReviewOpen(true)} className="w-fit h-fit md:hidden block absolute bottom-1/8 rounded-4xl  right-1/11 z-10">
+                <img src="/quick chat.svg" className="w-8 h-auto" alt="" />
             </button>
             {
                 sendSuccess && (
@@ -98,16 +98,16 @@ const ReviewPage = () => {
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-4xl w-full h-full overflow-y-auto relative">
+            <div className="bg-white rounded-4xl w-full h-full overflow-y-auto relative no-scrollbar">
                 {/* sticky filter bar inside comments panel */}
                 <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md px-4 py-3 border-b border-gray-100">
 
-                    <div className="flex gap-2 overflow-x-auto">
-                        <button className="flex items-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
+                    <div className="flex gap-1 justify-around overflow-x-auto no-scrollbar sm:text-xl text-sm">
+                        <button className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
                             <img src="/star.svg" alt="" className="w-4 h-4" />All
                         </button>
                         {[1, 2, 3, 4, 5].map((star) => (
-                            <button key={star} className="flex items-center gap-1 px-3 py-2 bg-gray-100 rounded-full">
+                            <button key={star} className="flex justify-center items-center gap-1 bg-gray-100 rounded-full px-3 py-3 h-auto">
                                 <img src="/star.svg" alt="" className="w-4 h-4" />{star}
                             </button>
                         ))}
@@ -119,8 +119,8 @@ const ReviewPage = () => {
                     <h2 className="text-2xl font-medium">Comments</h2>
                     <div className="space-y-4 mt-3">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((comment) => (
-                            <div key={comment} className="pb-4 last:border-b-0">
-                                <div className="flex items-center justify-between">
+                            <div key={comment} className="pb-4 last:border-b-0 ">
+                                <div className="flex items-center gap-5 min-[300px]:justify-between ">
                                     <div className="flex items-center gap-3">
                                         <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
                                         <div className="flex flex-col">
