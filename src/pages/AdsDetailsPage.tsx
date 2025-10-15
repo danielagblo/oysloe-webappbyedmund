@@ -126,7 +126,7 @@ const AdsDetailsPage: React.FC = () => {
             {/* Main Content */}
             <div className="flex justify-evenly gap-4 flex-col px-4 w-9/10 ad-details-page">
                 <div className='flex w-full ad-details-page'>
-                    <div className="flex flex-col space-y-6 w-1/2 ad-details-desc">
+                    <div className="flex flex-col space-y-6 w-fit md:w-1/2 ad-details-desc">
                         {/* Ad Details */}
                         <div className="bg-white p-6 rounded-lg">
                             <h2 className="text-xl font-bold">Ad Details</h2>
@@ -142,7 +142,7 @@ const AdsDetailsPage: React.FC = () => {
                             </ul>
                         </div>
                     </div>
-                    <div className="flex flex-col space-y-6 w-1/2 ad-details-desc">
+                    <div className="flex flex-col space-y-6 w-fit md:w-1/2 ad-details-desc">
                         {/* Safety Tips */}
                         <div className="bg-white p-6 rounded-lg">
                             <h2 className="text-xl font-bold mb-2">Safety tips</h2>
@@ -158,7 +158,7 @@ const AdsDetailsPage: React.FC = () => {
                     </div>
                 </div>
                 <div className='flex w-full ad-details-page'>
-                    <div className="flex flex-col max-[600px]:w-fit space-y-6 w-1/2 ">
+                    <div className="flex flex-col w-fit space-y-6 md:w-1/2 ">
                         {/* Reviews Section */}
                         <div className="bg-white p-6 gap-7 flex flex-col justify-center items-center  rounded-lg">
                             <div className="flex w-full">
@@ -201,7 +201,7 @@ const AdsDetailsPage: React.FC = () => {
 
                     </div>
                     {/* Action Buttons */}
-                    <div className="flex flex-col max-[600px]:w-fit space-y-6 w-1/2 ">
+                    <div className="flex flex-col w-fit space-y-6 md:w-1/2 ">
 
                         <div className="bg-white p-6 rounded-lg">
                             <div className="inline-flex flex-wrap  gap-2 mb-4">
@@ -229,7 +229,7 @@ const AdsDetailsPage: React.FC = () => {
                 </div>
                 <div className='flex w-full ad-details-page'>
                     {/* Comments */}
-                    <div className="bg-white p-6 max-[600px]:w-fit rounded-lg ads-details-page">
+                    <div className="bg-white p-6 w-fit sm:w-1/2 rounded-lg ads-details-page">
                         <h2 className="text-2xl font-medium">Comments</h2>
                         <div className="space-y-4">
                             {[1, 2, 3].map((comment) => (
@@ -265,7 +265,7 @@ const AdsDetailsPage: React.FC = () => {
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-6 max-[600px]:w-fit w-1/2 ">
+                    <div className="space-y-6 w-fit sm:w-1/2 ">
 
                         {/* Quick Chat */}
                         <div className="pt-4">
