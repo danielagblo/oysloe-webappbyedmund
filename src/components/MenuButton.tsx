@@ -152,8 +152,9 @@ const MobileFooter = ({
         <div
           key={id}
           onClick={() => onClick(key)}
-          className={`flex flex-col items-center text-xs ${active === key ? "text-green-500" : "text-gray-500"
-            }`}
+          className={`flex flex-col items-center text-xs ${
+            active === key ? "text-green-500" : "text-gray-500"
+          }`}
         >
           <img src={icon} alt={id} className="w-6 h-6" />
           {id.charAt(0).toUpperCase() + id.slice(1)}
