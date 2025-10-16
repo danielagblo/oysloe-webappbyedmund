@@ -16,4 +16,4 @@ function PostAdPage() {
   )
 }
 
-export default PostAdPage
+export default PostAdPage;

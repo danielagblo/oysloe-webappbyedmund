@@ -23,7 +23,7 @@ import PostAdPage from './pages/PostAdPage.tsx'
 function App() {
 
   return (
-    <>
+    <div  className="flex flex-col min-h-screen w-full">
       <Routes>
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
@@ -50,7 +50,7 @@ function App() {
 
 
       </Routes >
-    </>
+    </div>
   )
 }
 
