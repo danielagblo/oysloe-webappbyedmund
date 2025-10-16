@@ -9,7 +9,7 @@ type RouteKey = "home" | "alerts" | "post" | "inbox" | "profile";
 const routes: Record<RouteKey, string> = {
   home: "/homepage",
   alerts: "/alerts",
-  post: "/post",
+  post: "/postad",
   inbox: "/inbox",
   profile: "/profile",
 };
@@ -170,7 +170,6 @@ export default function ResponsiveMenu({ popup = false }: { popup?: boolean }) {
   const location = useLocation();
 
   const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
   const [isOpen, setIsOpen] = useState(!popup);
 
   const toggleOpen = () => setIsOpen((prev) => !prev);
@@ -190,7 +189,6 @@ export default function ResponsiveMenu({ popup = false }: { popup?: boolean }) {
     const handleResize = () => {
       const width = window.innerWidth;
       setIsMobile(width < 640);
-      setIsTablet(width >= 640 && width < 1024);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
