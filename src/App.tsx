@@ -18,6 +18,7 @@ import AccountPage from './pages/AccountPage.tsx'
 import FeedbackPage from './pages/FeedbackPage.tsx'
 import PrivacyPage from './pages/PrivacyPage.tsx'
 import ReferPage from './pages/ReferPage.tsx'
+import PostAdPage from './pages/PostAdPage.tsx'
 
 function App() {
 
@@ -35,7 +36,7 @@ function App() {
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path='/alerts' element={<AlertPage />} />
-        <Route path='/postad' element={<PostAd />} />
+        <Route path='/postad' element={<PostAdPage />} />
         <Route path='/inbox' element={<InboxPage />} />
         <Route path='/profile' element={<ProfilePage />} />
         <Route path='/profile?tab=ads' element={<ProfilePage />} />
