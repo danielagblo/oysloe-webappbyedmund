@@ -9,7 +9,7 @@ const ProfilePage = () => {
                 <ProfileSidebar />
             </div>
             <div className="w-3/5">
-                <PageLocked page={""} />
+                <PageLocked page={"Profile"} />
             </div>
             <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
                 <div className="flex p-4 bg-white rounded-2xl flex-col items-center gap-2 justify-center w-full h-1/2 show">

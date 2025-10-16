@@ -1,8 +1,7 @@
 :root {
-    --div-active: pink;
-    /* --div-active: #f9f9f9; */
+    --div-active: #f9f9f9;
     --dark-def: #374957;
-    --font-size: 30px;
+    --font-size: 1rem;
 }
 
 html,
