@@ -76,7 +76,7 @@ const MenuBar = ({
     return (
       <>
         {/* floating toggle button */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           <button
             onClick={toggleOpen}
             className="fixed bottom-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-3 shadow-lg z-20 transition-all"
@@ -87,8 +87,8 @@ const MenuBar = ({
 
         {/* popup nav */}
         {isOpen && (
-            <div  style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <div className="fixed bottom-16 bg-white border border-gray-300 rounded-lg shadow-xl flex flex-row items-center gap-3 px-4 py-1.5 z-10 animate-fadeIn">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div className="fixed bottom-16 bg-white border border-gray-300 rounded-lg shadow-xl flex flex-row items-center gap-3 px-4 py-1.5 z-10 animate-fadeIn">
               {Object.entries(icons).map(([id, icon]) => {
                 const key = id as RouteKey;
                 return (
@@ -106,7 +106,7 @@ const MenuBar = ({
           </div>
         )}
       </>
-      );
+    );
   }
 
   // normal bottom fixed bar
