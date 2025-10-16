@@ -13,12 +13,12 @@ import ResetPasswordWithPhonePage from './pages/ResetPasswordWithPhonePage.tsx'
 import ReviewPage from './pages/ReviewPage.tsx'
 import SignUpPage from './pages/SignUpPage.tsx'
 import VerificationPage from './pages/VerificationPage.tsx'
-import PostAd from './pages/PostAd.tsx'
+import PostAdPage from './pages/PostAdPage.tsx'
 
 function App() {
 
   return (
-    <>
+    <div  className="flex flex-col min-h-screen w-full">
       <Routes>
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
@@ -31,12 +31,12 @@ function App() {
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path='/alerts' element={<AlertPage />} />
-        <Route path='/postad' element={<PostAd />} />
+        <Route path='/postad' element={<PostAdPage />} />
         <Route path='/inbox' element={<InboxPage />} />
         <Route path='/profile' element={<ProfilePage />} />
 
       </Routes >
-    </>
+    </div>
   )
 }
 
