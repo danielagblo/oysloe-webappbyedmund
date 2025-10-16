@@ -125,7 +125,7 @@ const HomePage = () => {
                     </svg>
                 </button>
                 <p className="bg-[var(--div-active)] px-4 py-2 rounded-lg text-sm inline-flex items-center gap-4 space-x-0.8 mb-4">
-                    <span className="text-[var(--font-size)]">Category</span>
+                    <span className="text-[length:var(--font-size)]">Category</span>
                     {/* <span className="bg-[var(--dark-def)] text-white rounded-full w-4 h-4 rotate-[-45.15deg] text-[20px]"> + </span> */}
                     <svg width="25" height="25" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
