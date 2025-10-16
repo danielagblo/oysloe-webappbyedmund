@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import MenuButton from "../components/MenuButton";
 
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
+
 import "../App.css";
 
 
@@ -118,44 +121,94 @@ const HomePage = () => {
 
     const ShowFilter = () => (
         <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
-            <div className="bg-white rounded-3xl w-11/12 max-w-lg max-h-[90vh] overflow-y-auto p-5">
-                <button onClick={closeFilterPopup} className="block mb-3">
-                    <svg width="45" height="46" viewBox="0 0 85 86" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.6479 60.2642L60.1816 17.9453L67.363 25.1631L24.8293 67.482L17.6479 60.2642ZM17.7371 25.0375L24.9549 17.8561L67.2738 60.3898L60.056 67.5712L17.7371 25.0375Z" fill="#374957" />
-                    </svg>
-                </button>
-                <p className="bg-[var(--div-active)] px-4 py-2 rounded-lg text-sm inline-flex items-center gap-4 space-x-0.8 mb-4">
-                    <span className="text-[length:var(--font-size)]">Category</span>
-                    {/* <span className="bg-[var(--dark-def)] text-white rounded-full w-4 h-4 rotate-[-45.15deg] text-[20px]"> + </span> */}
-                    <svg width="25" height="25" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
-                        <path d="M7.67394 21.4473L19.8827 10.8223L21.292 12.4935L9.08324 23.1184L7.67394 21.4473ZM8.44226 11.4926L10.0817 10.0658L20.5236 22.4482L18.8842 23.8749L8.44226 11.4926Z" fill="white" />
-                    </svg>
+            <div className="bg-white rounded-[60px] w-5/10 lg:w-5/10 max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                    <button onClick={closeFilterPopup} className="block mb-3">
+                        <svg width="50" height="50" viewBox="0 0 85 86" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.6479 60.2642L60.1816 17.9453L67.363 25.1631L24.8293 67.482L17.6479 60.2642ZM17.7371 25.0375L24.9549 17.8561L67.2738 60.3898L60.056 67.5712L17.7371 25.0375Z" fill="#374957" />
+                        </svg>
+                    </button>
+                    <p className="bg-[var(--div-active)] px-4 py-2 rounded-lg text-sm inline-flex items-center gap-4 space-x-0.8">
+                        <span className="text-[length:var(--font-size)]">Category</span>
+                        {/* <span className="bg-[var(--dark-def)] text-white rounded-full w-4 h-4 rotate-[-45.15deg] text-[20px]"> + </span> */}
+                        <svg width="20" height="20" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
+                            <path d="M7.67394 21.4473L19.8827 10.8223L21.292 12.4935L9.08324 23.1184L7.67394 21.4473ZM8.44226 11.4926L10.0817 10.0658L20.5236 22.4482L18.8842 23.8749L8.44226 11.4926Z" fill="white" />
+                        </svg>
 
-                </p>
-                <div className="flex flex-wrap p-2 gap-3">
-                    {categories.map((category) => (
-                        <label
-                            key={category.id}
-                            className="flex items-center gap-3 p-3 w-fit bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
-                        >
-                            <input
-                                type="radio"
-                                name="category"
-                                value={category.name}
-                                checked={selectedCategory === category.name}
-                                onChange={() => setSelectedCategory(category.name)}
-                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
-                            />
-                            <span className="text-sm ml-2">{category.name}</span>
-                        </label>
-                    ))}
+                    </p>
                 </div>
-                <div className="flex justify-center mt-4">
-                    <button className="text-lg font-bold px-8 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+                <div className="category-list relative">
+                    <div  className="flex p-6 flex-wrap gap-3">
+                        {categories.map((category) => (
+                            <label
+                                key={category.id}
+                                className="text-[length:var(--font-size)] flex items-center gap-3 p-3 w-fit border-[1px] border-[var(--div-border)] rounded-lg hover:bg-gray-200 cursor-pointer"
+                            >
+                                <input
+                                    type="radio"
+                                    name="category"
+                                    value={category.name}
+                                    checked={selectedCategory === category.name}
+                                    onChange={() => setSelectedCategory(category.name)}
+                                    className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
+                                />
+                                <span className="ml-2">{category.name}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+                <div className="flex justify-center mb-5 mt-10">
+                    <button className="px-30 py-4 bg-[var(--div-active)] rounded-lg hover:bg-gray-200 text-4xl">
                         Search
                     </button>
                 </div>
+            </div>
+        </div>
+    )
+
+    const SelectACategory = () => (
+
+        <div className="w-3/4 max-w-6xl mt-3">
+            <div className="grid grid-cols-2 place-items-center  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                {categories.map((category) => (
+                    <div
+                        key={category.id}
+                        onClick={() => handleCategoryClick(category.name)}
+                        className="flex flex-col items-center justify-center sm:w-[100%] h-38 sm:h-40 gap-1 bg-[var(--div-active)] rounded-lg p-2 sm:p-3 cursor-pointer hover:bg-gray-300"
+                    >
+                        <div className="h-[90px] w-[90px] relative rounded-full bg-white ">
+                            <img
+                                src={category.icon}
+                                alt={category.name}
+                                className="absolute bottom-3 w-35 h-25 sm:w-[100%] sm:h-[95%] object-contain"
+                            />
+                        </div>
+                        <h3 className="text-center text-xs sm:text-[length:var(--font-size)] mt-1 truncate">
+                            {category.name}
+                        </h3>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+
+    const CircularSummaries = () => (
+        <div className="flex items-center justify-center h-[200px] w-full overflow-hidden my-[4rem]">
+            <div className="flex flex-row gap-4 sm:gap-10 justify-center items-center flex-nowrap">
+                {categ.map((category) => (
+                    <div
+                        key={category.id}
+                        className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center"
+                    >
+                        <CircularProgressbar 
+                            value={(category.adsCount / sum)*100} 
+                            text={`${category.name}% ${category.adsCount}+`} 
+                            
+                        />;
+                        
+                    </div>
+                ))}
             </div>
         </div>
     )
@@ -167,188 +220,149 @@ const HomePage = () => {
                 className={`w-full top-0 left-0 z-40 ${isSmallScreen && isCondensed ? 'fixed bg-white/90 backdrop-blur-sm' : ''}`}
             >
                 <div className={`flex items-center ${isSmallScreen && isCondensed ? 'justify-between px-4 py-2 gap-3' : 'flex-col items-center justify-center gap-8 mt-40'}`}>
-                    <h2 className={`${isSmallScreen && isCondensed ? 'text-lg' : 'text-4xl sm:text-6xl'} font-medium text-gray-500`}>Oysloe</h2>
-
+                    <h2 className={`${isSmallScreen && isCondensed ? 'text-lg' : 'text-4xl sm:text-6xl'} font-medium text-[var(--dark-def)]`}>Oysloe</h2>
                     <div className={`relative flex items-center ${isSmallScreen && isCondensed ? ' justify-end' : 'justify-center'}`}>
+                        <div className="rotating-bg" aria-hidden="true" />
+                        <div className="rotating-bg-inner" aria-hidden="true" />
                         <input
                             type="text"
                             placeholder="Search anything up for good"
-                            className={`px-10 sm:px-15 py-3 w-fit h-full box-border text-xl ${isSmallScreen && isCondensed ? 'w-75 text-[16px]' : 'w-95 sm:w-120'} h-12 sm:h-18 rounded-full text-2xl focus:border-gray-400 outline-0 bg-white animated-input border`}
+                            className={`search-input px-1 py-3 ${isSmallScreen && isCondensed ? 'w-75 text-[16px]' : 'w-80 sm:w-120'} h-12 sm:h-14 rounded-full text-2xl outline-0 bg-white`}
                         />
-                        <img src="/search.svg" className="absolute top-1/2 right-9/10 -translate-y-1/2 w-5    h-5" />
-                        {/* <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div className=" sm:w-121 w-91 h-13 sm:h-18.5 bg-gradient-to-r from-green-400 via-yellow-500 to-red-500 rounded-full opacity-30 animate-pulse -z-10 input-bkg"></div>
-                        </div> */}
+                        <img src="/search.svg" className="absolute top-1/2 left-[-25px] -translate-y-1/2 w-5 h-5 z-10" />
                     </div>
+
                 </div>
             </div>
-            {selectedCategory && (
-                <div className="flex gap-4 flex-wrap justify-center">
-                    <button
-                        onClick={handleFilterSettings}
-                        className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
-                    >
-                        Categories
-                        <img
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleBackToHome();
-                            }}
-                            src="/cancel.svg"
-                            alt=""
-                            className="w-4 h-4"
-                        />
-                    </button>
-                    <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-                        Locations <img src="/location.svg" alt="" className="w-4 h-4" />
-                    </button>
-                    <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-                        Ad Purpose <img src="/tag.svg" alt="" className="w-4 h-4" />
-                    </button>
-                    <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
-                        Highlight <img src="/highlight.svg" alt="" className="w-4 h-4" />
-                    </button>
-                </div>
-            )}
-
-            {showFilterPopup && (
-                <ShowFilter />
-            )}
-            {/* Conditional Content */}
-            {selectedCategory ? (
-                /* Category Ads Grid */
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full max-w-6xl ">
-                    {pics.map((pic, index) => (
-                        <div key={index} className="flex flex-col bg-white overflow-hidden">
-                            <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
-                                <img
-                                    src={pic}
-                                    alt={`${selectedCategory} ${index}`}
-                                    className="w-full h-40 sm:h-48 object-cover"
-                                />
-                                <div className="flex items-center gap-1 px-2 py-1">
-                                    <img src="/location.svg" alt="" className="w-4 h-4" />
-                                    <p className="text-xs text-gray-500">{ads[index].location}</p>
-                                </div>
-                                <p className="px-2 text-sm truncate text-gray-500">{ads[index].title}</p>
-                                <p className="px-2 text-sm font-light text-gray-500">{ads[index].price}</p>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <>
-                    {/* Categories Grid */}
-                    <div className="w-3/4 max-w-6xl mt-3">
-                        <div className="grid grid-cols-2 place-items-center  sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                            {categories.map((category) => (
-                                <div
-                                    key={category.id}
-                                    onClick={() => handleCategoryClick(category.name)}
-                                    className="flex flex-col items-center justify-center w-28 sm:w-30  h-38 sm:h-40 gap-1 bg-[#f3f4f6b5] rounded-lg p-2 sm:p-3 cursor-pointer hover:bg-gray-300"
-                                >
-                                    <img
-                                        src={category.icon}
-                                        alt={category.name}
-                                        className="w-16 h-16 sm:w-16 sm:h-16 p-2 bg-white rounded-full object-contain"
-                                    />
-                                    <h3 className="text-center text-xs sm:text-sm mt-1 truncate">
-                                        {category.name}
-                                    </h3>
-                                </div>
-                            ))}
-                        </div>
+            <div className="flex flex-col items-center justify-center">
+                {selectedCategory && (
+                    <div className="flex gap-4 flex-wrap justify-center">
+                        <button
+                            onClick={handleFilterSettings}
+                            className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2"
+                        >
+                            Categories
+                            <img
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBackToHome();
+                                }}
+                                src="/cancel.svg"
+                                alt=""
+                                className="w-4 h-4"
+                            />
+                        </button>
+                        <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            Locations <img src="/location.svg" alt="" className="w-4 h-4" />
+                        </button>
+                        <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            Ad Purpose <img src="/tag.svg" alt="" className="w-4 h-4" />
+                        </button>
+                        <button className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            Highlight <img src="/highlight.svg" alt="" className="w-4 h-4" />
+                        </button>
                     </div>
+                )}
 
-                    {/* Circular category summaries */}
-                    <div className="flex items-center justify-center w-full overflow-hidden">
-                        <div className="grid place-items-center justify-center grid-cols-2 md:grid-cols-4 lg:grid-cols-5 sm:grid-cols-3 gap-6 sm:gap-10 content-center">
-                            {categ.map((category) => (
-                                <div
-                                    key={category.id}
-                                    className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center"
-                                >
-                                    <div
-                                        className="absolute inset-0 rounded-full"
-                                        style={{
-                                            background: `conic-gradient(#1e2939 calc(${category.adsCount} / ${sum} * 100%), #e2e8f0 0deg)`,
-                                        }}
-                                    ></div>
-                                    <div className="absolute w-[90%] h-[90%] bg-white rounded-full"></div>
-                                    <div className="relative z-10 text-center text-gray-800">
-                                        <h2 className="text-xs sm:text-sm font-light">{category.name}</h2>
-                                        <p className="text-sm sm:text-base font-semibold">{category.adsCount}+</p>
+                {showFilterPopup && (
+                    <ShowFilter />
+                )}
+                {/* Conditional Content */}
+                {selectedCategory ? (
+                    /* Category Ads Grid */
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+                        {pics.map((pic, index) => (
+                            <div key={index} className="flex flex-col w-[100%] bg-white overflow-hidden">
+                                <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
+                                    <img
+                                        src={pic}
+                                        alt={`${selectedCategory} ${index}`}
+                                        className="w-full h-40 sm:h-48 object-cover"
+                                    />
+                                    <div className="flex items-center gap-1 px-2 py-1">
+                                        <img src="/location.svg" alt="" className="w-4 h-4" />
+                                        <p className="text-xs text-gray-500">{ads[index].location}</p>
+                                    </div>
+                                    <p className="px-2 text-sm truncate text-gray-500">{ads[index].title}</p>
+                                    <p className="px-2 text-sm font-light text-gray-500">{ads[index].price}</p>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <>
+                        {/* Categories Grid */}
+                        <SelectACategory />
+
+                        {/* Circular category summaries */}
+                        <CircularSummaries />
+
+                        {/* === Scrollable Ad Sections === */}
+                        {[
+                            "Electronics",
+                            "Furniture",
+                            "Vehicles",
+                            "Industry",
+                            "Fashion",
+                            "Grocery",
+                            "Games",
+                            "Cosmetics",
+                            "Property",
+                        ].map((section) => (
+                            <div key={section} className="flex flex-col w-full max-w-6xl mt-6">
+                                {/* Section Header */}
+                                <div className="flex items-center gap-3 mb-2 px-2">
+                                    <h2 className="text-lg sm:text-xl font-semibold">{section}</h2>
+                                    <button className="bg-gray-200 px-4 py-1 rounded-full text-sm">Show All</button>
+                                    <div className="flex gap-2 ml-auto">
+                                        <button
+                                            onClick={() => handleArrowClick("left", section.toLowerCase())}
+                                            className="bg-gray-200 p-2 rounded-full"
+                                        >
+                                            <img src="/arrowleft.svg" alt="Left" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleArrowClick("right", section.toLowerCase())}
+                                            className="bg-gray-200 p-2 rounded-full"
+                                        >
+                                            <img src="/arrowright.svg" alt="Right" />
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    {/* === Scrollable Ad Sections === */}
-                    {[
-                        "Electronics",
-                        "Furniture",
-                        "Vehicles",
-                        "Industry",
-                        "Fashion",
-                        "Grocery",
-                        "Games",
-                        "Cosmetics",
-                        "Property",
-                    ].map((section) => (
-                        <div key={section} className="flex flex-col w-full max-w-6xl mt-6">
-                            {/* Section Header */}
-                            <div className="flex items-center gap-3 mb-2 px-2">
-                                <h2 className="text-lg sm:text-xl font-semibold">{section}</h2>
-                                <button className="bg-gray-200 px-4 py-1 rounded-full text-sm">Show All</button>
-                                <div className="flex gap-2 ml-auto">
-                                    <button
-                                        onClick={() => handleArrowClick("left", section.toLowerCase())}
-                                        className="bg-gray-200 p-2 rounded-full"
-                                    >
-                                        <img src="/arrowleft.svg" alt="Left" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleArrowClick("right", section.toLowerCase())}
-                                        className="bg-gray-200 p-2 rounded-full"
-                                    >
-                                        <img src="/arrowright.svg" alt="Right" />
-                                    </button>
+                                {/* Horizontally scrollable ads */}
+                                <div
+                                    id={`move-${section.toLowerCase()}`}
+                                    className="overflow-x-auto whitespace-nowrap py-3 px-1 no-scrollbar"
+                                >
+                                    <div className="flex gap-3">
+                                        {pics.map((pic, index) => (
+                                            <Link
+                                                key={index}
+                                                to={`/ads/${ads[index].id}`}
+                                                state={{ adData: ads[index] }}
+                                                className="inline-block bg-white rounded overflow-hidden flex-shrink-0 w-40 sm:w-48"
+                                            >
+                                                <img
+                                                    src={pic}
+                                                    alt={`${section} ${index}`}
+                                                    className="w-full h-40 sm:h-48 object-cover rounded-2xl"
+                                                />
+                                                <div className="flex items-center gap-1 px-2 py-1">
+                                                    <img src="/location.svg" alt="" className="w-4 h-4" />
+                                                    <p className="text-[10px] sm:text-xs text-gray-500">{ads[index].location}</p>
+                                                </div>
+                                                <p className="px-2 text-sm line-clamp-1 text-gray-500">{ads[index].title}</p>
+                                                <p className="px-2 text-sm font-medium text-gray-500">{ads[index].price}</p>
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* Horizontally scrollable ads */}
-                            <div
-                                id={`move-${section.toLowerCase()}`}
-                                className="overflow-x-auto whitespace-nowrap py-3 px-1 no-scrollbar"
-                            >
-                                <div className="flex gap-3">
-                                    {pics.map((pic, index) => (
-                                        <Link
-                                            key={index}
-                                            to={`/ads/${ads[index].id}`}
-                                            state={{ adData: ads[index] }}
-                                            className="inline-block bg-white rounded overflow-hidden flex-shrink-0 w-40 sm:w-48"
-                                        >
-                                            <img
-                                                src={pic}
-                                                alt={`${section} ${index}`}
-                                                className="w-full h-40 sm:h-48 object-cover rounded-2xl"
-                                            />
-                                            <div className="flex items-center gap-1 px-2 py-1">
-                                                <img src="/location.svg" alt="" className="w-4 h-4" />
-                                                <p className="text-[10px] sm:text-xs text-gray-500">{ads[index].location}</p>
-                                            </div>
-                                            <p className="px-2 text-sm line-clamp-1 text-gray-500">{ads[index].title}</p>
-                                            <p className="px-2 text-sm font-medium text-gray-500">{ads[index].price}</p>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </>
-            )}
+                        ))}
+                    </>
+                )}
+            </div>
             <div className="h-16" />
             <MenuButton />
         </div>
