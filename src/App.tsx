@@ -13,7 +13,12 @@ import ResetPasswordWithPhonePage from './pages/ResetPasswordWithPhonePage.tsx'
 import ReviewPage from './pages/ReviewPage.tsx'
 import SignUpPage from './pages/SignUpPage.tsx'
 import VerificationPage from './pages/VerificationPage.tsx'
-import PostAd from './pages/PostAd.tsx'
+import SubscriptionPage from './pages/SubscriptionPage.tsx'
+import AccountPage from './pages/AccountPage.tsx'
+import FeedbackPage from './pages/FeedbackPage.tsx'
+import PrivacyPage from './pages/PrivacyPage.tsx'
+import ReferPage from './pages/ReferPage.tsx'
+import PostAdPage from './pages/PostAdPage.tsx'
 
 function App() {
 
@@ -31,9 +36,18 @@ function App() {
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path='/alerts' element={<AlertPage />} />
-        <Route path='/postad' element={<PostAd />} />
+        <Route path='/postad' element={<PostAdPage />} />
         <Route path='/inbox' element={<InboxPage />} />
         <Route path='/profile' element={<ProfilePage />} />
+        <Route path='/profile?tab=ads' element={<ProfilePage />} />
+        <Route path='/profile?tab=favorite' element={<ReviewPage />} />
+        <Route path='/profile?tab=subscription' element={<SubscriptionPage />} />
+        <Route path='/profile?tab=refer' element={<ReferPage />} />
+        <Route path='/profile?tab=feedback' element={<FeedbackPage />} />
+        <Route path='/profile?tab=account' element={<AccountPage />} />
+        <Route path='/profile?tab=privacy' element={<PrivacyPage />} />
+
+
 
       </Routes >
     </>

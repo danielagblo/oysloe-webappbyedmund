@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import MenuButton from "../components/MenuButton";
 
 import "../App.css";
+
+
 
 const HomePage = () => {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -113,6 +115,51 @@ const HomePage = () => {
         }
     }, [isCondensed, isSmallScreen]);
 
+
+    const ShowFilter = () => (
+        <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
+            <div className="bg-white rounded-3xl w-11/12 max-w-lg max-h-[90vh] overflow-y-auto p-5">
+                <button onClick={closeFilterPopup} className="block mb-3">
+                    <svg width="45" height="46" viewBox="0 0 85 86" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.6479 60.2642L60.1816 17.9453L67.363 25.1631L24.8293 67.482L17.6479 60.2642ZM17.7371 25.0375L24.9549 17.8561L67.2738 60.3898L60.056 67.5712L17.7371 25.0375Z" fill="#374957" />
+                    </svg>
+                </button>
+                <p className="bg-[var(--div-active)] px-4 py-2 rounded-lg text-sm inline-flex items-center gap-4 space-x-0.8 mb-4">
+                    <span className="text-[var(--font-size)]">Category</span>
+                    {/* <span className="bg-[var(--dark-def)] text-white rounded-full w-4 h-4 rotate-[-45.15deg] text-[20px]"> + </span> */}
+                    <svg width="25" height="25" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
+                        <path d="M7.67394 21.4473L19.8827 10.8223L21.292 12.4935L9.08324 23.1184L7.67394 21.4473ZM8.44226 11.4926L10.0817 10.0658L20.5236 22.4482L18.8842 23.8749L8.44226 11.4926Z" fill="white" />
+                    </svg>
+
+                </p>
+                <div className="flex flex-wrap p-2 gap-3">
+                    {categories.map((category) => (
+                        <label
+                            key={category.id}
+                            className="flex items-center gap-3 p-3 w-fit bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
+                        >
+                            <input
+                                type="radio"
+                                name="category"
+                                value={category.name}
+                                checked={selectedCategory === category.name}
+                                onChange={() => setSelectedCategory(category.name)}
+                                className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
+                            />
+                            <span className="text-sm ml-2">{category.name}</span>
+                        </label>
+                    ))}
+                </div>
+                <div className="flex justify-center mt-4">
+                    <button className="text-lg font-bold px-8 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+
     return (
         <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 ">
             <div
@@ -165,39 +212,7 @@ const HomePage = () => {
             )}
 
             {showFilterPopup && (
-                <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
-                    <div className="bg-white rounded-3xl w-11/12 max-w-lg max-h-[90vh] overflow-y-auto p-5">
-                        <button onClick={closeFilterPopup} className="self-end text-gray-500 hover:text-gray-700">
-                            <img src="/close.svg" alt="Close" className="p-2 w-10 h-10" />
-                        </button>
-                        <h3 className="bg-gray-200 px-4 py-2 rounded-lg text-sm flex items-center gap-2 w-fit mb-4">
-                            Category
-                        </h3>
-                        <div className="flex flex-wrap p-2 gap-3">
-                            {categories.map((category) => (
-                                <label
-                                    key={category.id}
-                                    className="flex items-center gap-3 p-3 w-fit bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer"
-                                >
-                                    <input
-                                        type="radio"
-                                        name="category"
-                                        value={category.name}
-                                        checked={selectedCategory === category.name}
-                                        onChange={() => setSelectedCategory(category.name)}
-                                        className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
-                                    />
-                                    <span className="text-sm ml-2">{category.name}</span>
-                                </label>
-                            ))}
-                        </div>
-                        <div className="flex justify-center mt-4">
-                            <button className="text-lg font-bold px-8 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                                Search
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ShowFilter />
             )}
             {/* Conditional Content */}
             {selectedCategory ? (

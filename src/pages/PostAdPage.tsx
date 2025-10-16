@@ -1,7 +1,7 @@
 import PageLocked from '../components/PageLocked'
 import ProfileStats from '../components/ProfileStats'
 
-function PostAd() {
+function PostAdPage() {
   return (
     <div className="flex flex-col lg:flex-row w-full h-screen bg-[#f3f4f6] -mt-3 overflow-hidden">
 
@@ -16,4 +16,4 @@ function PostAd() {
   )
 }
 
-export default PostAd
+export default PostAdPage
