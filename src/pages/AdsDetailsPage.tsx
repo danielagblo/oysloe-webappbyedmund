@@ -125,7 +125,7 @@ const AdsDetailsPage: React.FC = () => {
 
             {/* Main Content */}
             <div className="flex justify-evenly gap-4 flex-col px-4 w-9/10 ad-details-page">
-                <div className='flex w-full ad-details-page'>
+                <div className='flex w-full justify-between ad-details-page'>
                     <div className="flex flex-col space-y-6 w-fit md:w-1/2 ad-details-desc">
                         {/* Ad Details */}
                         <div className="bg-white p-6 rounded-lg">
@@ -326,7 +326,7 @@ const AdsDetailsPage: React.FC = () => {
                                     <button className="bg-gray-100 p-1 rounded-full hover:bg-gray-300">
                                         <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
                                     </button>
-                                    <div className="flex gap-2 overflow-x-auto flex-1">
+                                    <div className="flex gap-2 overflow-x-auto flex-1  custom-scroll">
                                         <img src="/fashion.png" alt="" className="w-24 h-24 object-cover rounded flex-shrink-0" />
                                         <img src="/games.png" alt="" className="w-24 h-24 object-cover rounded flex-shrink-0" />
                                         <img src="/grocery.png" alt="" className="w-24 h-24 object-cover rounded flex-shrink-0" />
