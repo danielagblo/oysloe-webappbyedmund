@@ -1,52 +1,47 @@
 import MenuButton from "../components/MenuButton";
+import PageLocked from "../components/PageLocked";
 import ProfileSidebar from "../components/ProfileSidebar";
 
-const SubscriptionPage = () => {
+const AdsPage = () => {
     return (
         <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
-            <div className="w-2/14  h-full">
+            <div className="w-2/14 h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-full p-3 overflow-auto">
-                <div className="bg-white w-1/2 h-screen mt-2 flex flex-col justify-center items-center gap-4 px-8 py-6 rounded-2xl overflow-auto">
+            <div className="w-full flex flex-col h-full">
+                <div className="bg-white w-full mt-2 flex justify-around items-center px-8 py-6 rounded-2xl">
                     <div className="flex items-center gap-2">
+                        <img src="/active.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
                         <div>
-                            <h2>You are currently subscribed</h2>
-                            <div className="flex gap-2">
-                                <h3>Basic package</h3>
-                                <h3>Expires in 30 days</h3>
-                            </div>
+                            <h2>650 Ads</h2>
+                            <p className="text-xs">Active</p>
                         </div>
-                        <img src="/games.png" alt="" className="w-24 h-24" />
                     </div>
-                    <h2>Choose a monthly plan that works for you</h2>
-                    <div onClick={{}} className="rounded ">
-                        <h2>Basic 3x</h2>
+                    <div className="flex items-center gap-2">
+                        <img src="/pending.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
                         <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
+                            <h2>120 Ads</h2>
+                            <p className="text-xs">Pending</p>
                         </div>
-                        <h2></h2>
                     </div>
-                    <div onClick={{}}>
-                        <h2>Business 4x</h2>
+                    <div className="flex items-center gap-2">
+                        <img src="/sold.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
                         <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
+                            <h2>50 Ads</h2>
+                            <p className="text-xs">Taken</p>
                         </div>
-                        <h2>GHS 512</h2>
                     </div>
-                    <div onClick={{}}>
-                        <h2>Platinum 10x</h2>
+                    <div className="flex items-center gap-2">
+                        <img src="/suspend (2).svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
                         <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
+                            <h2>50 Ads</h2>
+                            <p className="text-xs">Suspended</p>
                         </div>
-                        <h2></h2>
                     </div>
-                    <div>
+                </div>
+                <div>
+                    <PageLocked page={"Ads"} />
 
-                    </div>
                 </div>
             </div>
             <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
@@ -100,4 +95,4 @@ const SubscriptionPage = () => {
     );
 }
 
-export default SubscriptionPage;
+export default AdsPage;

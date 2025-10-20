@@ -27,20 +27,19 @@ type Props = {
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-type RouteKey = typeof MENU_ITEMS[number]['key'] | 'home';
+type RouteKey = typeof MENU_ITEMS[number]['key'] | 'profile';
 
 // map logical keys to route prefixes (used by pathToKey)
 const routes: Record<RouteKey, string> = {
-    home: '/',
     profile: '/profile',
-    ads: '/ads',
-    favorite: '/favorite',
-    subscription: '/subscription',
-    refer: '/refer',
-    feedback: '/feedback',
-    account: '/account',
-    terms: '/terms',
-    privacy: '/privacy',
+    ads: '/profile/ads',
+    favorite: '/profile/favorite',
+    subscription: '/profile/subscription',
+    refer: '/profile/refer',
+    feedback: '/profile/feedback',
+    account: '/profile/account',
+    terms: '/profile/terms',
+    privacy: '/profile/privacy',
 };
 
 const ProfileSidebar = ({ items = MENU_ITEMS }: Props) => {
@@ -66,15 +65,15 @@ const ProfileSidebar = ({ items = MENU_ITEMS }: Props) => {
 
     return (
         <div className='flex flex-col h-full w-full justify-center items-center bg-white'>
-            <div className='flex flex-col h-full gap-2 justify-center'>
+            <div className='flex flex-col h-full gap-2 justify-center w-full'>
                 {items.map(item => (
                     <button
                         key={item.key}
                         type="button"
                         onClick={() => handleItemClick(item)}
-                        className={`text-left py-1 px-4 active:border-r-2 active:border-gray-500 flex items-center gap-2 flex-col ${item.key === active ? 'border-r-2 border-green-500' : ''}`}
+                        className={`text-left py-1 px-4 active:border-r-2 active:border-gray-500 flex items-center gap-2 flex-col ${item.key === active ? 'w-full border-r-2 border-green-500' : ''}`}
                     >
-                        {item.icon && <img src={item.icon} alt={item.label} className='w-3 h-auto mx-auto' />}
+                        {item.icon && <img src={item.icon} alt={item.label} className='w-5 2xl:w-7 h-auto mx-auto' />}
                         <span className='text-center text-[8px]'>{item.label}</span>
                     </button>
                 ))}
