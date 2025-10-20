@@ -1,55 +1,38 @@
 import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 
-const SubscriptionPage = () => {
+const FavoritePage = () => {
+
+    const FavCard = () => {
+        const pics: string[] = Array.from({ length: 21 }, () => "https://picsum.photos/300/200");
+        return (
+            <div className="flex flex-wrap gap-4 p-4 w-full overflow-auto no-scrollbar">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((item) => (
+                    <div key={item} className="bg-white flex w-[31.78%] justify-center ">
+                        <div className="flex flex-col justify-between items-start w-1/2 p-3">
+                            <img src={`${pics[item]}`} alt={`Ad ${item}`} className="w-full h-auto rounded object-cover" />
+                            <h3 className="font-medium text-md">Ad Title {item}</h3>
+                            <p className="text-gray-600 text-xs line-clamp-1 w-[150%]">1970 Dodge Charger</p>
+                        </div>
+                        <img src="/favorited.svg" className="w-8 h-auto ml-auto mb-auto m-3" alt="" />
+
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
-        <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
+        <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] overflow-hidden">
             <div className="w-2/14  h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-full p-3 overflow-auto">
-                <div className="bg-white w-1/2 h-screen mt-2 flex flex-col justify-center items-center gap-4 px-8 py-6 rounded-2xl overflow-auto">
-                    <div className="flex items-center gap-2">
-                        <div>
-                            <h2>You are currently subscribed</h2>
-                            <div className="flex gap-2">
-                                <h3>Basic package</h3>
-                                <h3>Expires in 30 days</h3>
-                            </div>
-                        </div>
-                        <img src="/games.png" alt="" className="w-24 h-24" />
-                    </div>
-                    <h2>Choose a monthly plan that works for you</h2>
-                    <div onClick={{}} className="rounded ">
-                        <h2>Basic 3x</h2>
-                        <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
-                        </div>
-                        <h2></h2>
-                    </div>
-                    <div onClick={{}}>
-                        <h2>Business 4x</h2>
-                        <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
-                        </div>
-                        <h2>GHS 512</h2>
-                    </div>
-                    <div onClick={{}}>
-                        <h2>Platinum 10x</h2>
-                        <div>
-                            <img src="/tick.svg" alt="" /><h2>Share limited number of ads</h2>
-                            <img src="/tick.svg" alt="" /><h2>All ads stays promoted for a week</h2>
-                        </div>
-                        <h2></h2>
-                    </div>
-                    <div>
+            <div className="w-full flex flex-col h-full justify-start overflow-auto">
+                <FavCard />
+                <div className="h-[200px]" />
 
-                    </div>
-                </div>
             </div>
-            <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
+            <div className="md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
                 <div className="flex p-4 bg-white rounded-2xl flex-col items-center gap-2 justify-center w-full h-1/2 show">
                     <img src="/face.svg" alt="" className="w-24 h-24 border-green-300 border-2 p-2 rounded-full" />
                     <div>
@@ -100,4 +83,4 @@ const SubscriptionPage = () => {
     );
 }
 
-export default SubscriptionPage;
+export default FavoritePage;

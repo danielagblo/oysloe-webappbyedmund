@@ -4,11 +4,11 @@ import ProfileSidebar from "../components/ProfileSidebar";
 
 const ProfilePage = () => {
     return (
-        <div className="flex justify-between h-screen w-screen items-center bg-gray-600">
-            <div className="w-1/10 h-full">
+        <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
+            <div className="w-2/14 h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-3/5">
+            <div className="w-full">
                 <PageLocked page={"Profile"} />
             </div>
             <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
@@ -48,8 +48,8 @@ const ProfilePage = () => {
                             <div key={rating} className="flex items-center gap-2">
                                 <img src="/star.svg" alt="" className="w-4 h-4" />
                                 <h3 className="w-4 text-xs">{rating}</h3>
-                                <div className="flex-1 bg-gray-200 rounded-full h-4">
-                                    <div className="bg-gray-700 h-4 rounded-full" style={{ width: `${rating * 20}%` }}></div>
+                                <div className="flex-1 bg-gray-200 rounded-full h-1">
+                                    <div className="bg-gray-700 h-1 rounded-full" style={{ width: `${rating * 20}%` }}></div>
                                 </div>
                                 <span className="w-6 text-xs text-gray-600">{rating * 4}%</span>
                             </div>
