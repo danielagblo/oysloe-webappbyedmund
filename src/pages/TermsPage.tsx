@@ -1,51 +1,22 @@
-import MenuButton from "../components/MenuButton";
-import ProfileSidebar from "../components/ProfileSidebar";
 
-const SubscriptionPage = () => {
+import MenuButton from '../components/MenuButton';
+import ProfileSidebar from '../components/ProfileSidebar';
+
+const TermsPage = () => {
     return (
-        <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] overflow-hidden">
-            <div className="w-2/14  h-full">
+        <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
+            <div className="w-2/14 h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-full p-3 m-2 h-full overflow-auto no-scrollbar">
-                <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-center items-center gap-4 px-4 py-6 rounded-2xl overflow-auto text-xs">
-                    <div className="flex items-center gap-2 bg-[#f9f9f9] rounded-3xl px-2 py-2">
-                        <div>
-                            <h2 className="text-xs font-light text-center">You are currently subscribed</h2>
-                            <div className="flex gap-2">
-                                <h3 className="text-[8px] bg-[#FFECEC] p-1">Basic package</h3>
-                                <h3 className="text-[8px] p-1">Expires in 30 days</h3>
-                            </div>
-                        </div>
-                        <img src="/games.png" alt="" className="w-12 h-auto" />
-                    </div>
-                    <h2 className="text-center">Choose a monthly plan that works for you</h2>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3">
-                        <h2>Basic 3x</h2>
-                        <div className="">
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">All ads stays promoted for a week</span>
-                        </div>
-                        <h2>418</h2>
-                    </div>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3">
-                        <h2>Business 4x</h2>
-                        <div>
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">All ads stays promoted for a week</span>
-                        </div>
-                        <h2>GHS 512</h2>
-                    </div>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3">
-                        <h2>Platinum 10x</h2>
-                        <div>
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
-                            <img src="/ok.svg" alt="" className="inline" /><span className="p-1">All ads stays promoted for a week</span>
-                        </div>
-                        <h2>499</h2>
-                    </div>
-                    <div>
-
+            <div className=" md:flex w-full p-3 m-2 h-full overflow-hidden no-scrollbar justify-start hidden">
+                <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
+                    <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
+                        <h3 className=" text-2xl">
+                            T&C
+                        </h3>
+                        <h3 className="">
+                            Help us improve on our app
+                        </h3>
                     </div>
                 </div>
             </div>
@@ -56,7 +27,7 @@ const SubscriptionPage = () => {
                         <h3 className="font-medium text-3xl">Alexander Kowri</h3>
                         <div className="flex flex-col items-center gap-0.5 w-full">
                             <div className="flex px-1 rounded items-center  mr-auto">
-                                <img src="/ok.svg" alt="" className="w-1.5 h-1.5" />
+                                <img src="/tick.svg" alt="" className="w-1.5 h-1.5" />
                                 <span className="text-[6px]">High level</span>
                             </div>
                             <div className="bg-green-300 h-1 w-full px-2"></div>
@@ -100,4 +71,4 @@ const SubscriptionPage = () => {
     );
 }
 
-export default SubscriptionPage;
+export default TermsPage;
