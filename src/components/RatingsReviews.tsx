@@ -11,22 +11,12 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
 }) => {
   const containerClasses = `
     flex px-3 -ml-4 ${layout === "row" ? "flex-row items-center justify-between" : "flex-col items-center justify-center"}
-    ${fullWidth ? "w-[100vw]" : ""}
+    ${fullWidth ? "w-[95vw]" : ""}
   `;
 
   const ratingSection = (
-    <div
-      className={`flex flex-col  ${
-        layout === "row" ? "items-center" : "items-center"
-      } justify-center`}
-    >
-      <h3
-        className={`font-extrabold mb-1 ${
-          layout === "row" ? "text-3xl" : "text-5xl"
-        }`}
-      >
-        4.5
-      </h3>
+    <div className={`flex flex-col items-center justify-center`} >
+      <h3 className={"font-extrabold text-5xl mt-3 md:mt-0"}> 4.5 </h3>
       <p className={`${layout === "row" ? "text-base" : "text-lg"}`}>
         ★ ★ ★ ★ <span className="text-gray-400">★</span>
       </p>
@@ -47,22 +37,22 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
         width: "100%",
       }}
     >
-      {[5, 5, 5, 5, 1].map((stars, index) => (
+      {[5, 4, 3, 2, 1].map((stars, index) => (
         <div
           key={index}
           className="flex items-center mb-1 -ml-5"
           style={{ width: "100%" }}
         >
-          <span className="text-black w-8 text-sm">★ {stars}</span>
+          <span className="text-[var(--dark-def)] w-8 text-sm">★ {stars}</span>
           <div className="flex-1 h-1.25 bg-gray-200 rounded mx-2">
             <div
-              className="h-full bg-black rounded"
+              className="h-full bg-[var(--dark-def)] rounded"
               style={{ width: "40%" }}
             ></div>
           </div>
           <span
             className="text-sm text-gray-500 w-8"
-            style={{ fontSize: "80%" }}
+            style={{ fontSize: "65%" }}
           >
             50%
           </span>
@@ -72,17 +62,27 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   );
 
   return (
-    <div className={containerClasses}>
+    <div className="flex flex-col">
       {layout === "row" ? (
         <>
-          <div className="flex-[0.35]">{ratingSection}</div>
-          <div className="flex-[0.65] ml-4">{barsSection}</div>
+          <div className={containerClasses}>
+            <div className="flex-[0.35]">{ratingSection}</div>
+            <div className="flex-[0.65] ml-4">{barsSection}</div>
+          </div>
+          <div className="flex flex-row mt-2 gap-4 items-center justify-center">
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ All</p>
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ 5</p>
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ 4</p>
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ 3</p>
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ 2</p>
+            <p className="bg-[var(--div-active)] p-1.5 rounded-2xl">★ 1</p>
+          </div>
         </>
       ) : (
-        <>
+        <div className={containerClasses}>
           {ratingSection}
           {barsSection}
-        </>
+        </div>
       )}
     </div>
   );
