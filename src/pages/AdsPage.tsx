@@ -8,8 +8,8 @@ const AdsPage = () => {
             <div className="w-2/14 h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-full flex flex-col h-full">
-                <div className="bg-white w-full mt-2 flex justify-around items-center px-8 py-6 rounded-2xl">
+            <div className="w-full flex flex-col h-full items-center gap-7">
+                <div className="bg-white w-3/4 mt-2 flex justify-around items-center px-8 py-6 rounded-2xl">
                     <div className="flex items-center gap-2">
                         <img src="/active.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
                         <div>
@@ -39,16 +39,15 @@ const AdsPage = () => {
                         </div>
                     </div>
                 </div>
-                <div>
+                <div className="w-full">
                     <PageLocked page={"Ads"} />
-
                 </div>
             </div>
             <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
                 <div className="flex p-4 bg-white rounded-2xl flex-col items-center gap-2 justify-center w-full h-1/2 show">
                     <img src="/face.svg" alt="" className="w-24 h-24 border-green-300 border-2 p-2 rounded-full" />
                     <div>
-                        <h3 className="font-medium text-3xl">Alexander Kowri</h3>
+                        <h3 className="font-medium text-2xl">Alexander Kowri</h3>
                         <div className="flex flex-col items-center gap-0.5 w-full">
                             <div className="flex px-1 rounded items-center  mr-auto">
                                 <img src="/tick.svg" alt="" className="w-1.5 h-1.5" />

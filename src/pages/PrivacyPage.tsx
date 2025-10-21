@@ -24,7 +24,7 @@ const PrivacyPage = () => {
                 <div className="flex p-4 bg-white rounded-2xl flex-col items-center gap-2 justify-center w-full h-1/2 show">
                     <img src="/face.svg" alt="" className="w-24 h-24 border-green-300 border-2 p-2 rounded-full" />
                     <div>
-                        <h3 className="font-medium text-3xl">Alexander Kowri</h3>
+                        <h3 className="font-medium text-2xl">Alexander Kowri</h3>
                         <div className="flex flex-col items-center gap-0.5 w-full">
                             <div className="flex px-1 rounded items-center  mr-auto">
                                 <img src="/tick.svg" alt="" className="w-1.5 h-1.5" />
