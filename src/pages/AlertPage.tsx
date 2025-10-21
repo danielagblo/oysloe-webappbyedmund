@@ -1,19 +1,38 @@
+import { useNavigate } from "react-router-dom";
 import MenuButton from "../components/MenuButton";
 import ProfileStats from "../components/ProfileStats";
 import "../App.css";
 
+const MobileBanner = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="sticky top-0">
+      <div className="w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 bg-[var(--div-active)] sticky top-0 z-50">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-1">
+          <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
+          <span className="text-sm">Back</span>
+        </button>
+        <h2 className="text-sm font-medium rounded-2xl py-1 px-2">Alerts</h2>
+        <p style={{ transform: "rotate(90deg)" }}>…</p>
+      </div>
+    </div>
+  );
+};
+
 const AlertsPanel = () => (
-  <div className="flex flex-col items-center w-full h-full p-3 sm:p-4 bg-gray-100 text-gray-600">
-    <div className="bg-white w-full max-w-3xl rounded-3xl shadow-sm flex flex-col h-[80vh] sm:h-[85vh] overflow-hidden mx-auto">
+  <div className="flex flex-col items-center sm:w-full text-[var(--dark-def)] ">
+    {/* Fixed-height container only for desktop */}
+    <div className="bg-white w-full sm: mr-2 sm:w-[75vw] sm:h-[93vh] sm:rounded-2xl shadow-sm flex flex-col">
       
-      {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-gray-100 flex-shrink-0">
-        <h2 className="text-center text-2xl sm:text-3xl font-semibold">Alerts</h2>
+      {/* Header (desktop only) */}
+      <div className="p-4 sm:p-6 border-b hidden sm:block border-gray-100 flex-shrink-0">
+        <h2 className="sm:text-center sm:text-3xl sm:font-semibold">Alerts</h2>
       </div>
 
-      {/* Scrollable list */}
-      <div className="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 pb-24">
-        <div className="space-y-4">
+      {/* Scrollable desktop list ONLY */}
+      <div className="hidden sm:flex flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6 pb-24">
+        <div className="space-y-4 w-full">
           {Array.from({ length: 12 }).map((_, index) => (
             <div
               key={index}
@@ -30,34 +49,64 @@ const AlertsPanel = () => (
                   <span className="font-semibold">Oysloe</span>
                   <span className="ml-1 break-words">
                     We’re excited to have you onboard. You’ve taken the first
-                    step toward smarter shopping and selling. Big things await —
-                    stay tuned!
+                    step toward smarter shopping and selling. Big things await — stay tuned!
                   </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
-        <div className="h-14" />
       </div>
-    </div>
 
-    <MenuButton />
+      {/* Mobile full-page list */}
+      <div className="flex sm:hidden flex-col w-full p-4 bg-white">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <div
+            key={index}
+            className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+          >
+            <img
+              src="/building.svg"
+              alt="alert source"
+              className="w-8 h-8 object-cover rounded-full flex-shrink-0"
+            />
+            <div className="flex flex-col">
+              <span className="text-xs text-gray-400">10 mins ago</span>
+              <div className="text-sm">
+                <span className="font-semibold">Oysloe</span>
+                <span className="ml-1 text-gray-400">
+                  We’re excited to have you onboard. You’ve taken the first
+                  step toward smarter shopping and selling. Big things await — stay tuned!
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="h-15" />
+    </div>
   </div>
 );
 
 const AlertPage = () => (
-  <div className="flex flex-col lg:flex-row items-start justify-center w-full min-h-screen bg-[#f3f4f6] -mt-3 overflow-hidden">
-    {/* Profile section */}
-    <div className="w-full lg:w-[25%] p-4 lg:p-6 flex-shrink-0">
+  <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[var(--div-active)]">
+    {/* Mobile header */}
+    <div className="sm:hidden w-full">
+      <MobileBanner />
+    </div>
+
+    {/* Profile sidebar (desktop only) */}
+    <div className="hidden sm:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
       <ProfileStats />
     </div>
 
-    {/* Alerts section */}
-    <div className="flex items-center justify-center w-full lg:flex-grow p-4 lg:min-h-screen">
+    {/* Alerts panel (centered, minimal edge gap) */}
+    <div className="flex items-center justify-center w-full sm:w-[75vw] sm:h-full">
       <AlertsPanel />
     </div>
+
+    <MenuButton />
   </div>
 );
 

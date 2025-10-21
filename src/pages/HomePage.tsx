@@ -119,49 +119,84 @@ const HomePage = () => {
     }, [isCondensed, isSmallScreen]);
 
 
-    const HomePageHeader = () => (
-        <div
-            ref={headerRef}
-            className={`w-full top-0 left-0 z-40 ${isSmallScreen && isCondensed ? 'fixed bg-white/90 backdrop-blur-sm' : ''}`}
-        >
+    const HomePageHeader = () => {
+        const headerRef = useRef<HTMLDivElement>(null);
+        const [isSmallScreen, setIsSmallScreen] = useState(false);
+        const [isCondensed, setIsCondensed] = useState(false);
+
+        // check screen size
+        useEffect(() => {
+            const checkScreen = () => setIsSmallScreen(window.innerWidth <= 640);
+            checkScreen();
+            window.addEventListener("resize", checkScreen);
+            return () => window.removeEventListener("resize", checkScreen);
+        }, []);
+
+        // detect scroll to toggle condensed mode
+        useEffect(() => {
+            const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            setIsCondensed(scrollTop > 50); // triggers once you scroll down a bit
+            };
+
+            window.addEventListener("scroll", handleScroll);
+            return () => window.removeEventListener("scroll", handleScroll);
+        }, []);
+
+        return (
             <div
-                className={`flex items-center ${
-                    isSmallScreen && isCondensed
-                    ? 'justify-between px-4 py-2 gap-3'
-                    : 'flex-col items-center justify-center gap-8 mt-40'
+            ref={headerRef}
+            className={`w-full left-0 z-40 transition-all duration-300 ${
+                isSmallScreen && isCondensed
+                ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+                : "relative"
+            }`}
+            >
+            <div
+                className={`flex items-center transition-all duration-300 ${
+                isSmallScreen && isCondensed
+                    ? "justify-between px-4 py-2 gap-3"
+                    : "flex-col items-center justify-center gap-8 mt-40"
                 }`}
             >
                 <h2
-                    className={`${
-                    isSmallScreen && isCondensed ? 'text-lg' : 'text-4xl sm:text-6xl'
-                    } font-medium text-[var(--dark-def)]`}
+                className={`${
+                    isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+                } font-medium text-[var(--dark-def)] whitespace-nowrap`}
                 >
-                    Oysloe
+                Oysloe
                 </h2>
+
                 <div
-                    className={`relative flex items-center w-full max-w-[520px] ${
-                    isSmallScreen && isCondensed ? 'justify-end' : 'justify-center'
-                    }`}
+                className={`relative flex items-center ${
+                    isSmallScreen && isCondensed
+                    ? "justify-end flex-1"
+                    : "justify-center w-full max-w-[520px]"
+                }`}
                 >
-                    <div className="rotating-bg" aria-hidden="true" />
-                    <div className="rotating-bg-inner" aria-hidden="true" />
-                    <input
-                        type="text"
-                        placeholder="Search anything up for good"
-                        className={`search-input ${
-                            isSmallScreen && isCondensed
-                            ? 'text-[16px]'
-                            : 'text-2xl sm:text-2xl'
-                        } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
-                    />
-                    <img
-                        src="/search.svg"
-                        className="absolute top-1/2 left-[25px] -translate-y-1/2 w-5 h-5 z-10"
-                    />
+                <div className="rotating-bg" aria-hidden="true" />
+                <div className="rotating-bg-inner" aria-hidden="true" />
+
+                <input
+                    type="text"
+                    placeholder="Search anything up for good"
+                    className={`search-input ${
+                    isSmallScreen && isCondensed
+                        ? "text-[16px]"
+                        : "text-2xl sm:text-2xl"
+                    } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                />
+
+                <img
+                    src="/search.svg"
+                    className="absolute top-1/2 left-[25px] -translate-y-1/2 w-5 h-5 z-10"
+                />
                 </div>
             </div>
-        </div>
-    )
+            </div>
+        );
+    };
+
     const ShowFilter = () => (
         <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
             <div className="bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto shadow-lg">
@@ -440,7 +475,7 @@ const HomePage = () => {
 
 
     return (
-        <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 ">
+        <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
             <HomePageHeader />
             <div className="flex flex-col items-center justify-center">
                 <div className="bg-[var(--div-active)] w-[100vw]">  
