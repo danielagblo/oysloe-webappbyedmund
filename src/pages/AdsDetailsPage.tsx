@@ -72,23 +72,23 @@ const AdsDetailsPage = () => {
     // mini components
     const MobileHeader = () => (
         <div className="w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 bg-[var(--div-active)] sticky top-0 z-50">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1">
-            <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
-            <span className="text-sm">Back</span>
-        </button>
-        <h2 className="text-sm font-medium some-gray] rounded-2xl py-1 px-2">
-            {currentId}/{totalAds}
-        </h2>
-        <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
-            <img src="/flag.svg" alt="" className="w-4 h-4" />
-            <span className="text-xs">24</span>
+            <button onClick={() => navigate(-1)} className="flex items-center gap-1">
+                <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
+                <span className="text-sm">Back</span>
+            </button>
+            <h2 className="text-sm font-medium some-gray] rounded-2xl py-1 px-2">
+                {currentId}/{totalAds}
+            </h2>
+            <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                <img src="/flag.svg" alt="" className="w-4 h-4" />
+                <span className="text-xs">24</span>
+                </div>
+                <div className="flex items-center gap-1">
+                <img src="/favorited.svg" alt="" className="w-4 h-4" />
+                <span className="text-xs">10</span>
+                </div>
             </div>
-            <div className="flex items-center gap-1">
-            <img src="/favorited.svg" alt="" className="w-4 h-4" />
-            <span className="text-xs">10</span>
-            </div>
-        </div>
         </div>
     );
     const DesktopHeader = () => (
