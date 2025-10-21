@@ -40,7 +40,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
       {[5, 4, 3, 2, 1].map((stars, index) => (
         <div
           key={index}
-          className="flex items-center mb-1 -ml-5"
+          className="flex items-center mb-1 -ml-5 sm:ml-0"
           style={{ width: "100%" }}
         >
           <span className="text-[var(--dark-def)] w-8 text-sm">★ {stars}</span>
