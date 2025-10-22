@@ -13,3 +13,5 @@ const LottieJourneyBeginsNow = () => {
 };
 
 export default LottieJourneyBeginsNow;
+
+

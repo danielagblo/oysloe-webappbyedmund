@@ -19,8 +19,8 @@ import ResetPasswordWithPhonePage from './pages/ResetPasswordWithPhonePage.tsx'
 import ReviewPage from './pages/ReviewPage.tsx'
 import SignUpPage from './pages/SignUpPage.tsx'
 import SubscriptionPage from './pages/SubscriptionPage.tsx'
-import VerificationPage from './pages/VerificationPage.tsx'
 import TermsPage from './pages/TermsPage.tsx'
+import VerificationPage from './pages/VerificationPage.tsx'
 
 function App() {
 
@@ -34,7 +34,7 @@ function App() {
         <Route path="/verification" element={<VerificationPage />} />
         <Route path="/referal-verification" element={<ReferalVerificationPage />} />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
-        <Route path="/homepage" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
         <Route path='/alerts' element={<AlertPage />} />
