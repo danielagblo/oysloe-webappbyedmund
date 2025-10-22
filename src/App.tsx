@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import AccountPage from './pages/AccountPage.tsx'
 import AdsDetailsPage from './pages/AdsDetailsPage.tsx'
 import AdsPage from './pages/AdsPage.tsx'
 import AlertPage from './pages/AlertPage.tsx'
@@ -21,6 +20,7 @@ import ReviewPage from './pages/ReviewPage.tsx'
 import SignUpPage from './pages/SignUpPage.tsx'
 import SubscriptionPage from './pages/SubscriptionPage.tsx'
 import VerificationPage from './pages/VerificationPage.tsx'
+import TermsPage from './pages/TermsPage.tsx'
 
 function App() {
 
@@ -46,8 +46,8 @@ function App() {
         <Route path='/profile/subscription' element={<SubscriptionPage />} />
         <Route path='/profile/refer' element={<ReferPage />} />
         <Route path='/profile/feedback' element={<FeedbackPage />} />
-        <Route path='/profile/account' element={<AccountPage />} />
         <Route path='/profile/privacy' element={<PrivacyPage />} />
+        <Route path="/profile/terms" element={<TermsPage />} />
 
 
 

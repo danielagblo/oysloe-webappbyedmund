@@ -1,46 +1,23 @@
-import MenuButton from "../components/MenuButton";
-import PageLocked from "../components/PageLocked";
-import ProfileSidebar from "../components/ProfileSidebar";
 
-const AdsPage = () => {
+import MenuButton from '../components/MenuButton';
+import ProfileSidebar from '../components/ProfileSidebar';
+
+const TermsPage = () => {
     return (
         <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
             <div className="w-2/14 h-full">
                 <ProfileSidebar />
             </div>
-            <div className="w-full flex flex-col h-full items-center gap-7">
-                <div className="bg-white w-3/4 mt-2 flex justify-around items-center px-8 py-6 rounded-2xl">
-                    <div className="flex items-center gap-2">
-                        <img src="/active.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-                        <div>
-                            <h2>650 Ads</h2>
-                            <p className="text-xs">Active</p>
-                        </div>
+            <div className=" md:flex w-full p-3 m-2 h-full overflow-hidden no-scrollbar justify-start hidden">
+                <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
+                    <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
+                        <h3 className=" text-2xl">
+                            T&C
+                        </h3>
+                        <h3 className="">
+                            Help us improve on our app
+                        </h3>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <img src="/pending.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-                        <div>
-                            <h2>120 Ads</h2>
-                            <p className="text-xs">Pending</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <img src="/sold.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-                        <div>
-                            <h2>50 Ads</h2>
-                            <p className="text-xs">Taken</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <img src="/suspend (2).svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-                        <div>
-                            <h2>50 Ads</h2>
-                            <p className="text-xs">Suspended</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="w-full">
-                    <PageLocked page={"Ads"} />
                 </div>
             </div>
             <div className=" md:w-1/5 w-full hidden h-full md:flex flex-col items-center justify-around gap-2 mr-3 my-3">
@@ -94,4 +71,4 @@ const AdsPage = () => {
     );
 }
 
-export default AdsPage;
+export default TermsPage;
