@@ -82,27 +82,42 @@ type LiveChatProps = {
   onClose: () => void;
 };
 
-export default function LiveChat({ caseId }: LiveChatProps) {
+export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   if (!caseId) return null;
 
   const ChatInput = () => (
-    <div className="border-gray-200 flex justify-center items-center w-full">
-      <div
-        className="flex items-center w-full border border-gray-300 rounded-full px-4 py-2 bg-white"
-      >
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className="flex-1 border-0 focus:ring-0 text-gray-700 bg-transparent"
-        />
-        <button className="text-green-600 font-semibold">Send</button>
-      </div>
+    // <div className="border-gray-200 flex justify-center items-center w-full">
+    //   <div
+    //     className="flex items-center w-full border border-gray-300 rounded-full px-4 py-2 bg-white"
+    //   >
+    //     <input
+    //       type="text"
+    //       placeholder="Type a message..."
+    //       className="flex-1 border-0 focus:ring-0 text-gray-700 bg-transparent"
+    //     />
+    //     <button className="text-green-600 font-semibold">Send</button>
+    //   </div>
+    // </div>
+    <div className="relative flex gap-2 w-full">
+      <input
+        type="text"
+        placeholder="Start a chat"
+        style={{ border: "1px solid var(--div-border)" }}
+        className="rounded-2xl px-10 py-3 bg-[url('/send.svg')] bg-[length:20px_20px] bg-[center_right_12px] bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
+      />
+      <button style={{ border: "1px solid var(--div-border)" }} className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white">
+        <img src="/audio.svg" alt="" className="w-7 h-5" />
+      </button>
+      <button className="absolute bottom-3 left-3" >
+        <img src="/image.png" alt="" className="w-5 h-auto" />
+      </button>
     </div>
   );
 
   return (
     <div className="flex h-full border-gray-100 ">
       <div className="relative rounded-2xl bg-white px-5 py-3 h-full w-full flex flex-col">
+        <button className="absolute right-1 block sm:hidden" onClick={onClose}><img src="/close.svg" alt="" className="p-2" /></button>
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           <p className="text-xs text-gray-400 text-center mb-6">Yesterday</p>
           {/* Hardcoded messages for now */}
