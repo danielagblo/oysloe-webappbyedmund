@@ -82,13 +82,13 @@ type LiveChatProps = {
   onClose: () => void;
 };
 
-export default function LiveChat({ caseId, onClose }: LiveChatProps) {
+export default function LiveChat({ caseId }: LiveChatProps) {
   if (!caseId) return null;
 
   const ChatInput = () => (
-    <div className="border-gray-200 flex justify-center items-center absolute bottom-6 w-full">
+    <div className="border-gray-200 flex justify-center items-center w-full">
       <div
-        className="flex items-center w-[90%] border border-gray-300 rounded-full px-4 py-2 bg-white"
+        className="flex items-center w-full border border-gray-300 rounded-full px-4 py-2 bg-white"
       >
         <input
           type="text"
@@ -101,15 +101,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   );
 
   return (
-    <div className="col-span-12 lg:col-span-4 rounded-xl overflow-hidden shadow-lg border border-gray-100">
-      <div className="bg-white h-full flex flex-col relative">
-        <div className="flex items-center justify-between border-b px-4 py-2">
-          <h2 className="font-semibold text-lg">Case #{caseId}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            ✕
-          </button>
-        </div>
-
+    <div className="flex h-full border-gray-100 ">
+      <div className="relative rounded-2xl bg-white px-5 py-3 h-full w-full flex flex-col">
         <div className="flex-1 p-6 overflow-y-auto space-y-4">
           <p className="text-xs text-gray-400 text-center mb-6">Yesterday</p>
           {/* Hardcoded messages for now */}

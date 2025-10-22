@@ -27,10 +27,10 @@
 // }
 
 import { useState } from "react";
+import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
-import LiveChat from "../components/LiveChat";
 
 export default function InboxPage() {
   const [selectedCase, setSelectedCase] = useState<string | null>(null);
@@ -43,26 +43,28 @@ export default function InboxPage() {
       </div>
 
       {/* Page content */}
-      <div className="grid grid-cols-12 gap-2 pt-[4.5rem] lg:pt-0 h-full">
+      <div className="flex w-full h-full">
         {/* Profile Stats (Desktop only) */}
-        <div className="hidden lg:block col-span-3 h-full">
+        <div className="hidden lg:block pl-3 h-full">
           <ProfileStats />
         </div>
 
         {/* Support and Cases */}
-        <div className="col-span-12 lg:col-span-5 h-full overflow-y-auto custom-scroll">
+        <div className="w-1/2 h-screen overflow-y-auto py-8 px-2">
           <SupportAndCases onSelectCase={(caseId) => setSelectedCase(caseId)} />
         </div>
 
         {/* Live Chat — slides in when a case is selected */}
-        <LiveChat
-          caseId={selectedCase}
-          onClose={() => setSelectedCase(null)}
-        />
+        <div className="w-1/2 h-screen overflow-y-auto py-8 px-4">
+          <LiveChat
+            caseId={selectedCase}
+            onClose={() => setSelectedCase(null)}
+          />
+        </div>
       </div>
 
       {/* Bottom nav */}
-      <MenuButton popup />
+      <MenuButton />
     </div>
   );
 }
