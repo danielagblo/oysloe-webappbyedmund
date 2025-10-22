@@ -388,8 +388,9 @@ const HomePage = () => {
             "Property",
         ].map((section) => (
             <div
-            key={section}
-            className="flex flex-col w-[95vw] sm:w-full max-w-6xl mt-6 mx-auto overflow-hidden"
+                key={section}
+                style={{ transform: "scale(0.9)" }} 
+                className="flex flex-col w-[95vw] sm:w-full max-w-6xl mt-6 mx-auto overflow-hidden"
             >
             <div className="flex items-center gap-3 mb-2 px-2">
                 <h2 className="text-base sm:text-xl font-semibold truncate">{section}</h2>
@@ -494,14 +495,14 @@ const HomePage = () => {
                         <CircularSummaries />
 
                         {/* === Scrollable Ad Sections === */}
-                        <div className="bg-[var(--div-active)] w-[100vw]">  
+                        <div className="bg-[var(--div-active)] w-[100vw] px-20">  
                             {<ScrollableAds />}
+                            <div className="h-26" />
                         </div>
                     </>
                 )}
+                <MenuButton />
             </div>
-            <div className="h-16" />
-            <MenuButton />
         </div>
     );
 };
