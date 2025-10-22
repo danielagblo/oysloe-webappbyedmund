@@ -40,7 +40,7 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
             <img
               src={gPng}
               alt="Get it on Google Play"
-              className="h-25 sm:h-25 lg:h-25 w-auto object-contain transition-transform hover:scale-105"
+              className="h-25 w-auto object-contain transition-transform hover:scale-105"
             />
           </a>
 
@@ -48,7 +48,7 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
             <img
               src={iPng}
               alt="Download on the App Store"
-              className="h-12 sm:h-[3.8rem] lg:h-[4.2rem] w-auto object-contain transition-transform hover:scale-105 translate-y-[2px]"
+              className="h-17 w-auto object-contain transition-transform hover:scale-105 translate-y-[2px]"
             />
           </a>
         </div>

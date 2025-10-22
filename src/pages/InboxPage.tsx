@@ -1,33 +1,6 @@
-// import MenuButton from "../components/MenuButton"
-// import ProfileStats from "../components/ProfileStats"
-// import SupportAndCases from "../components/SupportAndCases"
-// import LiveChat from "../components/LiveChat"
-
-// export default function InboxPage () {
-//   return (
-//     <div style={{ backgroundColor:"#EDEDED", height: "100vh", padding: "0.75rem"}}>
-//         <div>
-//             <div className="grid grid-cols-12 gap-2 pb-20 lg:pb-0">
-
-//                 {/* Column 1: Profile Stats */}
-//                 <ProfileStats />
-
-//                 {/* Column 2: Support and Cases */}
-//                 <SupportAndCases />
-
-//                 {/* Column 3: Live Chat */}
-//                 <LiveChat />
-//             </div>
-//         </div>
-
-//       {/* Navigation */}
-//       <MenuButton popup /> 
-//     </div>
-//   );
-// }
-
 import { useState } from "react";
 import MenuButton from "../components/MenuButton";
+import MobileBanner from '../components/MobileBanner';
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 import LiveChat from "../components/LiveChat";
@@ -37,9 +10,8 @@ export default function InboxPage() {
 
   return (
     <div className="relative bg-[#EDEDED] min-h-screen h-screen w-full overflow-hidden">
-      {/* Profile banner on mobile */}
-      <div className="lg:hidden fixed top-0 left-0 w-full z-20">
-        <ProfileStats />
+      <div className="sm:hidden w-full">
+        <MobileBanner page="Inbox"/>
       </div>
 
       {/* Page content */}

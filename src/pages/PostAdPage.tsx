@@ -11,12 +11,10 @@ function PostAdPage() {
         <MobileBanner backto="Home" page="Post An Ad"/>
       </div>
 
-      {/* Profile sidebar (desktop only) hidden on mobile */}
       <div className="hidden sm:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
         <ProfileStats />
       </div>
 
-      {/* hidden on mobile */}
       <div className="flex items-center justify-center w-full lg:flex-grow p-4">
         <PageLocked page="Post Ad" />
       </div>
