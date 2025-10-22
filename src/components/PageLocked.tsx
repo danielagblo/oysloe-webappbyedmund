@@ -17,9 +17,13 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full text-center">
-      <div className="shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-10 sm:py-14 max-w-2xl w-full flex flex-col items-center justify-center">
- 
+    <div className="relative flex items-center justify-center w-full h-full text-center shadow-lg">
+      {/* Outer container changes on mobile */}
+      <div
+        className={`rounded-2xl bg-white px-6 py-10 sm:px-10 sm:pt-5 sm:pb-14 w-full 
+          flex flex-col items-center justify-center sm:rounded-2xl sm:w-auto sm:h-auto h-[100vh]
+        `}
+      >
         <p className="text-gray-700 text-lg font-medium mb-10 flex items-center justify-center gap-2">
           {page} page is locked
           <LockClosedIcon className="w-5 h-5 text-gray-700" />

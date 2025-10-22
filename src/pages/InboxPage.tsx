@@ -9,7 +9,7 @@ export default function InboxPage() {
   const [selectedCase, setSelectedCase] = useState<string | null>(null);
 
   return (
-    <div className="relative bg-[#EDEDED] min-h-screen h-screen w-full overflow-hidden">
+    <div className="relative bg-[var(--div-active)] min-h-screen h-screen w-full overflow-hidden">
       <div className="block sm:hidden w-full">
         <MobileBanner page="Inbox" />
       </div>

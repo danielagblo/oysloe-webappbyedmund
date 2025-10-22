@@ -95,7 +95,7 @@ body {
     #FF6B6B,
     #74FFA7
   );
-  animation: spin 6s linear infinite;
+  animation: spin 3500ms linear infinite;
   filter: blur(1px);
   will-change: transform;
   transform: translateZ(0);
