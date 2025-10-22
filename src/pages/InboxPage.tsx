@@ -10,8 +10,8 @@ export default function InboxPage() {
 
   return (
     <div className="relative bg-[#EDEDED] min-h-screen h-screen w-full overflow-hidden">
-      <div className="sm:hidden w-full">
-        <MobileBanner page="Inbox"/>
+      <div className="block sm:hidden w-full">
+        <MobileBanner page="Inbox" />
       </div>
 
       {/* Page content */}
@@ -22,17 +22,38 @@ export default function InboxPage() {
         </div>
 
         {/* Support and Cases */}
-        <div className="w-1/2 h-screen overflow-y-auto py-8 px-2">
-          <SupportAndCases onSelectCase={(caseId) => setSelectedCase(caseId)} />
+        {/* <div className="sm:w-1/2 w-full h-screen overflow-y-auto sm:py-5 sm:px-4">
+          <SupportAndCases
+            onSelectCase={(caseId) => setSelectedCase(prev => (prev === caseId ? null : caseId))}
+            onSelectChat={(chatId) => setSelectedCase(prev => (prev === chatId ? null : chatId))}
+          />
+        </div> */}
+
+        {/* Live Chat — desktop: right column; mobile: full-screen when open */}
+        {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
+        <div className={`sm:w-1/2 w-full h-screen overflow-y-auto sm:py-5 sm:px-4 ${selectedCase ? 'hidden sm:block' : ''}`}>
+          <SupportAndCases
+            onSelectCase={(caseId) => setSelectedCase(prev => (prev === caseId ? null : caseId))}
+            onSelectChat={(chatId) => setSelectedCase(prev => (prev === chatId ? null : chatId))}
+          />
         </div>
 
-        {/* Live Chat — slides in when a case is selected */}
-        <div className="w-1/2 h-screen overflow-y-auto py-8 px-4">
+        {/* Desktop right column */}
+        <div className="hidden sm:block sm:w-1/2 w-full h-screen overflow-y-auto sm:py-5 sm:px-4">
           <LiveChat
             caseId={selectedCase}
             onClose={() => setSelectedCase(null)}
           />
         </div>
+
+        {/* Mobile full-screen chat overlay */}
+        {selectedCase && (
+          <div className="sm:hidden fixed inset-0 z-40 bg-white">
+            <div className="h-full w-full">
+              <LiveChat caseId={selectedCase} onClose={() => setSelectedCase(null)} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom nav */}
