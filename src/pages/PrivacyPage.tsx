@@ -6,7 +6,7 @@ const PrivacyPage = () => {
     return (
         <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6]">
             <div className="w-2/14 h-full">
-                <ProfileSidebar />
+                <ProfileSidebar active="privacy" onSelect={() => { }} />
             </div>
             <div className=" md:flex w-full p-3 m-2 h-full overflow-hidden no-scrollbar justify-start hidden">
                 <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
