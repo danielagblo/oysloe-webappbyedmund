@@ -273,10 +273,9 @@ const HomePage = () => {
         className="
             grid 
             grid-cols-5 
-            sm:grid-cols-5 
-            md:grid-cols-5 
             gap-2 sm:gap-4 
             place-items-center
+            justify-items-center
             max-w-full
         "
         style={{
@@ -285,15 +284,15 @@ const HomePage = () => {
         >
         {categories.slice(0, 10).map((category) => (
             <div
-            key={category.id}
-            onClick={() => handleCategoryClick(category.name)}
-            className="
-                flex flex-col items-center justify-center
-                w-[70px] h-[80px] sm:w-[120px] sm:h-[130px]
-                bg-[var(--div-active)] rounded-lg 
-                p-2 sm:p-3 cursor-pointer 
-                hover:bg-gray-300
-            "
+                key={category.id}
+                onClick={() => handleCategoryClick(category.name)}
+                className="
+                    flex flex-col items-center justify-center
+                    w-[70px] h-[80px] sm:w-[120px] sm:h-[130px]
+                    bg-[var(--div-active)] rounded-lg 
+                    p-2 sm:p-3 cursor-pointer 
+                    hover:bg-gray-300
+                "
             >
             <div className="h-[45px] w-[45px] sm:h-[80px] sm:w-[80px] relative rounded-full bg-white">
                 <img
