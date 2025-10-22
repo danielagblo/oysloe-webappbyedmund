@@ -390,7 +390,7 @@ const HomePage = () => {
             <div
                 key={section}
                 style={{ transform: "scale(0.9)" }} 
-                className="flex flex-col w-[95vw] sm:w-full max-w-6xl mt-6 mx-auto overflow-hidden"
+                className="flex flex-col w-[95vw] max-w-6xl mt-6 mx-auto overflow-hidden"
             >
             <div className="flex items-center gap-3 mb-2 px-2">
                 <h2 className="text-base sm:text-xl font-semibold truncate">{section}</h2>
@@ -450,8 +450,8 @@ const HomePage = () => {
         ))
     );
     const ConditionalAds = () => (
-        <div className="bg-[var(--div-active)] w-full flex justify-center -mb-4">  
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-[95vw]  pb-[2rem]">
+        <div  className="bg-[var(--div-active)] w-full flex justify-center -mb-4">  
+            <div style={{ transform: "scale(0.9)" }} className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw]  pb-[2rem]">
                 {pics.map((pic, index) => (
                     <div key={index} className="flex flex-col w-[100%] overflow-hidden">
                         <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
@@ -469,6 +469,7 @@ const HomePage = () => {
                         </Link>
                     </div>
                 ))}
+                <div className="h-10" />
             </div>
         </div>
     )
@@ -495,7 +496,7 @@ const HomePage = () => {
                         <CircularSummaries />
 
                         {/* === Scrollable Ad Sections === */}
-                        <div className="bg-[var(--div-active)] w-[100vw] px-20">  
+                        <div className="bg-[var(--div-active)] w-[100vw]">  
                             {<ScrollableAds />}
                             <div className="h-26" />
                         </div>
