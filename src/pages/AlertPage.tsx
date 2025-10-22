@@ -1,24 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import MenuButton from "../components/MenuButton";
 import ProfileStats from "../components/ProfileStats";
+import MobileBanner from "../components/MobileBanner";
 import "../App.css";
-
-const MobileBanner = () => {
-  const navigate = useNavigate();
-
-  return (
-    <div className="sticky top-0">
-      <div className="w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 bg-[var(--div-active)] sticky top-0 z-50">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-1">
-          <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
-          <span className="text-sm">Back</span>
-        </button>
-        <h2 className="text-sm font-medium rounded-2xl py-1 px-2">Alerts</h2>
-        <p style={{ transform: "rotate(90deg)" }}>…</p>
-      </div>
-    </div>
-  );
-};
 
 const AlertsPanel = () => (
   <div className="flex flex-col items-center sm:w-full text-[var(--dark-def)] ">
@@ -93,7 +76,7 @@ const AlertPage = () => (
   <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[var(--div-active)]">
     {/* Mobile header */}
     <div className="sm:hidden w-full">
-      <MobileBanner />
+      <MobileBanner page="Alerts"/>
     </div>
 
     {/* Profile sidebar (desktop only) */}
