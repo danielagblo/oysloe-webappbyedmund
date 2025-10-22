@@ -20,7 +20,7 @@ const SubscriptionPage = () => {
                         <img src="/games.png" alt="" className="w-12 h-auto" />
                     </div>
                     <h2 className="text-center">Choose a monthly plan that works for you</h2>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3 w-6/7 h-24 flex-col justify-center items-start flex">
+                    <div onClick={() => { }} className="bg-[#f9f9f9] rounded-3xl px-6 py-3 w-6/7 h-24 flex-col justify-center items-start flex">
                         <h2>Basic 3x</h2>
                         <div className="">
                             <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
@@ -28,7 +28,7 @@ const SubscriptionPage = () => {
                         </div>
                         <h2>GHS 418</h2>
                     </div>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3  w-6/7 h-24 flex-col justify-center items-start flex">
+                    <div onClick={() => { }} className="bg-[#f9f9f9] rounded-3xl px-6 py-3  w-6/7 h-24 flex-col justify-center items-start flex">
                         <h2>Business 4x</h2>
                         <div>
                             <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
@@ -36,7 +36,7 @@ const SubscriptionPage = () => {
                         </div>
                         <h2>GHS 512</h2>
                     </div>
-                    <div onClick={{}} className="bg-[#f9f9f9] rounded-3xl px-6 py-3  w-6/7 h-24 flex-col justify-center items-start flex">
+                    <div onClick={() => { }} className="bg-[#f9f9f9] rounded-3xl px-6 py-3  w-6/7 h-24 flex-col justify-center items-start flex">
                         <h2>Platinum 10x</h2>
                         <div>
                             <img src="/ok.svg" alt="" className="inline" /><span className="p-1">Share limited number of ads</span><br />
