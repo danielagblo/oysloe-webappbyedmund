@@ -489,7 +489,7 @@ const HomePage = () => {
                     <ConditionalAds />
                 ) : (
                     <>
-                        <div className="transform scale-80">
+                        <div className="transform scale-90 sm:scale-100">
                             {/* Categories Grid */}
                             <SelectACategory />
 
