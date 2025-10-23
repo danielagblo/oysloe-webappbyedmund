@@ -62,7 +62,7 @@ const ProfilePage = () => {
         switch (activeTab) {
             case "terms":
                 return (
-                    <div className="relative flex items-center justify-center w-full h-full text-center">
+                    <div className="relative flex items-center justify-center w-[100vw] sm:w-full h-full text-center">
                         <div
                             className={`
                                 shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-5 sm:py-6 w-full 
@@ -82,7 +82,7 @@ const ProfilePage = () => {
 
             case "privacy":
                 return (
-                    <div className="relative flex items-center justify-center w-full h-full text-center">
+                    <div className="relative flex items-center justify-center w-[100vw] sm:w-full h-full text-center">
                         <div
                             className={`
                                 shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-5 sm:py-6 w-full 

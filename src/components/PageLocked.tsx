@@ -18,11 +18,11 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
   };
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full text-center shadow-lg">
+    <div className="relative flex items-center justify-center w-full h-full text-center">
       {/* Outer container changes on mobile */}
       <div
         className={`rounded-2xl bg-white px-6 py-15 sm:px-10 sm:pt-5 sm:pb-14 w-full 
-          flex flex-col items-center justify-start sm:justify-center sm:rounded-2xl sm:w-auto sm:h-auto h-[100vh]
+          flex flex-col items-center justify-start sm:justify-center sm:rounded-2xl sm:w-auto sm:h-auto h-[100vh] shadow-lg
         `}
       >
         <p className="text-gray-700 text-lg font-medium mb-10 flex items-center justify-center gap-2">
