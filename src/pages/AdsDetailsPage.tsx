@@ -1,73 +1,76 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useRef } from "react";
-import MenuButton from "../components/MenuButton";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
+import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 
 const AdsDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const adData = location.state?.adData;
+    const { id } = useParams<{ id: string }>();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const adData = location.state?.adData;
 
-  // mock ads
-  const ads = [
-    { id: 1, location: "Accra", title: "Smartphone for sale", price: "GHc 500" },
-    { id: 2, location: "Kumasi", title: "Car", price: "GHc 300 for 6days" },
-    { id: 3, location: "Takoradi", title: "Laptop", price: "GHc 800" },
-    { id: 4, location: "Cape Coast", title: "Bike", price: "GHc 150 for 3days" },
-    { id: 5, location: "Tamale", title: "Headphones", price: "GHc 200" },
-    { id: 6, location: "Ho", title: "Tablet", price: "GHc 400" },
-    { id: 7, location: "Tema", title: "Camera", price: "GHc 600" },
-    { id: 8, location: "Obuasi", title: "Smartwatch", price: "GHc 250" },
-    { id: 9, location: "Sunyani", title: "Printer", price: "GHc 250 GHc 250 GHc 250" },
-    { id: 10, location: "Wa", title: "Monitor", price: "GHc 450" },
-  ];
+    // mock ads
+    const pics: string[] = Array.from({ length: 10 }, () => "https://picsum.photos/200");
 
-  const images = [
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-  ];
 
-  // navigation 
-  const currentId = parseInt(id || "1");
-  const currentIndex = ads.findIndex((a) => a.id === currentId);
-  const currentAdData = adData || ads[currentIndex];
-  const totalAds = ads.length;
+    const ads = [
+        { id: 1, location: "Accra", title: "Smartphone for sale", price: "GHc 500" },
+        { id: 2, location: "Kumasi", title: "Car", price: "GHc 300 for 6days" },
+        { id: 3, location: "Takoradi", title: "Laptop", price: "GHc 800" },
+        { id: 4, location: "Cape Coast", title: "Bike", price: "GHc 150 for 3days" },
+        { id: 5, location: "Tamale", title: "Headphones", price: "GHc 200" },
+        { id: 6, location: "Ho", title: "Tablet", price: "GHc 400" },
+        { id: 7, location: "Tema", title: "Camera", price: "GHc 600" },
+        { id: 8, location: "Obuasi", title: "Smartwatch", price: "GHc 250" },
+        { id: 9, location: "Sunyani", title: "Printer", price: "GHc 250 GHc 250 GHc 250" },
+        { id: 10, location: "Wa", title: "Monitor", price: "GHc 450" }
+    ];
 
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      const prevAd = ads[currentIndex - 1];
-      navigate(`/ads/${prevAd.id}`, { state: { adData: prevAd } });
-    }
-  };
+    const images = [
+        "/3d-car-city-street.webp",
+        "/3d-car-city-street.webp",
+        "/3d-car-city-street.webp",
+        "/3d-car-city-street.webp",
+    ];
 
-  const handleNext = () => {
-    if (currentIndex < totalAds - 1) {
-      const nextAd = ads[currentIndex + 1];
-      navigate(`/ads/${nextAd.id}`, { state: { adData: nextAd } });
-    }
-  };
+    // navigation 
+    const currentId = parseInt(id || "1");
+    const currentIndex = ads.findIndex((a) => a.id === currentId);
+    const currentAdData = adData || ads[currentIndex];
+    const totalAds = ads.length;
 
-  // swipe support
-  const touchStartX = useRef<number | null>(null);
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
+    const handlePrevious = () => {
+        if (currentIndex > 0) {
+            const prevAd = ads[currentIndex - 1];
+            navigate(`/ads/${prevAd.id}`, { state: { adData: prevAd } });
+        }
+    };
+
+    const handleNext = () => {
+        if (currentIndex < totalAds - 1) {
+            const nextAd = ads[currentIndex + 1];
+            navigate(`/ads/${nextAd.id}`, { state: { adData: nextAd } });
+        }
+    };
+
+    // swipe support
+    const touchStartX = useRef<number | null>(null);
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartX.current = e.touches[0].clientX;
+    };
+    const handleTouchEnd = (e: React.TouchEvent) => {
         if (touchStartX.current === null) return;
         const diff = touchStartX.current - e.changedTouches[0].clientX;
         if (Math.abs(diff) > 50) {
-            if (diff > 0) { 
+            if (diff > 0) {
                 handleNext()
-            } else { 
+            } else {
                 handlePrevious();
             };
             touchStartX.current = null;
         }
-  };
+    };
 
     // mini components
     const MobileHeader = () => (
@@ -81,71 +84,71 @@ const AdsDetailsPage = () => {
             </h2>
             <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
-                <img src="/flag.svg" alt="" className="w-4 h-4" />
-                <span className="text-xs">24</span>
+                    <img src="/flag.svg" alt="" className="w-4 h-4" />
+                    <span className="text-xs">24</span>
                 </div>
                 <div className="flex items-center gap-1">
-                <img src="/favorited.svg" alt="" className="w-4 h-4" />
-                <span className="text-xs">10</span>
+                    <img src="/favorited.svg" alt="" className="w-4 h-4" />
+                    <span className="text-xs">10</span>
                 </div>
             </div>
         </div>
     );
     const DesktopHeader = () => (
         <div className="hidden sm:flex bg-white p-2 items-center justify-evenly gap-4 w-full font-light text-xs">
-        <div className="flex items-center gap-2">
-            <img src="/location.svg" alt="" className="w-3 h-3" />
-            <h2 className="text-sm">{currentAdData?.location || "Lashibi, Accra"}</h2>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/star.svg" alt="" className="w-3 h-3" />
-            <h2 className="text-sm">4.5 20 reviews</h2>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/flag.svg" alt="" className="w-3 h-3" />
-            <h2 className="text-sm">30</h2>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/favorited.svg" alt="" className="w-5 h-5" />
-            <h2 className="text-sm">34</h2>
-        </div>
-        <div className="flex gap-2 ml-auto">
-            <button onClick={handlePrevious} className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
-            <img src="/arrowleft.svg" alt="" className="w-5 h-5" />
-            </button>
-            <button onClick={handleNext} className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
-            <img src="/arrowright.svg" alt="" className="w-5 h-5" />
-            </button>
-        </div>
+            <div className="flex items-center gap-2">
+                <img src="/location.svg" alt="" className="w-3 h-3" />
+                <h2 className="text-sm">{currentAdData?.location || "Lashibi, Accra"}</h2>
+            </div>
+            <div className="flex items-center gap-2">
+                <img src="/star.svg" alt="" className="w-3 h-3" />
+                <h2 className="text-sm">4.5 20 reviews</h2>
+            </div>
+            <div className="flex items-center gap-2">
+                <img src="/flag.svg" alt="" className="w-3 h-3" />
+                <h2 className="text-sm">30</h2>
+            </div>
+            <div className="flex items-center gap-2">
+                <img src="/favorited.svg" alt="" className="w-5 h-5" />
+                <h2 className="text-sm">34</h2>
+            </div>
+            <div className="flex gap-2 ml-auto">
+                <button onClick={handlePrevious} className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
+                    <img src="/arrowleft.svg" alt="" className="w-5 h-5" />
+                </button>
+                <button onClick={handleNext} className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
+                    <img src="/arrowright.svg" alt="" className="w-5 h-5" />
+                </button>
+            </div>
         </div>
     );
     const ImageGallery = () => (
         <div className="w-full flex justify-center my-4 sm:my-8">
-        {/* Desktop */}
-        <div className="hidden sm:flex flex-row w-9/10 h-64 gap-1">
-            <div className="flex w-full">
-            <img src="/3d-car-city-street.webp" alt="" className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg" />
+            {/* Desktop */}
+            <div className="hidden sm:flex flex-row w-9/10 h-64 lg:h-80 gap-1">
+                <div className="flex w-full">
+                    <img src="/3d-car-city-street.webp" alt="" className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg" />
+                </div>
+                <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
+                    <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+                    <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+                </div>
+                <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
+                    <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+                    <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+                </div>
             </div>
-            <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
-            <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            </div>
-            <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
-            <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            <img src="/3d-car-city-street.webp" alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            </div>
-        </div>
 
-        {/* Mobile */}
-        <div
-            className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-        >
-            <img src={images[currentIndex]} alt="Ad main" className="object-cover w-full h-full" />
-            <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
-            <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
-        </div>
+            {/* Mobile */}
+            <div
+                className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
+                <img src={images[currentIndex]} alt="Ad main" className="object-cover w-full h-full" />
+                <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
+                <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
+            </div>
         </div>
     );
     const TitleAndPrice = () => (
@@ -160,17 +163,17 @@ const AdsDetailsPage = () => {
     );
     const AdDetails = () => (
         <div className=" sm:p-6 pl-2">
-        <h2 className="text-xl font-bold mb-2">Ad Details</h2>
-        <ul className="list-disc ml-5 marker:text-black marker:font-extrabold space-y-2 text-sm">
-            <li><span className="font-bold">Ad ID&nbsp;</span> {id}</li>
-            <li><span className="font-bold">State&nbsp;</span> Brand new</li>
-            <li><span className="font-bold">Body Type&nbsp;</span> Sedan</li>
-            <li><span className="font-bold">Year&nbsp;</span> 2025</li>
-            <li><span className="font-bold">Mileage&nbsp;</span> 0</li>
-            <li><span className="font-bold">Color&nbsp;</span> Red</li>
-            <li><span className="font-bold">Location&nbsp;</span> {currentAdData?.location || "Accra"}</li>
-            <li><span className="font-bold">Model:</span> Covet Hyundai csv salon</li>
-        </ul>
+            <h2 className="text-xl font-bold mb-2">Ad Details</h2>
+            <ul className="list-disc ml-5 marker:text-black marker:font-extrabold space-y-2 text-sm">
+                <li><span className="font-bold">Ad ID&nbsp;</span> {id}</li>
+                <li><span className="font-bold">State&nbsp;</span> Brand new</li>
+                <li><span className="font-bold">Body Type&nbsp;</span> Sedan</li>
+                <li><span className="font-bold">Year&nbsp;</span> 2025</li>
+                <li><span className="font-bold">Mileage&nbsp;</span> 0</li>
+                <li><span className="font-bold">Color&nbsp;</span> Red</li>
+                <li><span className="font-bold">Location&nbsp;</span> {currentAdData?.location || "Accra"}</li>
+                <li><span className="font-bold">Model:</span> Covet Hyundai csv salon</li>
+            </ul>
         </div>
     );
     const SafetyTips = () => (
@@ -190,17 +193,17 @@ const AdsDetailsPage = () => {
         <div>
             <div className="flex flex-wrap gap-2 mb-1">
                 {[
-                ["mark as taken.svg", "Mark as taken"],
-                ["flag.svg", "Report Ad"],
-                ["outgoing call.svg", "Caller 1"],
-                ["outgoing call.svg", "Caller 2"],
-                ["Make an offer.svg", "Make Offer"],
-                ["favorited.svg", "Favorites"],
+                    ["mark as taken.svg", "Mark as taken"],
+                    ["flag.svg", "Report Ad"],
+                    ["outgoing call.svg", "Caller 1"],
+                    ["outgoing call.svg", "Caller 2"],
+                    ["Make an offer.svg", "Make Offer"],
+                    ["favorited.svg", "Favorites"],
                 ].map(([icon, label]) => (
-                <button key={label} className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm bg-[var(--div-active)] sm:bg-white hover:bg-gray-50">
-                    <img src={`/${icon}`} alt="" className="w-4 h-4" />
-                    <p className="whitespace-nowrap">{label}</p>
-                </button>
+                    <button key={label} className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm bg-[var(--div-active)] sm:bg-white hover:bg-gray-50">
+                        <img src={`/${icon}`} alt="" className="w-4 h-4" />
+                        <p className="whitespace-nowrap">{label}</p>
+                    </button>
                 ))}
             </div>
         </div>
@@ -236,7 +239,7 @@ const AdsDetailsPage = () => {
                             </div>
                         </div>
                         <p className="text-gray-700 text-xs">
-                        This is a great car with excellent features. I had a wonderful experience driving it around the city.
+                            This is a great car with excellent features. I had a wonderful experience driving it around the city.
                         </p>
                     </div>
                 ))}
@@ -262,10 +265,10 @@ const AdsDetailsPage = () => {
                         "Can I see the service history?"
                     ].map((text, i) => (
                         <button
-                        key={i}
-                        className="px-3 py-2 bg-[var(--div-active)] sm:bg-white rounded text-xs hover:bg-gray-100 whitespace-nowrap w-fit"
+                            key={i}
+                            className="px-3 py-2 bg-[var(--div-active)] sm:bg-white rounded text-xs hover:bg-gray-100 whitespace-nowrap w-fit"
                         >
-                        {text}
+                            {text}
                         </button>
                     ))}
                 </div>
@@ -275,10 +278,10 @@ const AdsDetailsPage = () => {
                     <input
                         type="text"
                         placeholder="Start a chat"
-                        style={{ border:"1px solid var(--div-border)" }}
+                        style={{ border: "1px solid var(--div-border)" }}
                         className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-[length:20px_20px] bg-[center_right_12px] bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
                     />
-                    <button style={{ border:"1px solid var(--div-border)" }} className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white">
+                    <button style={{ border: "1px solid var(--div-border)" }} className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white">
                         <img src="/audio.svg" alt="" className="w-7 h-5" />
                     </button>
                 </div>
@@ -301,7 +304,7 @@ const AdsDetailsPage = () => {
             <div className="hidden sm:flex flex-row gap-4 bg-[var(--div-active)] px-4 py-7 rounded-2xl mb-5">
                 <div className="relative">
                     <img src="/face.svg" alt="" className="w-15 h-15 rounded-full" />
-                    <img src="/verified.svg" alt="" className="absolute -bottom-1 -right-2 w-8 h-8" />   
+                    <img src="/verified.svg" alt="" className="absolute -bottom-1 -right-2 w-8 h-8" />
                 </div>
                 <div>
                     <h2 className="text-sm text-gray-500">Jan,2024</h2>
@@ -320,7 +323,7 @@ const AdsDetailsPage = () => {
                 </div>
                 <button className="px-2 py-1 rounded text-sm bg-[var(--div-active)]">Seller Ads</button>
             </div>
-                
+
             {/* product slideshow */}
             <div className="flex items-center mb-4 w-full">
                 <div className="pt-4 overflow-x-hidden">
@@ -346,7 +349,7 @@ const AdsDetailsPage = () => {
             <div className="sm:hidden flex flex-row gap-4 bg-[var(--div-active)] p-4 rounded-2xl mb-5">
                 <div className="relative">
                     <img src="/face.svg" alt="" className="w-15 h-15 rounded-full" />
-                    <img src="/verified.svg" alt="" className="absolute -bottom-1 -right-2 w-8 h-8" />   
+                    <img src="/verified.svg" alt="" className="absolute -bottom-1 -right-2 w-8 h-8" />
                 </div>
                 <div>
                     <h2 className="text-sm text-gray-500">Jan,2024</h2>
@@ -357,9 +360,9 @@ const AdsDetailsPage = () => {
         </div>
     );
     const SimilarAds = () => (
-        <div className="bg-white sm:bg-[var(--div-active)] p-4 sm:py-6 sm:px-15 w-full">
-            <h2 className="text-xl font-bold mb-4 px-2">Similar Ads</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full">
+        <div className="bg-white sm:bg-[var(--div-active)] p-4 sm:py-6 sm:px-15 w-full ">
+            <h2 className="text-xl font-bold mb-4 px-2 lg:px-18">Similar Ads</h2>
+            {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full">
                 {Array.from({ length: 10 }).map((_, index) => (
                     <div key={index} className="flex flex-col w-full">
                         <img
@@ -379,18 +382,47 @@ const AdsDetailsPage = () => {
                         </p>
                     </div>
                 ))}
+
+            </div> */}
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center">
+                {pics.map((pic, index) => (
+                    <Link
+                        key={index}
+                        to={`/ads/${ads[index].id}`}
+                        state={{ adData: ads[index] }}
+                        className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+                    >
+                        <img
+                            src={pic}
+                            alt={`${index}`}
+                            className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
+                        />
+                        <div className="flex items-center gap-1 px-2 py-1">
+                            <img src="/location.svg" alt="" className="w-3 sm:w-4 h-3 sm:h-4" />
+                            <p className="text-[10px] sm:text-xs text-gray-500 truncate">
+                                {ads[index].location}
+                            </p>
+                        </div>
+                        <p className="px-2 text-[11px] sm:text-sm line-clamp-1 text-gray-600">
+                            {ads[index].title}
+                        </p>
+                        <p className="px-2 text-[11px] sm:text-sm font-medium text-gray-800">
+                            {ads[index].price}
+                        </p>
+                    </Link>
+                ))}
             </div>
         </div>
     );
 
 
     return (
-        
-        <div style={{color:"var(--dark-def)"}} className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white">
 
-            <MobileHeader  />
+        <div style={{ color: "var(--dark-def)" }} className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white">
+
+            <MobileHeader />
             <DesktopHeader />
-            <ImageGallery  />
+            <ImageGallery />
             <TitleAndPrice />
 
             {/* MAIN CONTENT */}
@@ -415,7 +447,7 @@ const AdsDetailsPage = () => {
                             <SellerInfo />
                             <RatingReviews layout='row' fullWidth />
                         </div>
-                        
+
                         <div className="bg-white mt-6 p-6 rounded-lg w-full">
                             <CommentsSection />
                         </div>
@@ -424,7 +456,7 @@ const AdsDetailsPage = () => {
                     {/* desktop layout */}
                     <div className=' hidden sm:grid sm:grid-cols-2 gap-1.5 w-full ad-details-page'>
                         <div className="flex flex-col w-full space-y-6 p-6 mb-5">
-                            <RatingReviews layout='row'/>
+                            <RatingReviews layout='row' />
                             <CommentsSection />
                         </div>
                         <div className="p-6 rounded-lg w-full -mt-17">
@@ -444,7 +476,7 @@ const AdsDetailsPage = () => {
             </div>
 
             <MenuButton />
-            
+
         </div>
     );
 };
