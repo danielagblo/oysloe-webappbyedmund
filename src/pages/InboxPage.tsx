@@ -12,7 +12,7 @@ export default function InboxPage() {
     <div className="relative bg-[var(--div-active)] min-h-screen h-screen w-full overflow-hidden">
       {/* Mobile top banner */}
       <div className="block sm:hidden w-full">
-        <MobileBanner page="Inbox" />
+        <MobileBanner page="Inbox"/>
       </div>
 
       {/* Page content */}
@@ -46,7 +46,7 @@ export default function InboxPage() {
 
       {/* Mobile full-screen chat overlay */}
       {selectedCase && (
-        <div className="sm:hidden fixed inset-0 z-40 bg-white">
+        <div className="sm:hidden fixed inset-0 z-400 bg-white">
           <div className="h-full w-full">
             <LiveChat caseId={selectedCase} onClose={() => setSelectedCase(null)} />
           </div>
