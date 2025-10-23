@@ -27,6 +27,7 @@ function App() {
         <Route path="/verification" element={<VerificationPage />} />
         <Route path="/referal-verification" element={<ReferalVerificationPage />} />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
