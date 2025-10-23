@@ -4,6 +4,7 @@ import PageLocked from "../components/PageLocked";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 
+
 const AdsTopbar = () => (
     <div className="bg-white w-full flex justify-around items-center px-8 py-2 rounded-2xl">
         <div className="flex items-center gap-2">
@@ -41,6 +42,7 @@ const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState("profile");
 
     const lockedTabs = ["profile", "ads", "favorite", "subscription", "refer", "feedback"];
+    const lockedTabs = ["profile", "ads", "favorite", "subscription", "refer", "feedback"];
 
     const renderContent = () => {
         if (lockedTabs.includes(activeTab)) {
@@ -49,6 +51,8 @@ const ProfilePage = () => {
                     ? "Ads"
                     : activeTab === "favorite"
                     ? "Favorite"
+                    : activeTab === "feedback"
+                    ? "Feedback"
                     : activeTab === "feedback"
                     ? "Feedback"
                     : activeTab === "subscription"
@@ -150,16 +154,21 @@ const ProfilePage = () => {
                                 shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-5 sm:py-6 w-full 
                                 flex flex-col items-center justify-center sm:shadow-lg sm:rounded-2xl 
                                 h-[100vh] sm:h-auto
+                                flex flex-col items-center justify-center sm:shadow-lg sm:rounded-2xl 
+                                h-[100vh] sm:h-auto
                             `}
                         >
                             <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh]">
+                            <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh]">
                                 <h3 className="text-2xl">Terms & Conditions</h3>
                                 <h3>Help us improve on our app</h3>
+                                
                                 
                             </div>
                         </div>
                     </div>
                 );
+
 
 
             case "privacy":
@@ -170,11 +179,15 @@ const ProfilePage = () => {
                                 shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-5 sm:py-6 w-full 
                                 flex flex-col items-center justify-center sm:shadow-lg sm:rounded-2xl 
                                 h-[100vh] sm:h-auto
+                                flex flex-col items-center justify-center sm:shadow-lg sm:rounded-2xl 
+                                h-[100vh] sm:h-auto
                             `}
                         >
                             <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh]">
+                            <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh]">
                                 <h3 className="text-2xl">Privacy Policy</h3>
                                 <h3>Help us improve on our app</h3>
+                                
                                 
                             </div>
                         </div>
@@ -195,6 +208,7 @@ const ProfilePage = () => {
 
             <div className="flex items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-hidden">
                 <div
+                    className={`flex gap-2 sm:h-full sm:w-full ${
                     className={`flex gap-2 sm:h-full sm:w-full ${
                     activeTab.toUpperCase() === "ADS" ? "flex-col w-full h-full" : ""
                     }`}
