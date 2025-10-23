@@ -268,7 +268,7 @@ const HomePage = () => {
         </div>
     );
     const SelectACategory = () => (
-    <div className="w-[94vw] sm:w-3/4 max-w-6xl mt-3 mx-auto">
+    <div className="w-[94vw] sm:max-w-[80vw] max-w-6xl mt-3">
         <div
         className="
             grid 
@@ -489,7 +489,7 @@ const HomePage = () => {
                     <ConditionalAds />
                 ) : (
                     <>
-                        <div className="transform scale-90 sm:scale-100">
+                        <div className="transform scale-90 sm:transform-none sm:scale-100">
                             {/* Categories Grid */}
                             <SelectACategory />
 
