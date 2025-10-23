@@ -13,6 +13,7 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
   const handleAction = () => {
     if (page.toUpperCase() === "POST AD") return "post an ad";
     if (page.toUpperCase() === "PROFILE") return "edit your profile";
+    if (page.toUpperCase() === "FEEDBACK") return "give us feedback";
     return "go any further";
   };
 
@@ -20,8 +21,8 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
     <div className="relative flex items-center justify-center w-full h-full text-center shadow-lg">
       {/* Outer container changes on mobile */}
       <div
-        className={`rounded-2xl bg-white px-6 py-10 sm:px-10 sm:pt-5 sm:pb-14 w-full 
-          flex flex-col items-center justify-center sm:rounded-2xl sm:w-auto sm:h-auto h-[100vh]
+        className={`rounded-2xl bg-white px-6 py-15 sm:px-10 sm:pt-5 sm:pb-14 w-full 
+          flex flex-col items-center justify-start sm:justify-center sm:rounded-2xl sm:w-auto sm:h-auto h-[100vh]
         `}
       >
         <p className="text-gray-700 text-lg font-medium mb-10 flex items-center justify-center gap-2">
@@ -29,9 +30,9 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
           <LockClosedIcon className="w-5 h-5 text-gray-700" />
         </p>
 
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 leading-tight mb-6">
+        <p className="text-[25px] sm:text-4xl lg:text-5xl font-extrabold text-gray-800 leading-tight mb-6">
           Download our mobile app to enjoy full access
-        </h1>
+        </p>
 
         <p className="text-gray-600 text-base sm:text-lg mb-10 max-w-md mx-auto">
           Our web version provides very limited access.
