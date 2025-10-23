@@ -4,39 +4,6 @@ import PageLocked from "../components/PageLocked";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 
-const AdsTopbar = () => (
-    <div className="bg-white w-full flex justify-around items-center px-8 py-2 rounded-2xl">
-        <div className="flex items-center gap-2">
-            <img src="/active.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-            <div>
-                <h2>650 Ads</h2>
-                <p className="text-xs">Active</p>
-            </div>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/pending.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-            <div>
-                <h2>120 Ads</h2>
-                <p className="text-xs">Pending</p>
-            </div>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/sold.svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-            <div>
-                <h2>50 Ads</h2>
-                <p className="text-xs">Taken</p>
-            </div>
-        </div>
-        <div className="flex items-center gap-2">
-            <img src="/suspend (2).svg" alt="" className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5" />
-            <div>
-                <h2>50 Ads</h2>
-                <p className="text-xs">Suspended</p>
-            </div>
-        </div>
-    </div>
-);
-
 const ProfilePage = () => {
     const [activeTab, setActiveTab] = useState("profile");
 
@@ -112,23 +79,8 @@ const ProfilePage = () => {
             </div>
 
             <div className="flex items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-hidden">
-                <div
-                    className={`flex gap-2 sm:h-full sm:w-full ${
-                    activeTab.toUpperCase() === "ADS" ? "flex-col w-full h-full" : ""
-                    }`}
-                >
-                    {activeTab.toUpperCase() === "ADS" ? (
-                    <div className="flex flex-col gap-2 w-full h-[100vh] sm:h-[95vh]">
-                        <div className="hidden sm:block">
-                            <AdsTopbar />
-                        </div>
-                        <div>
-                            {renderContent()}
-                        </div>
-                    </div>
-                    ) : (
-                        renderContent()
-                    )}
+                <div className="flex gap-2 sm:h-full sm:w-full">
+                {renderContent()}
                 </div>
             </div>
 

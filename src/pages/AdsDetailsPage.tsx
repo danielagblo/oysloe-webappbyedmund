@@ -159,7 +159,7 @@ const AdsDetailsPage = () => {
         </div>
     );
     const AdDetails = () => (
-        <div className=" sm:p-6 pl-2 mb-[2rem] ">
+        <div className=" sm:p-6 pl-2">
         <h2 className="text-xl font-bold mb-2">Ad Details</h2>
         <ul className="list-disc ml-5 marker:text-black marker:font-extrabold space-y-2 text-sm">
             <li><span className="font-bold">Ad ID&nbsp;</span> {id}</li>
@@ -209,7 +209,7 @@ const AdsDetailsPage = () => {
         <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0">
             <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
             <h2 className="text-2xl font-medium hidden sm:inline">Comments</h2>
-            <div className="mt-5 -ml-4 w-[120%] flex flex-col gap-3">
+            <div className="mt-5 -ml-4 w-[120%] sm:w-[100%] flex flex-col gap-3">
                 {[1, 2, 3].map((comment) => (
                     <div key={comment} className="p-4 last:border-b-0 bg-[var(--div-active)] rounded-lg w-full">
                         <div className="flex items-center justify-between">
@@ -357,26 +357,26 @@ const AdsDetailsPage = () => {
         </div>
     );
     const SimilarAds = () => (
-        <div className="bg-white sm:bg-[var(--div-active)] p-4 sm:p-6 w-full">
+        <div className="bg-white sm:bg-[var(--div-active)] p-4 sm:py-6 sm:px-15 w-full">
             <h2 className="text-xl font-bold mb-4 px-2">Similar Ads</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 sm:gap-6 w-full">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full">
                 {Array.from({ length: 10 }).map((_, index) => (
                     <div key={index} className="flex flex-col w-full">
-                    <img
-                        src="/building.svg"
-                        className="object-cover w-full h-32 sm:h-40 rounded-2xl"
-                        alt="Ad"
-                    />
-                    <div className="flex items-center justify-start px-1 mt-2">
-                        <img src="/location.svg" alt="" className="w-4 h-4" />
-                        <p className="text-xs ml-1 text-gray-600">Accra</p>
-                    </div>
-                    <p className="px-1 text-sm line-clamp-2 mt-1 text-gray-800">
-                        Six bedroom apartment
-                    </p>
-                    <p className="px-1 text-sm font-semibold text-gray-900">
-                        GH₵ 2,000 for 6 days
-                    </p>
+                        <img
+                            src="/building.svg"
+                            className="object-cover w-full sm:max-w-52 h-32 sm:h-40 rounded-2xl"
+                            alt="Ad"
+                        />
+                        <div className="flex items-center justify-start px-1 mt-2">
+                            <img src="/location.svg" alt="" className="w-4 h-4" />
+                            <p className="text-xs ml-1 text-gray-600">Accra</p>
+                        </div>
+                        <p className="px-1 text-sm line-clamp-2 mt-1 text-gray-800">
+                            Six bedroom apartment
+                        </p>
+                        <p className="px-1 text-sm font-semibold text-gray-900">
+                            GH₵ 2,000 for 6 days
+                        </p>
                     </div>
                 ))}
             </div>
@@ -397,7 +397,7 @@ const AdsDetailsPage = () => {
             <div className="flex flex-col gap-4 w-full">
                 <div className="flex justify-evenly gap-4 flex-col md:px-4 ad-details-page">
                     <div className='flex w-full justify-between ad-details-page'>
-                        <div className="flex flex-col space-y-6 w-fit md:w-1/2 ad-details-desc">
+                        <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6">
                             <AdDetails />
                         </div>
                         <div className="flex flex-col space-y-6 w-full md:w-1/2">
@@ -427,23 +427,19 @@ const AdsDetailsPage = () => {
                             <RatingReviews layout='row'/>
                             <CommentsSection />
                         </div>
-                        <div className="p-6 rounded-lg w-full">
+                        <div className="p-6 rounded-lg w-full -mt-17">
                             <div className="sm:bg-[var(--div-active)] w-full p-3 rounded-2xl">
                                 <ActionButtons />
                                 <QuickChat />
                             </div>
                             <SellerInfo />
                         </div>
-                        
-                        <div className="bg-white mt-6 p-6 rounded-lg w-full">
-                            
-                        </div>
                     </div>
                 </div>
 
                 <div className="w-[100vw] -ml-4 sm:-ml-12 p-0">
                     <SimilarAds />
-                    <div className="p-10 bg-[var(--div-active)]" />
+                    <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
                 </div>
             </div>
 
