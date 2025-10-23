@@ -268,7 +268,7 @@ const HomePage = () => {
         </div>
     );
     const SelectACategory = () => (
-    <div className="w-[94vw] sm:max-w-[80vw] max-w-6xl mt-3 mx-auto">
+    <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
         <div
         className="
             grid 
@@ -288,22 +288,22 @@ const HomePage = () => {
                 onClick={() => handleCategoryClick(category.name)}
                 className="
                     flex flex-col items-center justify-center
-                    w-[70px] h-[80px] sm:w-[120px] sm:h-[130px]
+                    min-w-[64px] min-h-[75px] sm:w-[120px] sm:h-[130px]
                     bg-[var(--div-active)] rounded-lg 
                     p-2 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
                 "
             >
-            <div className="h-[45px] w-[45px] sm:h-[80px] sm:w-[80px] relative rounded-full bg-white">
-                <img
-                src={category.icon}
-                alt={category.name}
-                className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
-                />
-            </div>
-            <h3 className="text-center text-[10px] sm:text-[length:var(--font-size)] mt-1 truncate">
-                {category.name}
-            </h3>
+                <div className="h-[45px] w-[45px] sm:h-[80px] sm:w-[80px] relative rounded-full bg-white">
+                    <img
+                    src={category.icon}
+                    alt={category.name}
+                    className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
+                    />
+                </div>
+                <h3 className="text-center text-[10px] sm:text-[length:var(--font-size)] mt-1 truncate">
+                    {category.name}
+                </h3>
             </div>
         ))}
         </div>
