@@ -268,7 +268,7 @@ const HomePage = () => {
         </div>
     );
     const SelectACategory = () => (
-    <div className="w-[94vw] sm:max-w-[80vw] max-w-6xl mt-3">
+    <div className="w-[94vw] sm:max-w-[80vw] max-w-6xl mt-3 mx-auto">
         <div
         className="
             grid 
