@@ -389,7 +389,7 @@ const HomePage = () => {
         ].map((section) => (
             <div
                 key={section}
-                style={{ transform: "scale(0.9)" }} 
+                
                 className="flex flex-col w-[95vw] max-w-6xl mt-6 mx-auto overflow-hidden"
             >
             <div className="flex items-center gap-3 mb-2 px-2">
@@ -489,11 +489,13 @@ const HomePage = () => {
                     <ConditionalAds />
                 ) : (
                     <>
-                        {/* Categories Grid */}
-                        <SelectACategory />
+                        <div className="transform scale-80">
+                            {/* Categories Grid */}
+                            <SelectACategory />
 
-                        {/* Circular category summaries */}
-                        <CircularSummaries />
+                            {/* Circular category summaries */}
+                            <CircularSummaries />
+                        </div>
 
                         {/* === Scrollable Ad Sections === */}
                         <div className="bg-[var(--div-active)] w-[100vw]">  
