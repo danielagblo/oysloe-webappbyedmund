@@ -35,9 +35,6 @@ function App() {
         <Route path='/postad' element={<PostAdPage />} />
         <Route path='/inbox' element={<InboxPage />} />
         <Route path='/profile' element={<ProfilePage />} />
-
-
-
       </Routes >
     </div>
   )
