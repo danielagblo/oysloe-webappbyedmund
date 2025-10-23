@@ -57,6 +57,7 @@ export default function InboxPage() {
 
       {/* Bottom nav */}
       <MenuButton />
+      </div>
     </div>
   );
 }
