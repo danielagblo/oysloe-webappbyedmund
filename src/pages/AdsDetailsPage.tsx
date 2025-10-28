@@ -364,7 +364,7 @@ const AdsDetailsPage = () => {
                     <div key={index} className="flex flex-col w-full">
                         <img
                             src="/building.svg"
-                            className="object-cover w-full sm:max-w-52 h-32 sm:h-40 rounded-2xl"
+                            className="object-cover w-full h-32 sm:h-40 rounded-2xl"
                             alt="Ad"
                         />
                         <div className="flex items-center justify-start px-1 mt-2">

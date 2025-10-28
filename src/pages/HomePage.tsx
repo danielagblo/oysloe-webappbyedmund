@@ -362,12 +362,12 @@ const HomePage = () => {
                     />
                     {/* Overlayed custom text */}
                     <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[8px] sm:text-xs w-[60px]">
-                        {category.name}
-                    </span>
-                    <span className="text-[10px] sm:text-sm font-bold text-[var(--accent-color)]">
-                        {category.adsCount}+
-                    </span>
+                        <span className="text-[8px] sm:text-xs w-[60px]">
+                            {category.name}
+                        </span>
+                        <span className="text-[10px] sm:text-sm font-bold text-[var(--accent-color)]">
+                            {category.adsCount}+
+                        </span>
                     </div>
                 </div>
                 );
