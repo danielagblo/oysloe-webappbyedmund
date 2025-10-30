@@ -7,13 +7,13 @@ import ReferPage from "./ReferPage";
 import TermsPage from "./TermsPage";
 import PrivacyPage from "./PrivacyPage";
 import AdsPage from "./AdsPage";
+import FavouritesPage from "./FavouritesPage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   const lockedTabs = [
     "profile",
-    "favorite",
     "subscription",
     "feedback",
   ];
@@ -21,9 +21,7 @@ const ProfilePage = () => {
   const renderContent = () => {
         if (lockedTabs.includes(activeTab)) {
         const pageName =
-            activeTab === "favorite"
-                ? "Favorite"
-                : activeTab === "feedback"
+            activeTab === "feedback"
                 ? "Feedback"
                 : activeTab === "subscription"
                     ? "Subscription"
@@ -32,6 +30,8 @@ const ProfilePage = () => {
         }
 
         switch (activeTab) {
+            case "favorite":
+              return <FavouritesPage />
             case "ads":
                 return <AdsPage />;
             case "refer":
@@ -51,7 +51,7 @@ const ProfilePage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-hidden">
+      <div className="flex items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-auto no-scrollbar">
         <div className="flex gap-2 sm:h-full sm:w-full">{renderContent()}</div>
       </div>
 

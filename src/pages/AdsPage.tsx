@@ -1,100 +1,6 @@
 import MenuButton from "../components/MenuButton";
-import adPlaceholderImg from "../assets/ad-placeholder.png";
 import { useState } from "react";
-
-const ads = [
-  {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Taken"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Pending"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  },{
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Taken"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Pending"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  },{
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Taken"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Pending"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Active"
-  }, {
-    img: adPlaceholderImg,
-    name: "Mercedes Benz",
-    price: "$32",
-    status: "Suspended"
-  }, 
-]
+import { ads } from "../data/ads";
 
 const AdsPage = () => {
   const [activeTab, setActiveTab] = useState("Active");
@@ -105,7 +11,7 @@ const AdsPage = () => {
   return (
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
-        <div className="bg-white w-full mt-3 flex justify-around items-center px-8 pt-6 rounded-2xl">
+        <div className="sticky top-3 z-50 bg-white w-full mt-3 flex justify-around items-center px-8 pt-6 rounded-2xl">
           {["Active", "Pending", "Taken", "Suspended"].map((status) => (
             <div
               key={status}
@@ -154,10 +60,11 @@ const AdsPage = () => {
               </div>
             </div>
           ))}
+          <div className="h-20 w-full"/>
         </div>
 
         {selectedAd && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div className="bg-white rounded-xl p-4 w-[90%] max-w-[400px] shadow-md relative pt-10">
               <button
                 onClick={() => setSelectedAd(null)}
