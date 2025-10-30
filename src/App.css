@@ -189,3 +189,7 @@ body {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+ html, body {
+  overflow-x: hidden;
+}
