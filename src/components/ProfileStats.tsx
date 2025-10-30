@@ -39,28 +39,6 @@ export default function ProfileStats() {
     </div>
   );
 
-  // // mobile banner
-  // const MobileBanner = () => (
-  //   <div className="w-full flex items-center justify-between bg-white shadow-sm rounded-none lg:rounded-xl px-4 py-3 active:scale-[0.99] transition sm:hidden fixed top-0 left-0 z-20">
-  //     <div className="flex items-center gap-3">
-  //       <img
-  //         src="avatar.jpg"
-  //         alt="pfp"
-  //         className="w-10 h-10 rounded-full object-cover bg-pink-300"
-  //       />
-  //       <div className="flex flex-col text-left">
-  //         <span className="font-semibold text-base leading-tight">Alexander Kowri</span>
-  //         <span className="text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded w-fit">
-  //           High Level
-  //         </span>
-  //       </div>
-  //     </div>
-  //     <span className="text-lg font-bold text-gray-700">4.5★</span>
-      
-  //   </div>
-  // );
-
-
   return (
     <div className="w-[25vw] m-0 relative text-[var(--dark-def)]">
         {/* <MobileBanner /> */}
