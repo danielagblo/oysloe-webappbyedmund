@@ -7,7 +7,6 @@ const AlertsPanel = () => (
   <div className="flex flex-col items-center lg:w-full text-[var(--dark-def)] ">
     {/* Fixed-height container only for desktop */}
     <div className="bg-white w-full mr-2 lg:w-[75vw] lg:h-[93vh] lg:rounded-2xl shadow-sm flex flex-col">
-
       {/* Header (desktop only) */}
       <div className="p-4 sm:p-6 border-b hidden sm:block border-gray-100 flex-shrink-0">
         <h2 className="sm:text-center sm:text-3xl sm:font-semibold">Alerts</h2>
@@ -32,7 +31,8 @@ const AlertsPanel = () => (
                   <span className="font-semibold">Oysloe</span>
                   <span className="ml-1 break-words">
                     We’re excited to have you onboard. You’ve taken the first
-                    step toward smarter shopping and selling. Big things await — stay tuned!
+                    step toward smarter shopping and selling. Big things await —
+                    stay tuned!
                   </span>
                 </div>
               </div>
@@ -58,8 +58,9 @@ const AlertsPanel = () => (
               <div className="text-sm">
                 <span className="font-semibold">Oysloe</span>
                 <span className="ml-1 text-gray-400">
-                  We’re excited to have you onboard. You’ve taken the first
-                  step toward smarter shopping and selling. Big things await — stay tuned!
+                  We’re excited to have you onboard. You’ve taken the first step
+                  toward smarter shopping and selling. Big things await — stay
+                  tuned!
                 </span>
               </div>
             </div>

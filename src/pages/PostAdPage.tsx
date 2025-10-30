@@ -1,14 +1,13 @@
-import MobileBanner from '../components/MobileBanner';
-import PageLocked from '../components/PageLocked'
-import ProfileStats from '../components/ProfileStats'
+import MobileBanner from "../components/MobileBanner";
+import PageLocked from "../components/PageLocked";
+import ProfileStats from "../components/ProfileStats";
 import MenuButton from "../components/MenuButton";
 
 function PostAdPage() {
   return (
     <div className="flex flex-col lg:flex-row w-full h-screen bg-[var(--div-active)] text-[var(--dark-def)] overflow-hidden">
-
       <div className="sm:hidden w-full">
-        <MobileBanner backto="Home" page="Post An Ad"/>
+        <MobileBanner backto="Home" page="Post An Ad" />
       </div>
 
       <div className="hidden sm:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
@@ -21,7 +20,7 @@ function PostAdPage() {
 
       <MenuButton />
     </div>
-  )
+  );
 }
 
 export default PostAdPage;

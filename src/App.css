@@ -1,16 +1,18 @@
 :root {
-    --div-active: #f9f9f9;
-    --div-border: #bfbfbf49;
-    --dark-def: #374957;
-    --trans-dark-def: #3749574d;
-    --some-gray: #dbdee1;
-    --some-other-gray: #2632386c;
-    --green: #74ffa7;
+  --div-active: #f9f9f9;
+  --div-border: #bfbfbf49;
+  --dark-def: #374957;
+  --trans-dark-def: #3749574d;
+  --some-gray: #dbdee1;
+  --some-other-gray: #2632386c;
+  --green: #74ffa7;
 
-    --font-size: 1rem;
+  --font-size: 1rem;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -19,56 +21,56 @@ html, body, #root {
 
 html,
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 body {
-      overflow-x: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .tempclass {
-    width: 100vw;
-    padding: 0px 60px;
+  width: 100vw;
+  padding: 0px 60px;
 }
 
 .bottom-nav {
-    width: fit-content;
-    padding: 0 2rem;
+  width: fit-content;
+  padding: 0 2rem;
 }
 
 .ad-details-page {
-    flex-wrap: nowrap;
+  flex-wrap: nowrap;
 }
 
 @media (max-width: 600px) {
-    .ad-details-page {
-        flex-wrap: wrap;
-    }
+  .ad-details-page {
+    flex-wrap: wrap;
+  }
 
-    .ad-details-desc {
-        width: fit-content;
-    }
+  .ad-details-desc {
+    width: fit-content;
+  }
 }
 
 .input-bkg-mask {
-    overflow: hidden;
-    border-radius: 9999px;
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+  overflow: hidden;
+  border-radius: 9999px;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .rotating-bg {
@@ -88,13 +90,7 @@ body {
   position: absolute;
   inset: -510%;
   border-radius: 50%;
-  background: conic-gradient(
-    #74FFA7,
-    #374957,
-    #74FFA7,
-    #FF6B6B,
-    #74FFA7
-  );
+  background: conic-gradient(#74ffa7, #374957, #74ffa7, #ff6b6b, #74ffa7);
   animation: spin 3500ms linear infinite;
   filter: blur(1px);
   will-change: transform;
@@ -123,8 +119,12 @@ body {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile */
@@ -161,7 +161,6 @@ body {
     width: 420px;
   }
 }
-
 
 @keyframes slideInLeft {
   from {

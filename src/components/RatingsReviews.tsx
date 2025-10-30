@@ -2,7 +2,7 @@ import React from "react";
 
 interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
-  fullWidth?: boolean;       // default: false
+  fullWidth?: boolean; // default: false
 }
 
 export const RatingReviews: React.FC<RatingReviewsProps> = ({
@@ -15,7 +15,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   `;
 
   const ratingSection = (
-    <div className={`flex flex-col items-center justify-center`} >
+    <div className={`flex flex-col items-center justify-center`}>
       <h3 className={"font-medium text-5xl mt-3"}> 4.5 </h3>
       <p className={`${layout === "row" ? "text-base" : "text-lg"}`}>
         ★ ★ ★ ★ <span className="text-gray-400">★</span>
