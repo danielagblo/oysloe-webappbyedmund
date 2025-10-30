@@ -6,13 +6,13 @@ import ProfileStats from "../components/ProfileStats";
 import ReferPage from "./ReferPage";
 import TermsPage from "./TermsPage";
 import PrivacyPage from "./PrivacyPage";
+import AdsPage from "./AdsPage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   const lockedTabs = [
     "profile",
-    "ads",
     "favorite",
     "subscription",
     "feedback",
@@ -21,9 +21,7 @@ const ProfilePage = () => {
   const renderContent = () => {
         if (lockedTabs.includes(activeTab)) {
         const pageName =
-            activeTab === "ads"
-            ? "Ads"
-            : activeTab === "favorite"
+            activeTab === "favorite"
                 ? "Favorite"
                 : activeTab === "feedback"
                 ? "Feedback"
@@ -34,6 +32,8 @@ const ProfilePage = () => {
         }
 
         switch (activeTab) {
+            case "ads":
+                return <AdsPage />;
             case "refer":
                 return <ReferPage />;
             case "terms":
