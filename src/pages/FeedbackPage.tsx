@@ -26,10 +26,10 @@ const FeedbackPage = () => {
         </div>
         <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
           <textarea
-            className="border-1 w-full rounded-md resize-none p-2 border-gray-300 mt-[10%]"
+            className="border-1 w-full h-1/4 rounded-md resize-none p-2 border-gray-300 mt-[10%]"
             placeholder="Comment"
           />
-          <button className="w-full bg-gray-100 p-5 rounded-md">
+          <button className="w-full cursor-pointer bg-gray-100 p-5 rounded-md">
             Send Review
           </button>
         </div>
