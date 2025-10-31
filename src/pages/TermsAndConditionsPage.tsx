@@ -2,16 +2,16 @@ import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 
-const PrivacyPage = () => {
+const TermsAndConditionsPage = () => {
   return (
     <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] gap-4">
       <div className="w-1/11 h-full">
-        <ProfileSidebar active="privacy" onSelect={() => {}} />
+        <ProfileSidebar active="terms" onSelect={() => {}} />
       </div>
       <div className="md:flex w-full p-3 m-0 mr-2 h-full overflow-hidden no-scrollbar justify-center gap-4 hidden">
         <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
           <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
-            <h3 className=" text-2xl">Privacy Policy</h3>
+            <h3 className=" text-2xl">T&C</h3>
             <h3 className="">Help us improve on our app</h3>
           </div>
         </div>
@@ -27,4 +27,4 @@ const PrivacyPage = () => {
   );
 };
 
-export default PrivacyPage;
+export default TermsAndConditionsPage;
