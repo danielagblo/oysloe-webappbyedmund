@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../App.css";
 import Button from "../components/Button";
 import MenuButton from "../components/MenuButton";
+
 const ReferPage = () => {
-  const [how, setHow] = useState(true);
+
+  const [how, setHow] = useState(false);
   const [redraw, setRedraw] = useState(false);
   const [apply, setApply] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) {
+      setHow(true);
+    }
+  }, []);
+
 
   const paymentData = [
     { date: "Apr 7, 2024", points: "20 points", total: "$430" },
@@ -18,7 +27,7 @@ const ReferPage = () => {
 
   const Refer = () => (
     <div className="h-full w-full flex flex-col gap-2">
-      <div className="bg-white w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm">
+      <div className="bg-white w-4/5 mr-2 md:mr-0 md:w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
         <div className="flex gap-2 my-2">
           <img src="/star green.svg" alt="" className="w-4 h-4 my-auto" />
           <h2 className="text-sm">Points</h2>
@@ -38,7 +47,7 @@ const ReferPage = () => {
           <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">equals &#8804;10</span>
         </div>
       </div>
-      <div className="flex gap-4 w-full">
+      <div className="flex gap-4 w-full px-2 md:px-0">
         <div className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm">
           <div className="flex flex-col items-center justify-between gap-2">
             <img src="/earn.svg" className="w-5 h-5" alt="" />
@@ -61,7 +70,7 @@ const ReferPage = () => {
         </div>
       </div>
       <div
-        className="bg-white shadom-sm w-full h-24 pt-6 rounded-2xl p-2 flex justify-between items-center"
+        className="bg-white shadom-sm w-[96%] ml-2 md:ml-0 md:w-full h-24 pt-6 rounded-2xl p-2 flex justify-between items-center"
         onClick={() => {
           setRedraw(false);
           setHow(false);
@@ -77,7 +86,7 @@ const ReferPage = () => {
         </div>
         <img className="mb-9" src="/arrowright.svg" alt="" />
       </div>
-      <div className="bg-white w-full h-full shadom-sm rounded-2xl p-3 flex flex-col justify-between items-start px-4 pt-6 pb-18">
+      <div className="bg-white w-full h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 pb-18">
         <div className="w-full flex flex-col justify-center gap-2">
           <h2 className="text-sm 2xl:text-xl">Refer Your friends and Earn</h2>
           <span>
@@ -101,7 +110,7 @@ const ReferPage = () => {
             <h2 className="text-xs inline pl-3 text-gray-400">Boost your business</h2>
           </span>
         </div>
-        <div className="mt-5 w-full">
+        <div className=" mt-10 md:mt-5 w-full">
           <h2 className="text-xs text-gray-400">You've referred 0 friends</h2>
           <div className="flex gap-2 items-center justify-between w-full">
             <div className="py-2 rounded-lg mt-3 relative flex flex-row gap-3 justify-center border border-[var(--div-border)] items-center w-full">
@@ -210,7 +219,7 @@ const ReferPage = () => {
         </div>
       </div>
       <div className="w-full px-3 h-full bg-white shadom-sm rounded-2xl pt-4 pb-18">
-        <div className="w-full h-full flex flex-col justify-center gap-2 py-8">
+        <div className="w-full h-full flex flex-col md:justify-center gap-2 md:py-8">
           <div className=" flex rounded-lg flex-col justify-between bg-[#F9F9F9] p-3">
             <h2 className="text-sm">Silver</h2>
             <h3 className="text-xs text-gray-500">10 points to silver</h3>
@@ -239,15 +248,42 @@ const ReferPage = () => {
       </div>
     </div>
   );
+
   return (
-    <div className="h-screen w-screen bg-[var(--background)] mb-5">
+    <div className="h-screen w-screen bg-[var(--background)] mb-5 relative">
       <div className="w-full sm:flex lg:grid lg:grid-cols-2 py-5 h-full overflow-auto no-scrollbar gap-4">
         <Refer />
-        {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : null}
+        <div className="hidden md:block">
+          {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : null}
+        </div>
       </div>
+      {(how || apply || redraw) && (
+        <div className="fixed inset-0 bg-white z-50 flex flex-col md:hidden animate-fadeIn">
+          
+          <div className="flex items-center gap-3 p-4 border-b border-gray-200">
+            <button
+              onClick={() => {
+                setHow(false);
+                setApply(false);
+                setRedraw(false);
+              }}
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <img src="/arrowleft.svg" alt="back" className="w-5 h-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4">
+            {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : null}
+          </div>
+        </div>
+      )}
+
       <MenuButton />
     </div>
   );
+
 };
 
 export default ReferPage;
