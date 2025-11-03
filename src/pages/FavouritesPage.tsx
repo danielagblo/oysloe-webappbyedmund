@@ -72,8 +72,9 @@ const FavouritesPage = () => {
               >
                 +
               </button>
-              <div className="mt-6 text-center text-gray-600">
-                <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40">Remove From Favourites</button>
+              <div className="mt-6 text-center text-gray-600 flex flex-col gap-1.5 sm:flex-row sm:justify-center items-center">
+                <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40">Open</button>
+                <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40">Remove From Favourites</button>
               </div>
             </div>
           </div>
