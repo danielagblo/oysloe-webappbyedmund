@@ -46,12 +46,12 @@ const ProfilePage = () => {
     };
 
   return (
-    <div className="overflow-y-hidden flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">
+    <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">
       <div className="h-full">
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-auto no-scrollbar">
+      <div className="flex no-scrollbar items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 sm:my-2 overflow-y-auto no-scrollbar">
         <div className="flex gap-2 sm:h-full sm:w-full">{renderContent()}</div>
       </div>
 
