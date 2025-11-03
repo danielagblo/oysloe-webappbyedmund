@@ -34,7 +34,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
   return (
     <>
-      {/* ---------- DESKTOP SIDEBAR ---------- */}
+      
       <div className="hidden sm:flex flex-col h-full w-[18vw] sm:w-[10vw] justify-center items-center bg-white py-10">
         <div className="flex flex-col h-full gap-10 sm:gap-2 justify-center w-full">
           {items.map((item) => {
@@ -74,8 +74,8 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
         </div>
       </div>
 
-      {/* ---------- MOBILE MENU BUTTON ---------- */}
-      <div className="sm:hidden fixed top-4 left-4 z-40">
+      
+      <div className="sm:hidden fixed top-4 left-4 z-1000">
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border border-gray-200"
@@ -84,16 +84,15 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
         </button>
       </div>
 
-      {/* ---------- MOBILE SIDEBAR DRAWER ---------- */}
       {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 flex">
-          {/* BACKDROP */}
+        <div className="sm:hidden fixed inset-0 z-1000 flex">
+          
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* SIDEBAR PANEL */}
+          
           <div className="relative w-64 h-full bg-white shadow-2xl flex flex-col justify-between animate-slide-in-left">
             <div className="flex flex-col gap-6 pt-8">
               <button
