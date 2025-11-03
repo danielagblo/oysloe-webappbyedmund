@@ -11,29 +11,7 @@ const AdsPage = () => {
   return (
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
-        {/* <div className="sticky top-3 z-50 bg-white w-full mt-3 flex justify-around items-center px-8 pt-6 rounded-2xl">
-          {["Active", "Pending", "Taken", "Suspended"].map((status) => (
-            <div
-              key={status}
-              onClick={() => setActiveTab(status)}
-              className={`flex items-center gap-2 cursor-pointer border-b-[4px] pb-3 ${
-                activeTab === status
-                  ? "border-[var(--dark-def)]"
-                  : "border-transparent"
-              }`}
-            >
-              <img
-                src={`/${status.toLowerCase()}.svg`}
-                alt={status}
-                className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5"
-              />
-              <div>
-                <h2>{ads.filter((ad) => ad.status === status).length} Ads</h2>
-                <p className="text-xs">{status}</p>
-              </div>
-            </div>
-          ))}
-        </div> */}
+
         <div className="sticky top-3 z-50 md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
 
           <div className="hidden md:flex justify-around items-center px-4 pb-2">
@@ -60,34 +38,36 @@ const AdsPage = () => {
             ))}
           </div>
 
-        <div className="flex flex-col items-end md:hidden gap-2">
-          <select
-            value={activeTab}
-            onChange={(e) => setActiveTab(e.target.value)}
-            className="w-3/4 border border-gray-400 rounded-xl p-2 px-3 text-sm focus:outline-none focus:ring-transparent"
-          >
-            {["Active", "Pending", "Taken", "Suspended"].map((status) => (
-              <option 
-                key={status} 
-                value={status}
-              >
-                {status} ({ads.filter((ad) => ad.status === status).length})
-              </option>
-            ))}
-          </select>
+        <div className=" sm:hidden fixed top-0 left-0 w-full bg-[#ededed] pt-7 pr-4">
+          <div className="flex flex-col items-end md:hidden gap-2">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value)}
+              className="w-3/4 border border-gray-400 rounded-xl p-2 px-3 text-sm focus:outline-none focus:ring-transparent"
+            >
+              {["Active", "Pending", "Taken", "Suspended"].map((status) => (
+                <option 
+                  key={status} 
+                  value={status}
+                >
+                  {status} ({ads.filter((ad) => ad.status === status).length})
+                </option>
+              ))}
+            </select>
 
-          <div className="w-full text-center my-2">
-            <h2 className="text-lg font-semibold">
-              {ads.filter((ad) => ad.status === activeTab).length} Ads
-            </h2>
-            <p className="text-sm text-gray-500">{activeTab}</p>
+            <div className="w-full text-center my-2">
+              <h2 className="text-lg font-semibold">
+                {ads.filter((ad) => ad.status === activeTab).length} Ads
+              </h2>
+              <p className="text-sm text-gray-500">{activeTab}</p>
+            </div>
           </div>
         </div>
 
       </div>
 
 
-        <div className="w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center">
+        <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center">
           {filteredAds.map((ad, index) => (
             <div
               key={index}

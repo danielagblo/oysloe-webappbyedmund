@@ -8,10 +8,10 @@ const FavouritesPage = () => {
   const favourites = ads.filter((ad) => ad.isFavourited);
 
   return (
-    <div className="flex justify-between h-screen w-screen items-center bg-transparent">
+    <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
         
-        <div className="sticky top-3 bg-white w-full mt-3 flex items-center px-8 py-3 rounded-2xl z-50">
+        <div className="hidden sticky top-3 bg-white w-full mt-3 sm:flex items-center px-8 py-3 rounded-2xl z-50">
           <img
             src="/favorited.svg"
             alt="Favourites"
@@ -22,12 +22,24 @@ const FavouritesPage = () => {
             <h2>{favourites.length} Ads Favourited</h2>
           </div>
         </div>
+        
+        <div className="sm:hidden fixed top-0 left-0 py-4 w-full flex justify-center items-center bg-[#ededed] z-20">
+          <img
+            src="/favorited.svg"
+            alt="Favourites"
+            className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5"
+          />
 
-        <div className="w-full flex flex-row h-auto flex-wrap gap-2 justify-center">
+          <div className="ml-8">
+            <h2><span className="font-bold text-xl">{favourites.length}</span> Ads Favourited</h2>
+          </div>
+        </div>
+
+        <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center">
           {favourites.map((ad, index) => (
             <div
               key={index}
-              className="w-[32%] max-w-[300px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
+              className="lg:w-[32%] lg:max-w-[300px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
             >
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
