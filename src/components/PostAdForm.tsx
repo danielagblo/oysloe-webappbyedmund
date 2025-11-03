@@ -7,6 +7,7 @@ import { categoryOptions } from "../data/categories";
 import LocationSelector from "./LocationSelector";
 import { mockPostAd } from "../api/mock";
 import { postAd } from "../api/postAd";
+import { type AdMetadata } from "../types/AdMetaData";
 
 // mock || realApi toggle, currently using mock
 const useMock = true;
@@ -119,7 +120,7 @@ export default function PostAdForm() {
     }
 
 
-    const metadata = {
+    const metadata: AdMetadata = {
       title: title.trim(),
       category,
       purpose,
@@ -346,22 +347,25 @@ export default function PostAdForm() {
               <LocationSelector onConfirm={handleMapConfirm} />
             </div>
 
-            <div className="flex flex-wrap gap-1 ">
-              {[
-                "Home Spintex",
-                "Shop Accra",
-                "Shop East Legon",
-                "Shop Kumasi",
-              ].map((loc) => (
-                <button
-                  key={loc}
-                  type="button"
-                  className="p-1 bg-gray-100 rounded-xs text-[length:0.9vw] hover:bg-gray-200"
-                  onClick={() => setRegionLocation(loc)}
-                >
-                  {loc}
-                </button>
-              ))}
+            <div className="flex flex-wrap gap-1 my-1 font-bold">
+
+              <div className="flex flex-wrap gap-1 ">
+                {[
+                  "Home Spintex",
+                  "Shop Accra",
+                  "Shop East Legon",
+                  "Shop Kumasi",
+                ].map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    className="p-1 bg-gray-100 rounded-xs text-[length:0.9vw] hover:bg-gray-200"
+                    onClick={() => setRegionLocation(loc)}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
