@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import DropdownPopup from "./DropDownPopup";
 import uploadImg from "../assets/upload.png";
 import sample from "/sample.png";
@@ -21,6 +22,7 @@ interface UploadedImage {
   id: number;
   url: string;
   file?: File;
+  hasFile?: boolean;
 }
 
 export default function PostAdForm() {
@@ -97,10 +99,6 @@ export default function PostAdForm() {
     setSelectedImage(null);
   }
 
-  // function handleRegionSelect(opt: string) {
-  //   setRegionLocation(opt);
-  //   setMapSelection(null);
-  // }
   function handleRegionSelect(opt: string) {
     setTempSelectedLocation(opt);
     setShowSaveLocationModal(true);
@@ -187,6 +185,17 @@ export default function PostAdForm() {
     if (trigger === "weekly") setWeeklyDuration(value);
     if (trigger === "monthly") setMonthlyDuration(value);
   }
+
+  const reorder = (
+    list: UploadedImage[],
+    startIndex: number,
+    endIndex: number
+  ): UploadedImage[] => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
 
   const resetForm = () => {
     setTitle("");
@@ -466,23 +475,23 @@ export default function PostAdForm() {
               </span>
             </div>
 
-            <div
+            {/* <div
               ref={gridRef}
               className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 relative mt-3"
             >
               {uploadedImages.map((img) => (
-                <div key={img.id} className="relative group">
+                <div key={img.id} className="relative group flex justify-center items-center">
                   <img
                     src={img.url}
                     alt={`Uploaded ${img.id}`}
-                    className="w-full rounded-lg object-cover cursor-pointer"
+                    className="w-full h-full rounded-lg object-cover cursor-pointer"
                     onClick={() => setSelectedImage(img.id)}
                   />
                   {selectedImage === img.id && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
                       <button
                         onClick={() => handleDeleteImage(img.id)}
-                        className="border border-[var(--div-border)] bg-transparent text-red-600 hover:bg-red-200/40 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                        className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
                       >
                         Delete
                       </button>
@@ -490,18 +499,138 @@ export default function PostAdForm() {
                   )}
                 </div>
               ))}
-            </div>
+            </div> */}
+            {/* <DragDropContext
+              onDragEnd={(result) => {
+                if (!result.destination) return;
+                const reordered = Array.from(uploadedImages);
+                const [moved] = reordered.splice(result.source.index, 1);
+                reordered.splice(result.destination.index, 0, moved);
+                setUploadedImages(reordered);
+              }}
+            >
+              <Droppable droppableId="images" direction="horizontal">
+                {(provided) => (
+                  <div
+                    ref={(el) => {
+                      gridRef.current = el;
+                      provided.innerRef(el);
+                    }}
+                    {...provided.droppableProps}
+                    className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 relative mt-3"
+                  >
+                    {uploadedImages.map((img, index) => (
+                      <Draggable key={img.id} draggableId={String(img.id)} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="relative group flex justify-center items-center"
+                          >
+                            <img
+                              src={img.url}
+                              alt={`Uploaded ${img.id}`}
+                              className="w-full h-full rounded-lg object-cover cursor-pointer"
+                              onClick={() => setSelectedImage(img.id)}
+                            />
+                            {selectedImage === img.id && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
+                                <button
+                                  onClick={() => handleDeleteImage(img.id)}
+                                  className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext> */}
+            
+            <div className="relative flex flex-col w-full overflow-y-scroll no-scrollbar">
+              <DragDropContext
+                onDragEnd={(result) => {
+                  if (!result.destination) return;
+                  const reordered = reorder(
+                    uploadedImages,
+                    result.source.index,
+                    result.destination.index
+                  );
+                  setUploadedImages(reordered);
+                }}
+              >
+                <Droppable
+                  droppableId="imageGrid"
+                  direction="horizontal"
+                  renderClone={null}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="
+                        grid gap-3 sm:gap-4 relative mt-3 overflow-y-auto no-scrollbar
+                        grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
+                      "
+                    >
+                      {uploadedImages.map((img, index) => (
+                        <Draggable key={img.id} draggableId={img.id.toString()} index={index}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="relative group flex justify-center items-center"
+                            >
+                              <img
+                                src={img.url}
+                                alt={`Uploaded ${img.id}`}
+                                className="w-full h-full rounded-lg object-cover cursor-pointer"
+                                onClick={() => setSelectedImage(img.id)}
+                              />
+                              {selectedImage === img.id && (
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
+                                  <button
+                                    onClick={() => handleDeleteImage(img.id)}
+                                    className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                  
+                </Droppable>
+              </DragDropContext>
+              
+              <div className="h-30 w-full" />
+            </div>           
 
             {isMobile && (
-              <div className="w-full flex justify-center items-center">
-                <button
-                  onClick={() => setMobileStep("form")}
-                  type="button"
-                  className="fixed bottom-20 sm:bottom-25 w-4/5 py-4 sm:py-7 bg-[var(--dark-def)] text-white rounded-xl hover:bg-[var(--accent)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] transition"
-                >
-                  Next →
-                </button>
-              </div>
+              <>
+                <div className="w-full flex justify-center items-center">
+                  <button
+                    onClick={() => setMobileStep("form")}
+                    type="button"
+                    className="fixed bottom-17 sm:bottom-25 w-4/5 py-4 sm:py-7 bg-[var(--dark-def)] text-white rounded-xl hover:bg-[var(--accent)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] transition"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </>
             )}
 
             {!isMobile && (
