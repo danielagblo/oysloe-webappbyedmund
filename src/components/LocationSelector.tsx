@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -49,18 +49,21 @@ interface LocationSelectorProps {
   onConfirm?: (
     selection: { coords: { lat: number; lng: number }; placeName: string } | null
   ) => void;
+  selectedLocation?: { coords: { lat: number; lng: number }; placeName: string } | null;
 }
 
-export default function LocationSelector({ onConfirm }: LocationSelectorProps) {
+export default function LocationSelector({ onConfirm, selectedLocation }: LocationSelectorProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempSelection, setTempSelection] = useState<{
     coords: Coords;
     placeName: string;
   } | null>(null);
-  const [finalSelection, setFinalSelection] = useState<{
-    coords: Coords;
-    placeName: string;
-  } | null>(null);
+  const [finalSelection, setFinalSelection] = useState(selectedLocation || null);
+
+  useEffect(() => {
+    setFinalSelection(selectedLocation || null);
+  }, [selectedLocation]);
+
 
   const handleConfirm = () => {
     if (tempSelection) {

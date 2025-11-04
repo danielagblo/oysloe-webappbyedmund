@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -22,6 +22,10 @@ export default function DropdownPopup({
   const [submenuOptions, setSubmenuOptions] = useState<string[]>([]);
   const [selectedMain, setSelectedMain] = useState<string>("");
   const [finalLabel, setFinalLabel] = useState(triggerLabel);
+
+  useEffect(() => {
+    setFinalLabel(triggerLabel);
+  }, [triggerLabel]);
 
   const handleMainSelect = (mainOption: string) => {
     if (supportsSubmenu && !Array.isArray(options)) {
