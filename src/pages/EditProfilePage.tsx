@@ -6,7 +6,7 @@ import { PlusIcon, X } from "lucide-react";
 import mailGif from "../assets/mail.gif";
 
 const EditProfilePage = () => {
-  const [activeTab, setActiveTab] = useState("feedback");
+  const [activeTab, setActiveTab] = useState("profile");
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);

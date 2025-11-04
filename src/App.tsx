@@ -19,6 +19,7 @@ import PrivacyPage from "./pages/PrivacyPage.tsx";
 import AlertsPage from "./pages/AlertsPage.tsx";
 import TermsAndConditionsPage from "./pages/TermsAndConditionsPage.tsx";
 import FeedbackPage from "./pages/FeedbackPage.tsx";
+import SubscriptionPage from "./pages/SubscriptionPage.tsx";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/subscription" element={<SubscriptionPage />} />
         <Route path="/tc" element={<TermsAndConditionsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
