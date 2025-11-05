@@ -1,11 +1,11 @@
 <p align="center">
   <a href="https://papaya-starlight-a2c388.netlify.app/" target="_blank" rel="noopener noreferrer">
     <img
-      src="https://raw.githubusercontent.com/fireheart071/oysloebynellyedmund/snapmock/output_laptop.png"
+      src="https://raw.githubusercontent.com/danielagblo/oysloe-webappbyedmund/snapmock/output_laptop.png"
       srcset="
-        https://raw.githubusercontent.com/fireheart071/oysloebynellyedmund/snapmock/output_mobile.png  767w,
-        https://raw.githubusercontent.com/fireheart071/oysloebynellyedmund/snapmock/output_tablet.png 1023w,
-        https://raw.githubusercontent.com/fireheart071/oysloebynellyedmund/snapmock/output_laptop.png 1280w
+        https://raw.githubusercontent.com/danielagblo/oysloe-webappbyedmund/snapmock/output_mobile.png  767w,
+        https://raw.githubusercontent.com/danielagblo/oysloe-webappbyedmund/snapmock/output_tablet.png 1023w,
+        https://raw.githubusercontent.com/danielagblo/oysloe-webappbyedmund/snapmock/output_laptop.png 1280w
       "
       sizes="(max-width: 767px) 100vw,
              (max-width: 1023px) 80vw,
