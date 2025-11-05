@@ -1,6 +1,5 @@
 import { useState } from "react";
 import MenuButton from "../components/MenuButton";
-import PageLocked from "../components/PageLocked";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 import ReferPage from "./ReferPage";
@@ -10,6 +9,7 @@ import FavouritesPage from "./FavouritesPage";
 import SubscriptionPage from "./SubscriptionPage";
 import EditProfilePage from "./EditProfilePage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
+import FeedbackPage from "./FeedbackPage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -31,9 +31,9 @@ const ProfilePage = () => {
             case "subscription":
               return <SubscriptionPage />;
             case "feedback":
-              return <PageLocked page="Feedback"/>
+              return <FeedbackPage />
             default:
-                return null;
+                return <p>Page not found.</p>;
         }
     };
 
