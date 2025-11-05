@@ -1,5 +1,4 @@
 import RatingReviews from "./RatingsReviews";
-import avatar from "../assets/avatar.jpg";
 
 export default function ProfileStats() {
   // mini components
