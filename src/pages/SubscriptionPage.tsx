@@ -14,17 +14,17 @@ const SubscriptionPage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="md:flex w-full p-3 m-0 mr-2 h-full overflow-hidden no-scrollbar justify-center gap-4 hidden">
-        <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-start gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
+      <div className="flex flex-col lg:flex-row w-full p-3 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
+        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
             <div className="bg-gray-50 flex p-4 rounded-2xl justify-between items-center gap-2">
               <div className="w-full flex flex-col justify-start items-start gap-4">
-                <p className="text-[1.25rem] font-light text-nowrap">
+                <p className="md:text-[1.25rem] max-md:text-[0.8rem]  font-light text-nowrap">
                   You're currently subscribed
                 </p>
                 <div className="flex justify-start items-start gap-4">
-                  <p className="font-medium">Basic Package</p>
-                  <p className="font-medium">Expires in 30 days</p>
+                  <p className="font-medium max-md:text-[0.5rem]">Basic Package</p>
+                  <p className="font-medium max-md:text-[0.5rem]">Expires in 30 days</p>
                 </div>
               </div>
               <img src={Subscription} alt="subscription" className="w-[20%]" />
@@ -32,7 +32,7 @@ const SubscriptionPage = () => {
           </div>
         </div>
 
-        <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl overflow-auto text-xs">
+        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs max-lg:mb-20">
           <div className="flex pt-5 px-5 flex-col justify-start gap-6 mb-2 w-full">
             <p className="text-center text-gray-500">
               Choose a monthly plan that works for you{" "}
