@@ -27,7 +27,9 @@ const ReviewPage = () => {
         {/* Comments Panel */}
         <div className="relative bg-white w-[55%] rounded-2xl shadow-sm flex flex-col p-4 overflow-y-auto no-scrollbar">
           <div className="sticky -top-4 left-0 pt-2 bg-white">
-            <h2 className="text-2xl font-semibold mb-4 text-center">User Reviews</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-center">
+              User Reviews
+            </h2>
 
             {/* Star Filter Bar */}
             <div className="bg-white/95 backdrop-blur-md px-2 py-3 border-b min-h-fit border-gray-100 flex gap-1 justify-around overflow-x-auto no-scrollbar text-sm">
@@ -49,16 +51,28 @@ const ReviewPage = () => {
           {/* Comments */}
           <div className="space-y-4 mt-4">
             {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="pb-4 border-b border-gray-100 last:border-b-0">
+              <div
+                key={i}
+                className="pb-4 border-b border-gray-100 last:border-b-0"
+              >
                 <div className="flex items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
-                    <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
+                    <img
+                      src="/face.svg"
+                      alt=""
+                      className="w-10 h-10 rounded-lg"
+                    />
                     <div className="flex flex-col">
                       <p className="text-[10px] text-gray-400">April 1</p>
                       <h3 className="font-semibold">Sandra</h3>
                       <div className="flex">
                         {[...Array(5)].map((_, j) => (
-                          <img key={j} src="/star.svg" alt="" className="w-3 h-3" />
+                          <img
+                            key={j}
+                            src="/star.svg"
+                            alt=""
+                            className="w-3 h-3"
+                          />
                         ))}
                       </div>
                     </div>
@@ -69,8 +83,8 @@ const ReviewPage = () => {
                   </div>
                 </div>
                 <p className="text-gray-700 text-sm mt-1">
-                  This is a great car with excellent features. I had a wonderful experience
-                  driving it around the city.
+                  This is a great car with excellent features. I had a wonderful
+                  experience driving it around the city.
                 </p>
               </div>
             ))}
@@ -80,7 +94,9 @@ const ReviewPage = () => {
 
         {/* Make a Review Panel (desktop) */}
         <div className="bg-white w-[45%] rounded-2xl shadow-sm flex flex-col items-center justify-start p-6 relative">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Make a Review</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center">
+            Make a Review
+          </h2>
 
           {/* Star Selection */}
           <div className="flex w-full justify-around mb-4">
@@ -101,14 +117,14 @@ const ReviewPage = () => {
             {selectedStars === 0
               ? "Rate your experience"
               : selectedStars === 5
-              ? "Excellent"
-              : selectedStars === 4
-              ? "Good"
-              : selectedStars === 3
-              ? "Average"
-              : selectedStars === 2
-              ? "Poor"
-              : "Terrible"}
+                ? "Excellent"
+                : selectedStars === 4
+                  ? "Good"
+                  : selectedStars === 3
+                    ? "Average"
+                    : selectedStars === 2
+                      ? "Poor"
+                      : "Terrible"}
           </h3>
 
           {/* Comment Input */}
@@ -150,8 +166,8 @@ const ReviewPage = () => {
           <h2 className="text-xl font-semibold mb-3">User Reviews</h2>
           <div className="flex gap-2 flex-wrap mb-4">
             <button className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
-                <img src="/star.svg" alt="" className="w-4 h-4" /> All
-              </button>
+              <img src="/star.svg" alt="" className="w-4 h-4" /> All
+            </button>
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -195,7 +211,12 @@ const ReviewPage = () => {
             <div className="bg-white w-full rounded-t-3xl p-6 animate-slide-up">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-xl font-semibold">Make a Review</h2>
-                <button onClick={() => setShowMobileForm(false)} className="text-gray-500 text-2xl">×</button>
+                <button
+                  onClick={() => setShowMobileForm(false)}
+                  className="text-gray-500 text-2xl"
+                >
+                  ×
+                </button>
               </div>
 
               <div className="flex justify-around mb-3">

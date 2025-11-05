@@ -12,6 +12,14 @@ const routes: Record<RouteKey, string> = {
   profile: "/profile",
 };
 
+const profileSubPages = [
+  "/edit-profile",
+  "/feedback",
+  "/tc",
+  "/privacy",
+  "/subscription",
+];
+
 const icons: Record<RouteKey, string> = {
   home: "/home.svg",
   alerts: "/Alert.svg",
@@ -134,13 +142,16 @@ export default function ResponsiveMenu() {
 
   const pathToKey = useCallback((path: string): RouteKey => {
     const entry = Object.entries(routes).find(
-      ([, route]) => path === route || path.startsWith(route)
+      ([, route]) => path === route || path.startsWith(route),
     );
+    if (profileSubPages?.includes(path)) {
+      return "profile";
+    }
     return (entry?.[0] as RouteKey) || "home";
   }, []);
 
   const [active, setActive] = useState<RouteKey>(() =>
-    pathToKey(location.pathname)
+    pathToKey(location.pathname),
   );
 
   useEffect(() => {
