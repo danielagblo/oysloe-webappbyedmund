@@ -134,13 +134,13 @@ export default function ResponsiveMenu() {
 
   const pathToKey = useCallback((path: string): RouteKey => {
     const entry = Object.entries(routes).find(
-      ([, route]) => path === route || path.startsWith(route)
+      ([, route]) => path === route || path.startsWith(route),
     );
     return (entry?.[0] as RouteKey) || "home";
   }, []);
 
   const [active, setActive] = useState<RouteKey>(() =>
-    pathToKey(location.pathname)
+    pathToKey(location.pathname),
   );
 
   useEffect(() => {

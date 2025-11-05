@@ -1,7 +1,7 @@
 import { useState } from "react";
 import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
-import MobileBanner from '../components/MobileBanner';
+import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 
@@ -11,7 +11,7 @@ export default function InboxPage() {
   return (
     <div className="relative bg-[var(--div-active)] min-h-screen h-screen w-full overflow-hidden">
       <div className="block sm:hidden w-full">
-        <MobileBanner page="Inbox"/>
+        <MobileBanner page="Inbox" />
       </div>
 
       {/* Page content */}
@@ -31,10 +31,16 @@ export default function InboxPage() {
 
         {/* Live Chat — desktop: right column; mobile: full-screen when open */}
         {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
-        <div className={`sm:w-[50%] w-full h-screen overflow-y-auto sm:py-5 sm:pr-1 sm:-ml-3 ${selectedCase ? 'hidden sm:block' : ''}`}>
+        <div
+          className={`sm:w-[50%] w-full h-screen overflow-y-auto sm:py-5 sm:pr-1 sm:-ml-3 ${selectedCase ? "hidden sm:block" : ""}`}
+        >
           <SupportAndCases
-            onSelectCase={(caseId) => setSelectedCase(prev => (prev === caseId ? null : caseId))}
-            onSelectChat={(chatId) => setSelectedCase(prev => (prev === chatId ? null : chatId))}
+            onSelectCase={(caseId) =>
+              setSelectedCase((prev) => (prev === caseId ? null : caseId))
+            }
+            onSelectChat={(chatId) =>
+              setSelectedCase((prev) => (prev === chatId ? null : chatId))
+            }
           />
         </div>
 
@@ -46,17 +52,20 @@ export default function InboxPage() {
           />
         </div>
 
-      {/* Mobile full-screen chat overlay */}
-      {selectedCase && (
-        <div className="sm:hidden fixed inset-0 z-400 bg-white">
-          <div className="h-full w-full">
-            <LiveChat caseId={selectedCase} onClose={() => setSelectedCase(null)} />
+        {/* Mobile full-screen chat overlay */}
+        {selectedCase && (
+          <div className="sm:hidden fixed inset-0 z-400 bg-white">
+            <div className="h-full w-full">
+              <LiveChat
+                caseId={selectedCase}
+                onClose={() => setSelectedCase(null)}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Bottom nav */}
-      <MenuButton />
+        {/* Bottom nav */}
+        <MenuButton />
       </div>
     </div>
   );

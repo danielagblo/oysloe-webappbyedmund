@@ -1,5 +1,5 @@
-import React from 'react';
-import { LockClosedIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import { LockClosedIcon } from "@heroicons/react/24/outline";
 import MenuButton from "./MenuButton";
 
 import gPng from "../assets/google-play-badge.png";
