@@ -30,7 +30,7 @@ jobs:
       - name: Run SnapMock
         uses: Programming-Sai/SnapMock@v1.0.0
         with:
-          url: "https://papaya-starlight-a2c388.netlify.app/"
+          url: "https://oysloe.netlify.app/"
           devices: "laptop,tablet,mobile"
           output: "${{ github.workspace }}/snapshots" # Correctly output to the snapshots directory
 

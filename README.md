@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://papaya-starlight-a2c388.netlify.app/" target="_blank" rel="noopener noreferrer">
+  <a href="`https://oysloe.netlify.app/`" target="_blank" rel="noopener noreferrer">
     <img
       src="https://raw.githubusercontent.com/danielagblo/oysloe-webappbyedmund/snapmock/output_laptop.png"
       srcset="
