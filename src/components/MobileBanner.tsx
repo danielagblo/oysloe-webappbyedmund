@@ -15,9 +15,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
     <>
       <div className="fixed top-0 z-200">
         <div
-          className={`${
-            page === "Alerts" ? "bg-[var(--div-active)]" : "bg-white"
-          } w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 sticky top-0 z-50`}
+          className={`${page === "Alerts" ? "bg-[var(--div-active)]" : "bg-white"} w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 sticky top-0 z-50`}
         >
           <button
             onClick={() => navigate(-1)}
@@ -30,6 +28,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
           <button style={{ transform: "rotate(90deg)" }}>…</button>
         </div>
       </div>
+      <div className="h-10 bg-white" />
     </>
   );
 };

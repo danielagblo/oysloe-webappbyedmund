@@ -142,7 +142,7 @@ export default function ResponsiveMenu() {
 
   const pathToKey = useCallback((path: string): RouteKey => {
     const entry = Object.entries(routes).find(
-      ([, route]) => path === route || path.startsWith(route)
+      ([, route]) => path === route || path.startsWith(route),
     );
     if (profileSubPages?.includes(path)) {
       return "profile";
@@ -151,7 +151,7 @@ export default function ResponsiveMenu() {
   }, []);
 
   const [active, setActive] = useState<RouteKey>(() =>
-    pathToKey(location.pathname)
+    pathToKey(location.pathname),
   );
 
   useEffect(() => {

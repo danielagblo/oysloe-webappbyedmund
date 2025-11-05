@@ -12,7 +12,6 @@ const AlertsPanel = () => (
         <h2 className="sm:text-center sm:text-3xl sm:font-semibold">Alerts</h2>
       </div>
 
-      {/* Scrollable desktop list ONLY */}
       <div className="hidden lg:flex flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 pb-24">
         <div className="space-y-4 w-full">
           {Array.from({ length: 12 }).map((_, index) => (
@@ -41,7 +40,6 @@ const AlertsPanel = () => (
         </div>
       </div>
 
-      {/* Mobile full-page list */}
       <div className="flex lg:hidden flex-col w-full p-4 bg-white">
         {Array.from({ length: 12 }).map((_, index) => (
           <div
@@ -75,17 +73,14 @@ const AlertsPanel = () => (
 
 const AlertPage = () => (
   <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[var(--div-active)]">
-    {/* Mobile header */}
     <div className="sm:hidden w-full">
       <MobileBanner page="Alerts" />
     </div>
 
-    {/* Profile sidebar (desktop only) */}
     <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
       <ProfileStats />
     </div>
 
-    {/* Alerts panel (centered, minimal edge gap) */}
     <div className="flex items-center justify-center w-full lg:w-[75vw] lg:h-full">
       <AlertsPanel />
     </div>

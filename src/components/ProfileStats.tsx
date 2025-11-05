@@ -1,4 +1,5 @@
 import RatingReviews from "./RatingsReviews";
+import avatar from "../assets/avatar.jpg";
 
 export default function ProfileStats() {
   // mini components
@@ -7,8 +8,8 @@ export default function ProfileStats() {
       <img
         src="face.svg"
         alt="pfp"
-        className="w-24 h-24 rounded-full object-cover mb-4 bg-pink-300"
-        style={{ height: "3rem", width: "3rem" }}
+        className="rounded-full object-cover mb-3 bg-pink-300"
+        style={{ height: "4rem", width: "4rem" }}
       />
       <h2 className="text-xl font-medium mb-1">Alexander Kowri</h2>
       <div className="flex flex-col justify-start">
