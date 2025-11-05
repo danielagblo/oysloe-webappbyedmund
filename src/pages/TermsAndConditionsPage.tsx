@@ -3,16 +3,16 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 
-const PrivacyPage = () => {
+const TermsAndConditionsPage = () => {
   return (
     <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] gap-4">
       <div className="w-1/11 h-full">
-        <ProfileSidebar active="privacy" onSelect={() => {}} />
+        <ProfileSidebar active="terms" onSelect={() => {}} />
       </div>
       <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-20 max-md:ml-[-2.5rem] mr-2 h-full  justify-start gap-4">
         <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
-            <h3 className=" text-2xl">Privacy Policy</h3>
+            <h3 className=" text-2xl">T&C</h3>
             <h3 className="">Help us improve on our app</h3>
           </div>
         </div>
@@ -22,7 +22,7 @@ const PrivacyPage = () => {
       </div>
 
       <div className="sm:hidden w-full fixed">
-        <MobileBanner page="Privacy Policy" />
+        <MobileBanner page="Terms & Conditions" />
       </div>
       <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-6">
         <ProfileStats />
@@ -32,4 +32,4 @@ const PrivacyPage = () => {
   );
 };
 
-export default PrivacyPage;
+export default TermsAndConditionsPage;

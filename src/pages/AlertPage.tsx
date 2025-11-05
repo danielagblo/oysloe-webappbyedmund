@@ -5,7 +5,9 @@ import ProfileStats from "../components/ProfileStats";
 
 const AlertsPanel = () => (
   <div className="flex flex-col items-center lg:w-full text-[var(--dark-def)] ">
-    <div className="bg-white w-full mr-2 lg:w-[75vw] lg:h-[93vh] lg:rounded-2xl shadow-sm flex flex-col">
+    {/* Fixed-height container only for desktop */}
+    <div className="bg-white w-full max-md:mt-20 mr-2 lg:w-[75vw] lg:h-[93vh] lg:rounded-2xl shadow-sm flex flex-col">
+      {/* Header (desktop only) */}
       <div className="p-4 sm:p-6 border-b hidden sm:block border-gray-100 flex-shrink-0">
         <h2 className="sm:text-center sm:text-3xl sm:font-semibold">Alerts</h2>
       </div>

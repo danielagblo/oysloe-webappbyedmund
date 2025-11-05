@@ -25,7 +25,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
             <span className="text-sm">{backto}</span>
           </button>
           <h2 className="text-sm font-medium rounded-2xl py-1 px-2">{page}</h2>
-          <p style={{ transform: "rotate(90deg)" }}>…</p>
+          <button style={{ transform: "rotate(90deg)" }}>…</button>
         </div>
       </div>
       <div className="h-10 bg-white" />

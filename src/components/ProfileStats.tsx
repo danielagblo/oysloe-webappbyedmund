@@ -6,7 +6,7 @@ export default function ProfileStats() {
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 border-b border-gray-100 ">
       <img
-        src={avatar}
+        src="face.svg"
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-pink-300"
         style={{ height: "4rem", width: "4rem" }}
@@ -57,6 +57,7 @@ export default function ProfileStats() {
 
   return (
     <div className="w-[25vw] m-0 relative text-[var(--dark-def)]">
+      {/* <MobileBanner /> */}
       <div className="h-[100vh] w-[23vw] hidden sm:flex flex-col gap-2 justify-center items-center">
         <div className="shadow-sm p-6 rounded-xl bg-white w-full h-[46vh]">
           <Profile />
