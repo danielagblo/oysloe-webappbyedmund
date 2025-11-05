@@ -78,7 +78,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       <div className="sm:hidden fixed top-4 left-4 z-40">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border border-gray-200"
+          className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border-gray-200 mt-10"
         >
           <Bars3Icon className="w-6 h-6 text-gray-700" />
         </button>

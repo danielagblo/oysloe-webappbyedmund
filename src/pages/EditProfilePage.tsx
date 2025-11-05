@@ -4,6 +4,7 @@ import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 import { PlusIcon, X } from "lucide-react";
 import mailGif from "../assets/mail.gif";
+import MobileBanner from "../components/MobileBanner";
 
 const EditProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -59,17 +60,11 @@ const EditProfilePage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      {/* MAIN CENTER AREA:
-          - flex-col on small screens -> stacks
-          - md:flex-row on md+ -> side-by-side
-          - this container handles vertical scrolling (overflow-y-auto)
-          - min-h-0 so flex children can shrink if needed
-      */}
-      <div className="flex flex-col lg:flex-row w-full p-3 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
+      <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-10 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           {closeProgress && (
-            <div className="flex-col gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
+            <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
               {setupProgress === 100 && (
                 <div className="mt-[-5px] w-full flex justify-end items-center">
                   <button
@@ -269,6 +264,10 @@ const EditProfilePage = () => {
           </div>
         </div>
       )}
+
+      <div className="sm:hidden w-full fixed">
+        <MobileBanner page="Edit Profile" />
+      </div>
 
       <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-6">
         <ProfileStats />

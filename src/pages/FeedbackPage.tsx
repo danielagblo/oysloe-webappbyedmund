@@ -3,6 +3,7 @@ import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 import StarRating from "../components/StarRating";
+import MobileBanner from "../components/MobileBanner";
 
 const FeedbackPage = () => {
   const [activeTab, setActiveTab] = useState("feedback");
@@ -13,7 +14,7 @@ const FeedbackPage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full p-3 max-md:ml-[-2.5rem] mr-2 h-full  justify-start gap-4">
+      <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-20 max-md:ml-[-2.5rem] mr-2 h-full  justify-start gap-4">
         <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           <div className="flex flex-col pt-5 px-5 gap-2 mb-2 w-full h-full min-h-0 justify-center items-center">
             <div className={`flex flex-col items-center justify-center w-full`}>
@@ -33,6 +34,10 @@ const FeedbackPage = () => {
             Send Review
           </button>
         </div>
+      </div>
+
+      <div className="sm:hidden w-full fixed">
+        <MobileBanner page="Feedback" />
       </div>
       <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-6">
         <ProfileStats />

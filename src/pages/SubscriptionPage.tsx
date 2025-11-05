@@ -3,7 +3,7 @@ import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 import Subscription from "../assets/Subscription.png";
-// import MobileBanner from "../components/MobileBanner";
+import MobileBanner from "../components/MobileBanner";
 
 const SubscriptionPage = () => {
   const [activeTab, setActiveTab] = useState("subscription");
@@ -14,7 +14,7 @@ const SubscriptionPage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full p-3 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
+      <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-20 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
         <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
             <div className="bg-gray-50 flex p-4 rounded-2xl justify-between items-center gap-2">
@@ -23,8 +23,12 @@ const SubscriptionPage = () => {
                   You're currently subscribed
                 </p>
                 <div className="flex justify-start items-start gap-4">
-                  <p className="font-medium max-md:text-[0.5rem]">Basic Package</p>
-                  <p className="font-medium max-md:text-[0.5rem]">Expires in 30 days</p>
+                  <p className="font-medium max-md:text-[0.5rem]">
+                    Basic Package
+                  </p>
+                  <p className="font-medium max-md:text-[0.5rem]">
+                    Expires in 30 days
+                  </p>
                 </div>
               </div>
               <img src={Subscription} alt="subscription" className="w-[20%]" />
@@ -121,9 +125,9 @@ const SubscriptionPage = () => {
         </div>
       </div>
 
-      {/* <div className="sm:hidden w-full">
-        <MobileBanner page="Alerts" />
-      </div> */}
+      <div className="sm:hidden w-full fixed">
+        <MobileBanner page="Subscriptions" />
+      </div>
 
       <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
         <ProfileStats />
