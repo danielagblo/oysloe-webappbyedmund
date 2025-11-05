@@ -72,7 +72,7 @@ const AlertsPanel = () => (
 );
 
 const AlertPage = () => (
-  <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[var(--div-active)]">
+  <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[#ededed]">
     <div className="sm:hidden w-full">
       <MobileBanner page="Alerts" />
     </div>

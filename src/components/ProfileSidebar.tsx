@@ -75,7 +75,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       </div>
 
       {/* ---------- MOBILE MENU BUTTON ---------- */}
-      <div className="sm:hidden fixed top-4 left-4 z-40">
+      <div className="sm:hidden fixed -top-4 left-4 z-500">
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border-gray-200 mt-10"
@@ -86,7 +86,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
       {/* ---------- MOBILE SIDEBAR DRAWER ---------- */}
       {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-50 flex">
+        <div className="sm:hidden fixed inset-0 z-500 flex">
           {/* BACKDROP */}
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-md"

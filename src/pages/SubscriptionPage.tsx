@@ -1,21 +1,10 @@
-import { useState } from "react";
-import MenuButton from "../components/MenuButton";
-import ProfileSidebar from "../components/ProfileSidebar";
-import ProfileStats from "../components/ProfileStats";
 import Subscription from "../assets/Subscription.png";
-import MobileBanner from "../components/MobileBanner";
 
 const SubscriptionPage = () => {
-  const [activeTab, setActiveTab] = useState("subscription");
-
   return (
-    <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] gap-4">
-      <div className="w-1/11 h-full">
-        <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
-      </div>
-
-      <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-20 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
-        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
+    <div className="flex justify-between h-screen w-screen items-center gap-2 no-scrollbar">
+       <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-0 md:py-3 min-h-0 max-h-screen overflow-auto no-scrollbar justify-start gap-4">
+        <div className="w-full md:bg-white lg:w-1/2 pt-20 md:mt-2 flex flex-col justify-start items-center gap-4 px-3 md:py-3 rounded-2xl text-xs">
           <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
             <div className="bg-gray-50 flex p-4 rounded-2xl justify-between items-center gap-2">
               <div className="w-full flex flex-col justify-start items-start gap-4">
@@ -36,10 +25,10 @@ const SubscriptionPage = () => {
           </div>
         </div>
 
-        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs max-lg:mb-20">
+        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 h-fit px-3 py-3 md:rounded-2xl text-xs max-lg:mb-10 lg:pb-17">
           <div className="flex pt-5 px-5 flex-col justify-start gap-6 mb-2 w-full">
             <p className="text-center text-gray-500">
-              Choose a monthly plan that works for you{" "}
+              Choose a monthly plan that works for you
             </p>
 
             {/* <-- keep the card relative so absolute children position to it */}
@@ -125,14 +114,7 @@ const SubscriptionPage = () => {
         </div>
       </div>
 
-      <div className="sm:hidden w-full fixed">
-        <MobileBanner page="Subscriptions" />
-      </div>
 
-      <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
-        <ProfileStats />
-      </div>
-      <MenuButton />
     </div>
   );
 };

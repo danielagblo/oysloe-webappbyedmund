@@ -1,13 +1,9 @@
 import { useState } from "react";
-import MenuButton from "../components/MenuButton";
-import ProfileSidebar from "../components/ProfileSidebar";
-import ProfileStats from "../components/ProfileStats";
 import { PlusIcon, X } from "lucide-react";
 import mailGif from "../assets/mail.gif";
-import MobileBanner from "../components/MobileBanner";
+import { useNavigate } from "react-router-dom";
 
 const EditProfilePage = () => {
-  const [activeTab, setActiveTab] = useState("profile");
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -46,8 +42,10 @@ const EditProfilePage = () => {
     e.currentTarget.src = fallback;
   };
 
+  const navigate = useNavigate();
+
   return (
-    <div className="flex justify-between min-h-screen w-screen items-start bg-[#f3f4f6] gap-4 relative">
+    <div className="flex justify-between min-h-screen w-screen relative">
       <style>{`
         .hide-scrollbar {
           -ms-overflow-style: none; /* IE and Edge */
@@ -55,14 +53,9 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-
-      <div className="w-1/11 h-full">
-        <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
-      </div>
-
-      <div className="flex flex-col lg:flex-row w-full p-3 max-md:mt-10 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
+      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-2 py-2">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
-        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
+        <div className="bg-white md:shadow-lg h-fit pt-10 md:pt-3 md:pb-12 w-full lg:w-1/2 md:mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
           {closeProgress && (
             <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
               {setupProgress === 100 && (
@@ -90,7 +83,10 @@ const EditProfilePage = () => {
               </p>
               {setupProgress === 100 && (
                 <div className="mt-[-5px] w-full flex justify-end items-center">
-                  <button className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center">
+                  <button 
+                    className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center"
+                    onClick={() => navigate("/postad")}
+                  >
                     <span className="border-2 border-gray-500 p-0.5 rounded">
                       <PlusIcon size={12} />
                     </span>
@@ -133,11 +129,12 @@ const EditProfilePage = () => {
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
 
-            <div className="flex justify-between items-center">
+            <div className="flex items-center">
               <label className="text-xs text-gray-600">Email</label>
-              <span className="text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
+              &nbsp;
+              <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
                 {selectedUser?.email ? "Verified" : "Unverified"}
-              </span>
+              </p>
             </div>
             <input
               defaultValue={selectedUser?.email}
@@ -156,11 +153,12 @@ const EditProfilePage = () => {
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
 
-            <div className="flex justify-between items-center">
+            <div className="flex items-center">
               <label className="text-xs text-gray-600">National ID</label>
-              <span className="text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
+              &nbsp;
+              <p className="mb-1 inline text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
                 {selectedUser?.nationalId ? "Verified" : "Not Verified"}
-              </span>
+              </p>
             </div>
             <input
               defaultValue={selectedUser?.nationalId}
@@ -199,7 +197,7 @@ const EditProfilePage = () => {
         </div>
 
         {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
-        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs max-lg:mb-20">
+        <div className="bg-white lg:shadow-lg w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center h-fit gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
           {!linkSent && (
             <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
               <p className="text-lg text-center">Please verify your email*</p>
@@ -244,6 +242,7 @@ const EditProfilePage = () => {
           </div>
         </div>
       </div>
+      
 
       {openVerificationModal && (
         <div className="fixed inset-0 z-30 backdrop-blur-sm bg-black/50 flex justify-center items-center ">
@@ -264,15 +263,6 @@ const EditProfilePage = () => {
           </div>
         </div>
       )}
-
-      <div className="sm:hidden w-full fixed">
-        <MobileBanner page="Edit Profile" />
-      </div>
-
-      <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-6">
-        <ProfileStats />
-      </div>
-      <MenuButton />
     </div>
   );
 };

@@ -4,42 +4,34 @@ import PageLocked from "../components/PageLocked";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 import ReferPage from "./ReferPage";
-import TermsPage from "./TermsPage";
 import PrivacyPage from "./PrivacyPage";
 import AdsPage from "./AdsPage";
 import FavouritesPage from "./FavouritesPage";
+import SubscriptionPage from "./SubscriptionPage";
+import EditProfilePage from "./EditProfilePage";
+import TermsAndConditionsPage from "./TermsAndConditionsPage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
-  const lockedTabs = [
-    "profile",
-    "subscription",
-    "feedback",
-  ];
-
   const renderContent = () => {
-        if (lockedTabs.includes(activeTab)) {
-        const pageName =
-            activeTab === "feedback"
-                ? "Feedback"
-                : activeTab === "subscription"
-                    ? "Subscription"
-                    : "Profile";
-        return <PageLocked page={pageName} />;
-        }
-
         switch (activeTab) {
+            case "profile":
+              return <EditProfilePage />;
             case "favorite":
-              return <FavouritesPage />
+              return <FavouritesPage />;
             case "ads":
                 return <AdsPage />;
             case "refer":
                 return <ReferPage />;
             case "terms":
-                return <TermsPage />;
+                return <TermsAndConditionsPage />;
             case "privacy":
                 return <PrivacyPage />;
+            case "subscription":
+              return <SubscriptionPage />;
+            case "feedback":
+              return <PageLocked page="Feedback"/>
             default:
                 return null;
         }

@@ -225,7 +225,7 @@ export default function PostAdForm() {
   )
 
   return (
-    <form className="flex flex-col w-full h-[100dvh]" onSubmit={handleSave}>
+    <form className="flex flex-col w-full h-[100dvh] py-2" onSubmit={handleSave}>
       <div className="text-xs flex lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
 
         {(!isMobile || mobileStep === "form") && (

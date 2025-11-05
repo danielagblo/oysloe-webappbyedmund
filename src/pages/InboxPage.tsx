@@ -9,15 +9,15 @@ export default function InboxPage() {
   const [selectedCase, setSelectedCase] = useState<string | null>(null);
 
   return (
-    <div className="relative bg-[var(--div-active)] min-h-screen h-screen w-full overflow-hidden">
-      <div className="block sm:hidden w-full">
+    <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">
+      <div className="lg:hidden w-full">
         <MobileBanner page="Inbox" />
       </div>
 
       {/* Page content */}
       <div className="flex w-full h-full">
         {/* Profile Stats (Desktop only) */}
-        <div className="hidden lg:block pl-3 h-full">
+        <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
           <ProfileStats />
         </div>
 
@@ -32,7 +32,7 @@ export default function InboxPage() {
         {/* Live Chat — desktop: right column; mobile: full-screen when open */}
         {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
         <div
-          className={`sm:w-[50%] w-full h-screen overflow-y-auto sm:py-5 sm:pr-1 sm:-ml-3 ${selectedCase ? "hidden sm:block" : ""}`}
+          className={`sm:w-[50vw] w-full h-screen overflow-y-auto sm:py-5 sm:pr-1 ${selectedCase ? "hidden sm:block" : ""}`}
         >
           <SupportAndCases
             onSelectCase={(caseId) =>

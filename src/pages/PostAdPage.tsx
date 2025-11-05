@@ -14,7 +14,7 @@ function PostAdPage() {
         <ProfileStats />
       </div>
 
-      <div className="flex items-center justify-center no-scrollbar w-full lg:w-[75vw] lg:h-full ">
+      <div className="flex items-center justify-center no-scrollbar w-full lg:w-[75vw] lg:h-full">
         <PostAdForm />
       </div>
 
