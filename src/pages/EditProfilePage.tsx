@@ -12,7 +12,6 @@ const EditProfilePage = () => {
   const [linkSent, setLinkSent] = useState(false);
   const setupProgress: number = 100;
 
-  // lightweight selectedUser placeholder — replace with real data/props as needed
   const [selectedUser] = useState({
     profileImage: "",
     businessLogo: "",
@@ -29,19 +28,15 @@ const EditProfilePage = () => {
     mobileNetwork: "",
   });
 
-  // sensible placeholders
   const avatarPlaceholder =
     "https://placehold.co/100x100?text=Avatar&bg=EFEFEF&fg=666";
   const logoPlaceholder =
     "https://placehold.co/100x100?text=Logo&bg=EFEFEF&fg=666";
-
   const frontPlaceholder =
     "https://placehold.co/500x250?text=Front&bg=EFEFEF&fg=666";
-
   const backPlaceholder =
     "https://placehold.co/500x250?text=Back&bg=EFEFEF&fg=666";
 
-  // image error handler that swaps to sensible placeholder
   const onImgError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>,
     fallback: string = avatarPlaceholder
@@ -51,8 +46,7 @@ const EditProfilePage = () => {
   };
 
   return (
-    <div className="flex justify-between h-screen w-screen items-center bg-[#f3f4f6] gap-4 relative">
-      {/* Inject small CSS to hide scrollbars for the targeted containers */}
+    <div className="flex justify-between min-h-screen w-screen items-start bg-[#f3f4f6] gap-4 relative">
       <style>{`
         .hide-scrollbar {
           -ms-overflow-style: none; /* IE and Edge */
@@ -65,12 +59,17 @@ const EditProfilePage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      {/* add hide-scrollbar to remove the thin scrollbar visually */}
-      <div className="md:flex w-full p-3 m-0 mr-2 h-full overflow-hidden hide-scrollbar justify-center gap-4 hidden">
-        {/* LEFT COLUMN: profile images + general details */}
-        <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl overflow-auto hide-scrollbar text-xs pb-20">
+      {/* MAIN CENTER AREA:
+          - flex-col on small screens -> stacks
+          - md:flex-row on md+ -> side-by-side
+          - this container handles vertical scrolling (overflow-y-auto)
+          - min-h-0 so flex children can shrink if needed
+      */}
+      <div className="flex flex-col lg:flex-row w-full p-3 max-md:ml-[-2.5rem] mr-2 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-4">
+        {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
+        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
           {closeProgress && (
-            <div className="flex-col gap-2 p-4 w-[80%] bg-gray-50 rounded-2xl">
+            <div className="flex-col gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
               {setupProgress === 100 && (
                 <div className="mt-[-5px] w-full flex justify-end items-center">
                   <button
@@ -90,14 +89,13 @@ const EditProfilePage = () => {
 
               <p className="text-lg">You're set now {setupProgress}%</p>
               <p className="mb-3">
-                {" "}
                 {setupProgress === 100
                   ? "Congrats! Submit your first ad"
-                  : "Complete your account to upload your first ad"}{" "}
+                  : "Complete your account to upload your first ad"}
               </p>
               {setupProgress === 100 && (
                 <div className="mt-[-5px] w-full flex justify-end items-center">
-                  <button className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-4xl px-4 items-center">
+                  <button className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center">
                     <span className="border-2 border-gray-500 p-0.5 rounded">
                       <PlusIcon size={12} />
                     </span>
@@ -114,7 +112,7 @@ const EditProfilePage = () => {
               <img
                 src={selectedUser?.profileImage || avatarPlaceholder}
                 alt="Profile"
-                className="w-20 h-20 rounded-full object-cover bg-gray-100"
+                className="w-20 max-w-full h-auto rounded-full object-cover bg-gray-100"
                 onError={(e) => onImgError(e, avatarPlaceholder)}
               />
               <p className="text-xs">Profile Image</p>
@@ -123,7 +121,7 @@ const EditProfilePage = () => {
               <img
                 src={selectedUser?.businessLogo || logoPlaceholder}
                 alt="Business Logo"
-                className="w-20 h-20 rounded-md object-cover bg-gray-100"
+                className="w-20 max-w-full h-auto rounded-md object-cover bg-gray-100"
                 onError={(e) => onImgError(e, logoPlaceholder)}
               />
               <p className="text-xs">Business Logo</p>
@@ -131,16 +129,18 @@ const EditProfilePage = () => {
           </div>
 
           {/* general details */}
-          <div className="w-[90%] bg-white p-4 rounded-md ">
+          <div className="w-[95%] bg-white p-4 rounded-md">
             <p className="mb-2 text-sm font-medium">General Details</p>
+
             <label className="text-xs text-gray-600">Name</label>
             <input
               defaultValue={selectedUser?.name}
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
+
             <div className="flex justify-between items-center">
               <label className="text-xs text-gray-600">Email</label>
-              <span className="text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.5rem] rounded-2xl">
+              <span className="text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
                 {selectedUser?.email ? "Verified" : "Unverified"}
               </span>
             </div>
@@ -148,19 +148,22 @@ const EditProfilePage = () => {
               defaultValue={selectedUser?.email}
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
+
             <label className="text-xs text-gray-600">First Number</label>
             <input
               defaultValue={selectedUser?.phonePrimary}
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
+
             <label className="text-xs text-gray-600">Second Number</label>
             <input
               defaultValue={selectedUser?.phoneSecondary || "---"}
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
+
             <div className="flex justify-between items-center">
               <label className="text-xs text-gray-600">National ID</label>
-              <span className=" text-white bg-blue-400 px-1 py-0.5 text-[0.5rem] rounded-2xl">
+              <span className="text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
                 {selectedUser?.nationalId ? "Verified" : "Not Verified"}
               </span>
             </div>
@@ -171,27 +174,27 @@ const EditProfilePage = () => {
 
             {setupProgress === 100 ? (
               <>
-                <label>Buisness Name</label>
+                <label>Business Name</label>
                 <input
                   defaultValue={selectedUser?.businessName}
                   className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
                 />
               </>
             ) : (
-              <div className="flex justify-between items-center gap-4">
-                <div className="flex flex-col justify-start items-center gap-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
                   <p>Front</p>
                   <img
                     src={frontPlaceholder}
-                    className="w-full h-full rounded-md object-cover bg-gray-100"
+                    className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
                     onError={(e) => onImgError(e, frontPlaceholder)}
                   />
                 </div>
-                <div className="flex flex-col justify-start items-center gap-2">
+                <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
                   <p>Back</p>
                   <img
                     src={backPlaceholder}
-                    className="w-full h-full rounded-md object-cover bg-gray-100"
+                    className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
                     onError={(e) => onImgError(e, backPlaceholder)}
                   />
                 </div>
@@ -200,14 +203,14 @@ const EditProfilePage = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: ID images + business/payment details */}
-        <div className="bg-white w-1/2 h-full mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl overflow-auto hide-scrollbar text-xs">
+        {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
+        <div className="bg-white w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs max-lg:mb-20">
           {!linkSent && (
-            <div className="flex flex-col justify-start items-center gap-2 p-4 w-[80%] bg-gray-50 rounded-2xl">
+            <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
               <p className="text-lg text-center">Please verify your email*</p>
               <p className="mb-3 text-center">
-                We will send an email to agblod27@gmail.com Click the link in
-                the email to verify your account
+                We will send an email to agblod27@gmail.com. Click the link in
+                the email to verify your account.
               </p>
               <button
                 onClick={() => {
@@ -219,8 +222,8 @@ const EditProfilePage = () => {
               </button>
             </div>
           )}
-          {/* business/payment details */}
-          <div className="w-[95%] bg-white p-4 rounded-md h-full">
+
+          <div className="w-[95%] bg-white p-4 rounded-md">
             <p className="mt-2 mb-1 text-sm font-medium">Payment Account</p>
             <label className="text-xs text-gray-600">Account Name</label>
             <input
@@ -240,25 +243,26 @@ const EditProfilePage = () => {
               className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
             />
 
-            <button className="w-full bg-gray-200 py-3 rounded text-[1.1rem] text-gray-800 mt-[25%]">
+            <button className="w-full bg-gray-200 py-3 rounded text-[1.1rem] text-gray-800 mt-6">
               {setupProgress === 100 ? "Finish" : "Save"}
             </button>
           </div>
         </div>
       </div>
+
       {openVerificationModal && (
-        <div className="absolute inset-0 z-30 backdrop-blur-xs bg-black/50 flex justify-center items-center ">
-          <div className="bg-white flex justify-center items-center flex-col p-2 px-10 gap-4 rounded-4xl">
-            <img src={mailGif} alt="Mail animation" />
-            <h2 className="text-xl text-wrap w-[80%] text-center">
+        <div className="fixed inset-0 z-30 backdrop-blur-sm bg-black/50 flex justify-center items-center ">
+          <div className="bg-white flex justify-center items-center flex-col p-4 px-10 gap-4 rounded-3xl max-w-md w-full mx-4">
+            <img src={mailGif} alt="Mail animation" className="w-32 h-auto" />
+            <h2 className="text-xl w-[80%] text-center">
               Verification link has been sent
             </h2>
             <button
               onClick={() => {
-                setOpenVerificationModal((prev) => !prev);
+                setOpenVerificationModal(false);
                 setLinkSent(true);
               }}
-              className="text-sm border-2 cursor-pointer border-gray-300 rounded-4xl py-1.5 px-4"
+              className="text-sm border-2 cursor-pointer border-gray-300 rounded-full py-1.5 px-4"
             >
               Close
             </button>
