@@ -180,30 +180,33 @@ const HomePage = () => {
             Oysloe
           </h2>
 
-          <div
-            className={`relative flex items-center ${
-              isSmallScreen && isCondensed
-                ? "justify-end flex-1"
-                : "justify-center w-full max-w-[520px]"
-            }`}
-          >
-            <div className="rotating-bg" aria-hidden="true" />
-            <div className="rotating-bg-inner" aria-hidden="true" />
-
-            <input
-              type="text"
-              placeholder="Search anything up for good"
-              className={`search-input ${
+          <div className="flex w-full px-200">
+            <div
+              className={`relative flex items-center ${
                 isSmallScreen && isCondensed
-                  ? "text-[16px]"
-                  : "text-2xl sm:text-2xl"
-              } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
-            />
+                  ? "justify-end flex-1"
+                  : "justify-center w-full max-w-[520px]"
+              }`}
+            >
+              <div className="rotating-bg" aria-hidden="true" />
+              <div className="rotating-bg-inner" aria-hidden="true" />
 
-            <img
-              src="/search.svg"
-              className="absolute top-1/2 left-[25px] -translate-y-1/2 w-5 h-5 z-10"
-            />
+              <input
+                type="text"
+                placeholder="Search anything up for good"
+                className={`search-input ${
+                  isSmallScreen && isCondensed
+                    ? "text-[16px]"
+                    : "text-2xl sm:text-2xl"
+                } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+              />
+
+                {/* missing */}
+              <img
+                src="/search.svg"
+                className="absolute top-0 left-0 w-5 h-5 z-10"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -301,7 +304,7 @@ const HomePage = () => {
             onClick={() => handleCategoryClick(category.name)}
             className="
                     flex flex-col items-center justify-center
-                    min-w-[64px] min-h-[75px] sm:w-[120px] sm:h-[130px]
+                    min-w-[64px] min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
                     bg-[var(--div-active)] rounded-lg 
                     p-2 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
@@ -354,14 +357,14 @@ const HomePage = () => {
     </div>
   );
   const CircularSummaries = () => (
-    <div className="flex items-center justify-center w-full overflow-hidden my-[3rem]">
-      <div className="flex flex-row gap-2 sm:gap-10 justify-center items-center flex-nowrap">
+    <div className=" text-[var(--dark-def)] flex items-center justify-center w-full overflow-hidden my-[3rem]">
+      <div className="flex flex-row max-lg:gap-2 max-sm:gap-10 justify-center items-center flex-nowrap md:grid md:grid-cols-5 md:w-3/5 md:h-fit">
         {categ.map((category) => {
           const percentage = (category.adsCount / sum) * 100;
           return (
             <div
               key={category.id}
-              className="relative w-17 h-17 sm:w-24 sm:h-24 flex items-center justify-center"
+              className="relative w-17 h-17 lg:h-4/5 lg:w-4/5 flex items-center justify-center"
             >
               <CircularProgressbar
                 value={percentage}
@@ -372,12 +375,11 @@ const HomePage = () => {
                   },
                 }}
               />
-              {/* Overlayed custom text */}
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] sm:text-xs w-[60px]">
+                <span className="text-[8px] md:text-sm min-w-[60px]">
                   {category.name}
                 </span>
-                <span className="text-[10px] sm:text-sm font-bold text-[var(--accent-color)]">
+                <span className="text-[10px] md:text-xl font-bold text-[var(--accent-color)]">
                   {category.adsCount}+
                 </span>
               </div>
@@ -387,84 +389,87 @@ const HomePage = () => {
       </div>
     </div>
   );
-  const ScrollableAds = () =>
-    [
-      "Electronics",
-      "Furniture",
-      "Vehicles",
-      "Industry",
-      "Fashion",
-      "Grocery",
-      "Games",
-      "Cosmetics",
-      "Property",
-    ].map((section) => (
-      <div
-        key={section}
-        className="flex flex-col w-[95vw] max-w-6xl mt-6 mx-auto overflow-hidden"
-      >
-        <div className="flex items-center gap-3 mb-2 px-2">
-          <h2 className="text-base sm:text-xl font-semibold truncate">
-            {section}
-          </h2>
-          <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm whitespace-nowrap">
-            Show All
-          </button>
-          <div className="flex gap-2 ml-auto">
-            <button
-              onClick={() => handleArrowClick("left", section.toLowerCase())}
-              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-            >
-              <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-4" />
-            </button>
-            <button
-              onClick={() => handleArrowClick("right", section.toLowerCase())}
-              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-            >
-              <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-4" />
-            </button>
-          </div>
-        </div>
 
-        <div
-          id={`move-${section.toLowerCase()}`}
-          className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2"
-        >
-          <div className="flex gap-2 sm:gap-3 w-max">
-            {pics.map((pic, index) => (
-              <Link
-                key={index}
-                to={`/ads/${ads[index].id}`}
-                state={{ adData: ads[index] }}
-                className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
-              >
-                <img
-                  src={pic}
-                  alt={`${section} ${index}`}
-                  className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
-                />
-                <div className="flex items-center gap-1 px-2 py-1">
-                  <img
-                    src="/location.svg"
-                    alt=""
-                    className="w-3 sm:w-4 h-3 sm:h-4"
-                  />
-                  <p className="text-[10px] sm:text-xs text-gray-500 truncate">
-                    {ads[index].location}
-                  </p>
-                </div>
-                <p className="px-2 text-[11px] sm:text-sm line-clamp-1 text-gray-600">
-                  {ads[index].title}
-                </p>
-                <p className="px-2 text-[11px] sm:text-sm font-medium text-gray-800">
-                  {ads[index].price}
-                </p>
-              </Link>
-            ))}
-          </div>
+  const ScrollableAds = () =>
+  [
+    "Electronics",
+    "Furniture",
+    "Vehicles",
+    "Industry",
+    "Fashion",
+    "Grocery",
+    "Games",
+    "Cosmetics",
+    "Property",
+  ].map((section) => (
+    <div
+      key={section}
+      className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-[var(--dark-def)]"
+    >
+      <div className="flex items-center gap-3 mb-2 px-2">
+        <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-[var(--dark-def)]">
+          {section}
+        </h2>
+        <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+          Show All
+        </button>
+        <div className="flex gap-2 ml-auto">
+          <button
+            onClick={() => handleArrowClick("left", section.toLowerCase())}
+            className="bg-gray-200 p-2 rounded-full flex-shrink-0"
+          >
+            <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
+          </button>
+          <button
+            onClick={() => handleArrowClick("right", section.toLowerCase())}
+            className="bg-gray-200 p-2 rounded-full flex-shrink-0"
+          >
+            <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
+          </button>
         </div>
       </div>
-    ));
+
+      <div
+        id={`move-${section.toLowerCase()}`}
+        className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 [mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
+      >
+        <div className="flex gap-2 sm:gap-3 w-max">
+          {pics.map((pic, index) => (
+            <Link
+              key={index}
+              to={`/ads/${ads[index].id}`}
+              state={{ adData: ads[index] }}
+              className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+            >
+              <img
+                src={pic}
+                alt={`${section} ${index}`}
+                className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+              />
+              <div className="flex items-center gap-1 px-2 py-1">
+                <img
+                  src="/location.svg"
+                  alt=""
+                  className="w-3 sm:w-5 h-3 sm:h-5"
+                />
+                <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                  {ads[index].location}
+                </p>
+              </div>
+              <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                {ads[index].title}
+              </p>
+              <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                {ads[index].price}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  ));
+
+
   const ConditionalAds = () => (
     <div className="bg-[var(--div-active)] w-full flex justify-center -mb-4">
       <div
