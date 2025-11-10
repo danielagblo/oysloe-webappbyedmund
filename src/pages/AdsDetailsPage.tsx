@@ -114,35 +114,35 @@ const AdsDetailsPage = () => {
   const DesktopHeader = () => (
     <div className="hidden sm:flex bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
-        <img src="/location.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-base">
+        <img src="/location.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <h2 className="text-base md:text-[1.125vw]">
           {currentAdData?.location || "Lashibi, Accra"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/star.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-base">4.5 20 reviews</h2>
+        <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <h2 className="text-base  md:text-[1.125vw]">4.5 20 reviews</h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/flag.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-base">30</h2>
+        <img src="/flag.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <h2 className="text-base md:text-[1.125vw]">30</h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/favorited.svg" alt="" className="w-5 h-5" />
-        <h2 className="text-base">34</h2>
+        <img src="/favorited.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
+        <h2 className="text-base md:text-[1.125vw]">34</h2>
       </div>
       <div className="flex gap-2 ml-auto">
         <button
           onClick={handlePrevious}
           className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
         >
-          <img src="/arrowleft.svg" alt="" className="w-5 h-5" />
+          <img src="/arrowleft.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
         </button>
         <button
           onClick={handleNext}
           className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
         >
-          <img src="/arrowright.svg" alt="" className="w-5 h-5" />
+          <img src="/arrowright.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
         </button>
       </div>
     </div>
@@ -210,22 +210,22 @@ const AdsDetailsPage = () => {
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
         <img src="/location.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-sm">
+        <h2 className="text-sm md:text-[1.1vw]">
           {currentAdData?.location || "Lashibi, Accra"}
         </h2>
       </div>
-      <h2 className="text-2xl lg:text-3xl font-medium">
+      <h2 className="text-2xl md:text-[2vw] font-medium">
         {currentAdData?.title || "Covet Hyundai csv salon 2025"}
       </h2>
-      <h2 className="text-xl font-medium">
+      <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price || "₵25,000"}
       </h2>
     </div>
   );
   const AdDetails = () => (
-    <div className=" sm:p-6 lg:pl-0">
-      <h2 className="text-xl lg:text-2xl font-bold mb-2">Ad Details</h2>
-      <ul className="list-disc ml-5 lg:ml-10 marker:text-black marker:font-extrabold space-y-2 text-sm lg:text-xl">
+    <div className=" sm:p-6 md:pl-0">
+      <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Ad Details</h2>
+      <ul className="list-disc ml-5 md:ml-10 marker:text-black marker:font-extrabold space-y-2 text-sm md:text-[1.125vw]">
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>
@@ -256,11 +256,11 @@ const AdsDetailsPage = () => {
   );
   const SafetyTips = () => (
     <div className="bg-white sm:bg-[var(--div-active)] sm:p-6 rounded-lg py-1 px-2 pb-5">
-      <h2 className="text-xl font-bold mb-2">Safety tips</h2>
-      <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-[var(--div-active)] sm:bg-white">
+      <h2 className="text-xl font-bold mb-2 md:text-[1.75vw]">Safety tips</h2>
+      <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-[var(--div-active)] sm:bg-white md:text-[0.9vw]">
         Follow this tips and report any suspicious activity.
       </p>
-      <ul className="list-disc ml-5 marker:text-black space-y-2 font-bold text-sm">
+      <ul className="list-disc ml-5 marker:text-black space-y-2 font-bold text-sm md:text-[1.125vw]">
         <li>Meet in a public place</li>
         <li>Check the vehicle history</li>
         <li>Inspect the vehicle thoroughly</li>
@@ -282,9 +282,9 @@ const AdsDetailsPage = () => {
         ].map(([icon, label]) => (
           <button
             key={label}
-            className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm bg-[var(--div-active)] sm:bg-white hover:bg-gray-50"
+            className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-[var(--div-active)] sm:bg-white hover:bg-gray-50"
           >
-            <img src={`/${icon}`} alt="" className="w-4 h-4" />
+            <img src={`/${icon}`} alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
             <p className="whitespace-nowrap">{label}</p>
           </button>
         ))}
@@ -294,8 +294,8 @@ const AdsDetailsPage = () => {
   const CommentsSection = () => (
     <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
       <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
-      <h2 className="text-2xl font-medium hidden sm:inline">Comments</h2>
-      <div className="mt-5 -ml-4 w-[120%] sm:w-[100%] flex flex-col gap-3">
+      <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">Comments</h2>
+      <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
         {[1, 2, 3].map((comment) => (
           <div
             key={comment}
@@ -305,33 +305,33 @@ const AdsDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
                 <div className="flex flex-col">
-                  <p className="text-[10px] lg:text-xs text-gray-500">1st April</p>
-                  <h3 className="font-semibold">Sandra</h3>
+                  <p className="text-[10px] text-gray-500 md:text-[0.9vw]">1st April</p>
+                  <h3 className="font-semibold md:text-[1.2vw]">Sandra</h3>
                   <div className="flex">
-                    <img src="/star.svg" alt="" className="w-3 h-3" />
-                    <img src="/star.svg" alt="" className="w-3 h-3" />
-                    <img src="/star.svg" alt="" className="w-3 h-3" />
-                    <img src="/star.svg" alt="" className="w-3 h-3" />
-                    <img src="/star.svg" alt="" className="w-3 h-3" />
+                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button className="flex items-center gap-1 m-2">
-                  <img src="/like.svg" alt="" className="w-5 h-5" />
+                <button className="flex items-center gap-1 m-2 md:text-[1vw]">
+                  <img src="/like.svg" alt="" className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]" />
                   <h3>Like</h3>
                 </button>
-                <span className="text-sm">20</span>
+                <span className="text-sm md:text-[1vw]">20</span>
               </div>
             </div>
-            <p className="text-gray-700 text-sm">
+            <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">
               This is a great car with excellent features. I had a wonderful
               experience driving it around the city.
             </p>
           </div>
         ))}
       </div>
-      <div className="flex gap-3 mt-6 items-center justify-center">
+      <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
         <button
           onClick={() => navigate("/reviews")}
           className="bg-[var(--div-active)] text-[var(--dark-def)] px-6 py-3 rounded-full whitespace-nowrap"
@@ -352,7 +352,7 @@ const AdsDetailsPage = () => {
       <div className="pt-4 w-full">
         <div className="flex items-center gap-2 mb-3">
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
-          <h6 className="font-semibold text-xs">Quick Chat</h6>
+          <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
         <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-400 sm:text-[var(--dark-def)] font-extralight justify-start">
           {[
@@ -363,7 +363,7 @@ const AdsDetailsPage = () => {
           ].map((text, i) => (
             <button
               key={i}
-              className="px-3 py-2 bg-[var(--div-active)] sm:bg-white rounded text-xs hover:bg-gray-100 whitespace-nowrap w-fit"
+              className="px-3 py-2 bg-[var(--div-active)] sm:bg-white rounded text-xs md:text-[0.9vw] hover:bg-gray-100 whitespace-nowrap w-fit"
             >
               {text}
             </button>
@@ -375,18 +375,18 @@ const AdsDetailsPage = () => {
             type="text"
             placeholder="Start a chat"
             style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-[length:20px_20px] bg-[center_right_12px] bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
+            className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-[length:20px_20px] bg-[center_right_12px] bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-[var(--dark-def)]"
           />
           <button
             style={{ border: "1px solid var(--div-border)" }}
             className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white"
           >
-            <img src="/audio.svg" alt="" className="w-7 h-5" />
+            <img src="/audio.svg" alt="" className="w-7 h-5 md:h-[1.5vw] md:w-[1.5vw]" />
           </button>
         </div>
         <div className="mt-4 space-y-2 text-[10px] inline-flex flex-wrap gap-2 text-gray-600">
           <div className="flex items-center justify-end relative">
-            <h4 className="bg-[var(--green)] h-fit p-0 pl-1 pr-8 rounded-2xl">
+            <h4 className="bg-[var(--green)] h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
               Chat is secured
             </h4>
             <img
@@ -395,8 +395,8 @@ const AdsDetailsPage = () => {
               className="bg-[var(--green)] z-10 rounded-full w-6 h-6 p-1 absolute"
             />
           </div>
-          <div className="flex -mt-2 items-center gap-1">
-            <img src="/shield.svg" alt="" className="w-3 h-3" />
+          <div className="flex -mt-2 items-center gap-1 md:text-[0.8vw]">
+            <img src="/shield.svg" alt="" className="w-3 h-3 md:w-[0.9vw] md:h-[0.9vw]" />
             <h4>Always chat here for Safety reasons!</h4>
           </div>
         </div>
@@ -408,37 +408,37 @@ const AdsDetailsPage = () => {
       {/* profile bit pc */}
       <div className="hidden sm:flex flex-row gap-4 bg-[var(--div-active)] px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
-          <img src="/face.svg" alt="" className="w-15 h-15 rounded-full" />
+          <img src="/face.svg" alt="" className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full" />
           <img
             src="/verified.svg"
             alt=""
-            className="absolute -bottom-1 -right-2 w-8 h-8"
+            className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw]"
           />
         </div>
         <div>
-          <h2 className="text-sm text-gray-500">Jan,2024</h2>
-          <h3 className="font-semibold">Alexander Kowri</h3>
-          <h3 className="text-sm text-gray-600">Total Ads: 2k</h3>
+          <h2 className="text-sm text-gray-500 md:text-[1vw]">Jan,2024</h2>
+          <h3 className="font-semibold md:text-[1.2vw]">Alexander Kowri</h3>
+          <h3 className="text-sm text-gray-600 md:text-[1vw]">Total Ads: 2k</h3>
         </div>
       </div>
       {/* store name */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-start gap-2 flex-col">
-          <h4 className="text-xl">ElectroMart Gh Ltd</h4>
+          <h4 className="text-xl md:text-[1.5vw]">ElectroMart Gh Ltd</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
-            <span className="text-[10px] text-green-800">High level</span>
+            <span className="text-[10px] md:text-[0.9vw] text-green-800">High level</span>
           </div>
         </div>
-        <button className="px-2 py-1 rounded text-sm bg-[var(--div-active)]">
+        <button className="px-2 py-1 rounded text-sm md:text-[1vw] bg-[var(--div-active)]">
           Seller Ads
         </button>
       </div>
 
       {/* product slideshow */}
-      <div className="flex items-center mb-4 w-full">
-        <div className="pt-4 overflow-x-hidden">
-          <div className="relative flex items-center gap-2">
+      <div className="flex items-center justify-center mb-4 w-full">
+        <div className="pt-4 overflow-x-hidden w-full">
+          <div className="relative flex items-center justify-center gap-2 w-full">
             <button className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
               <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
             </button>
@@ -495,10 +495,10 @@ const AdsDetailsPage = () => {
     </div>
   );
   const SimilarAds = () => (
-    <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw]">
-      <h2 className="text-xl font-bold mb-6 px-2 lg:px-26 lg:text-2xl">Similar Ads</h2>
+    <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw] md:px-12">
+      <h2 className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl">Similar Ads</h2>
 
-      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center">
+      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
         {pics.map((pic, index) => (
           <Link
             key={index}
@@ -515,16 +515,16 @@ const AdsDetailsPage = () => {
               <img
                 src="/location.svg"
                 alt=""
-                className="w-3 sm:w-4 h-3 sm:h-4"
+                className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
               />
-              <p className="text-[10px] sm:text-xs text-gray-500 truncate">
+              <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
                 {ads[index].location}
               </p>
             </div>
-            <p className="px-2 text-[11px] sm:text-sm line-clamp-1 text-gray-600">
+            <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
               {ads[index].title}
             </p>
-            <p className="px-2 text-[11px] sm:text-sm font-medium text-gray-800">
+            <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
               {ads[index].price}
             </p>
           </Link>
@@ -534,7 +534,7 @@ const AdsDetailsPage = () => {
   );
 
   return (
-    <div className="lg:pt-15">
+    <div className="lg:pt-5">
       <div
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white"

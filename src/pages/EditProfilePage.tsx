@@ -53,9 +53,10 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen overflow-auto hide-scrollbar justify-start gap-2 py-2">
+      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen overflow-hidden hide-scrollbar justify-start gap-2 py-2">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
-        <div className="bg-white md:shadow-lg h-fit pt-10 md:pt-3 md:pb-12 w-full lg:w-1/2 md:mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
+        <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
+          <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-6 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
           {closeProgress && (
             <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
               {setupProgress === 100 && (
@@ -195,51 +196,55 @@ const EditProfilePage = () => {
             )}
           </div>
         </div>
+        </div>
 
         {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
-        <div className="bg-white lg:shadow-lg w-full lg:w-1/2 mt-2 flex flex-col justify-start items-center h-fit gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
-          {!linkSent && (
-            <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
-              <p className="text-lg text-center">Please verify your email*</p>
-              <p className="mb-3 text-center">
-                We will send an email to agblod27@gmail.com. Click the link in
-                the email to verify your account.
-              </p>
-              <button
-                onClick={() => {
-                  setOpenVerificationModal((prev) => !prev);
-                }}
-                className="text-center mx-auto px-4 cursor-pointer py-2 rounded-2xl bg-gray-200"
-              >
-                Send Link
+        <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
+          <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-6 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
+            {!linkSent && (
+              <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
+                <p className="text-lg text-center">Please verify your email*</p>
+                <p className="mb-3 text-center">
+                  We will send an email to agblod27@gmail.com. Click the link in
+                  the email to verify your account.
+                </p>
+                <button
+                  onClick={() => {
+                    setOpenVerificationModal((prev) => !prev);
+                  }}
+                  className="text-center mx-auto px-4 cursor-pointer py-2 rounded-2xl bg-gray-200"
+                >
+                  Send Link
+                </button>
+              </div>
+            )}
+
+            <div className="w-[95%] bg-white p-4 rounded-md">
+              <p className="mt-2 mb-1 text-sm font-medium">Payment Account</p>
+              <label className="text-xs text-gray-600">Account Name</label>
+              <input
+                defaultValue={selectedUser?.accountName}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <label className="text-xs text-gray-600">Account Number</label>
+              <input
+                defaultValue={selectedUser?.accountNumber || "---"}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <label className="text-xs text-gray-600">Mobile Network</label>
+              <input
+                defaultValue={selectedUser?.mobileNetwork}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <button className="w-full bg-gray-200 py-3 md:py-4 rounded-xl text-[1.1rem] text-gray-800 mt-6">
+                {setupProgress === 100 ? "Finish" : "Save"}
               </button>
             </div>
-          )}
-
-          <div className="w-[95%] bg-white p-4 rounded-md">
-            <p className="mt-2 mb-1 text-sm font-medium">Payment Account</p>
-            <label className="text-xs text-gray-600">Account Name</label>
-            <input
-              defaultValue={selectedUser?.accountName}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <label className="text-xs text-gray-600">Account Number</label>
-            <input
-              defaultValue={selectedUser?.accountNumber || "---"}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <label className="text-xs text-gray-600">Mobile Network</label>
-            <input
-              defaultValue={selectedUser?.mobileNetwork}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <button className="w-full bg-gray-200 py-3 rounded text-[1.1rem] text-gray-800 mt-6">
-              {setupProgress === 100 ? "Finish" : "Save"}
-            </button>
           </div>
+          <div className="md:w-full md:h-20" />
         </div>
       </div>
       

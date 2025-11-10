@@ -132,7 +132,7 @@ export default function SupportAndCases({
       </p>
       <div className="w-[100%] flex items-center justify-center">
         <button
-          className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-2xl hover:bg-gray-200"
+          className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-medium py-4 px-6 rounded-2xl hover:bg-gray-200"
           onClick={() => onSelectChat?.("new")}
         >
           <p>Add case</p>

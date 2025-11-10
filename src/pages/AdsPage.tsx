@@ -12,14 +12,14 @@ const AdsPage = () => {
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
 
-        <div className="sticky top-3 z-50 md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
+        <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
 
           <div className="hidden md:flex justify-around items-center px-4 pb-2">
             {["Active", "Pending", "Taken", "Suspended"].map((status) => (
               <div
                 key={status}
                 onClick={() => setActiveTab(status)}
-                className={`flex items-center gap-2 cursor-pointer border-b-[4px] pb-3 transition-colors ${
+                className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors ${
                   activeTab === status
                     ? "border-[var(--dark-def)]"
                     : "border-transparent hover:border-gray-300"
@@ -67,11 +67,11 @@ const AdsPage = () => {
       </div>
 
 
-        <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center">
+        <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-evenly">
           {filteredAds.map((ad, index) => (
             <div
               key={index}
-              className="lg:w-[32%] lg:max-w-[300px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
+              className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
             >
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
@@ -79,12 +79,12 @@ const AdsPage = () => {
                   src={ad.img}
                   alt={ad.name}
                 />
-                <p
-                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer"
+                <button
+                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2 "
                   onClick={() => setSelectedAd(ad)}
                 >
                   ...
-                </p>
+                </button>
               </div>
               <div className="mt-2">
                 <p className="font-medium">{ad.name}</p>

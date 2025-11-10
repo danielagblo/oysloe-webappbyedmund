@@ -218,7 +218,7 @@ export default function PostAdForm() {
     <button
       disabled={isSubmitting}
       type="submit"
-      className="w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-3 text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]"
+      className="w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]"
     >
       {isSubmitting ? "Saving..." : "Save"}
     </button>
@@ -451,173 +451,96 @@ export default function PostAdForm() {
         
         {(!isMobile || mobileStep === "images") && (
           <div className="relative flex flex-col w-full lg:w-2/5 lg:bg-white lg:shadow-lg rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
-            <label className="bg-gray-100 lg:bg-transparent border-1 border-dashed rounded-xl flex flex-col items-center justify-center h-25 cursor-pointer hover:bg-gray-50">
-              <p className="text-xs text-gray-500 mb-1">Upload Images</p>
-              <img src={uploadImg} alt="upload" className="w-5 h-5 text-gray-500" />
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-            </label>
+            <div className="w-full">
+              <label className="bg-gray-100 lg:bg-transparent border-1 border-dashed rounded-xl flex flex-col items-center justify-center h-25 cursor-pointer hover:bg-gray-50">
+                <p className="text-xs text-gray-500 mb-1 md:text-[1.2vw]">Upload Images</p>
+                <img src={uploadImg} alt="upload" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw] text-gray-500" />
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
 
-            <div className="flex justify-between text-sm lg:text-xs scale-60 -ml-18 lg:-ml-17 text-gray-500 my-1 gap-4 lg:gap-1">
-              <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
-                {uploadedImages.length} images added
-              </span>
-              <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
-                • Drag images to arrange
-              </span>
-              <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
-                • Tap image twice to delete
-              </span>
-            </div>
-
-            {/* <div
-              ref={gridRef}
-              className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 relative mt-3"
-            >
-              {uploadedImages.map((img) => (
-                <div key={img.id} className="relative group flex justify-center items-center">
-                  <img
-                    src={img.url}
-                    alt={`Uploaded ${img.id}`}
-                    className="w-full h-full rounded-lg object-cover cursor-pointer"
-                    onClick={() => setSelectedImage(img.id)}
-                  />
-                  {selectedImage === img.id && (
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
-                      <button
-                        onClick={() => handleDeleteImage(img.id)}
-                        className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div> */}
-            {/* <DragDropContext
-              onDragEnd={(result) => {
-                if (!result.destination) return;
-                const reordered = Array.from(uploadedImages);
-                const [moved] = reordered.splice(result.source.index, 1);
-                reordered.splice(result.destination.index, 0, moved);
-                setUploadedImages(reordered);
-              }}
-            >
-              <Droppable droppableId="images" direction="horizontal">
-                {(provided) => (
-                  <div
-                    ref={(el) => {
-                      gridRef.current = el;
-                      provided.innerRef(el);
-                    }}
-                    {...provided.droppableProps}
-                    className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 relative mt-3"
+              <div className="flex justify-between md:justify-around text-sm scale-60 md:scale-80 -ml-18 text-gray-500 my-1 gap-4 md:gap-4 md:text-[0.85vw] md:pl-8">
+                <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
+                  {uploadedImages.length} images added
+                </span>
+                <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
+                  • Drag images to arrange
+                </span>
+                <span className="whitespace-nowrap py-1 px-2 bg-[var(--div-active)] rounded-xl">
+                  • Tap image twice to delete
+                </span>
+              </div>
+              
+              <div className="relative flex flex-col w-full overflow-y-scroll no-scrollbar">
+                <DragDropContext
+                  onDragEnd={(result) => {
+                    if (!result.destination) return;
+                    const reordered = reorder(
+                      uploadedImages,
+                      result.source.index,
+                      result.destination.index
+                    );
+                    setUploadedImages(reordered);
+                  }}
+                >
+                  <Droppable
+                    droppableId="imageGrid"
+                    direction="horizontal"
+                    renderClone={null}
                   >
-                    {uploadedImages.map((img, index) => (
-                      <Draggable key={img.id} draggableId={String(img.id)} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="relative group flex justify-center items-center"
-                          >
-                            <img
-                              src={img.url}
-                              alt={`Uploaded ${img.id}`}
-                              className="w-full h-full rounded-lg object-cover cursor-pointer"
-                              onClick={() => setSelectedImage(img.id)}
-                            />
-                            {selectedImage === img.id && (
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
-                                <button
-                                  onClick={() => handleDeleteImage(img.id)}
-                                  className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
-                                >
-                                  Delete
-                                </button>
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="
+                          grid gap-3 sm:gap-4 relative mt-3 overflow-y-auto no-scrollbar
+                          grid-cols-2 sm:grid-cols-3
+                        "
+                      >
+                        {uploadedImages.map((img, index) => (
+                          <Draggable key={img.id} draggableId={img.id.toString()} index={index}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="relative group flex justify-center items-center"
+                              >
+                                <img
+                                  src={img.url}
+                                  alt={`Uploaded ${img.id}`}
+                                  className="w-full h-full rounded-lg object-cover cursor-pointer"
+                                  onClick={() => setSelectedImage(img.id)}
+                                />
+                                {selectedImage === img.id && (
+                                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
+                                    <button
+                                      onClick={() => handleDeleteImage(img.id)}
+                                      className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext> */}
-            
-            <div className="relative flex flex-col w-full overflow-y-scroll no-scrollbar">
-              <DragDropContext
-                onDragEnd={(result) => {
-                  if (!result.destination) return;
-                  const reordered = reorder(
-                    uploadedImages,
-                    result.source.index,
-                    result.destination.index
-                  );
-                  setUploadedImages(reordered);
-                }}
-              >
-                <Droppable
-                  droppableId="imageGrid"
-                  direction="horizontal"
-                  renderClone={null}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.droppableProps}
-                      className="
-                        grid gap-3 sm:gap-4 relative mt-3 overflow-y-auto no-scrollbar
-                        grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
-                      "
-                    >
-                      {uploadedImages.map((img, index) => (
-                        <Draggable key={img.id} draggableId={img.id.toString()} index={index}>
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="relative group flex justify-center items-center"
-                            >
-                              <img
-                                src={img.url}
-                                alt={`Uploaded ${img.id}`}
-                                className="w-full h-full rounded-lg object-cover cursor-pointer"
-                                onClick={() => setSelectedImage(img.id)}
-                              />
-                              {selectedImage === img.id && (
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg z-10">
-                                  <button
-                                    onClick={() => handleDeleteImage(img.id)}
-                                    className="h-full w-full bg-transparent text-red-600 hover:bg-red-200/40 py-2 rounded-xl text-xs font-medium text-center transition-all"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                  
-                </Droppable>
-              </DragDropContext>
-              
-              <div className="h-30 w-full" />
-            </div>           
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                    
+                  </Droppable>
+                </DragDropContext>
+                
+                <div className="h-30 w-full" />
+              </div>    
+            </div>         
 
             {isMobile && (
               <>
