@@ -25,14 +25,14 @@ const ReviewPage = () => {
       {/* Main Review Area (desktop) */}
       <div className="hidden sm:flex w-[75vw] h-[93vh] pr-2 gap-4 mt-0">
         {/* Comments Panel */}
-        <div className="relative bg-white w-[55%] rounded-2xl shadow-sm flex flex-col p-4 overflow-y-auto no-scrollbar">
-          <div className="sticky -top-4 left-0 pt-2 bg-white">
+        <div className="relative bg-white w-[55%] rounded-2xl shadow-lg flex flex-col p-4 overflow-y-auto no-scrollbar">
+          <div className="sticky -mt-4 -top-4 left-0 pt-2 bg-white">
             <h2 className="text-2xl font-semibold mb-4 text-center">
               User Reviews
             </h2>
 
             {/* Star Filter Bar */}
-            <div className="bg-white/95 backdrop-blur-md px-2 py-3 border-b min-h-fit border-gray-100 flex gap-1 justify-around overflow-x-auto no-scrollbar text-sm">
+            <div className="bg-white/95 backdrop-blur-md px-2 py-3 border-b min-h-fit border-gray-100 flex flex-nowrap gap-1 justify-around overflow-x-auto no-scrollbar text-sm">
               <button className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
                 <img src="/star.svg" alt="" className="w-4 h-4" /> All
               </button>

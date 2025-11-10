@@ -263,7 +263,7 @@ export default function PostAdForm() {
                 {(["Sale", "Pay Later", "Rent"] as const).map((option) => (
                   <label
                     key={option}
-                    className="relative flex items-center gap-1 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 cursor-pointer"
+                    className="relative flex items-center gap-1 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
                   >
                     <input
                       type="radio"
@@ -428,7 +428,7 @@ export default function PostAdForm() {
                 />
               </div>
               {isMobile && (
-                <div className=" w-full flex items-center justify-center -ml-4">
+                <div className=" w-full flex items-center justify-center -ml-4 max-sm:ml-0">
                   <div className="w-[80%] flex flex-col gap-3 items-center justify-center">
                     <button
                       onClick={() => setMobileStep("images")}
@@ -548,7 +548,7 @@ export default function PostAdForm() {
                   <button
                     onClick={() => setMobileStep("form")}
                     type="button"
-                    className="fixed bottom-17 sm:bottom-25 w-4/5 py-4 sm:py-7 bg-[var(--dark-def)] text-white rounded-xl hover:bg-[var(--accent)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] transition"
+                    className="fixed bottom-17 sm:bottom-25 w-4/5 py-5 sm:py-7 bg-[var(--dark-def)] text-white rounded-xl hover:bg-[var(--accent)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] transition"
                   >
                     Next →
                   </button>

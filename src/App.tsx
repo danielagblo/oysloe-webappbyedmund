@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
-import AlertPage from "./pages/AlertPage.tsx";
+import AlertPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import InboxPage from "./pages/InboxPage.tsx";
 import LogInPage from "./pages/LogInPage.tsx";

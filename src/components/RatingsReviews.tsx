@@ -17,7 +17,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   const ratingSection = (
     <div className={`flex flex-col items-center justify-center`}>
       <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}> 4.5 </h3>
-      <p className={` md:text-[1.5vw] ${layout === "row" ? "text-base" : "text-lg"}`}>
+      <p className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}>
         ★ ★ ★ ★ <span className="text-gray-400">★</span>
       </p>
       <p

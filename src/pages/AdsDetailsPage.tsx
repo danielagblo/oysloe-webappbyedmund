@@ -541,7 +541,7 @@ const AdsDetailsPage = () => {
       >
         <MobileHeader />
 
-        <div className="w-full p-6">
+        <div className="w-full md:p-6">
           <DesktopHeader />
           <ImageGallery />
           <TitleAndPrice />
@@ -566,7 +566,12 @@ const AdsDetailsPage = () => {
                 </div>
                 <div className="bg-white p-6 rounded-lg w-full">
                   <SellerInfo />
-                  <RatingReviews layout="row" fullWidth />
+                  <div className="hidden md:block">
+                    <RatingReviews layout="row" fullWidth />
+                  </div>
+                  <div className="md:hidden">
+                    <RatingReviews fullWidth />
+                  </div>
                 </div>
 
                 <div className="bg-white mt-6 p-6 rounded-lg w-full">

@@ -12,7 +12,7 @@ export type MenuItem = {
 const MENU_ITEMS: MenuItem[] = [
   { key: "profile", label: "Profile", icon: "/profile.svg" },
   { key: "ads", label: "Ads", icon: "/ads.svg" },
-  { key: "favorite", label: "Favorite", icon: "/favorite.svg" },
+  { key: "favorite", label: "Favourite", icon: "/favorite.svg" },
   { key: "subscription", label: "Subscription", icon: "/subecribe.svg" },
   { key: "refer", label: "Refer & Earn", icon: "/refer and earn.svg" },
   { key: "feedback", label: "Feedback", icon: "/feedback.svg" },
@@ -119,7 +119,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                       onClick={() => handleSelect(item.key)}
                       className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${
                         isActive
-                          ? "bg-[var(--div-active)] border-l-4 border-[var(--dark-def)]"
+                          ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
                           : "hover:bg-gray-100"
                       }`}
                     >
@@ -154,11 +154,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       {Logout && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-[300] px-4">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm flex flex-col items-center gap-5">
-            <Lottie animationData={logoutAnim} loop={true} className="w-24 h-24 md:w-[15vw] md:h-auto" />
+            <Lottie animationData={logoutAnim} loop={true} className="w-40 h-auto md:w-[15vw] md:h-auto" />
 
             <p className="text-lg font-semibold text-center sm:px-7">Are you sure you would like to log out?</p>
 
-            <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-full">
+            <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
               <button
                 onClick={handleLogout}
                 className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40 w-full"

@@ -53,7 +53,7 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen overflow-hidden hide-scrollbar justify-start gap-2 py-2">
+      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-6 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
@@ -239,7 +239,7 @@ const EditProfilePage = () => {
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
-              <button className="w-full bg-gray-200 py-3 md:py-4 rounded-xl text-[1.1rem] text-gray-800 mt-6">
+              <button className="w-full bg-gray-200 py-4 rounded-xl text-[1.1rem] text-gray-800 mt-6">
                 {setupProgress === 100 ? "Finish" : "Save"}
               </button>
             </div>

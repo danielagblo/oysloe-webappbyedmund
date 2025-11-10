@@ -27,24 +27,27 @@ const ReferPage = () => {
 
   const Refer = () => (
     <div className="h-full md:min-h-[92vh] md:mt-5 md:overflow-auto no-scrollbar w-full flex flex-col gap-2">
-      <div className="bg-white w-4/5 mr-2 md:mr-0 md:w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
-        <div className="flex gap-2 my-2">
-          <img src="/star green.svg" alt="" className="w-4 h-4 md:w-[1.2vw] md:h-[1.2vw] my-auto" />
-          <h2 className="text-sm md:text-[1.2vw]">Points</h2>
-        </div>
-        <div className="flex flex-col gap-1">
-          <div
-            className="flex gap-6 "
-            onClick={() => {
-              setHow(true);
-              setApply(false);
-              setRedraw(false);
-            }}
-          >
-            <span className="text-xl">10,000</span>
-            <img className="md:-mr-2" src="/arrowright.svg" alt="" />
+      <h2 className="md:hidden max-md:block w-full text-center text-2xl font-bold mt-2 text-[var(--dark-def)]">&nbsp; &nbsp; &nbsp;Refer a Friend</h2>
+      <div className="max-md:w-screen max-md:px-2 max-md:mt-3">
+        <div className="bg-white w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
+          <div className="flex gap-2 my-2">
+            <img src="/star green.svg" alt="" className="w-4 h-4 md:w-[1.2vw] md:h-[1.2vw] my-auto" />
+            <h2 className="text-sm md:text-[1.2vw]">Points</h2>
           </div>
-          <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">equals &#8804;10</span>
+          <div className="flex flex-col gap-1">
+            <div
+              className="flex gap-6 "
+              onClick={() => {
+                setHow(true);
+                setApply(false);
+                setRedraw(false);
+              }}
+            >
+              <span className="text-xl">10,000</span>
+              <img className="md:-mr-2" src="/arrowright.svg" alt="" />
+            </div>
+            <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">equals &#8804;10</span>
+          </div>
         </div>
       </div>
       <div className="flex gap-4 w-full px-2 md:px-0">
