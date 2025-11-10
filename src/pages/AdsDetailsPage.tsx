@@ -112,24 +112,24 @@ const AdsDetailsPage = () => {
     </div>
   );
   const DesktopHeader = () => (
-    <div className="hidden sm:flex bg-white p-2 items-center justify-evenly gap-4 w-full font-light text-xs">
+    <div className="hidden sm:flex bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
         <img src="/location.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-sm">
+        <h2 className="text-base">
           {currentAdData?.location || "Lashibi, Accra"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
         <img src="/star.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-sm">4.5 20 reviews</h2>
+        <h2 className="text-base">4.5 20 reviews</h2>
       </div>
       <div className="flex items-center gap-2">
         <img src="/flag.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-sm">30</h2>
+        <h2 className="text-base">30</h2>
       </div>
       <div className="flex items-center gap-2">
         <img src="/favorited.svg" alt="" className="w-5 h-5" />
-        <h2 className="text-sm">34</h2>
+        <h2 className="text-base">34</h2>
       </div>
       <div className="flex gap-2 ml-auto">
         <button
@@ -148,9 +148,9 @@ const AdsDetailsPage = () => {
     </div>
   );
   const ImageGallery = () => (
-    <div className="w-full flex justify-center my-4 sm:my-8">
+    <div className="w-full flex justify-center my-4 sm:mb-8">
       {/* Desktop */}
-      <div className="hidden sm:flex flex-row w-9/10 h-64 lg:h-80 gap-1">
+      <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
         <div className="flex w-full">
           <img
             src="/3d-car-city-street.webp"
@@ -207,14 +207,14 @@ const AdsDetailsPage = () => {
     </div>
   );
   const TitleAndPrice = () => (
-    <div className="bg-white px-4 sm:px-12 py-2 w-full text-left rounded-lg">
+    <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
         <img src="/location.svg" alt="" className="w-3 h-3" />
         <h2 className="text-sm">
           {currentAdData?.location || "Lashibi, Accra"}
         </h2>
       </div>
-      <h2 className="text-2xl font-medium">
+      <h2 className="text-2xl lg:text-3xl font-medium">
         {currentAdData?.title || "Covet Hyundai csv salon 2025"}
       </h2>
       <h2 className="text-xl font-medium">
@@ -223,9 +223,9 @@ const AdsDetailsPage = () => {
     </div>
   );
   const AdDetails = () => (
-    <div className=" sm:p-6 pl-2">
-      <h2 className="text-xl font-bold mb-2">Ad Details</h2>
-      <ul className="list-disc ml-5 marker:text-black marker:font-extrabold space-y-2 text-sm">
+    <div className=" sm:p-6 lg:pl-0">
+      <h2 className="text-xl lg:text-2xl font-bold mb-2">Ad Details</h2>
+      <ul className="list-disc ml-5 lg:ml-10 marker:text-black marker:font-extrabold space-y-2 text-sm lg:text-xl">
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>
@@ -292,7 +292,7 @@ const AdsDetailsPage = () => {
     </div>
   );
   const CommentsSection = () => (
-    <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0">
+    <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
       <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
       <h2 className="text-2xl font-medium hidden sm:inline">Comments</h2>
       <div className="mt-5 -ml-4 w-[120%] sm:w-[100%] flex flex-col gap-3">
@@ -305,7 +305,7 @@ const AdsDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
                 <div className="flex flex-col">
-                  <p className="text-[10px] text-gray-500">1st April</p>
+                  <p className="text-[10px] lg:text-xs text-gray-500">1st April</p>
                   <h3 className="font-semibold">Sandra</h3>
                   <div className="flex">
                     <img src="/star.svg" alt="" className="w-3 h-3" />
@@ -324,14 +324,14 @@ const AdsDetailsPage = () => {
                 <span className="text-sm">20</span>
               </div>
             </div>
-            <p className="text-gray-700 text-xs">
+            <p className="text-gray-700 text-sm">
               This is a great car with excellent features. I had a wonderful
               experience driving it around the city.
             </p>
           </div>
         ))}
       </div>
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-6 items-center justify-center">
         <button
           onClick={() => navigate("/reviews")}
           className="bg-[var(--div-active)] text-[var(--dark-def)] px-6 py-3 rounded-full whitespace-nowrap"
@@ -495,30 +495,9 @@ const AdsDetailsPage = () => {
     </div>
   );
   const SimilarAds = () => (
-    <div className="bg-white sm:bg-[var(--div-active)] p-4 sm:py-6 sm:px-15 w-full ">
-      <h2 className="text-xl font-bold mb-4 px-2 lg:px-18">Similar Ads</h2>
-      {/* <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 w-full">
-                {Array.from({ length: 10 }).map((_, index) => (
-                    <div key={index} className="flex flex-col w-full">
-                        <img
-                            src="/building.svg"
-                            className="object-cover w-full h-32 sm:h-40 rounded-2xl"
-                            alt="Ad"
-                        />
-                        <div className="flex items-center justify-start px-1 mt-2">
-                            <img src="/location.svg" alt="" className="w-4 h-4" />
-                            <p className="text-xs ml-1 text-gray-600">Accra</p>
-                        </div>
-                        <p className="px-1 text-sm line-clamp-2 mt-1 text-gray-800">
-                            Six bedroom apartment
-                        </p>
-                        <p className="px-1 text-sm font-semibold text-gray-900">
-                            GH₵ 2,000 for 6 days
-                        </p>
-                    </div>
-                ))}
+    <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw]">
+      <h2 className="text-xl font-bold mb-6 px-2 lg:px-26 lg:text-2xl">Similar Ads</h2>
 
-            </div> */}
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center">
         {pics.map((pic, index) => (
           <Link
@@ -555,67 +534,72 @@ const AdsDetailsPage = () => {
   );
 
   return (
-    <div
-      style={{ color: "var(--dark-def)" }}
-      className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white"
-    >
-      <MobileHeader />
-      <DesktopHeader />
-      <ImageGallery />
-      <TitleAndPrice />
+    <div className="lg:pt-15">
+      <div
+        style={{ color: "var(--dark-def)" }}
+        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white"
+      >
+        <MobileHeader />
 
-      {/* MAIN CONTENT */}
-      <div className="flex flex-col gap-4 w-full">
-        <div className="flex justify-evenly gap-4 flex-col md:px-4 ad-details-page">
-          <div className="flex w-full justify-between ad-details-page">
-            <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6">
-              <AdDetails />
-            </div>
-            <div className="flex flex-col space-y-6 w-full md:w-1/2">
-              <SafetyTips />
-            </div>
-          </div>
+        <div className="w-full p-6">
+          <DesktopHeader />
+          <ImageGallery />
+          <TitleAndPrice />
 
-          {/* mobile layout */}
-          <div className="sm:hidden flex w-full ad-details-page">
-            <div className="flex flex-col w-fit space-y-6 md:w-1/2  bg-white p-6 rounded-lg mb-5">
-              <ActionButtons />
-              <QuickChat />
-            </div>
-            <div className="bg-white p-6 rounded-lg w-full">
-              <SellerInfo />
-              <RatingReviews layout="row" fullWidth />
-            </div>
-
-            <div className="bg-white mt-6 p-6 rounded-lg w-full">
-              <CommentsSection />
-            </div>
-          </div>
-
-          {/* desktop layout */}
-          <div className=" hidden sm:grid sm:grid-cols-2 gap-1.5 w-full ad-details-page">
-            <div className="flex flex-col w-full space-y-6 p-6 mb-5">
-              <RatingReviews layout="row" />
-              <CommentsSection />
-            </div>
-            <div className="p-6 rounded-lg w-full -mt-17">
-              <div className="sm:bg-[var(--div-active)] w-full p-3 rounded-2xl">
-                <ActionButtons />
-                <QuickChat />
+          {/* MAIN CONTENT */}
+          <div className="flex flex-col gap-4 w-full">
+            <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
+              <div className="flex w-full justify-between ad-details-page">
+                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6">
+                  <AdDetails />
+                </div>
+                <div className="flex flex-col space-y-6 w-full md:w-1/2">
+                  <SafetyTips />
+                </div>
               </div>
-              <SellerInfo />
+
+              {/* mobile layout */}
+              <div className="sm:hidden flex w-full ad-details-page">
+                <div className="flex flex-col w-fit space-y-6 md:w-1/2  bg-white p-6 rounded-lg mb-5">
+                  <ActionButtons />
+                  <QuickChat />
+                </div>
+                <div className="bg-white p-6 rounded-lg w-full">
+                  <SellerInfo />
+                  <RatingReviews layout="row" fullWidth />
+                </div>
+
+                <div className="bg-white mt-6 p-6 rounded-lg w-full">
+                  <CommentsSection />
+                </div>
+              </div>
+
+              {/* desktop layout */}
+              <div className=" hidden sm:grid sm:grid-cols-2 gap-1.5 w-full ad-details-page">
+                <div className="flex flex-col w-full space-y-6 p-6 lg:p-0 mb-5">
+                  <RatingReviews layout="row" />
+                  <CommentsSection />
+                </div>
+                <div className="p-6 rounded-lg w-full -mt-17">
+                  <div className="sm:bg-[var(--div-active)] w-full p-3 rounded-2xl">
+                    <ActionButtons />
+                    <QuickChat />
+                  </div>
+                  <SellerInfo />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="w-[100vw] -ml-4 sm:-ml-12 p-0">
-          <SimilarAds />
-          <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
         </div>
       </div>
-
+      <div className="w-[100vw] p-0 lg:mt-15">
+        <SimilarAds />
+        <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
+      </div>
       <MenuButton />
+
     </div>
+
   );
 };
 
