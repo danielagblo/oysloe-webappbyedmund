@@ -47,7 +47,7 @@ const ProfilePage = () => {
         <div className="flex gap-2 sm:h-full sm:w-full">{renderContent()}</div>
       </div>
 
-      <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-6">
+      <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-[2.125vw]">
         <ProfileStats />
       </div>
       <MenuButton />

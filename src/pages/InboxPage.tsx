@@ -21,14 +21,6 @@ export default function InboxPage() {
           <ProfileStats />
         </div>
 
-        {/* Support and Cases */}
-        {/* <div className="sm:w-1/2 w-full h-screen overflow-y-auto sm:py-5 sm:px-4">
-          <SupportAndCases
-            onSelectCase={(caseId) => setSelectedCase(prev => (prev === caseId ? null : caseId))}
-            onSelectChat={(chatId) => setSelectedCase(prev => (prev === chatId ? null : chatId))}
-          />
-        </div> */}
-
         {/* Live Chat — desktop: right column; mobile: full-screen when open */}
         {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
         <div
