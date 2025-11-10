@@ -448,7 +448,7 @@ export default function PostAdForm() {
           </div>
         )}
 
-        
+    
         {(!isMobile || mobileStep === "images") && (
           <div className="relative flex flex-col w-full lg:w-2/5 lg:bg-white lg:shadow-lg rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
             <div className="w-full">
@@ -476,7 +476,7 @@ export default function PostAdForm() {
                 </span>
               </div>
               
-              <div className="relative flex flex-col w-full overflow-y-scroll no-scrollbar">
+              <div className="relative flex flex-col w-full max-h-[70vh]">
                 <DragDropContext
                   onDragEnd={(result) => {
                     if (!result.destination) return;
@@ -538,7 +538,7 @@ export default function PostAdForm() {
                   </Droppable>
                 </DragDropContext>
                 
-                <div className="h-30 w-full" />
+                <div className="h-[150px] w-full bg-transparent" />
               </div>    
             </div>         
 
