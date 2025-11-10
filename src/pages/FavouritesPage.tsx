@@ -48,7 +48,7 @@ const FavouritesPage = () => {
                   alt={ad.name}
                 />
                 <p
-                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer"
+                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2"
                   onClick={() => setSelectedAd(ad)}
                 >
                   ...

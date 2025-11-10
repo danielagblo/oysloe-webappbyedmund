@@ -12,7 +12,7 @@ export type MenuItem = {
 const MENU_ITEMS: MenuItem[] = [
   { key: "profile", label: "Profile", icon: "/profile.svg" },
   { key: "ads", label: "Ads", icon: "/ads.svg" },
-  { key: "favorite", label: "Favourite", icon: "/favorite.svg" },
+  { key: "favorite", label: "Favourites", icon: "/favorite.svg" },
   { key: "subscription", label: "Subscription", icon: "/subecribe.svg" },
   { key: "refer", label: "Refer & Earn", icon: "/refer and earn.svg" },
   { key: "feedback", label: "Feedback", icon: "/feedback.svg" },
