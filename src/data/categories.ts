@@ -1,5 +1,5 @@
 interface CategoriesData {
-  [regionName: string]: string[]; 
+  [regionName: string]: string[];
 }
 
 export const categoryOptions: CategoriesData = {
@@ -19,14 +19,8 @@ export const categoryOptions: CategoriesData = {
     "Headphones & Earbuds",
     "Routers, modems, & Switches",
   ],
-  Furniture: [
-    "Living room",
-    "Bedroom",
-    "Office",
-    "Outdoor",
-    "Kitchen",
-  ],
+  Furniture: ["Living room", "Bedroom", "Office", "Outdoor", "Kitchen"],
   Vehicles: ["Cars", "Motorbikes", "Trucks", "Bicycles"],
   Clothing: ["Men", "Women", "Kids", "Accessories"],
   Books: ["Textbooks", "Novels", "Comics", "Children's books"],
-}
+};

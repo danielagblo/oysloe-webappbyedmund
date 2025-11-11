@@ -154,9 +154,15 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       {Logout && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-[300] px-4">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm flex flex-col items-center gap-5">
-            <Lottie animationData={logoutAnim} loop={true} className="w-40 h-auto md:w-[15vw] md:h-auto" />
+            <Lottie
+              animationData={logoutAnim}
+              loop={true}
+              className="w-40 h-auto md:w-[15vw] md:h-auto"
+            />
 
-            <p className="text-lg font-semibold text-center sm:px-7">Are you sure you would like to log out?</p>
+            <p className="text-lg font-semibold text-center sm:px-7">
+              Are you sure you would like to log out?
+            </p>
 
             <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
               <button

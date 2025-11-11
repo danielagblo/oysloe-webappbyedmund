@@ -77,7 +77,6 @@ export interface VerifyOTPRequest {
 
 export type VerifyOTPResponse = LoginUser | GenericMessage;
 
-
 /* -- Reset Password -- */
 export interface ResetPasswordRequest {
   new_password: string;

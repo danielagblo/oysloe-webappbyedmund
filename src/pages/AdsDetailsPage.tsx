@@ -114,21 +114,37 @@ const AdsDetailsPage = () => {
   const DesktopHeader = () => (
     <div className="hidden sm:flex bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
-        <img src="/location.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <img
+          src="/location.svg"
+          alt=""
+          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+        />
         <h2 className="text-base md:text-[1.125vw]">
           {currentAdData?.location || "Lashibi, Accra"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <img
+          src="/star.svg"
+          alt=""
+          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+        />
         <h2 className="text-base  md:text-[1.125vw]">4.5 20 reviews</h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/flag.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+        <img
+          src="/flag.svg"
+          alt=""
+          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+        />
         <h2 className="text-base md:text-[1.125vw]">30</h2>
       </div>
       <div className="flex items-center gap-2">
-        <img src="/favorited.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
+        <img
+          src="/favorited.svg"
+          alt=""
+          className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
+        />
         <h2 className="text-base md:text-[1.125vw]">34</h2>
       </div>
       <div className="flex gap-2 ml-auto">
@@ -136,13 +152,21 @@ const AdsDetailsPage = () => {
           onClick={handlePrevious}
           className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
         >
-          <img src="/arrowleft.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
+          <img
+            src="/arrowleft.svg"
+            alt=""
+            className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
+          />
         </button>
         <button
           onClick={handleNext}
           className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
         >
-          <img src="/arrowright.svg" alt="" className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]" />
+          <img
+            src="/arrowright.svg"
+            alt=""
+            className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
+          />
         </button>
       </div>
     </div>
@@ -284,7 +308,11 @@ const AdsDetailsPage = () => {
             key={label}
             className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-[var(--div-active)] sm:bg-white hover:bg-gray-50"
           >
-            <img src={`/${icon}`} alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
+            <img
+              src={`/${icon}`}
+              alt=""
+              className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
+            />
             <p className="whitespace-nowrap">{label}</p>
           </button>
         ))}
@@ -294,7 +322,9 @@ const AdsDetailsPage = () => {
   const CommentsSection = () => (
     <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
       <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
-      <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">Comments</h2>
+      <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">
+        Comments
+      </h2>
       <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
         {[1, 2, 3].map((comment) => (
           <div
@@ -305,20 +335,46 @@ const AdsDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
                 <div className="flex flex-col">
-                  <p className="text-[10px] text-gray-500 md:text-[0.9vw]">1st April</p>
+                  <p className="text-[10px] text-gray-500 md:text-[0.9vw]">
+                    1st April
+                  </p>
                   <h3 className="font-semibold md:text-[1.2vw]">Sandra</h3>
                   <div className="flex">
-                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
-                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
-                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
-                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
-                    <img src="/star.svg" alt="" className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]" />
+                    <img
+                      src="/star.svg"
+                      alt=""
+                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+                    />
+                    <img
+                      src="/star.svg"
+                      alt=""
+                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+                    />
+                    <img
+                      src="/star.svg"
+                      alt=""
+                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+                    />
+                    <img
+                      src="/star.svg"
+                      alt=""
+                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+                    />
+                    <img
+                      src="/star.svg"
+                      alt=""
+                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+                    />
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <button className="flex items-center gap-1 m-2 md:text-[1vw]">
-                  <img src="/like.svg" alt="" className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]" />
+                  <img
+                    src="/like.svg"
+                    alt=""
+                    className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]"
+                  />
                   <h3>Like</h3>
                 </button>
                 <span className="text-sm md:text-[1vw]">20</span>
@@ -381,7 +437,11 @@ const AdsDetailsPage = () => {
             style={{ border: "1px solid var(--div-border)" }}
             className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white"
           >
-            <img src="/audio.svg" alt="" className="w-7 h-5 md:h-[1.5vw] md:w-[1.5vw]" />
+            <img
+              src="/audio.svg"
+              alt=""
+              className="w-7 h-5 md:h-[1.5vw] md:w-[1.5vw]"
+            />
           </button>
         </div>
         <div className="mt-4 space-y-2 text-[10px] inline-flex flex-wrap gap-2 text-gray-600">
@@ -396,7 +456,11 @@ const AdsDetailsPage = () => {
             />
           </div>
           <div className="flex -mt-2 items-center gap-1 md:text-[0.8vw]">
-            <img src="/shield.svg" alt="" className="w-3 h-3 md:w-[0.9vw] md:h-[0.9vw]" />
+            <img
+              src="/shield.svg"
+              alt=""
+              className="w-3 h-3 md:w-[0.9vw] md:h-[0.9vw]"
+            />
             <h4>Always chat here for Safety reasons!</h4>
           </div>
         </div>
@@ -408,7 +472,11 @@ const AdsDetailsPage = () => {
       {/* profile bit pc */}
       <div className="hidden sm:flex flex-row gap-4 bg-[var(--div-active)] px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
-          <img src="/face.svg" alt="" className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full" />
+          <img
+            src="/face.svg"
+            alt=""
+            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
+          />
           <img
             src="/verified.svg"
             alt=""
@@ -427,7 +495,9 @@ const AdsDetailsPage = () => {
           <h4 className="text-xl md:text-[1.5vw]">ElectroMart Gh Ltd</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
-            <span className="text-[10px] md:text-[0.9vw] text-green-800">High level</span>
+            <span className="text-[10px] md:text-[0.9vw] text-green-800">
+              High level
+            </span>
           </div>
         </div>
         <button className="px-2 py-1 rounded text-sm md:text-[1vw] bg-[var(--div-active)]">
@@ -496,7 +566,9 @@ const AdsDetailsPage = () => {
   );
   const SimilarAds = () => (
     <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw] md:px-12">
-      <h2 className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl">Similar Ads</h2>
+      <h2 className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl">
+        Similar Ads
+      </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
         {pics.map((pic, index) => (
@@ -602,9 +674,7 @@ const AdsDetailsPage = () => {
         <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
       </div>
       <MenuButton />
-
     </div>
-
   );
 };
 

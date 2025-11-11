@@ -1,5 +1,5 @@
 interface RegionsData {
-  [regionName: string]: string[]; 
+  [regionName: string]: string[];
 }
 
 export const ghanaRegionsAndPlaces: RegionsData = {
@@ -207,4 +207,4 @@ export const ghanaRegionsAndPlaces: RegionsData = {
     "Debiso",
     "Essam",
   ],
-}
+};

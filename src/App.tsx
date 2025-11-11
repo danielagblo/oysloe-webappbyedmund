@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
-import AlertPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import InboxPage from "./pages/InboxPage.tsx";
 import LogInPage from "./pages/LogInPage.tsx";
@@ -40,7 +39,6 @@ function App() {
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
         <Route path="/reviews" element={<ReviewPage />} />
-        <Route path="/alerts" element={<AlertPage />} />
         <Route path="/postad" element={<PostAdPage />} />
         <Route path="/inbox" element={<InboxPage />} />
         <Route path="/profile" element={<ProfilePage />} />

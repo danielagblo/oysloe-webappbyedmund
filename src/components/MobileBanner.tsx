@@ -24,7 +24,9 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
             <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
             <span className="text-sm">{backto}</span>
           </button>
-          <h2 className="absolute w-full flex justify-center items-center text-sm font-medium rounded-2xl py-1 px-2">{page}</h2>
+          <h2 className="absolute w-full flex justify-center items-center text-sm font-medium rounded-2xl py-1 px-2">
+            {page}
+          </h2>
         </div>
       </div>
       <div className="h-10 bg-white" />

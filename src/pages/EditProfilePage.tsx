@@ -36,7 +36,7 @@ const EditProfilePage = () => {
 
   const onImgError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>,
-    fallback: string = avatarPlaceholder
+    fallback: string = avatarPlaceholder,
   ) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = fallback;
@@ -57,145 +57,145 @@ const EditProfilePage = () => {
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-6 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
-          {closeProgress && (
-            <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
-              {setupProgress === 100 && (
-                <div className="mt-[-5px] w-full flex justify-end items-center">
-                  <button
-                    className="p-2 cursor-pointer"
-                    onClick={() => setCloseProgress((prev) => !prev)}
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              )}
-              <div className="my-3 h-[6px] w-full bg-[#defeed] rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[#74ffa7] rounded-full"
-                  style={{ width: `${setupProgress}%` }}
-                />
-              </div>
-
-              <p className="text-lg">You're set now {setupProgress}%</p>
-              <p className="mb-3">
-                {setupProgress === 100
-                  ? "Congrats! Submit your first ad"
-                  : "Complete your account to upload your first ad"}
-              </p>
-              {setupProgress === 100 && (
-                <div className="mt-[-5px] w-full flex justify-end items-center">
-                  <button 
-                    className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center"
-                    onClick={() => navigate("/postad")}
-                  >
-                    <span className="border-2 border-gray-500 p-0.5 rounded">
-                      <PlusIcon size={12} />
-                    </span>
-                    <p>Post Ad</p>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* profile images area */}
-          <div className="flex justify-around items-center w-full p-4 rounded-md">
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src={selectedUser?.profileImage || avatarPlaceholder}
-                alt="Profile"
-                className="w-20 max-w-full h-auto rounded-full object-cover bg-gray-100"
-                onError={(e) => onImgError(e, avatarPlaceholder)}
-              />
-              <p className="text-xs">Profile Image</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src={selectedUser?.businessLogo || logoPlaceholder}
-                alt="Business Logo"
-                className="w-20 max-w-full h-auto rounded-md object-cover bg-gray-100"
-                onError={(e) => onImgError(e, logoPlaceholder)}
-              />
-              <p className="text-xs">Business Logo</p>
-            </div>
-          </div>
-
-          {/* general details */}
-          <div className="w-[95%] bg-white p-4 rounded-md">
-            <p className="mb-2 text-sm font-medium">General Details</p>
-
-            <label className="text-xs text-gray-600">Name</label>
-            <input
-              defaultValue={selectedUser?.name}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <div className="flex items-center">
-              <label className="text-xs text-gray-600">Email</label>
-              &nbsp;
-              <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
-                {selectedUser?.email ? "Verified" : "Unverified"}
-              </p>
-            </div>
-            <input
-              defaultValue={selectedUser?.email}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <label className="text-xs text-gray-600">First Number</label>
-            <input
-              defaultValue={selectedUser?.phonePrimary}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <label className="text-xs text-gray-600">Second Number</label>
-            <input
-              defaultValue={selectedUser?.phoneSecondary || "---"}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            <div className="flex items-center">
-              <label className="text-xs text-gray-600">National ID</label>
-              &nbsp;
-              <p className="mb-1 inline text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
-                {selectedUser?.nationalId ? "Verified" : "Not Verified"}
-              </p>
-            </div>
-            <input
-              defaultValue={selectedUser?.nationalId}
-              className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-            />
-
-            {setupProgress === 100 ? (
-              <>
-                <label>Business Name</label>
-                <input
-                  defaultValue={selectedUser?.businessName}
-                  className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-                />
-              </>
-            ) : (
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
-                  <p>Front</p>
-                  <img
-                    src={frontPlaceholder}
-                    className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
-                    onError={(e) => onImgError(e, frontPlaceholder)}
+            {closeProgress && (
+              <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
+                {setupProgress === 100 && (
+                  <div className="mt-[-5px] w-full flex justify-end items-center">
+                    <button
+                      className="p-2 cursor-pointer"
+                      onClick={() => setCloseProgress((prev) => !prev)}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                <div className="my-3 h-[6px] w-full bg-[#defeed] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-[#74ffa7] rounded-full"
+                    style={{ width: `${setupProgress}%` }}
                   />
                 </div>
-                <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
-                  <p>Back</p>
-                  <img
-                    src={backPlaceholder}
-                    className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
-                    onError={(e) => onImgError(e, backPlaceholder)}
-                  />
-                </div>
+
+                <p className="text-lg">You're set now {setupProgress}%</p>
+                <p className="mb-3">
+                  {setupProgress === 100
+                    ? "Congrats! Submit your first ad"
+                    : "Complete your account to upload your first ad"}
+                </p>
+                {setupProgress === 100 && (
+                  <div className="mt-[-5px] w-full flex justify-end items-center">
+                    <button
+                      className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center"
+                      onClick={() => navigate("/postad")}
+                    >
+                      <span className="border-2 border-gray-500 p-0.5 rounded">
+                        <PlusIcon size={12} />
+                      </span>
+                      <p>Post Ad</p>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
+
+            {/* profile images area */}
+            <div className="flex justify-around items-center w-full p-4 rounded-md">
+              <div className="flex flex-col items-center gap-2">
+                <img
+                  src={selectedUser?.profileImage || avatarPlaceholder}
+                  alt="Profile"
+                  className="w-20 max-w-full h-auto rounded-full object-cover bg-gray-100"
+                  onError={(e) => onImgError(e, avatarPlaceholder)}
+                />
+                <p className="text-xs">Profile Image</p>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <img
+                  src={selectedUser?.businessLogo || logoPlaceholder}
+                  alt="Business Logo"
+                  className="w-20 max-w-full h-auto rounded-md object-cover bg-gray-100"
+                  onError={(e) => onImgError(e, logoPlaceholder)}
+                />
+                <p className="text-xs">Business Logo</p>
+              </div>
+            </div>
+
+            {/* general details */}
+            <div className="w-[95%] bg-white p-4 rounded-md">
+              <p className="mb-2 text-sm font-medium">General Details</p>
+
+              <label className="text-xs text-gray-600">Name</label>
+              <input
+                defaultValue={selectedUser?.name}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <div className="flex items-center">
+                <label className="text-xs text-gray-600">Email</label>
+                &nbsp;
+                <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
+                  {selectedUser?.email ? "Verified" : "Unverified"}
+                </p>
+              </div>
+              <input
+                defaultValue={selectedUser?.email}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <label className="text-xs text-gray-600">First Number</label>
+              <input
+                defaultValue={selectedUser?.phonePrimary}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <label className="text-xs text-gray-600">Second Number</label>
+              <input
+                defaultValue={selectedUser?.phoneSecondary || "---"}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              <div className="flex items-center">
+                <label className="text-xs text-gray-600">National ID</label>
+                &nbsp;
+                <p className="mb-1 inline text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
+                  {selectedUser?.nationalId ? "Verified" : "Not Verified"}
+                </p>
+              </div>
+              <input
+                defaultValue={selectedUser?.nationalId}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+              />
+
+              {setupProgress === 100 ? (
+                <>
+                  <label>Business Name</label>
+                  <input
+                    defaultValue={selectedUser?.businessName}
+                    className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                  />
+                </>
+              ) : (
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
+                    <p>Front</p>
+                    <img
+                      src={frontPlaceholder}
+                      className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
+                      onError={(e) => onImgError(e, frontPlaceholder)}
+                    />
+                  </div>
+                  <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
+                    <p>Back</p>
+                    <img
+                      src={backPlaceholder}
+                      className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
+                      onError={(e) => onImgError(e, backPlaceholder)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </div>
 
         {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
@@ -247,7 +247,6 @@ const EditProfilePage = () => {
           <div className="md:w-full md:h-20" />
         </div>
       </div>
-      
 
       {openVerificationModal && (
         <div className="fixed inset-0 z-30 backdrop-blur-sm bg-black/50 flex justify-center items-center ">

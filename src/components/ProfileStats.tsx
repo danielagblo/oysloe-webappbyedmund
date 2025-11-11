@@ -9,11 +9,12 @@ export default function ProfileStats() {
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />
-      <h2 className="text-xl font-medium mb-1 md:text-[2vw]">Alexander Kowri</h2>
+      <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
+        Alexander Kowri
+      </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
           <svg
-            
             width="1.2vw"
             height="1.2vw"
             viewBox="0 0 10 11"
@@ -34,9 +35,12 @@ export default function ProfileStats() {
               fill="#374957"
             />
           </svg>
-          <p className="inline text-[length:10px] md:text-[0.9vw]"> High Level</p>
+          <p className="inline text-[length:10px] md:text-[0.9vw]">
+            {" "}
+            High Level
+          </p>
         </div>
-        <div className="w-full bg-green-200 h-[0.5vw] rounded" />  
+        <div className="w-full bg-green-200 h-[0.5vw] rounded" />
       </div>
     </div>
   );
@@ -45,11 +49,15 @@ export default function ProfileStats() {
     <div className="flex gap-4 justify-center w-full text-sm">
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
         <p className="font-medium md:text-[1.5vw]">900k</p>
-        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">Active Ads</p>
+        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+          Active Ads
+        </p>
       </div>
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
         <p className="font-medium md:text-[1.5vw]">900k</p>
-        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">Sold Ads</p>
+        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+          Sold Ads
+        </p>
       </div>
     </div>
   );

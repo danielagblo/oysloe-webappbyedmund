@@ -3,7 +3,7 @@ import Subscription from "../assets/Subscription.png";
 const SubscriptionPage = () => {
   return (
     <div className="flex justify-between h-screen w-screen items-center gap-2 no-scrollbar">
-       <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-4 md:py-3 min-h-0 max-h-[100vh] max-lg:overflow-auto lg:overflow-hidden justify-start gap-4">
+      <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-4 md:py-3 min-h-0 max-h-[100vh] max-lg:overflow-auto lg:overflow-hidden justify-start gap-4">
         <div className="lg:w-1/2 lg:overflow-y-auto no-scrollbar">
           <div className="w-full md:bg-white md:min-h-[92vh] lg:w-full pt-20 md:mt-0 flex flex-col justify-start items-center gap-4 px-3 md:py-3 rounded-2xl text-xs">
             <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
@@ -21,7 +21,11 @@ const SubscriptionPage = () => {
                     </p>
                   </div>
                 </div>
-                <img src={Subscription} alt="subscription" className="w-[20%]" />
+                <img
+                  src={Subscription}
+                  alt="subscription"
+                  className="w-[20%]"
+                />
               </div>
             </div>
           </div>
@@ -47,10 +51,16 @@ const SubscriptionPage = () => {
                 </p>
                 <ul>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">Share limited number of ads</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      Share limited number of ads
+                    </span>
                   </li>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">All ads stays promoted for a week</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      All ads stays promoted for a week
+                    </span>
                   </li>
                 </ul>
                 <div className="flex justify-start items-start gap-4">
@@ -67,10 +77,16 @@ const SubscriptionPage = () => {
                 </p>
                 <ul>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">Pro partnership status</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      Pro partnership status
+                    </span>
                   </li>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">All ads stays promoted for a month</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      All ads stays promoted for a month
+                    </span>
                   </li>
                 </ul>
                 <div className="flex justify-start items-start gap-4">
@@ -82,16 +98,21 @@ const SubscriptionPage = () => {
               </div>
 
               <div className="relative bg-[var(--div-active)] rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full">
-
                 <p className="font-bold">
                   Premium <span className="font-normal">10x</span>
                 </p>
                 <ul>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">Unlimited number of ads</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      Unlimited number of ads
+                    </span>
                   </li>
                   <li>
-                    <span className="font-bold">&#10004; </span><span className="text-gray-500">Sell 10x faster in all categories</span>
+                    <span className="font-bold">&#10004; </span>
+                    <span className="text-gray-500">
+                      Sell 10x faster in all categories
+                    </span>
                   </li>
                 </ul>
                 <div className="flex justify-start items-start gap-4">
@@ -110,8 +131,6 @@ const SubscriptionPage = () => {
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };

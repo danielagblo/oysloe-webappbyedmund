@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-} from "react-leaflet";
-import type {
-  LeafletMouseEvent,
-} from "leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import type { LeafletMouseEvent } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 interface Coords {
@@ -29,7 +22,7 @@ function LocationPicker({
 
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
         );
         const data: { display_name?: string } = await res.json();
         const placeName =
@@ -47,23 +40,33 @@ function LocationPicker({
 
 interface LocationSelectorProps {
   onConfirm?: (
-    selection: { coords: { lat: number; lng: number }; placeName: string } | null
+    selection: {
+      coords: { lat: number; lng: number };
+      placeName: string;
+    } | null,
   ) => void;
-  selectedLocation?: { coords: { lat: number; lng: number }; placeName: string } | null;
+  selectedLocation?: {
+    coords: { lat: number; lng: number };
+    placeName: string;
+  } | null;
 }
 
-export default function LocationSelector({ onConfirm, selectedLocation }: LocationSelectorProps) {
+export default function LocationSelector({
+  onConfirm,
+  selectedLocation,
+}: LocationSelectorProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempSelection, setTempSelection] = useState<{
     coords: Coords;
     placeName: string;
   } | null>(null);
-  const [finalSelection, setFinalSelection] = useState(selectedLocation || null);
+  const [finalSelection, setFinalSelection] = useState(
+    selectedLocation || null,
+  );
 
   useEffect(() => {
     setFinalSelection(selectedLocation || null);
   }, [selectedLocation]);
-
 
   const handleConfirm = () => {
     if (tempSelection) {
