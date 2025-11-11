@@ -305,7 +305,9 @@ const AdsDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
                 <div className="flex flex-col">
-                  <p className="text-[10px] lg:text-xs text-gray-500">1st April</p>
+                  <p className="text-[10px] lg:text-xs text-gray-500">
+                    1st April
+                  </p>
                   <h3 className="font-semibold">Sandra</h3>
                   <div className="flex">
                     <img src="/star.svg" alt="" className="w-3 h-3" />
@@ -496,7 +498,9 @@ const AdsDetailsPage = () => {
   );
   const SimilarAds = () => (
     <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw]">
-      <h2 className="text-xl font-bold mb-6 px-2 lg:px-26 lg:text-2xl">Similar Ads</h2>
+      <h2 className="text-xl font-bold mb-6 px-2 lg:px-26 lg:text-2xl">
+        Similar Ads
+      </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center">
         {pics.map((pic, index) => (
@@ -597,9 +601,7 @@ const AdsDetailsPage = () => {
         <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
       </div>
       <MenuButton />
-
     </div>
-
   );
 };
 

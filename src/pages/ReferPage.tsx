@@ -4,7 +4,6 @@ import Button from "../components/Button";
 import MenuButton from "../components/MenuButton";
 
 const ReferPage = () => {
-
   const [how, setHow] = useState(false);
   const [redraw, setRedraw] = useState(false);
   const [apply, setApply] = useState(false);
@@ -15,7 +14,6 @@ const ReferPage = () => {
     }
   }, []);
 
-
   const paymentData = [
     { date: "Apr 7, 2024", points: "20 points", total: "$430" },
     { date: "Apr 8, 2024", points: "10 points", total: "$440" },
@@ -23,7 +21,6 @@ const ReferPage = () => {
     { date: "Apr 10, 2024", points: "15 points", total: "$485" },
     { date: "Apr 11, 2024", points: "25 points", total: "$510" },
   ];
-
 
   const Refer = () => (
     <div className="h-full w-full flex flex-col gap-2">
@@ -44,7 +41,9 @@ const ReferPage = () => {
             <span className="text-xl">10,000</span>
             <img src="/arrowright.svg" alt="" />
           </div>
-          <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">equals &#8804;10</span>
+          <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">
+            equals &#8804;10
+          </span>
         </div>
       </div>
       <div className="flex gap-4 w-full px-2 md:px-0">
@@ -81,7 +80,7 @@ const ReferPage = () => {
           <h2 className="text-sm">Gold (Level)</h2>
           <h3 className="text-xs text-gray-400">9,000 points to diamond</h3>
           <div className="relative bg-[#defeed] w-8/10 h-1 my-2">
-            <div className="absolute left-0 w-9 h-1 bg-[var(--green)]"/>
+            <div className="absolute left-0 w-9 h-1 bg-[var(--green)]" />
           </div>
         </div>
         <img className="mb-9" src="/arrowright.svg" alt="" />
@@ -91,7 +90,9 @@ const ReferPage = () => {
           <h2 className="text-sm 2xl:text-xl">Refer Your friends and Earn</h2>
           <span>
             <img src="/ok.svg" alt="" className="inline" />
-            <h2 className="text-xs inline pl-3 text-gray-400">Pro Partnership status</h2>
+            <h2 className="text-xs inline pl-3 text-gray-400">
+              Pro Partnership status
+            </h2>
           </span>
           <span>
             <img src="/ok.svg" alt="" className="inline" />
@@ -107,7 +108,9 @@ const ReferPage = () => {
           </span>
           <span>
             <img src="/ok.svg" alt="" className="inline" />
-            <h2 className="text-xs inline pl-3 text-gray-400">Boost your business</h2>
+            <h2 className="text-xs inline pl-3 text-gray-400">
+              Boost your business
+            </h2>
           </span>
         </div>
         <div className=" mt-10 md:mt-5 w-full">
@@ -115,15 +118,17 @@ const ReferPage = () => {
           <div className="flex gap-2 items-center justify-between w-full">
             <div className="py-2 rounded-lg mt-3 relative flex flex-row gap-3 justify-center border border-[var(--div-border)] items-center w-full">
               <input
-              type="text"
-              value="DAN2785"
-              readOnly
-              className="py-1 focus:border-none rounded text-md"
+                type="text"
+                value="DAN2785"
+                readOnly
+                className="py-1 focus:border-none rounded text-md"
               />
-              <button 
+              <button
                 className="absolute right-1 top-1 hover:text-gray-500 hover:cursor-pointer bg-[var(--div-active)] rounded-lg px-3 py-2"
                 onClick={() => navigator.clipboard.writeText("DAN2785")}
-              >Copy</button>
+              >
+                Copy
+              </button>
             </div>
           </div>
         </div>
@@ -134,20 +139,19 @@ const ReferPage = () => {
     <div className="h-fit w-full px-8 py-9 bg-white rounded-2xl flex flex-col gap-1 items-start">
       <div>
         <h2 className="text-sm">We value friendship</h2>
-        <h2 className="text-xs text-gray-400">Follow the steps below and get rewarded</h2>
+        <h2 className="text-xs text-gray-400">
+          Follow the steps below and get rewarded
+        </h2>
       </div>
-      <div 
-        className="w-full flex -ml-13 justify-start gap-4" 
-        style={{ transform:"scale(0.7)" }}>
+      <div
+        className="w-full flex -ml-13 justify-start gap-4"
+        style={{ transform: "scale(0.7)" }}
+      >
         <img src="/steps.svg" alt="" className="w-10 h-auto ml-5" />
         <div className="flex flex-col justify-evenly gap-6 mb-0">
           <div>
             <h2 className="text-xs inline text-gray-600">Share your code</h2>
-            <img 
-              src="/copy.svg" 
-              className="inline w-3 h-auto" 
-              alt=""
-            />
+            <img src="/copy.svg" className="inline w-3 h-auto" alt="" />
           </div>
           <h2 className="text-xs text-gray-600">Your friend adds the code</h2>
           <h2 className="text-xs text-gray-600">Your friend places an order</h2>
@@ -214,8 +218,14 @@ const ReferPage = () => {
           <h2>$0</h2>
         </div>
         <div className="relative flex flex-row gap-3 justify-center items-center">
-          <input type="text" className="bg-[#F9F9F9] p-3 rounded-lg w-full" placeholder="Add code here" />
-          <button className="absolute right-1 top-1 bg-white rounded-lg px-3 py-2">Apply</button>
+          <input
+            type="text"
+            className="bg-[#F9F9F9] p-3 rounded-lg w-full"
+            placeholder="Add code here"
+          />
+          <button className="absolute right-1 top-1 bg-white rounded-lg px-3 py-2">
+            Apply
+          </button>
         </div>
       </div>
       <div className="w-full px-3 h-full bg-white shadom-sm rounded-2xl pt-4 pb-18">
@@ -224,21 +234,23 @@ const ReferPage = () => {
             <h2 className="text-sm">Silver</h2>
             <h3 className="text-xs text-gray-500">10 points to silver</h3>
             <div className="relative bg-[#defeed] w-8/10 h-1 my-2">
-              <div className="absolute left-0 w-9 h-1 bg-[var(--green)]"/>
+              <div className="absolute left-0 w-9 h-1 bg-[var(--green)]" />
             </div>
           </div>
           <div className=" flex flex-col rounded-lg justify-between bg-[#F9F9F9] p-3">
             <h2 className="text-sm">Gold</h2>
             <h3 className="text-xs text-gray-500">100,000 points to gold</h3>
             <div className="relative bg-[#defeed] w-8/10 h-1 my-2">
-              <div className="absolute left-0 w-3 h-1 bg-[var(--green)]"/>
+              <div className="absolute left-0 w-3 h-1 bg-[var(--green)]" />
             </div>
           </div>
           <div className=" flex flex-col rounded-lg justify-between bg-[#F9F9F9] p-3">
             <h2 className="text-sm">Diamond</h2>
-            <h3 className="text-xs text-gray-500">1,000,000 points to diamond</h3>
+            <h3 className="text-xs text-gray-500">
+              1,000,000 points to diamond
+            </h3>
             <div className="relative bg-[#defeed] w-8/10 h-1 my-2">
-              <div className="absolute left-0 w-36 h-1 bg-[var(--green)]"/>
+              <div className="absolute left-0 w-36 h-1 bg-[var(--green)]" />
             </div>
           </div>
           <h2 className="text-xs text-gray-500">
@@ -259,7 +271,6 @@ const ReferPage = () => {
       </div>
       {(how || apply || redraw) && (
         <div className="fixed inset-0 bg-white z-50 flex flex-col md:hidden animate-fadeIn">
-          
           <div className="flex items-center gap-3 p-4 border-b border-gray-200">
             <button
               onClick={() => {
@@ -283,7 +294,6 @@ const ReferPage = () => {
       <MenuButton />
     </div>
   );
-
 };
 
 export default ReferPage;

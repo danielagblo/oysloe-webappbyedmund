@@ -22,14 +22,14 @@ const AlertsPage = () => {
         activeTab === "ads"
           ? "Ads"
           : activeTab === "favorite"
-          ? "Favorite"
-          : activeTab === "feedback"
-          ? "Feedback"
-          : activeTab === "subscription"
-          ? "Subscription"
-          : activeTab === "refer"
-          ? "Refer & Earn"
-          : "Profile";
+            ? "Favorite"
+            : activeTab === "feedback"
+              ? "Feedback"
+              : activeTab === "subscription"
+                ? "Subscription"
+                : activeTab === "refer"
+                  ? "Refer & Earn"
+                  : "Profile";
       return <PageLocked page={pageName} />;
     }
 

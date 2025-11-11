@@ -1,15 +1,31 @@
 const API_URL = import.meta.env.VITE_API_URL;
-import type { ChangePasswordRequest, GenericMessage, LoginRequest, LoginResponse, LogoutRequest, RegisterUserRequest, RegisterUserResponse, ResetPasswordRequest, SimpleStatusGenericMessage, SimpleStatusResponse, User, VerifyOTPRequest, VerifyOTPResponse } from "../types/AuthTypeApi";
+import type {
+  ChangePasswordRequest,
+  GenericMessage,
+  LoginRequest,
+  LoginResponse,
+  LogoutRequest,
+  RegisterUserRequest,
+  RegisterUserResponse,
+  ResetPasswordRequest,
+  SimpleStatusGenericMessage,
+  SimpleStatusResponse,
+  User,
+  VerifyOTPRequest,
+  VerifyOTPResponse,
+} from "../types/AuthTypeApi";
 
 /* -- Registration -- */
-export async function registerUser(data: RegisterUserRequest): Promise<RegisterUserResponse> {
+export async function registerUser(
+  data: RegisterUserRequest,
+): Promise<RegisterUserResponse> {
   const response = await fetch(`${API_URL}/register/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      Accept: "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -23,10 +39,12 @@ export async function registerUser(data: RegisterUserRequest): Promise<RegisterU
   return result;
 }
 /* -- Logout -- */
-export async function logoutUser(data: LogoutRequest): Promise<SimpleStatusResponse> {
+export async function logoutUser(
+  data: LogoutRequest,
+): Promise<SimpleStatusResponse> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    "Accept": "application/json"
+    Accept: "application/json",
   };
 
   // Check if a token exists in the data and add it to the Authorization header
@@ -37,7 +55,7 @@ export async function logoutUser(data: LogoutRequest): Promise<SimpleStatusRespo
   const response = await fetch(`${API_URL}/logout/`, {
     method: "POST",
     headers: headers, // Use the updated headers
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -46,7 +64,7 @@ export async function logoutUser(data: LogoutRequest): Promise<SimpleStatusRespo
     // When the response is a 400 error, return both status and message to satisfy SimpleStatusResponse
     return {
       status: result.status || "error",
-      message: result.message || "Logout failed"
+      message: result.message || "Logout failed",
     };
   }
 
@@ -58,9 +76,9 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      Accept: "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -72,11 +90,13 @@ export async function loginUser(data: LoginRequest): Promise<LoginResponse> {
   return result;
 }
 /* -- OTP Login -- */
-export async function otpLogin(data: VerifyOTPRequest): Promise<VerifyOTPResponse> {
+export async function otpLogin(
+  data: VerifyOTPRequest,
+): Promise<VerifyOTPResponse> {
   const response = await fetch(`${API_URL}/otplogin/`, {
     method: "POST",
     headers: {
-      "Accept": "application/json",
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
@@ -91,14 +111,16 @@ export async function otpLogin(data: VerifyOTPRequest): Promise<VerifyOTPRespons
 
   return result;
 }
-export async function verifyOTP(data: VerifyOTPRequest): Promise<GenericMessage> {
+export async function verifyOTP(
+  data: VerifyOTPRequest,
+): Promise<GenericMessage> {
   const response = await fetch(`${API_URL}/verifyotp/`, {
     method: "POST",
     headers: {
-      "Accept": "application/json",
-      "Content-Type": "application/json"
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -111,12 +133,15 @@ export async function verifyOTP(data: VerifyOTPRequest): Promise<GenericMessage>
   return result;
 }
 export async function sendOTP(phone: string): Promise<GenericMessage> {
-  const response = await fetch(`${API_URL}/verifyotp/?phone=${encodeURIComponent(phone)}`, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json"
-    }
-  });
+  const response = await fetch(
+    `${API_URL}/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    },
+  );
 
   const result = await response.json();
 
@@ -129,21 +154,24 @@ export async function sendOTP(phone: string): Promise<GenericMessage> {
 }
 
 /* -- Reset Password -- */
-export async function resetPassword(data: ResetPasswordRequest): Promise<SimpleStatusGenericMessage> {
+export async function resetPassword(
+  data: ResetPasswordRequest,
+): Promise<SimpleStatusGenericMessage> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    "Accept": "application/json"
+    Accept: "application/json",
   };
 
   // Check if a token exists in the data and add it to the Authorization header
-  if (data.token) { // Assuming 'data' contains a 'token' field
+  if (data.token) {
+    // Assuming 'data' contains a 'token' field
     headers["Authorization"] = `Token ${data.token}`;
   }
 
   const response = await fetch(`${API_URL}/resetpassword/`, {
     method: "POST",
     headers: headers, // Use the updated headers
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -157,14 +185,16 @@ export async function resetPassword(data: ResetPasswordRequest): Promise<SimpleS
 }
 
 /* -- Change Password -- */
-export async function changePassword(data: ChangePasswordRequest): Promise<SimpleStatusGenericMessage> {
+export async function changePassword(
+  data: ChangePasswordRequest,
+): Promise<SimpleStatusGenericMessage> {
   const response = await fetch(`${API_URL}/changepassword/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Accept": "application/json"
+      Accept: "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();
@@ -177,14 +207,13 @@ export async function changePassword(data: ChangePasswordRequest): Promise<Simpl
   return result; // Has both status and message
 }
 
-
 /* -- Profile data -- */
 export async function getUserProfile(token: string): Promise<User | null> {
   const response = await fetch(`${API_URL}/userprofile/`, {
     method: "GET",
     headers: {
-      "Accept": "application/json",
-      "Authorization": `Token ${token}`,
+      Accept: "application/json",
+      Authorization: `Token ${token}`,
     },
   });
 

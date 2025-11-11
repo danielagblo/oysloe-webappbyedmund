@@ -15,27 +15,27 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   const renderContent = () => {
-        switch (activeTab) {
-            case "profile":
-              return <EditProfilePage />;
-            case "favorite":
-              return <FavouritesPage />;
-            case "ads":
-                return <AdsPage />;
-            case "refer":
-                return <ReferPage />;
-            case "terms":
-                return <TermsAndConditionsPage />;
-            case "privacy":
-                return <PrivacyPage />;
-            case "subscription":
-              return <SubscriptionPage />;
-            case "feedback":
-              return <FeedbackPage />
-            default:
-                return <p>Page not found.</p>;
-        }
-    };
+    switch (activeTab) {
+      case "profile":
+        return <EditProfilePage />;
+      case "favorite":
+        return <FavouritesPage />;
+      case "ads":
+        return <AdsPage />;
+      case "refer":
+        return <ReferPage />;
+      case "terms":
+        return <TermsAndConditionsPage />;
+      case "privacy":
+        return <PrivacyPage />;
+      case "subscription":
+        return <SubscriptionPage />;
+      case "feedback":
+        return <FeedbackPage />;
+      default:
+        return <p>Page not found.</p>;
+    }
+  };
 
   return (
     <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">

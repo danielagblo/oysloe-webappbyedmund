@@ -201,7 +201,7 @@ const HomePage = () => {
                 } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
               />
 
-                {/* missing */}
+              {/* missing */}
               <img
                 src="/search.svg"
                 className="absolute top-0 left-0 w-5 h-5 z-10"
@@ -391,84 +391,83 @@ const HomePage = () => {
   );
 
   const ScrollableAds = () =>
-  [
-    "Electronics",
-    "Furniture",
-    "Vehicles",
-    "Industry",
-    "Fashion",
-    "Grocery",
-    "Games",
-    "Cosmetics",
-    "Property",
-  ].map((section) => (
-    <div
-      key={section}
-      className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-[var(--dark-def)]"
-    >
-      <div className="flex items-center gap-3 mb-2 px-2">
-        <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-[var(--dark-def)]">
-          {section}
-        </h2>
-        <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
-          Show All
-        </button>
-        <div className="flex gap-2 ml-auto">
-          <button
-            onClick={() => handleArrowClick("left", section.toLowerCase())}
-            className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-          >
-            <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
-          </button>
-          <button
-            onClick={() => handleArrowClick("right", section.toLowerCase())}
-            className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-          >
-            <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
-          </button>
-        </div>
-      </div>
-
+    [
+      "Electronics",
+      "Furniture",
+      "Vehicles",
+      "Industry",
+      "Fashion",
+      "Grocery",
+      "Games",
+      "Cosmetics",
+      "Property",
+    ].map((section) => (
       <div
-        id={`move-${section.toLowerCase()}`}
-        className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 [mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
+        key={section}
+        className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-[var(--dark-def)]"
       >
-        <div className="flex gap-2 sm:gap-3 w-max">
-          {pics.map((pic, index) => (
-            <Link
-              key={index}
-              to={`/ads/${ads[index].id}`}
-              state={{ adData: ads[index] }}
-              className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+        <div className="flex items-center gap-3 mb-2 px-2">
+          <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-[var(--dark-def)]">
+            {section}
+          </h2>
+          <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+            Show All
+          </button>
+          <div className="flex gap-2 ml-auto">
+            <button
+              onClick={() => handleArrowClick("left", section.toLowerCase())}
+              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
             >
-              <img
-                src={pic}
-                alt={`${section} ${index}`}
-                className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
-              />
-              <div className="flex items-center gap-1 px-2 py-1">
+              <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
+            </button>
+            <button
+              onClick={() => handleArrowClick("right", section.toLowerCase())}
+              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
+            >
+              <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
+            </button>
+          </div>
+        </div>
+
+        <div
+          id={`move-${section.toLowerCase()}`}
+          className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 [mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
+        >
+          <div className="flex gap-2 sm:gap-3 w-max">
+            {pics.map((pic, index) => (
+              <Link
+                key={index}
+                to={`/ads/${ads[index].id}`}
+                state={{ adData: ads[index] }}
+                className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+              >
                 <img
-                  src="/location.svg"
-                  alt=""
-                  className="w-3 sm:w-5 h-3 sm:h-5"
+                  src={pic}
+                  alt={`${section} ${index}`}
+                  className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                 />
-                <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                  {ads[index].location}
+                <div className="flex items-center gap-1 px-2 py-1">
+                  <img
+                    src="/location.svg"
+                    alt=""
+                    className="w-3 sm:w-5 h-3 sm:h-5"
+                  />
+                  <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                    {ads[index].location}
+                  </p>
+                </div>
+                <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                  {ads[index].title}
                 </p>
-              </div>
-              <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
-                {ads[index].title}
-              </p>
-              <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
-                {ads[index].price}
-              </p>
-            </Link>
-          ))}
+                <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                  {ads[index].price}
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  ));
-
+    ));
 
   const ConditionalAds = () => (
     <div className="bg-[var(--div-active)] w-full flex justify-center -mb-4">

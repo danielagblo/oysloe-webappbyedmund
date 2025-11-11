@@ -15,7 +15,7 @@ export default function DropdownPopup({
   onSelect,
   supportsSubmenu = false,
   title = "Select an Option",
-  truncate = false
+  truncate = false,
 }: DropdownPopupProps) {
   const [open, setOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);
@@ -56,7 +56,6 @@ export default function DropdownPopup({
 
   return (
     <div className="relative">
-      
       <button
         type="button"
         onClick={(e) => {
@@ -99,9 +98,7 @@ export default function DropdownPopup({
           {open && !submenuOpen && (
             <div className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg w-[80%] max-w-sm py-3 px-5 text-[var(--dark-def)] transition-all duration-300">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold text-lg text-gray-700">
-                  {title}
-                </h3>
+                <h3 className="font-semibold text-lg text-gray-700">{title}</h3>
                 <button
                   onClick={() => {
                     setOpen(false);
@@ -150,7 +147,6 @@ export default function DropdownPopup({
             <div className="fixed z-[60] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-lg w-[80%] max-w-sm py-3 px-5 text-[var(--dark-def)] transition-all duration-300">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-2">
-
                   <button
                     onClick={() => {
                       setSubmenuOpen(false);
@@ -158,10 +154,19 @@ export default function DropdownPopup({
                     }}
                     className="bg-[var(--div-active)] hover:bg-gray-200 rounded-full p-2 flex justify-center items-center"
                   >
-                    <svg width="12" height="11" viewBox="0 0 12 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.09135 10.1816L0.000443935 5.09073L5.09135 -0.000177383L5.96635 0.863459L2.36408 4.46573H11.6936V5.71573H2.36408L5.96635 9.30664L5.09135 10.1816Z" fill="#646161" fill-opacity="0.81"/>
+                    <svg
+                      width="12"
+                      height="11"
+                      viewBox="0 0 12 11"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M5.09135 10.1816L0.000443935 5.09073L5.09135 -0.000177383L5.96635 0.863459L2.36408 4.46573H11.6936V5.71573H2.36408L5.96635 9.30664L5.09135 10.1816Z"
+                        fill="#646161"
+                        fill-opacity="0.81"
+                      />
                     </svg>
-
                   </button>
                   <h3 className="font-semibold text-lg text-gray-700">
                     {selectedMain}

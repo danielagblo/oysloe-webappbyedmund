@@ -36,7 +36,7 @@ const EditProfilePage = () => {
 
   const onImgError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>,
-    fallback: string = avatarPlaceholder
+    fallback: string = avatarPlaceholder,
   ) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = fallback;
@@ -83,7 +83,7 @@ const EditProfilePage = () => {
               </p>
               {setupProgress === 100 && (
                 <div className="mt-[-5px] w-full flex justify-end items-center">
-                  <button 
+                  <button
                     className="p-2 cursor-pointer flex justify-between gap-2 bg-gray-100 rounded-full px-4 items-center"
                     onClick={() => navigate("/postad")}
                   >
@@ -242,7 +242,6 @@ const EditProfilePage = () => {
           </div>
         </div>
       </div>
-      
 
       {openVerificationModal && (
         <div className="fixed inset-0 z-30 backdrop-blur-sm bg-black/50 flex justify-center items-center ">
