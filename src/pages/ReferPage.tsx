@@ -23,8 +23,8 @@ const ReferPage = () => {
   ];
 
   const Refer = () => (
-    <div className="h-full md:min-h-[92vh] md:mt-5 md:overflow-auto no-scrollbar w-full flex flex-col gap-2">
-      <h2 className="md:hidden max-md:block w-full text-center text-2xl font-bold mt-2 text-[var(--dark-def)]">
+    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full flex flex-col gap-2">
+      <h2 className="md:hidden max-md:block w-full text-center text-2xl font-bold max-md:mt-2 text-[var(--dark-def)]">
         &nbsp; &nbsp; &nbsp;Refer a Friend
       </h2>
       <div className="max-md:w-screen max-md:px-2 max-md:mt-3">
@@ -160,7 +160,7 @@ const ReferPage = () => {
     </div>
   );
   const How = () => (
-    <div className="h-full md:min-h-[92vh] md:mt-5 md:overflow-auto no-scrollbar w-full px-8 py-9 bg-white rounded-2xl flex flex-col gap-1 items-start">
+    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full px-8 py-9 bg-white rounded-2xl flex flex-col gap-1 items-start">
       <div>
         <h2 className="text-sm md:text-[1.2vw]">We value friendship</h2>
         <h2 className="text-xs text-gray-400 md:text-[1vw]">
@@ -211,7 +211,7 @@ const ReferPage = () => {
     </div>
   );
   const Redraw = () => (
-    <div className="h-full md:min-h-[92vh] md:mt-5 md:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
+    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
       <div className="flex items-center p-3 mt-4 flex-col">
         <p className="text-4xl">$10</p>
         <Button name="Redraw" />
@@ -242,7 +242,7 @@ const ReferPage = () => {
     </div>
   );
   const Apply = () => (
-    <div className="h-full md:min-h-[92vh] md:mt-5 md:overflow-auto no-scrollbar w-full rounded-2xl flex flex-col gap-2">
+    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full rounded-2xl flex flex-col gap-2">
       <div className="bg-white w-full shadom-sm h-56 rounded-2xl pt-8 p-5 flex flex-col justify-between items-start gap-8">
         <div className="flex gap-2 text-sm">
           <img src="/Redeem.svg" alt="" className="w-5 h-5" />
@@ -298,10 +298,10 @@ const ReferPage = () => {
 
   return (
     <div className="h-screen w-screen bg-[var(--background)] mb-5 relative">
-      <div className="w-full sm:flex lg:grid lg:grid-cols-2 py-5 h-full overflow-hidden gap-4">
+      <div className="w-full sm:flex lg:grid lg:grid-cols-2 py-5 md:py-[3.5vh] h-full overflow-hidden gap-4">
         <Refer />
         <div className="md:w-full md:overflow-auto no-scrollbar">
-          <div className="hidden md:block md:min-h-[94vh]">
+          <div className="hidden md:h-full md:block md:min-h-[94vh]">
             {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : null}
             <div className="w-full h-17" />
           </div>

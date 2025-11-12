@@ -53,10 +53,10 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2">
+      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 md:py-[3.5vh]">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
-          <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-6 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
+          <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-0 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
             {closeProgress && (
               <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
                 {setupProgress === 100 && (
@@ -200,7 +200,7 @@ const EditProfilePage = () => {
 
         {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
-          <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-6 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
+          <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-0 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
             {!linkSent && (
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>
