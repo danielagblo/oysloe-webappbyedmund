@@ -358,7 +358,7 @@ const HomePage = () => {
   );
   const CircularSummaries = () => (
     <div className=" text-[var(--dark-def)] flex items-center justify-center w-full overflow-hidden my-[3rem]">
-      <div className="flex flex-row max-lg:gap-2 max-sm:gap-10 justify-center items-center flex-nowrap md:grid md:grid-cols-5 md:w-3/5 md:h-fit">
+      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 md:h-fit">
         {categ.map((category) => {
           const percentage = (category.adsCount / sum) * 100;
           return (

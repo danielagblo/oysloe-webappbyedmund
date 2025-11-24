@@ -3,19 +3,20 @@ import RatingReviews from "./RatingsReviews";
 export default function ProfileStats() {
   // mini components
   const Profile = () => (
-    <div className="flex flex-col items-center pb-6 border-b border-gray-100 ">
+    <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
       <img
         src="face.svg"
         alt="pfp"
-        className="rounded-full object-cover mb-3 bg-pink-300"
-        style={{ height: "4rem", width: "4rem" }}
+        className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />
-      <h2 className="text-xl font-medium mb-1">Alexander Kowri</h2>
-      <div className="flex flex-col justify-start">
+      <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
+        Alexander Kowri
+      </h2>
+      <div className="flex flex-col justify-start w-full">
         <div>
           <svg
-            width="10"
-            height="11"
+            width="1.2vw"
+            height="1.2vw"
             viewBox="0 0 10 11"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -34,9 +35,12 @@ export default function ProfileStats() {
               fill="#374957"
             />
           </svg>
-          <p className="inline text-[length:10px]"> High Level</p>
+          <p className="inline text-[length:10px] md:text-[0.9vw]">
+            {" "}
+            High Level
+          </p>
         </div>
-        <span className="text-xs text-green-500 font-medium bg-green-500/10 px-2 py-0.5 rounded w-[170px]" />
+        <div className="w-full bg-green-200 h-[0.5vw] rounded" />
       </div>
     </div>
   );
@@ -44,21 +48,25 @@ export default function ProfileStats() {
   const AdStats = () => (
     <div className="flex gap-4 justify-center w-full text-sm">
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium">900k</p>
-        <p className="text-[var(--some-other-gray)] text-xs">Active Ads</p>
+        <p className="font-medium md:text-[1.5vw]">900k</p>
+        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+          Active Ads
+        </p>
       </div>
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium">900k</p>
-        <p className="text-[var(--some-other-gray)] text-xs">Sold Ads</p>
+        <p className="font-medium md:text-[1.5vw]">900k</p>
+        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+          Sold Ads
+        </p>
       </div>
     </div>
   );
 
   return (
-    <div className="w-[25vw] m-0 relative text-[var(--dark-def)]">
+    <div className="w-[25vw] m-0 relative text-[var(--dark-def)] flex">
       {/* <MobileBanner /> */}
       <div className="h-[100vh] w-[23vw] hidden sm:flex flex-col gap-2 justify-center items-center">
-        <div className="shadow-sm p-6 rounded-xl bg-white w-full h-[46vh]">
+        <div className="shadow-sm p-6 rounded-xl bg-white w-full h-[46vh] flex flex-col justify-around">
           <Profile />
           <AdStats />
         </div>
