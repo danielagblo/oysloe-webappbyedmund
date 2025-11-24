@@ -6,6 +6,8 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
 
   const response = await fetch(url, { ...options, headers, body, credentials: 'include' });
   if (!response.ok) throw new Error(`${options.method ?? 'GET'} ${url} failed`);
+  // Some endpoints (DELETE, mark-all-read) return 204 No Content — handle that safely
+  if (response.status === 204) return undefined as unknown as T;
   return response.json();
 }
 
@@ -13,6 +15,7 @@ export const apiClient = {
   get: <T>(url: string) => request<T>(url),
   post: <T>(url: string, body: unknown) => request<T>(url, { method: 'POST', body }),
   patch: <T>(url: string, body: unknown) => request<T>(url, { method: 'PATCH', body }),
+  put: <T>(url: string, body: unknown) => request<T>(url, { method: 'PUT', body }),
   delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
 };
 

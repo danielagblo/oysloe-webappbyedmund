@@ -6,3 +6,5 @@ export interface AccountDeleteRequest {
   created_at: string;      
   processed_at?: string;    
 }
+
+export type AccountDeleteRequestStatus = "PENDING" | "APPROVED" | "REJECTED";
