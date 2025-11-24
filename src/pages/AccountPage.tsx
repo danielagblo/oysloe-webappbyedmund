@@ -19,7 +19,7 @@ const AccountPage = () => {
 
   return (
     <div className="flex flex-col items-center w-full h-full justify-center">
-      <div className="flex flex-col gap-4 items-center bg-white sm:h-[93vh] w-full h-full p-6 rounded-2xl">
+      <div className="flex flex-col gap-4 items-center bg-white sm:h-[93vh] w-full max-sm:h-screen max-sm:w-screen max-sm:pt-30 p-6 rounded-2xl">
         <h2 className="text-2xl text-[var(--dark-def)] font-semibold">Account Settings</h2>
 
         <div className="flex gap-4 flex-col">
