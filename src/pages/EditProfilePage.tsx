@@ -3,7 +3,7 @@ import { PlusIcon, X } from "lucide-react";
 import mailGif from "../assets/mail.gif";
 import { useNavigate } from "react-router-dom";
 
-const EditProfilePage = () => {
+const EditProfilePage = ({ setShowEdit }: {setShowEdit: (value: boolean) => void;}) => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -56,7 +56,15 @@ const EditProfilePage = () => {
       <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 md:py-[3.5vh]">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
-          <div className="bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10 md:pt-3 md:pb-12 w-full md:mt-0 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
+          <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
+            <button 
+              className="absolute top-4 left-4 flex items-center justify-center bg-white shadow-sm px-2 rounded-lg hover:scale-95 cursor-pointer hover:bg-gray-100 transition"
+              onClick={() => setShowEdit(false)}
+            >
+              <span className="text-2xl">← </span>
+              &nbsp;
+              <span className="text-sm">Back</span>
+            </button>
             {closeProgress && (
               <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
                 {setupProgress === 100 && (

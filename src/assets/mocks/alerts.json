@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1001,
+    "user": 501,
+    "title": "Welcome to Our Platform!",
+    "body": "Your account has been successfully created and is ready to use.",
+    "kind": "ACCOUNT_CREATED",
+    "is_read": true,
+    "created_at": "2025-11-23T08:00:00Z"
+  },
+  {
+    "id": 1002,
+    "user": 502,
+    "title": "Account Approved",
+    "body": "Congratulations! Your account application has been reviewed and approved.",
+    "kind": "ACCOUNT_APPROVED",
+    "is_read": false,
+    "created_at": "2025-11-23T09:15:30Z"
+  },
+  {
+    "id": 1003,
+    "user": 501,
+    "title": "New Product Approved: 'Quantum Processor'",
+    "body": "Your product 'Quantum Processor' has been approved and is now live on the marketplace.",
+    "kind": "PRODUCT_APPROVED",
+    "is_read": false,
+    "created_at": "2025-11-23T10:30:15Z"
+  },
+  {
+    "id": 1004,
+    "user": 503,
+    "title": "Password Reset Successful",
+    "body": "Your password was successfully updated on November 23rd.",
+    "kind": "SECURITY_UPDATE",
+    "is_read": true,
+    "created_at": "2025-11-23T11:45:50Z"
+  },
+  {
+    "id": 1005,
+    "user": 504,
+    "title": "Product Declined: 'Budget Controller'",
+    "body": "Your product submission 'Budget Controller' was declined. Please check the rejection reasons.",
+    "kind": "PRODUCT_DECLINED",
+    "is_read": false,
+    "created_at": "2025-11-23T12:05:25Z"
+  },
+  {
+    "id": 1006,
+    "user": 501,
+    "title": "New Message from Support",
+    "body": "You have received a reply regarding your ticket #456.",
+    "kind": "SUPPORT_REPLY",
+    "is_read": true,
+    "created_at": "2025-11-23T13:00:00Z"
+  },
+  {
+    "id": 1007,
+    "user": 505,
+    "title": "Payment Method Expiring",
+    "body": "Your saved credit card will expire next month. Please update your payment details.",
+    "kind": "BILLING_WARNING",
+    "is_read": false,
+    "created_at": "2025-11-23T14:20:10Z"
+  },
+  {
+    "id": 1008,
+    "user": 502,
+    "title": "New Login Detected",
+    "body": "A new login from an unrecognized device was detected in London, UK.",
+    "kind": "SECURITY_ALERT",
+    "is_read": false,
+    "created_at": "2025-11-23T15:35:45Z"
+  },
+  {
+    "id": 1009,
+    "user": 506,
+    "title": "Product Updated: 'Server Monitor v2'",
+    "body": "Your product 'Server Monitor v2' has been successfully updated.",
+    "kind": "PRODUCT_UPDATED",
+    "is_read": true,
+    "created_at": "2025-11-23T16:50:05Z"
+  },
+  {
+    "id": 1010,
+    "user": 503,
+    "title": "Subscription Renewed",
+    "body": "Your 'Pro' subscription has been successfully renewed for another year.",
+    "kind": "SUBSCRIPTION_RENEWED",
+    "is_read": true,
+    "created_at": "2025-11-23T17:05:18Z"
+  },
+  {
+    "id": 1011,
+    "user": 507,
+    "title": "Profile Information Missing",
+    "body": "Your profile is missing a contact phone number. Please complete your profile.",
+    "kind": "PROFILE_INCOMPLETE",
+    "is_read": false,
+    "created_at": "2025-11-23T18:10:33Z"
+  },
+  {
+    "id": 1012,
+    "user": 504,
+    "title": "Product Pending Review",
+    "body": "Your product 'Digital Canvas' has been submitted and is currently pending review.",
+    "kind": "PRODUCT_PENDING",
+    "is_read": true,
+    "created_at": "2025-11-23T19:25:00Z"
+  },
+  {
+    "id": 1013,
+    "user": 501,
+    "title": "Storage Limit Reached",
+    "body": "You have used 95% of your allocated storage. Consider upgrading your plan.",
+    "kind": "USAGE_WARNING",
+    "is_read": false,
+    "created_at": "2025-11-23T20:40:12Z"
+  },
+  {
+    "id": 1014,
+    "user": 508,
+    "title": "New Feature: Dark Mode",
+    "body": "Exciting news! Dark Mode is now available. Check it out in your settings.",
+    "kind": "PLATFORM_UPDATE",
+    "is_read": false,
+    "created_at": "2025-11-23T21:55:59Z"
+  },
+  {
+    "id": 1015,
+    "user": 502,
+    "title": "Email Verification Required",
+    "body": "Please click the link in your email to verify your account within 24 hours.",
+    "kind": "EMAIL_VERIFY",
+    "is_read": true,
+    "created_at": "2025-11-23T23:10:20Z"
+  },
+  {
+    "id": 1016,
+    "user": 509,
+    "title": "Invoice #402 Ready",
+    "body": "Your invoice for November services is ready to be viewed and downloaded.",
+    "kind": "INVOICE_READY",
+    "is_read": false,
+    "created_at": "2025-11-24T00:25:35Z"
+  },
+  {
+    "id": 1017,
+    "user": 503,
+    "title": "Two-Factor Authentication Enabled",
+    "body": "You have successfully enabled 2FA for enhanced security.",
+    "kind": "SECURITY_UPDATE",
+    "is_read": true,
+    "created_at": "2025-11-24T01:40:10Z"
+  },
+  {
+    "id": 1018,
+    "user": 510,
+    "title": "Account Disabled",
+    "body": "Your account has been temporarily disabled due to multiple failed login attempts.",
+    "kind": "ACCOUNT_DISABLED",
+    "is_read": false,
+    "created_at": "2025-11-24T02:55:42Z"
+  },
+  {
+    "id": 1019,
+    "user": 505,
+    "title": "Service Degradation Notice",
+    "body": "We are currently experiencing minor issues with the data sync feature.",
+    "kind": "SERVICE_ISSUE",
+    "is_read": true,
+    "created_at": "2025-11-24T04:10:07Z"
+  },
+  {
+    "id": 1020,
+    "user": 506,
+    "title": "API Key Rotated",
+    "body": "Your primary API key has been automatically rotated for security reasons.",
+    "kind": "SECURITY_UPDATE",
+    "is_read": false,
+    "created_at": "2025-11-24T05:25:50Z"
+  }
+]

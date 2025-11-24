@@ -7,9 +7,9 @@ import PrivacyPage from "./PrivacyPage";
 import AdsPage from "./AdsPage";
 import FavouritesPage from "./FavouritesPage";
 import SubscriptionPage from "./SubscriptionPage";
-import EditProfilePage from "./EditProfilePage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
 import FeedbackPage from "./FeedbackPage";
+import AccountPage from "./AccountPage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -17,7 +17,7 @@ const ProfilePage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return <EditProfilePage />;
+        return <AccountPage />;
       case "favorite":
         return <FavouritesPage />;
       case "ads":
