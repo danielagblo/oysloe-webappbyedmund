@@ -1,113 +1,80 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Alert } from "../../types/Alert";
+
 import {
-  listAlerts,
+  getAlerts,
+  getAlert,
   createAlert,
-  retrieveAlert,
-  updateAlert,
-  destroyAlert,
-  markRead as serviceMarkRead,
-  markAllRead as serviceMarkAllRead,
+  markAlertRead,
+  markAllAlertsRead,
 } from "../../services/alertService";
 
 export function useAlerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  /** Fetch all alerts */
   const fetchAlerts = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const data = await listAlerts();
+      const data = await getAlerts();
       setAlerts(data);
-    } catch (err) {
-      console.log(err);
+    } catch {
       setError("Failed to load alerts");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  /** Create alert */
-  const addAlert = useCallback(async (payload: Partial<Alert>) => {
-    try {
-      const created = await createAlert(payload);
-      setAlerts(prev => [created, ...prev]);
-      return created;
-    } catch (err) {
-      setError("Failed to create alert");
-      throw err;
-    }
-  }, []);
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
-  /** Retrieve one alert */
-  const getAlert = useCallback(async (id: number) => {
+  const fetchAlert = useCallback(async (id: number) => {
     try {
-      return await retrieveAlert(id);
-    } catch (err) {
-      console.log(err);
+      return await getAlert(id);
+    } catch {
       setError("Failed to retrieve alert");
       return undefined;
     }
   }, []);
 
-  /** Update alert */
-  const editAlert = useCallback(async (id: number, payload: Partial<Alert>) => {
-    try {
-      const updated = await updateAlert(id, payload);
-      setAlerts(prev =>
-        prev.map(a => (a.id === id ? updated : a))
-      );
-      return updated;
-    } catch (err) {
-      setError("Failed to update alert");
-      throw err;
-    }
-  }, []);
-
-  /** Delete alert */
-  const deleteAlert = useCallback(async (id: number) => {
-    try {
-      await destroyAlert(id);
-      setAlerts(prev => prev.filter(a => a.id !== id));
-    } catch (err) {
-      setError("Failed to delete alert");
-      throw err;
-    }
-  }, []);
-
-  /** Mark a single alert read */
   const markRead = useCallback(async (id: number) => {
     try {
-      const updated = await serviceMarkRead(id);
-      setAlerts(prev =>
-        prev.map(a => (a.id === id ? updated : a))
+      const updated = await markAlertRead(id);
+
+      setAlerts((prev) =>
+        prev.map((a) => (a.id === id ? updated : a))
       );
-      return updated;
-    } catch (err) {
-      setError("Failed to mark read");
-      throw err;
+    } catch {
+      setError("Failed to mark alert as read");
     }
   }, []);
 
-  /** Mark all alerts read */
-  const markAllAsRead = useCallback(async () => {
+  const markAllRead = useCallback(async () => {
     try {
-      const data = await serviceMarkAllRead();
-      setAlerts(data);
-      return data;
-    } catch (err) {
-      setError("Failed to mark all read");
-      throw err;
+      await markAllAlertsRead();
+
+      setAlerts((prev) =>
+        prev.map((a) => ({ ...a, is_read: true }))
+      );
+    } catch {
+      setError("Failed to mark all alerts as read");
     }
   }, []);
 
-  // Load alerts on mount
-  useEffect(() => {
-    fetchAlerts();
-  }, [fetchAlerts]);
+  const addAlert = useCallback(async (body: Partial<Alert>) => {
+    try {
+      const newAlert = await createAlert(body);
+      setAlerts((prev) => [newAlert, ...prev]);
+      return newAlert;
+    } catch {
+      setError("Failed to create alert");
+      return undefined;
+    }
+  }, []);
 
   return {
     alerts,
@@ -115,12 +82,9 @@ export function useAlerts() {
     error,
 
     fetchAlerts,
+    fetchAlert,
     addAlert,
-    getAlert,
-    editAlert,
-    deleteAlert,
-
     markRead,
-    markAllAsRead,
+    markAllRead,
   };
 }
