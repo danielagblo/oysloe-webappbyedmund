@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-import {
+import type {
   AccountDeleteRequest,
   AdminCategoryWithSubcategories,
   AdminToggleUser,
@@ -65,7 +65,7 @@ import {
   UserUpdate,
   VerifyOTPPostRequest,
 } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { HttpClient, ContentType, type RequestParams } from "./http-client";
 
 export class ApiV1<
   SecurityDataType = unknown,
