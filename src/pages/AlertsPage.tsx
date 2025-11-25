@@ -1,12 +1,37 @@
+import { useEffect, useState } from "react";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
-import { useAlerts } from '../features/alerts/useAlerts';
 import { timeAgo } from "../utils/timeAgo";
-
 const AlertsPanel = () => {
-  const { alerts, loading } = useAlerts();
+  type Alert = { id: string; title: string; body: string; created_at: string };
+
+  const [loading, setLoading] = useState(true);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  useEffect(() => {
+    // simulate a fetch for alerts (replace with real fetch as needed)
+    const t = setTimeout(() => {
+      setAlerts([
+        {
+          id: "1",
+          title: "Welcome",
+          body: "Thanks for joining our platform.",
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          title: "Maintenance",
+          body: "Scheduled maintenance tonight at 11pm.",
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      setLoading(false);
+    }, 400);
+
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div className="flex flex-col items-center lg:w-full text-[var(--dark-def)] ">
@@ -22,63 +47,21 @@ const AlertsPanel = () => {
           <div className="space-y-4 w-full">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
-                  >
-                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-300 flex-shrink-0" />
-                    <div className="flex flex-col w-full">
-                      <span className="text-xs text-gray-400">...</span>
-                      <div className="text-sm lg:text-base">
-                        <span className="font-semibold">Loading...</span>
-                        <span className="ml-1 break-words">Please wait</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              : alerts.map((alert) => (
-                  <div
-                    key={alert.id}
-                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-                  >
-                    <img
-                      src="/building.svg"
-                      alt="alert source"
-                      className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full flex-shrink-0"
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-xs text-gray-400">
-                        {timeAgo(alert.created_at)}
-                      </span>
-                      <div className="text-sm lg:text-base">
-                        <span className="font-semibold">{alert.title}</span>
-                        <span className="ml-1 break-words">{alert.body}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-          </div>
-        </div>
-
-        {/* Mobile alerts */}
-        <div className="flex lg:hidden flex-col w-full p-4 bg-white">
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
                   className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-300 flex-shrink-0" />
                   <div className="flex flex-col w-full">
                     <span className="text-xs text-gray-400">...</span>
-                    <div className="text-sm">
+                    <div className="text-sm lg:text-base">
                       <span className="font-semibold">Loading...</span>
-                      <span className="ml-1 text-gray-400">Please wait</span>
+                      <span className="ml-1 break-words">Please wait</span>
                     </div>
                   </div>
                 </div>
               ))
-            : alerts.map((alert) => (
+              : alerts.map((alert) => (
                 <div
                   key={alert.id}
                   className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
@@ -86,19 +69,61 @@ const AlertsPanel = () => {
                   <img
                     src="/building.svg"
                     alt="alert source"
-                    className="w-8 h-8 object-cover rounded-full flex-shrink-0"
+                    className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full flex-shrink-0"
                   />
                   <div className="flex flex-col">
                     <span className="text-xs text-gray-400">
                       {timeAgo(alert.created_at)}
                     </span>
-                    <div className="text-sm">
+                    <div className="text-sm lg:text-base">
                       <span className="font-semibold">{alert.title}</span>
-                      <span className="ml-1 text-gray-400">{alert.body}</span>
+                      <span className="ml-1 break-words">{alert.body}</span>
                     </div>
                   </div>
                 </div>
               ))}
+          </div>
+        </div>
+
+        {/* Mobile alerts */}
+        <div className="flex lg:hidden flex-col w-full p-4 bg-white">
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
+              >
+                <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
+                <div className="flex flex-col w-full">
+                  <span className="text-xs text-gray-400">...</span>
+                  <div className="text-sm">
+                    <span className="font-semibold">Loading...</span>
+                    <span className="ml-1 text-gray-400">Please wait</span>
+                  </div>
+                </div>
+              </div>
+            ))
+            : alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+              >
+                <img
+                  src="/building.svg"
+                  alt="alert source"
+                  className="w-8 h-8 object-cover rounded-full flex-shrink-0"
+                />
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-400">
+                    {timeAgo(alert.created_at)}
+                  </span>
+                  <div className="text-sm">
+                    <span className="font-semibold">{alert.title}</span>
+                    <span className="ml-1 text-gray-400">{alert.body}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
         </div>
 
         <div className="h-15" />

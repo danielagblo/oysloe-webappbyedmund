@@ -16,19 +16,19 @@ export const getPayments = async (params?: {
 	if (typeof params?.subscription === "number") qs.append("subscription", String(params.subscription));
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Payment[]>(`/api-v1/payments/${query}`);
+	return apiClient.get<Payment[]>(`/payments/${query}`);
 };
 
 export const getPayment = async (id: number): Promise<Payment> => {
-	return apiClient.get<Payment>(`/api-v1/payments/${id}/`);
+	return apiClient.get<Payment>(`/payments/${id}/`);
 };
 
 export const initiatePaystackPayment = async (body: PaystackInitiateRequest): Promise<void> => {
-	await apiClient.post<void>(`/api-v1/paystack/initiate/`, body);
+	await apiClient.post<void>(`/paystack/initiate/`, body);
 };
 
 export const paystackWebhook = async (body: unknown): Promise<void> => {
-	await apiClient.post<void>(`/api-v1/paystack/webhook/`, body);
+	await apiClient.post<void>(`/paystack/webhook/`, body);
 };
 
 export default {

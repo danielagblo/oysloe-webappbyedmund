@@ -7,25 +7,25 @@ export const getAlerts = async (params?: { ordering?: string; search?: string })
 	if (params?.search) qs.append("search", params.search);
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Alert[]>(`/api-v1/alerts/${query}`);
+	return apiClient.get<Alert[]>(`/alerts/${query}`);
 };
 
 export const getAlert = async (id: number): Promise<Alert> => {
-	return apiClient.get<Alert>(`/api-v1/alerts/${id}/`);
+	return apiClient.get<Alert>(`/alerts/${id}/`);
 };
 
 // Mark a single alert as read (server may accept partial Alert payload)
 export const markAlertRead = async (id: number, body: Partial<Alert> = {}): Promise<Alert> => {
-	return apiClient.post<Alert>(`/api-v1/alerts/${id}/mark-read/`, body);
+	return apiClient.post<Alert>(`/alerts/${id}/mark-read/`, body);
 };
 
 // Mark all alerts as read; body is optional and depends on backend behavior
 export const markAllAlertsRead = async (body: Partial<Alert> = {}): Promise<void> => {
-	await apiClient.post<void>(`/api-v1/alerts/mark-all-read/`, body);
+	await apiClient.post<void>(`/alerts/mark-all-read/`, body);
 };
 
 export const createAlert = async (body: Partial<Alert>): Promise<Alert> => {
-	return apiClient.post<Alert>(`/api-v1/alerts/`, body);
+	return apiClient.post<Alert>(`/alerts/`, body);
 };
 
 export default {

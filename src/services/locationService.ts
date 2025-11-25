@@ -14,27 +14,27 @@ export const getLocations = async (params?: {
 	if (params?.search) qs.append("search", params.search);
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Location[]>(`/api-v1/locations/${query}`);
+	return apiClient.get<Location[]>(`/locations/${query}`);
 };
 
 export const getLocation = async (id: number): Promise<Location> => {
-	return apiClient.get<Location>(`/api-v1/locations/${id}/`);
+	return apiClient.get<Location>(`/locations/${id}/`);
 };
 
 export const createLocation = async (body: LocationPayload): Promise<Location> => {
-	return apiClient.post<Location>(`/api-v1/locations/`, body);
+	return apiClient.post<Location>(`/locations/`, body);
 };
 
 export const updateLocation = async (id: number, body: LocationPayload): Promise<Location> => {
-	return apiClient.put<Location>(`/api-v1/locations/${id}/`, body);
+	return apiClient.put<Location>(`/locations/${id}/`, body);
 };
 
 export const patchLocation = async (id: number, body: Partial<LocationPayload>): Promise<Location> => {
-	return apiClient.patch<Location>(`/api-v1/locations/${id}/`, body);
+	return apiClient.patch<Location>(`/locations/${id}/`, body);
 };
 
 export const deleteLocation = async (id: number): Promise<void> => {
-	await apiClient.delete<void>(`/api-v1/locations/${id}/`);
+	await apiClient.delete<void>(`/locations/${id}/`);
 };
 
 export default {

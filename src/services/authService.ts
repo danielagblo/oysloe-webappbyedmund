@@ -2,23 +2,23 @@ import type { LoginRequest, LoginResponse, LogoutRequest, LogoutResponse, OTPLog
 import { apiClient } from "./apiClient";
 
 export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
-	return apiClient.post<LoginResponse>(`/api-v1/login/`, credentials);
+	return apiClient.post<LoginResponse>(`/login/`, credentials);
 };
 
 export const otpLogin = async (credentials: OTPLoginRequest): Promise<LoginResponse> => {
-	return apiClient.post<LoginResponse>(`/api-v1/otplogin/`, credentials);
+	return apiClient.post<LoginResponse>(`/otplogin/`, credentials);
 };
 
 export const register = async (userData: RegisterRequest): Promise<LoginResponse> => {
-	return apiClient.post<LoginResponse>(`/api-v1/register/`, userData);
+	return apiClient.post<LoginResponse>(`/register/`, userData);
 };
 
 export const resetPassword = async (data: ResetPasswordRequest): Promise<ResetPasswordResponse> => {
-	return apiClient.post<ResetPasswordResponse>(`/api-v1/resetpassword/`, data);
+	return apiClient.post<ResetPasswordResponse>(`/resetpassword/`, data);
 };
 
 export const logout = async (body: LogoutRequest = {}): Promise<LogoutResponse> => {
-	return apiClient.post<LogoutResponse>(`/api-v1/logout/`, body);
+	return apiClient.post<LogoutResponse>(`/logout/`, body);
 };
 
 export default {

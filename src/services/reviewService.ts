@@ -14,27 +14,27 @@ export const getReviews = async (params?: {
 	if (typeof params?.user === "number") qs.append("user", String(params.user));
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Review[]>(`/api-v1/reviews/${query}`);
+	return apiClient.get<Review[]>(`/reviews/${query}`);
 };
 
 export const getReview = async (id: number): Promise<Review> => {
-	return apiClient.get<Review>(`/api-v1/reviews/${id}/`);
+	return apiClient.get<Review>(`/reviews/${id}/`);
 };
 
 export const createReview = async (body: ReviewPayload): Promise<Review> => {
-	return apiClient.post<Review>(`/api-v1/reviews/`, body);
+	return apiClient.post<Review>(`/reviews/`, body);
 };
 
 export const updateReview = async (id: number, body: ReviewPayload): Promise<Review> => {
-	return apiClient.put<Review>(`/api-v1/reviews/${id}/`, body);
+	return apiClient.put<Review>(`/reviews/${id}/`, body);
 };
 
 export const patchReview = async (id: number, body: Partial<ReviewPayload>): Promise<Review> => {
-	return apiClient.patch<Review>(`/api-v1/reviews/${id}/`, body);
+	return apiClient.patch<Review>(`/reviews/${id}/`, body);
 };
 
 export const deleteReview = async (id: number): Promise<void> => {
-	await apiClient.delete<void>(`/api-v1/reviews/${id}/`);
+	await apiClient.delete<void>(`/reviews/${id}/`);
 };
 
 export default {

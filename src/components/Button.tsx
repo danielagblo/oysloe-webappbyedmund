@@ -1,13 +1,15 @@
 interface ButtonProp {
   name: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
 }
 const Button: React.FC<ButtonProp> = (props) => {
   return (
     <div className="flex justify-center w-full">
       <button
-        className="px-3 mt-5 py-4 w-full bg-[#F9F9F9] text-black rounded-lg"
+        className="px-3 mt-5 py-4 w-full bg-[#F9F9F9] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={props.onClick}
+        disabled={props.disabled}
       >
         {props.name}
       </button>

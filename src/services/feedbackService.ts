@@ -10,27 +10,27 @@ export const getFeedbacks = async (params?: {
 	if (params?.search) qs.append("search", params.search);
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Feedback[]>(`/api-v1/feedback/${query}`);
+	return apiClient.get<Feedback[]>(`/feedback/${query}`);
 };
 
 export const getFeedback = async (id: number): Promise<Feedback> => {
-	return apiClient.get<Feedback>(`/api-v1/feedback/${id}/`);
+	return apiClient.get<Feedback>(`/feedback/${id}/`);
 };
 
 export const createFeedback = async (body: FeedbackPayload): Promise<Feedback> => {
-	return apiClient.post<Feedback>(`/api-v1/feedback/`, body);
+	return apiClient.post<Feedback>(`/feedback/`, body);
 };
 
 export const updateFeedback = async (id: number, body: FeedbackPayload): Promise<Feedback> => {
-	return apiClient.put<Feedback>(`/api-v1/feedback/${id}/`, body);
+	return apiClient.put<Feedback>(`/feedback/${id}/`, body);
 };
 
 export const patchFeedback = async (id: number, body: Partial<FeedbackPayload>): Promise<Feedback> => {
-	return apiClient.patch<Feedback>(`/api-v1/feedback/${id}/`, body);
+	return apiClient.patch<Feedback>(`/feedback/${id}/`, body);
 };
 
 export const deleteFeedback = async (id: number): Promise<void> => {
-	await apiClient.delete<void>(`/api-v1/feedback/${id}/`);
+	await apiClient.delete<void>(`/feedback/${id}/`);
 };
 
 export default {

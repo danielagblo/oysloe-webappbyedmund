@@ -12,27 +12,27 @@ export const getFeatures = async (params?: {
 	if (typeof params?.subcategory === "number") qs.append("subcategory", String(params.subcategory));
 
 	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Feature[]>(`/api-v1/features/${query}`);
+	return apiClient.get<Feature[]>(`/features/${query}`);
 };
 
 export const getFeature = async (id: number): Promise<Feature> => {
-	return apiClient.get<Feature>(`/api-v1/features/${id}/`);
+	return apiClient.get<Feature>(`/features/${id}/`);
 };
 
 export const createFeature = async (body: FeaturePayload): Promise<Feature> => {
-	return apiClient.post<Feature>(`/api-v1/features/`, body);
+	return apiClient.post<Feature>(`/features/`, body);
 };
 
 export const updateFeature = async (id: number, body: FeaturePayload): Promise<Feature> => {
-	return apiClient.put<Feature>(`/api-v1/features/${id}/`, body);
+	return apiClient.put<Feature>(`/features/${id}/`, body);
 };
 
 export const patchFeature = async (id: number, body: Partial<FeaturePayload>): Promise<Feature> => {
-	return apiClient.patch<Feature>(`/api-v1/features/${id}/`, body);
+	return apiClient.patch<Feature>(`/features/${id}/`, body);
 };
 
 export const deleteFeature = async (id: number): Promise<void> => {
-	await apiClient.delete<void>(`/api-v1/features/${id}/`);
+	await apiClient.delete<void>(`/features/${id}/`);
 };
 
 export default {

@@ -16,37 +16,37 @@ export const getCoupons = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Coupon[]>(`/api-v1/coupons/${query}`);
+  return apiClient.get<Coupon[]>(`/coupons/${query}`);
 };
 
 export const getCoupon = async (id: number): Promise<Coupon> => {
-  return apiClient.get<Coupon>(`/api-v1/coupons/${id}/`);
+  return apiClient.get<Coupon>(`/coupons/${id}/`);
 };
 
 export const createCoupon = async (body: CouponPayload): Promise<Coupon> => {
-  return apiClient.post<Coupon>(`/api-v1/coupons/`, body);
+  return apiClient.post<Coupon>(`/coupons/`, body);
 };
 
 export const updateCoupon = async (id: number, body: CouponPayload): Promise<Coupon> => {
-  return apiClient.put<Coupon>(`/api-v1/coupons/${id}/`, body);
+  return apiClient.put<Coupon>(`/coupons/${id}/`, body);
 };
 
 export const patchCoupon = async (id: number, body: Partial<CouponPayload>): Promise<Coupon> => {
-  return apiClient.patch<Coupon>(`/api-v1/coupons/${id}/`, body);
+  return apiClient.patch<Coupon>(`/coupons/${id}/`, body);
 };
 
 export const deleteCoupon = async (id: number): Promise<void> => {
-  await apiClient.delete<void>(`/api-v1/coupons/${id}/`);
+  await apiClient.delete<void>(`/coupons/${id}/`);
 };
 
 // Expire a coupon (admin action) - server may accept an optional payload
 export const expireCoupon = async (id: number, body: Partial<CouponPayload> = {}): Promise<void> => {
-  await apiClient.post<void>(`/api-v1/coupons/${id}/expire/`, body);
+  await apiClient.post<void>(`/coupons/${id}/expire/`, body);
 };
 
 // Redeem a coupon (user action) - may accept optional payload (e.g., user id)
 export const redeemCoupon = async (id: number, body: Partial<CouponPayload> = {}): Promise<void> => {
-  await apiClient.post<void>(`/api-v1/coupons/${id}/redeem/`, body);
+  await apiClient.post<void>(`/coupons/${id}/redeem/`, body);
 };
 
 export default {
