@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import useIsSmallScreen from "../Auth/useIsSmallScreen";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 
