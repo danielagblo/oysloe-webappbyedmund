@@ -92,8 +92,9 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center w-full max-lg:m-8 overflow-auto no-scrollbar h-full py-20">
+    <div className="h-screen w-screen flex items-center justify-center ">
+      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 overflow-auto no-scrollbar h-full py-20">
+
         <div className=" flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl pt-10">Getting started</h2>
           <form className="relative" onSubmit={handleSubmit}>
@@ -209,14 +210,14 @@ const SignInPage = () => {
         {isSmall ? 
           (
             shouldShowOnboarding ? (
-              <div className="overflow-hidden w-full h-full">
+              
                 <OnboardingScreen overlay onFinish={() => navigate("/login")} />
-              </div>
+              
             ) : null
           ) : (
-            <div className="overflow-hidden w-full h-full">
+            
               <OnboardingScreen />
-            </div>
+            
           )
         }
       
