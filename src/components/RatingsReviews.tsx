@@ -41,28 +41,31 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
     </div>
   );
 
+  // compute distribution for stars 5..1
+  const total = reviews.length;
+  const distribution = [5, 4, 3, 2, 1].map((s) => {
+    const c = reviews.filter((r) => Math.round(r.rating) === s).length;
+    const pct = total > 0 ? (c / total) * 100 : 0;
+    return { stars: s, count: c, pct };
+  });
+
   const barsSection = (
-    <div
-      className="w-full flex flex-col justify-center items-center md:gap-2 md:px-2"
-      style={
-        {
-          // fontSize: "80%",
-          // width: "80%",
-        }
-      }
-    >
-      {[5, 4, 3, 2, 1].map((stars, index) => (
+    <div className="w-full flex flex-col justify-center items-center md:gap-2 md:px-2">
+      {distribution.map((item) => (
         <div
-          key={index}
+          key={item.stars}
           className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
         >
           <span className="text-[var(--dark-def)] w-8 text-xs md:text-[1.25vw]">
-            ★ {stars}
+            ★ {item.stars}
           </span>
           <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
-            <div className="h-full bg-[var(--dark-def)] w-2/5 rounded"></div>
+            <div
+              className="h-full bg-[var(--dark-def)] rounded"
+              style={{ width: `${Math.round(item.pct)}%` }}
+            />
           </div>
-          <span className="text-sm md:text-[1vw] text-gray-500 w-8">40%</span>
+          <span className="text-sm md:text-[1vw] text-gray-500 w-8">{Math.round(item.pct)}%</span>
         </div>
       ))}
     </div>
