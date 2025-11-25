@@ -1,12 +1,12 @@
 // src/hooks/useUserProfile.ts
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   getUserPreferences,
-  updateUserPreferences,
   getUserProfile,
-  updateUserProfile,
   sendOTP,
+  updateUserPreferences,
+  updateUserProfile,
   verifyOTP,
 } from "../../services/userProfileService";
 
@@ -17,10 +17,7 @@ import type {
   UserProfileUpdatePayload,
 } from "../../types/UserProfile";
 
-import mockUserProfile from "../assets/mocks/userProfile.json";
-import mockUserPreferences from "../assets/mocks/userPreferences.json";
-
-const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
+// Always use real API services (remove mock data pathing)
 
 /* -------------------------------------------------------
               QUERY KEYS (to avoid typos)
@@ -42,10 +39,6 @@ export function useUserProfile() {
   const profileQuery = useQuery<UserProfile>({
     queryKey: QUERY_KEYS.profile,
     queryFn: async () => {
-      if (useMocks) {
-        console.log("Using mock: getUserProfile");
-        return mockUserProfile as UserProfile;
-      }
       return getUserProfile();
     },
     retry: 1,
@@ -61,10 +54,6 @@ export function useUserProfile() {
     UserProfileUpdatePayload
   >({
     mutationFn: async (body) => {
-      if (useMocks) {
-        console.log("Using mock: updateUserProfile");
-        return { ...mockUserProfile, ...body } as UserProfile;
-      }
       return updateUserProfile(body);
     },
 
@@ -83,10 +72,6 @@ export function useUserProfile() {
   const preferencesQuery = useQuery<UserProfile>({
     queryKey: QUERY_KEYS.preferences,
     queryFn: async () => {
-      if (useMocks) {
-        console.log("Using mock: getUserPreferences");
-        return mockUserPreferences as UserProfile;
-      }
       return getUserPreferences();
     },
     retry: 1,
@@ -102,10 +87,6 @@ export function useUserProfile() {
     UserProfileUpdatePayload
   >({
     mutationFn: async (body) => {
-      if (useMocks) {
-        console.log("Using mock: updateUserPreferences");
-        return { ...mockUserPreferences, ...body } as UserProfile;
-      }
       return updateUserPreferences(body);
     },
 
@@ -123,10 +104,6 @@ export function useUserProfile() {
   --------------------------------------------------------*/
   const sendOTPMutation = useMutation<MessageResponse, Error, string>({
     mutationFn: async (phone) => {
-      if (useMocks) {
-        console.log("Using mock: sendOTP");
-        return { message: "Mock: OTP sent successfully" };
-      }
       return sendOTP(phone);
     },
 
@@ -144,10 +121,6 @@ export function useUserProfile() {
     OTPVerifyRequest
   >({
     mutationFn: async (body) => {
-      if (useMocks) {
-        console.log("Using mock: verifyOTP");
-        return { message: "Mock: OTP verified successfully" };
-      }
       return verifyOTP(body);
     },
 

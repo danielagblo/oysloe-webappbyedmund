@@ -1,17 +1,24 @@
+import type { UserProfile } from "../types/UserProfile";
 import RatingReviews from "./RatingsReviews";
 
+type Props = {
+  user?: UserProfile | null;
+};
 
-export default function ProfileStats() {
+export default function ProfileStats({ user }: Props) {
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
       <img
-        src="/userPfp2.jpg"
+        src={
+          (user as any)?.avatar || (user as any)?.profile_image ||
+          (user as any)?.avatar_url || "/userPfp2.jpg"
+        }
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        Alexander Kowri
+        {(user as any)?.name || (user as any)?.full_name || "Alexander Kowri"}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
@@ -38,7 +45,7 @@ export default function ProfileStats() {
           </svg>
           <p className="inline text-[length:10px] md:text-[0.9vw]">
             {" "}
-            High Level
+            {(user as any)?.level || "High Level"}
           </p>
         </div>
         <div className="w-full bg-green-200 h-[0.5vw] rounded" />

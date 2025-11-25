@@ -2,6 +2,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.oysloe.com/api
 // Set VITE_API_CREDENTIALS to 'include' when you need cookies; default to 'omit'
 // to avoid CORS issues in local development.
 const CREDENTIALS_MODE = (import.meta.env.VITE_API_CREDENTIALS as string) || 'omit';
+// Authorization scheme (Bearer by default). Set VITE_API_AUTH_SCHEME if backend expects a different prefix.
+const AUTH_SCHEME = (import.meta.env.VITE_API_AUTH_SCHEME as string) || 'Bearer';
 
 type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
@@ -12,7 +14,22 @@ async function request<T>(
   // Remove leading slash from url if API_BASE_URL ends with slash
   const cleanUrl = API_BASE_URL.endsWith("/") ? url.replace(/^\//, "") : url;
   const fullUrl = `${API_BASE_URL}${cleanUrl}`;
-  const headers = { "Content-Type": "application/json", ...options.headers };
+  // Build headers and attach Authorization automatically when token is present
+  const headers = { "Content-Type": "application/json", ...(options.headers ?? {}) } as Record<string, string>;
+
+  try {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('oysloe_token');
+      // Only add Authorization if not already provided and we have a token
+      if (token && !headers['Authorization'] && !headers['authorization']) {
+        const tokenValue = token.startsWith('Bearer ') || token.startsWith('Token ') ? token : `${AUTH_SCHEME} ${token}`;
+        headers['Authorization'] = tokenValue;
+      }
+    }
+  } catch (e) {
+    // ignore localStorage errors (e.g., private mode) and continue without auth header
+    void e;
+  }
   const body = options.body ? JSON.stringify(options.body) : undefined;
 
   let response: Response;
