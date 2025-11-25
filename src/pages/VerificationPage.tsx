@@ -27,7 +27,7 @@ const VerificationPage = () => {
 
     try {
       await verifyOTP(phone, otpValue);
-      navigate("/reset-password/new");
+      navigate("/homepage");
     } catch (err) {
       console.error(err);
     }

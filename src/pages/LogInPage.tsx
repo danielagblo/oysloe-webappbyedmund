@@ -2,14 +2,20 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const LogInPage = () => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
+  
+
+
   const shouldShowOnboarding =
     typeof window !== "undefined"
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
+
+      
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-[50%] m-8">
@@ -46,12 +52,9 @@ const LogInPage = () => {
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
-              <Link to={"/reset-password/email"}>
-                <button className="px-5 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  Password Reset
-                </button>
-              </Link>
-              <Link to={"/reset-password/phone"}>
+              <ResetDropdown />
+
+              <Link to={"/enterphone"}>
                 <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
                   OTP Login
                 </button>

@@ -4,8 +4,9 @@ import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { useState } from "react";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
+import { ResetDropdown } from "../components/ResetDropdown";
 
-const ResetPasswordWithPhonePage = () => {
+const ResetPasswordWithPhonePage = ( {page = "Reset Password"} : { page?: string } ) => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
   const shouldShowOnboarding =
@@ -41,8 +42,8 @@ const ResetPasswordWithPhonePage = () => {
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
         <div className="flex flex-col gap-5 items-center justify-center">
-          <h2 className="text-2xl">Reset Password</h2>
-          <form className="w-3/5 h-4/5 overflow-y-auto relative">
+          <h2 className="text-2xl">{page}</h2>
+          <form className="w-3/5 relative">
             <input
               type="tel"
               placeholder="+233"
@@ -61,7 +62,7 @@ const ResetPasswordWithPhonePage = () => {
               className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
             />
             <p className="text-center font-extralight">
-              We'll send a verification link to the number if it begins in our system
+              We'll send a verification link to the number if it is in our system
             </p>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
@@ -69,12 +70,8 @@ const ResetPasswordWithPhonePage = () => {
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
-              <Link to={"/reset-password/email"}>
-                <button className="px-5 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  Password Reset
-                </button>
-              </Link>
-              <Link to={"/reset-password/phone"}>
+              <ResetDropdown />
+              <Link to={"/enterphone"}>
                 <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
                   OTP Login
                 </button>
