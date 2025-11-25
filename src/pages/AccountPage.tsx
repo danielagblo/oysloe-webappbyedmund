@@ -14,24 +14,26 @@ const AccountPage = () => {
   };
 
   if (showEdit) {
-    return <EditProfilePage setShowEdit={setShowEdit}/>;
+    return <EditProfilePage setShowEdit={setShowEdit} />;
   }
 
   return (
     <div className="flex flex-col items-center w-full h-full justify-center">
       <div className="flex flex-col gap-4 items-center bg-white sm:h-[93vh] w-full max-sm:h-screen max-sm:w-screen max-sm:pt-30 p-6 rounded-2xl">
-        <h2 className="text-2xl text-[var(--dark-def)] font-semibold">Account Settings</h2>
+        <h2 className="text-2xl text-[var(--dark-def)] font-semibold">
+          Account Settings
+        </h2>
 
         <div className="flex gap-4 flex-col">
           <button
-            className="px-10 py-4 border bg-blue-600 hover:border-blue-600 hover:bg-transparent text-white hover:text-blue-600 rounded-lg transition"
+            className="px-10 py-4 border bg-blue-600 hover:border-blue-600 hover:bg-transparent text-white hover:text-blue-600 hover:shadow-[4px_4px_4px_gray] rounded-lg transition"
             onClick={() => setShowEdit(true)}
           >
             Edit Profile
           </button>
 
           <button
-            className="px-10 py-4 border bg-red-600 hover:border-red-600 hover:bg-transparent text-white rounded-lg hover:text-red-600 transition"
+            className="px-10 py-4 border bg-red-600 hover:border-red-600 hover:bg-transparent text-white rounded-lg hover:shadow-[4px_4px_4px_gray] hover:text-red-600 transition"
             onClick={() => setShowDeleteModal(true)}
           >
             Delete your Account
@@ -46,7 +48,9 @@ const AccountPage = () => {
             />
 
             <div className="fixed z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg w-[90%] max-w-md shadow-lg flex flex-col gap-4">
-              <h3 className="text-xl font-semibold">Confirm Account Deletion</h3>
+              <h3 className="text-xl font-semibold">
+                Confirm Account Deletion
+              </h3>
               <textarea
                 placeholder="Why do you want to delete your account?"
                 value={deleteReason}

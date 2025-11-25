@@ -39,29 +39,31 @@ const AlertsPanel = () => {
       <div className="bg-white w-full mr-2 lg:w-[75vw] lg:h-[93vh] lg:rounded-2xl shadow-sm flex flex-col">
         {/* Header (desktop only) */}
         <div className="p-4 sm:p-6 border-b hidden sm:block border-gray-100 flex-shrink-0">
-          <h2 className="sm:text-center sm:text-3xl sm:font-semibold">Alerts</h2>
+          <h2 className="sm:text-center sm:text-3xl sm:font-semibold">
+            Alerts
+          </h2>
         </div>
 
         {/* Desktop alerts */}
         <div className="hidden lg:flex flex-1 overflow-y-auto no-scrollbar p-4 lg:p-6 pb-24">
           <div className="space-y-4 w-full">
-            {loading
-              ? Array.from({ length: 5 }).map((_, i) => (
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
                 <div
                   key={i}
                   className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
                 >
                   <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-300 flex-shrink-0" />
-                  <div className="flex flex-col w-full">
-                    <span className="text-xs text-gray-400">...</span>
-                    <div className="text-sm lg:text-base">
-                      <span className="font-semibold">Loading...</span>
-                      <span className="ml-1 break-words">Please wait</span>
-                    </div>
+                  <div className="flex flex-col w-full gap-2">
+                    <span className="text-xs bg-gray-400 w-[100px] h-[10px] rounded-full" />
+                    <div className="text-sm lg:text-base bg-gray-400 w-[300px] h-[10px] rounded-full" />
                   </div>
                 </div>
               ))
-              : alerts.map((alert) => (
+            ) : alerts.length === 0 ? (
+              <p className="w-full text-center">You have no alerts</p>
+            ) : (
+              alerts.map((alert) => (
                 <div
                   key={alert.id}
                   className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
@@ -81,14 +83,15 @@ const AlertsPanel = () => {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+            )}
           </div>
         </div>
 
         {/* Mobile alerts */}
-        <div className="flex lg:hidden flex-col w-full p-4 bg-white">
-          {loading
-            ? Array.from({ length: 5 }).map((_, i) => (
+        <div className="flex lg:hidden flex-col w-full p-4 bg-white h-[87vh] overflow-y-auto no-scrollbar">
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
                 className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
@@ -103,7 +106,10 @@ const AlertsPanel = () => {
                 </div>
               </div>
             ))
-            : alerts.map((alert) => (
+          ) : alerts.length === 0 ? (
+            <p className="w-full text-center">You have no alerts</p>
+          ) : (
+            alerts.map((alert) => (
               <div
                 key={alert.id}
                 className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
@@ -123,7 +129,8 @@ const AlertsPanel = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))
+          )}
         </div>
 
         <div className="h-15" />
@@ -131,7 +138,6 @@ const AlertsPanel = () => {
     </div>
   );
 };
-
 
 const AlertsPage = () => (
   <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[#ededed]">

@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { useState } from "react";
+import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
+import OTPInput from "../components/OTPINput";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -9,6 +12,26 @@ const VerificationPage = () => {
     typeof window !== "undefined"
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
+
+  const { verifyOTP, loading, error } = useVerifyOTP();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const phone = location.state?.phone ?? "";
+
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const otpValue = otp.join("");
+    if (!phone || otpValue.length !== 6) return;
+
+    try {
+      await verifyOTP(phone, otpValue);
+      navigate("/homepage");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
@@ -18,49 +41,18 @@ const VerificationPage = () => {
           <form className="w-4/5 h-4/5 overflow-y-auto relative">
             <div className="flex flex-col items-center p-8 bg-white rounded-lg">
               <div className="flex space-x-2" id="otp-container">
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
-                <input
-                  type="text"
-                  maxLength={1}
-                  className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
-                  inputMode="numeric"
-                />
+                <OTPInput length={6} otp={otp} setOtp={setOtp} />
               </div>
             </div>
             <p className="text-center font-extralight">
               Enter the code sent to your phone number
             </p>
+            {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
-              <Button name="Submit" />
+              <Button
+                name={loading ? "Verifying..." : "Submit"}
+                onClick={handleSubmit}
+              />
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">

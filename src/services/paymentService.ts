@@ -1,39 +1,46 @@
-import type { Payment, PaymentStatus, PaystackInitiateRequest } from "../types/Payment";
+import type {
+  Payment,
+  PaymentStatus,
+  PaystackInitiateRequest,
+} from "../types/Payment";
 import { apiClient } from "./apiClient";
 
 export const getPayments = async (params?: {
-	ordering?: string;
-	provider?: string;
-	search?: string;
-	status?: PaymentStatus;
-	subscription?: number;
+  ordering?: string;
+  provider?: string;
+  search?: string;
+  status?: PaymentStatus;
+  subscription?: number;
 }): Promise<Payment[]> => {
-	const qs = new URLSearchParams();
-	if (params?.ordering) qs.append("ordering", params.ordering);
-	if (params?.provider) qs.append("provider", params.provider);
-	if (params?.search) qs.append("search", params.search);
-	if (params?.status) qs.append("status", params.status);
-	if (typeof params?.subscription === "number") qs.append("subscription", String(params.subscription));
+  const qs = new URLSearchParams();
+  if (params?.ordering) qs.append("ordering", params.ordering);
+  if (params?.provider) qs.append("provider", params.provider);
+  if (params?.search) qs.append("search", params.search);
+  if (params?.status) qs.append("status", params.status);
+  if (typeof params?.subscription === "number")
+    qs.append("subscription", String(params.subscription));
 
-	const query = qs.toString() ? `?${qs.toString()}` : "";
-	return apiClient.get<Payment[]>(`/payments/${query}`);
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+  return apiClient.get<Payment[]>(`/payments/${query}`);
 };
 
 export const getPayment = async (id: number): Promise<Payment> => {
-	return apiClient.get<Payment>(`/payments/${id}/`);
+  return apiClient.get<Payment>(`/payments/${id}/`);
 };
 
-export const initiatePaystackPayment = async (body: PaystackInitiateRequest): Promise<void> => {
-	await apiClient.post<void>(`/paystack/initiate/`, body);
+export const initiatePaystackPayment = async (
+  body: PaystackInitiateRequest,
+): Promise<void> => {
+  await apiClient.post<void>(`/paystack/initiate/`, body);
 };
 
 export const paystackWebhook = async (body: unknown): Promise<void> => {
-	await apiClient.post<void>(`/paystack/webhook/`, body);
+  await apiClient.post<void>(`/paystack/webhook/`, body);
 };
 
 export default {
-	getPayments,
-	getPayment,
-	initiatePaystackPayment,
-	paystackWebhook,
+  getPayments,
+  getPayment,
+  initiatePaystackPayment,
+  paystackWebhook,
 };

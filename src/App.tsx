@@ -26,6 +26,12 @@ function App() {
           element={<ResetPasswordWithPhonePage />}
         />
         <Route
+          path="/enterphone"
+          element={
+            <ResetPasswordWithPhonePage page="Enter Your Phone Number" />
+          }
+        />
+        <Route
           path="/reset-password/email"
           element={<ResetPasswordWithEmailPage />}
         />
@@ -35,6 +41,7 @@ function App() {
           element={<ReferalVerificationPage />}
         />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
+        <Route path="/resetpassword/new" element={<ResetPasswordPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/homepage" element={<HomePage />} />
         <Route path="/ads/:id" element={<AdsDetailsPage />} />
