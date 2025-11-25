@@ -34,15 +34,34 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value, type, checked } = e.target;
+
+    let newValue = value;
+    if (name === "phone") {
+      newValue = newValue.replace(/[^\d+]/g, "");
+
+      if (newValue.indexOf("+") > 0) {
+        newValue = newValue.replace(/\+/g, "");
+      }
+
+      if (newValue.startsWith("+233") && newValue.length > 13)
+        newValue = newValue.slice(0, 13);
+      else if (!newValue.startsWith("+") && newValue.length > 12)
+        newValue = newValue.slice(0, 12);
+      if (newValue.startsWith("0") && newValue.length > 10)
+        newValue = newValue.slice(0, 10);
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : newValue,
     }));
   };
 
+
   const handleSubmit = async (e: FormEvent) => {
+    console.log("Form Submitted")
     e.preventDefault();
     setError(null);
 
@@ -74,6 +93,7 @@ const SignInPage = () => {
     setIsLoading(true);
 
     try {
+      console.log("Sending formdata to server...")
       const registerData: RegisterRequest = {
         email: formData.email,
         phone: formData.phone,
@@ -90,8 +110,11 @@ const SignInPage = () => {
       localStorage.setItem("oysloe_user", JSON.stringify(response.user));
 
       // Navigate to home or verification page
+      console.log("taking you to login..");
+      
       navigate("/login");
     } catch (err) {
+      console.log("could not log you in");
       const errorMessage =
         err instanceof Error
           ? err.message
@@ -120,6 +143,7 @@ const SignInPage = () => {
                 placeholder="Name"
                 value={formData.name}
                 onChange={handleInputChange}
+                autoComplete="name"
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(name.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <input
@@ -128,27 +152,22 @@ const SignInPage = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleInputChange}
+                autoComplete="email"
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <PhoneInput 
+                name="phone"
                 phone={formData.phone} 
                 onChange={handleInputChange}
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
                 required
               />
               <input
-                type="tel"
-                name="phone"
-                placeholder="+233"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-              />
-              <input
                 type="password"
                 name="password"
                 placeholder="Password"
+                autoComplete="new-password"
                 value={formData.password}
                 onChange={handleInputChange}
                 required
@@ -159,6 +178,7 @@ const SignInPage = () => {
                 name="confirmPassword"
                 placeholder="Retype Password"
                 value={formData.confirmPassword}
+                autoComplete="new-password"
                 onChange={handleInputChange}
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
@@ -166,11 +186,11 @@ const SignInPage = () => {
               <p className="text-[10px] pb-2">
                 I have agreed to the
                 <Link to="/privacy-policy">
-                  <p className="text-black inline"> Privacy policy</p>
+                  <span className="text-black inline"> privacy policy</span>
                 </Link>{" "}
                 and
                 <Link to="/terms">
-                  <p className="text-black inline"> terms & conditions</p>
+                  <span className="text-black inline"> terms & conditions</span>
                 </Link>
                 <label
                   className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline"
