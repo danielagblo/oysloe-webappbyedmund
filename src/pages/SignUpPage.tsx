@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const SignInPage = () => {
   const isSmall = useIsSmallScreen();
@@ -12,8 +13,8 @@ const SignInPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center overflow-x-auto">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] h-full m-8">
+    <div className="h-screen w-screen flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center w-full max-lg:m-8 overflow-auto no-scrollbar h-full py-20">
         <div className=" flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl pt-10">Getting started</h2>
           <form className="relative">
@@ -79,12 +80,8 @@ const SignInPage = () => {
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
-              <Link to={"/reset-password/email"}>
-                <button className="px-5 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  Password Reset
-                </button>
-              </Link>
-              <Link to={"/reset-password/phone"}>
+              <ResetDropdown />
+              <Link to={"/enterphone"}>
                 <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
                   OTP Login
                 </button>
@@ -99,13 +96,21 @@ const SignInPage = () => {
           </Link>
         </h2>
       </div>
-      {isSmall ? (
-        shouldShowOnboarding ? (
-          <OnboardingScreen overlay onFinish={() => navigate("/login")} />
-        ) : null
-      ) : (
-        <OnboardingScreen />
-      )}
+      
+        {isSmall ? 
+          (
+            shouldShowOnboarding ? (
+              <div className="overflow-hidden w-full h-full">
+                <OnboardingScreen overlay onFinish={() => navigate("/login")} />
+              </div>
+            ) : null
+          ) : (
+            <div className="overflow-hidden w-full h-full">
+              <OnboardingScreen />
+            </div>
+          )
+        }
+      
     </div>
   );
 };

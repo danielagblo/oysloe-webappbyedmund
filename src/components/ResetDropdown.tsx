@@ -41,7 +41,7 @@ export const ResetDropdown = () => {
                   <div className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
                     <Link to="/reset-password/email">
                       <button
-                        className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-t-lg"
+                        className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-t-lg whitespace-nowrap"
                       >
                         Reset with Email
                       </button>
@@ -49,7 +49,7 @@ export const ResetDropdown = () => {
 
                     <Link to="/reset-password/phone">
                       <button
-                        className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-b-lg"
+                        className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-b-lg whitespace-nowrap"
                       >
                         Reset with Phone
                       </button>

@@ -41,7 +41,7 @@ const ResetPasswordWithEmailPage = () => {
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
-              <Link to={"enterphone"}>
+              <Link to={"/enterphone"}>
                 <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
                   OTP Login
                 </button>
