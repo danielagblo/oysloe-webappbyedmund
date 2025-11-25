@@ -18,35 +18,24 @@ const VerificationPage = () => {
   const navigate = useNavigate();
   const phone = location.state?.phone ?? "";
 
-  const mode = location.state?.mode ?? "reset-password";
+  let mode = location.state?.mode ?? "reset-password";
 
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
 
   const handleSubmit = async (e: React.FormEvent) => {
+    mode = location.state?.mode ?? "reset-password";
+    console.log("Button CLicked!");
     e.preventDefault();
     const otpValue = otp.join("");
-    if (!phone || otpValue.length !== 6) return;
+    if (!phone || otpValue.length !== 6) {
+      return;
+    };
 
     try {
       await verifyOTP(phone, otpValue);
-
-      if (mode === "reset-password") {
-        navigate("/resetpassword");
-        console.log("reset password fired");
-        
-        
-      }
-      else if (mode === "otp-login") {
-        
-        
-        navigate("/homepage");
-        console.log("otp login fired");
-      }
-      else {
-        
-        navigate("/homepage")
-        console.log("Fallback. Neither worked!")
-      }
+      if (mode === "reset-password") navigate("/resetpassword");
+      else if (mode === "otp-login") navigate("/homepage");
+      else console.log("Fallback. Neither worked!");
     } catch (err) {
       console.error(err);
     }
@@ -71,6 +60,7 @@ const VerificationPage = () => {
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
+                type="submit"
                 name={loading ? "Verifying..." : "Submit"}
                 onClick={handleSubmit}
               />
