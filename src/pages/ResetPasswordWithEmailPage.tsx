@@ -32,6 +32,7 @@ const ResetPasswordWithEmailPage = () => {
             </p>
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
+                type="submit"
                 name="Submit"
                 onClick={(e) => {
                   e.preventDefault();

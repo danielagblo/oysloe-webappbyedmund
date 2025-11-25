@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, FormEventHandler } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
@@ -34,73 +34,119 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value, type, checked } = e.target;
+
+    let newValue = value;
+    if (name === "phone") {
+      newValue = newValue.replace(/[^\d+]/g, "");
+
+      if (newValue.indexOf("+") > 0) {
+        newValue = newValue.replace(/\+/g, "");
+      }
+
+      if (newValue.startsWith("+233") && newValue.length > 13)
+        newValue = newValue.slice(0, 13);
+      else if (!newValue.startsWith("+") && newValue.length > 12)
+        newValue = newValue.slice(0, 12);
+      if (newValue.startsWith("0") && newValue.length > 10)
+        newValue = newValue.slice(0, 10);
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: type === "checkbox" ? checked : newValue,
     }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError(null);
 
-    // Validation
-    if (!formData.name || formData.name.trim() === "") {
-      setError("Name is required");
-      return;
-    }
-    if (!formData.agreedToTerms) {
-      setError("You must agree to the Privacy Policy and Terms & Conditions");
-      return;
-    }
+const handleSubmit: FormEventHandler = async (e: FormEvent) => {
+  console.log("Form Submitted");
+  e.preventDefault();
+  setError(null);
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+  const data = formData;
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
+  // Name validation
+  if (!data.name?.trim()) {
+    console.log("Name is required");
+    setError("Name is required");
+    return;
+  }
 
-    if (!formData.phone.startsWith("+233")) {
-      setError("Phone number must start with +233");
-      return;
-    }
+  // Email validation (basic check)
+  if (!data.email?.trim()) {
+    console.log("Email is required");
+    setError("Email is required");
+    return;
+  }
 
-    setIsLoading(true);
+  // Terms & conditions
+  if (!data.agreedToTerms) {
+    console.log("You must agree to the Privacy Policy and Terms & Conditions");
+    setError("You must agree to the Privacy Policy and Terms & Conditions");
+    return;
+  }
 
-    try {
-      const registerData: RegisterRequest = {
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
-        name: formData.name || "",
-        address: formData.address || "",
-        referral_code: formData.referral_code || "",
-      };
+  // Password validation
+  if (!data.password || data.password.length < 6) {
 
-      const response = await register(registerData);
+    console.log("Password must be at least 6 characters long");
+    setError("Password must be at least 6 characters long");
+    return;
+  }
 
-      // Store token and user data
-      localStorage.setItem("oysloe_token", response.token);
-      localStorage.setItem("oysloe_user", JSON.stringify(response.user));
+  if (data.password !== data.confirmPassword) {
+    console.log("Passwords do not match");
+    setError("Passwords do not match");
+    return;
+  }
 
-      // Navigate to home or verification page
-      navigate("/login");
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Registration failed. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Phone validation & sanitization
+  const phoneVal = data.phone.replace(/[^\d+]/g, "");
+  
+  // Phone validation (trust sanitization)
+  if (!data.phone || data.phone.length === 0) {
+    console.log("Phone number is required");
+    setError("Phone number is required");
+    return;
+  }
+
+
+  setIsLoading(true);
+
+  try {
+    console.log("Sending formdata to server...");
+    const registerData: RegisterRequest = {
+      email: phoneVal === data.phone ? data.email : data.email, // no change needed here
+      phone: phoneVal,
+      password: data.password,
+      name: data.name || "",
+      address: data.address || "",
+      referral_code: data.referral_code || "",
+    };
+
+    const response = await register(registerData);
+
+    // Store token and user data
+    localStorage.setItem("oysloe_token", response.token);
+    localStorage.setItem("oysloe_user", JSON.stringify(response.user));
+
+    // Navigate to login
+    console.log("taking you to login...");
+    navigate("/login");
+  } catch (err) {
+    console.log("could not log you in");
+    const errorMessage =
+      err instanceof Error
+        ? err.message
+        : "Registration failed. Please try again.";
+    setError(errorMessage);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="h-screen w-screen flex items-center justify-center ">
@@ -120,6 +166,7 @@ const SignInPage = () => {
                 placeholder="Name"
                 value={formData.name}
                 onChange={handleInputChange}
+                autoComplete="name"
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(name.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <input
@@ -128,27 +175,22 @@ const SignInPage = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleInputChange}
+                autoComplete="email"
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <PhoneInput 
+                name="phone"
                 phone={formData.phone} 
                 onChange={handleInputChange}
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
                 required
               />
               <input
-                type="tel"
-                name="phone"
-                placeholder="+233"
-                value={formData.phone}
-                onChange={handleInputChange}
-                required
-              />
-              <input
                 type="password"
                 name="password"
                 placeholder="Password"
+                autoComplete="new-password"
                 value={formData.password}
                 onChange={handleInputChange}
                 required
@@ -159,6 +201,7 @@ const SignInPage = () => {
                 name="confirmPassword"
                 placeholder="Retype Password"
                 value={formData.confirmPassword}
+                autoComplete="new-password"
                 onChange={handleInputChange}
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
@@ -166,11 +209,11 @@ const SignInPage = () => {
               <p className="text-[10px] pb-2">
                 I have agreed to the
                 <Link to="/privacy-policy">
-                  <p className="text-black inline"> Privacy policy</p>
+                  <span className="text-black inline"> privacy policy</span>
                 </Link>{" "}
                 and
                 <Link to="/terms">
-                  <p className="text-black inline"> terms & conditions</p>
+                  <span className="text-black inline"> terms & conditions</span>
                 </Link>
                 <label
                   className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline"
@@ -191,6 +234,7 @@ const SignInPage = () => {
             </div>
             <div className="flex flex-col gap-3 w-full">
               <Button
+                type="submit"
                 name={isLoading ? "Signing up..." : "Sign up"}
                 disabled={isLoading}
               />
