@@ -1,33 +1,42 @@
 import React from "react";
+import useReviews from "../features/reviews/useReviews";
 
 interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
   fullWidth?: boolean; // default: false
+  userId?: number; // optional filter to get reviews by a specific user
 }
 
 export const RatingReviews: React.FC<RatingReviewsProps> = ({
   layout = "column",
   fullWidth = false,
+  userId,
 }) => {
   const containerClasses = `
     flex px-3 md:px-1.5 pb-2 w-full ${layout === "row" ? "-ml-4 flex-row items-center justify-between" : "flex-col items-center justify-center"}
     ${fullWidth ? "w-[95vw]" : ""}
   `;
 
+  const { reviews, count, isLoading } = useReviews(userId ? { user: userId } : undefined);
+
+  // compute average rating from reviews (safe fallback to 0)
+  const average = count > 0 ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / count : 0;
+  const avgDisplay = average ? average.toFixed(1) : "0.0";
+  // number of filled stars (rounded)
+  const filledStars = Math.round(average);
+
   const ratingSection = (
     <div className={`flex flex-col items-center justify-center`}>
-      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}> 4.5 </h3>
-      <p
-        className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}
-      >
-        ★ ★ ★ ★ <span className="text-gray-400">★</span>
+      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>{avgDisplay}</h3>
+      <p className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className={i < filledStars ? "text-[var(--dark-def)]" : "text-gray-300"}>
+            ★
+          </span>
+        ))}
       </p>
-      <p
-        className={`text-gray-600 md:text-[1.2vw] mb-3 ${
-          layout === "row" ? "text-sm" : "text-lg"
-        }`}
-      >
-        234 Reviews
+      <p className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}>
+        {isLoading ? "..." : `${count} Reviews`}
       </p>
     </div>
   );

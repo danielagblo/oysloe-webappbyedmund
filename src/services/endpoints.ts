@@ -22,6 +22,15 @@ export const endpoints = {
     sendOTP: (phone: string) => `/verifyotp/?phone=${encodeURIComponent(phone)}`,
     verifyOTP: "/verifyotp/",
   },
+  reviews: {
+    list: () => "/reviews/",
+    listWithQuery: (qs: string) => `/reviews/${qs}`,
+    retrieve: (id: number) => `/reviews/${id}/`,
+    create: () => `/reviews/`,
+    update: (id: number) => `/reviews/${id}/`,
+    partial: (id: number) => `/reviews/${id}/`,
+    delete: (id: number) => `/reviews/${id}/`,
+  },
 
   
 };
