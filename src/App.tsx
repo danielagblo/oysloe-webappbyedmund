@@ -27,7 +27,9 @@ function App() {
         />
         <Route
           path="/enterphone"
-          element={<ResetPasswordWithPhonePage page="Enter Your Phone Number"/>}
+          element={
+            <ResetPasswordWithPhonePage page="Enter Your Phone Number" />
+          }
         />
         <Route
           path="/reset-password/email"

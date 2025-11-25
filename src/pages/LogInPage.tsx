@@ -7,15 +7,12 @@ import { ResetDropdown } from "../components/ResetDropdown";
 const LogInPage = () => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
-  
-
 
   const shouldShowOnboarding =
     typeof window !== "undefined"
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
 
-      
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">

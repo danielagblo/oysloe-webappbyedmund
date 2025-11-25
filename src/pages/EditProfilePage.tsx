@@ -3,7 +3,11 @@ import { PlusIcon, X } from "lucide-react";
 import mailGif from "../assets/mail.gif";
 import { useNavigate } from "react-router-dom";
 
-const EditProfilePage = ({ setShowEdit }: {setShowEdit: (value: boolean) => void;}) => {
+const EditProfilePage = ({
+  setShowEdit,
+}: {
+  setShowEdit: (value: boolean) => void;
+}) => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -57,7 +61,7 @@ const EditProfilePage = ({ setShowEdit }: {setShowEdit: (value: boolean) => void
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
-            <button 
+            <button
               className="absolute top-4 max-lg:top-7 max-lg:left-20 left-4 flex items-center justify-center bg-white shadow-sm px-2 rounded-lg hover:scale-95 cursor-pointer hover:bg-gray-100 transition"
               onClick={() => setShowEdit(false)}
             >

@@ -11,7 +11,8 @@ export const getCoupons = async (params?: {
   const qs = new URLSearchParams();
   if (params?.code) qs.append("code", params.code);
   if (params?.discount_type) qs.append("discount_type", params.discount_type);
-  if (typeof params?.is_active === "boolean") qs.append("is_active", String(params.is_active));
+  if (typeof params?.is_active === "boolean")
+    qs.append("is_active", String(params.is_active));
   if (params?.ordering) qs.append("ordering", params.ordering);
   if (params?.search) qs.append("search", params.search);
 
@@ -27,11 +28,17 @@ export const createCoupon = async (body: CouponPayload): Promise<Coupon> => {
   return apiClient.post<Coupon>(`/coupons/`, body);
 };
 
-export const updateCoupon = async (id: number, body: CouponPayload): Promise<Coupon> => {
+export const updateCoupon = async (
+  id: number,
+  body: CouponPayload,
+): Promise<Coupon> => {
   return apiClient.put<Coupon>(`/coupons/${id}/`, body);
 };
 
-export const patchCoupon = async (id: number, body: Partial<CouponPayload>): Promise<Coupon> => {
+export const patchCoupon = async (
+  id: number,
+  body: Partial<CouponPayload>,
+): Promise<Coupon> => {
   return apiClient.patch<Coupon>(`/coupons/${id}/`, body);
 };
 
@@ -40,12 +47,18 @@ export const deleteCoupon = async (id: number): Promise<void> => {
 };
 
 // Expire a coupon (admin action) - server may accept an optional payload
-export const expireCoupon = async (id: number, body: Partial<CouponPayload> = {}): Promise<void> => {
+export const expireCoupon = async (
+  id: number,
+  body: Partial<CouponPayload> = {},
+): Promise<void> => {
   await apiClient.post<void>(`/coupons/${id}/expire/`, body);
 };
 
 // Redeem a coupon (user action) - may accept optional payload (e.g., user id)
-export const redeemCoupon = async (id: number, body: Partial<CouponPayload> = {}): Promise<void> => {
+export const redeemCoupon = async (
+  id: number,
+  body: Partial<CouponPayload> = {},
+): Promise<void> => {
   await apiClient.post<void>(`/coupons/${id}/redeem/`, body);
 };
 

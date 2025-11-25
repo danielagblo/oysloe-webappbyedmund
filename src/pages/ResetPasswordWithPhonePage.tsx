@@ -6,7 +6,11 @@ import { useState } from "react";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import { ResetDropdown } from "../components/ResetDropdown";
 
-const ResetPasswordWithPhonePage = ( {page = "Reset Password"} : { page?: string } ) => {
+const ResetPasswordWithPhonePage = ({
+  page = "Reset Password",
+}: {
+  page?: string;
+}) => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
   const shouldShowOnboarding =
@@ -18,25 +22,23 @@ const ResetPasswordWithPhonePage = ( {page = "Reset Password"} : { page?: string
   const [phone, setPhone] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!phone) return;
+    e.preventDefault();
+    if (!phone) return;
 
-  try {
-    const res = await sendOTP(phone);
+    try {
+      const res = await sendOTP(phone);
 
-    if (res?.success === false) {
-      console.log("Phone number not found in the system.");
-      return;
+      if (res?.success === false) {
+        console.log("Phone number not found in the system.");
+        return;
+      }
+      navigate("/verification", { state: { phone } });
+    } catch (err: unknown) {
+      console.error(err);
+
+      alert("Phone number not found in the system.");
     }
-    navigate("/verification", { state: { phone } });
-
-  } catch (err: unknown) {
-    console.error(err);
-
-    alert("Phone number not found in the system.");
-  }
-};
-
+  };
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
@@ -54,19 +56,26 @@ const ResetPasswordWithPhonePage = ( {page = "Reset Password"} : { page?: string
                 if (val.indexOf("+") > 0) {
                   val = val.replace(/\+/g, "");
                 }
-                if (val.startsWith("+233") && val.length > 13) val = val.slice(0, 13);
-                else if (!val.startsWith("+") && val.length > 12) val = val.slice(0, 12);
-                if (val.startsWith("0") && val.length > 10) val = val.slice(0, 10);
+                if (val.startsWith("+233") && val.length > 13)
+                  val = val.slice(0, 13);
+                else if (!val.startsWith("+") && val.length > 12)
+                  val = val.slice(0, 12);
+                if (val.startsWith("0") && val.length > 10)
+                  val = val.slice(0, 10);
                 setPhone(val);
               }}
               className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
             />
             <p className="text-center font-extralight">
-              We'll send a verification link to the number if it is in our system
+              We'll send a verification link to the number if it is in our
+              system
             </p>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
-              <Button name={loading ? "Sending..." : "Submit"} onClick={handleSubmit} />
+              <Button
+                name={loading ? "Sending..." : "Submit"}
+                onClick={handleSubmit}
+              />
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">

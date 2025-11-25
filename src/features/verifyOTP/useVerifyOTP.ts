@@ -19,20 +19,16 @@ export function useVerifyOTP() {
       setMessage(response.message);
 
       if (response.success === false) {
-        setError(response.message); 
+        setError(response.message);
       }
 
       return response;
-      
     } catch (err: unknown) {
       handleError(err, "Failed to send OTP");
       throw err;
     } finally {
       setLoading(false);
     }
-    
-
-    
   }, []);
 
   const verifyOTP = useCallback(async (phone: string, otp: string) => {

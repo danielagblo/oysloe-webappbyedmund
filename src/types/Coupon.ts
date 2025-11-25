@@ -1,4 +1,4 @@
-export type DiscountType = 'fixed' | 'percent';
+export type DiscountType = "fixed" | "percent";
 
 export interface Coupon {
   id: number;

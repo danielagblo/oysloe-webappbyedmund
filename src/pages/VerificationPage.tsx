@@ -49,7 +49,10 @@ const VerificationPage = () => {
             </p>
             {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
-              <Button name={loading ? "Verifying..." : "Submit"} onClick={handleSubmit} />
+              <Button
+                name={loading ? "Verifying..." : "Submit"}
+                onClick={handleSubmit}
+              />
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">

@@ -7,11 +7,10 @@ interface OTPInputProps {
 }
 
 const OTPInput = ({ length = 6, otp, setOtp }: OTPInputProps) => {
-  
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
   const handleChange = (value: string, index: number) => {
-    if (!/^\d?$/.test(value)) return; 
+    if (!/^\d?$/.test(value)) return;
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
@@ -21,7 +20,10 @@ const OTPInput = ({ length = 6, otp, setOtp }: OTPInputProps) => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       const prevIndex = index - 1;
       const newOtp = [...otp];
@@ -41,12 +43,13 @@ const OTPInput = ({ length = 6, otp, setOtp }: OTPInputProps) => {
           value={value}
           onChange={(e) => handleChange(e.target.value, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
-          ref={(el) => { inputsRef.current[index] = el; }}
+          ref={(el) => {
+            inputsRef.current[index] = el;
+          }}
           className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
           inputMode="numeric"
         />
       ))}
-
     </>
   );
 };

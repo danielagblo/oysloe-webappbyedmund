@@ -8,7 +8,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      
       "/api-v1": {
         target: "https://api.oysloe.com/api-v1/",
         changeOrigin: true,
