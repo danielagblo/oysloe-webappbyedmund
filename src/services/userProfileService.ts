@@ -5,40 +5,39 @@ import type {
   UserProfileUpdatePayload,
 } from "../types/UserProfile";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 // User Preferences
 export const getUserPreferences = async (): Promise<UserProfile> => {
-  return apiClient.get<UserProfile>(`/userpreferences/`);
+  return apiClient.get<UserProfile>(endpoints.userProfile.userPreferences);
 };
 
 export const updateUserPreferences = async (
   body: UserProfileUpdatePayload,
 ): Promise<UserProfile> => {
-  return apiClient.put<UserProfile>(`/userpreferences/`, body);
+  return apiClient.put<UserProfile>(endpoints.userProfile.userPreferences, body);
 };
 
 // User Profile
 export const getUserProfile = async (): Promise<UserProfile> => {
-  return apiClient.get<UserProfile>(`/userprofile/`);
+  return apiClient.get<UserProfile>(endpoints.userProfile.userProfile);
 };
 
 export const updateUserProfile = async (
   body: UserProfileUpdatePayload,
 ): Promise<UserProfile> => {
-  return apiClient.put<UserProfile>(`/userprofile/`, body);
+  return apiClient.put<UserProfile>(endpoints.userProfile.userProfile, body);
 };
 
 // OTP Verification
 export const sendOTP = async (phone: string): Promise<MessageResponse> => {
-  return apiClient.get<MessageResponse>(
-    `/verifyotp/?phone=${encodeURIComponent(phone)}`,
-  );
+  return apiClient.get<MessageResponse>(endpoints.userProfile.sendOTP(phone));
 };
 
 export const verifyOTP = async (
   body: OTPVerifyRequest,
 ): Promise<MessageResponse> => {
-  return apiClient.post<MessageResponse>(`/verifyotp/`, body);
+  return apiClient.post<MessageResponse>(endpoints.userProfile.verifyOTP, body);
 };
 
 export default {

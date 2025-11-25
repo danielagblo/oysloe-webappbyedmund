@@ -1,11 +1,12 @@
 import RatingReviews from "./RatingsReviews";
 
+
 export default function ProfileStats() {
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
       <img
-        src="face.svg"
+        src="/userPfp2.jpg"
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />

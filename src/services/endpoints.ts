@@ -15,4 +15,13 @@ export const endpoints = {
       `/verifyotp/?phone=${encodeURIComponent(phone)}`,
     verify: () => `/verifyotp/`,
   },
+
+  userProfile: {
+    userPreferences: "/userpreferences/",
+    userProfile: "/userprofile/",
+    sendOTP: (phone: string) => `/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    verifyOTP: "/verifyotp/",
+  },
+
+  
 };
