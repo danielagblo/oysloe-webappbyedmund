@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.oysloe.com";
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.oysloe.com/api-v1';
+// Set VITE_API_CREDENTIALS to 'include' when you need cookies; default to 'omit'
+// to avoid CORS issues in local development.
+const CREDENTIALS_MODE = (import.meta.env.VITE_API_CREDENTIALS as string) || 'omit';
 
 type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
@@ -12,13 +15,26 @@ async function request<T>(
   const headers = { "Content-Type": "application/json", ...options.headers };
   const body = options.body ? JSON.stringify(options.body) : undefined;
 
-  const response = await fetch(fullUrl, {
-    ...options,
-    headers,
-    body,
-    credentials: "include",
-  });
-  if (!response.ok) throw new Error(`${options.method ?? "GET"} ${url} failed`);
+  let response: Response;
+  try {
+    response = await fetch(fullUrl, { ...options, headers, body, credentials: CREDENTIALS_MODE as RequestCredentials });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`Network request failed: ${fullUrl}`, err);
+    throw new Error(`Network request failed: ${fullUrl} - ${msg}`);
+  }
+
+  if (!response.ok) {
+    // Try to read response body for more details (may be empty)
+    let text = '';
+    try {
+      text = await response.text();
+    } catch (e) {
+      void e;
+    }
+    console.error(`Request failed: ${fullUrl}`, { status: response.status, body: text });
+    throw new Error(`${options.method ?? 'GET'} ${fullUrl} failed (${response.status}) ${text}`);
+  }
   // Some endpoints (DELETE, mark-all-read) return 204 No Content — handle that safely
   if (response.status === 204) return undefined as unknown as T;
   return response.json();
