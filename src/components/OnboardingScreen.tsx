@@ -13,7 +13,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
   const [visible, setVisible] = useState(true);
   const baseClass = overlay
     ? `fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#DEFEED] p-6 ${visible ? "opacity-100" : "opacity-0"} transition-opacity duration-300`
-    : "flex flex-col items-center justify-center h-screen bg-[#DEFEED] w-1/2";
+    : "flex flex-col items-center justify-center h-screen bg-[#DEFEED] w-full";
 
   const STORAGE_KEY = "oysloe_onboarding_seen";
 

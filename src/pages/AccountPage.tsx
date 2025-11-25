@@ -24,14 +24,14 @@ const AccountPage = () => {
 
         <div className="flex gap-4 flex-col">
           <button
-            className="px-10 py-4 border bg-blue-600 hover:border-blue-600 hover:bg-transparent text-white hover:text-blue-600 rounded-lg transition"
+            className="px-10 py-4 border bg-blue-600 hover:border-blue-600 hover:bg-transparent text-white hover:text-blue-600 hover:shadow-[4px_4px_4px_gray] rounded-lg transition"
             onClick={() => setShowEdit(true)}
           >
             Edit Profile
           </button>
 
           <button
-            className="px-10 py-4 border bg-red-600 hover:border-red-600 hover:bg-transparent text-white rounded-lg hover:text-red-600 transition"
+            className="px-10 py-4 border bg-red-600 hover:border-red-600 hover:bg-transparent text-white rounded-lg hover:shadow-[4px_4px_4px_gray] hover:text-red-600 transition"
             onClick={() => setShowDeleteModal(true)}
           >
             Delete your Account

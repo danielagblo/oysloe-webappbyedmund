@@ -47,41 +47,44 @@ const AlertsPanel = () => {
           <div className="space-y-4 w-full">
             {loading
               ? Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
-                >
-                  <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-300 flex-shrink-0" />
-                  <div className="flex flex-col w-full">
-                    <span className="text-xs text-gray-400">...</span>
-                    <div className="text-sm lg:text-base">
-                      <span className="font-semibold">Loading...</span>
-                      <span className="ml-1 break-words">Please wait</span>
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
+                  >
+                    <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gray-300 flex-shrink-0" />
+                    <div className="flex flex-col w-full">
+                      <span className="text-xs text-gray-400">...</span>
+                      <div className="text-sm lg:text-base">
+                        <span className="font-semibold">...</span>
+                        <span className="ml-1 break-words">loading...Please wait</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
-              : alerts.map((alert) => (
-                <div
-                  key={alert.id}
-                  className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <img
-                    src="/building.svg"
-                    alt="alert source"
-                    className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full flex-shrink-0"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-400">
-                      {timeAgo(alert.created_at)}
-                    </span>
-                    <div className="text-sm lg:text-base">
-                      <span className="font-semibold">{alert.title}</span>
-                      <span className="ml-1 break-words">{alert.body}</span>
+                ))
+              : alerts.length === 0 ? <p className="w-full text-center">You have no alerts</p>
+                : alerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+                    >
+                      <img
+                        src="/building.svg"
+                        alt="alert source"
+                        className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full flex-shrink-0"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-400">
+                          {timeAgo(alert.created_at)}
+                        </span>
+                        <div className="text-sm lg:text-base">
+                          <span className="font-semibold">{alert.title}</span>
+                          <span className="ml-1 break-words">{alert.body}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  )
+                )
+              }
           </div>
         </div>
 
@@ -89,41 +92,42 @@ const AlertsPanel = () => {
         <div className="flex lg:hidden flex-col w-full p-4 bg-white">
           {loading
             ? Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
-              >
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
-                <div className="flex flex-col w-full">
-                  <span className="text-xs text-gray-400">...</span>
-                  <div className="text-sm">
-                    <span className="font-semibold">Loading...</span>
-                    <span className="ml-1 text-gray-400">Please wait</span>
+                <div
+                  key={i}
+                  className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
+                  <div className="flex flex-col w-full">
+                    <span className="text-xs text-gray-400">...</span>
+                    <div className="text-sm">
+                      <span className="font-semibold">Loading...</span>
+                      <span className="ml-1 text-gray-400">Please wait</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-            : alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
-              >
-                <img
-                  src="/building.svg"
-                  alt="alert source"
-                  className="w-8 h-8 object-cover rounded-full flex-shrink-0"
-                />
-                <div className="flex flex-col">
-                  <span className="text-xs text-gray-400">
-                    {timeAgo(alert.created_at)}
-                  </span>
-                  <div className="text-sm">
-                    <span className="font-semibold">{alert.title}</span>
-                    <span className="ml-1 text-gray-400">{alert.body}</span>
+              ))
+            : alerts.length === 0 ? <p className="w-full text-center">You have no alerts</p>
+                : alerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+                  >
+                    <img
+                      src="/building.svg"
+                      alt="alert source"
+                      className="w-8 h-8 object-cover rounded-full flex-shrink-0"
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400">
+                        {timeAgo(alert.created_at)}
+                      </span>
+                      <div className="text-sm">
+                        <span className="font-semibold">{alert.title}</span>
+                        <span className="ml-1 text-gray-400">{alert.body}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                ))}
         </div>
 
         <div className="h-15" />
