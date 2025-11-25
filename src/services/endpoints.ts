@@ -12,7 +12,7 @@ export const endpoints = {
 
   verifyOTP: {
     send: (phone: string) =>
-      `/api-v1/verifyotp/?phone=${encodeURIComponent(phone)}`,
-    verify: () => `/api-v1/verifyotp/`,
+      `/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    verify: () => `/verifyotp/`,
   },
 };

@@ -1,6 +1,5 @@
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
-import mockOTPsRaw from "../assets/mocks/otpPosts.json";
 
 export interface VerifyOTPRequest {
   phone: string;
@@ -12,31 +11,8 @@ export interface GenericMessage {
   message: string;
 }
 
-const mockOTPs: Record<string, string> = (
-  mockOTPsRaw as { phone: string; otp: string }[]
-).reduce(
-  (acc, curr) => {
-    acc[curr.phone] = curr.otp;
-    return acc;
-  },
-  {} as Record<string, string>,
-);
-
-const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
-
 export async function sendOTP(phone: string): Promise<GenericMessage> {
-  if (useMocks) {
-    if (!mockOTPs[phone]) {
-      return {
-        success: false,
-        message: `No mock OTP configured for phone ${phone}`,
-      };
-    }
-    return {
-      success: true,
-      message: `Mock OTP sent to ${phone}`,
-    };
-  }
+  
 
   try {
     const response = await apiClient.get<GenericMessage>(
@@ -64,21 +40,7 @@ export async function sendOTP(phone: string): Promise<GenericMessage> {
 
 export async function verifyOTP(
   payload: VerifyOTPRequest,
-): Promise<GenericMessage> {
-  if (useMocks) {
-    const correctOTP = mockOTPs[payload.phone];
-    if (!correctOTP) {
-      throw new Error(`No mock OTP configured for phone ${payload.phone}`);
-    }
-    if (correctOTP === payload.otp) {
-      return {
-        success: true,
-        message: "OTP verified successfully (mock)",
-      };
-    } else {
-      throw new Error("Invalid OTP (mock)");
-    }
-  }
+): Promise<{ phone: string }> {
 
-  return apiClient.post<GenericMessage>(endpoints.verifyOTP.verify(), payload);
+  return apiClient.post<{ phone: string }>(endpoints.verifyOTP.verify(), payload);
 }

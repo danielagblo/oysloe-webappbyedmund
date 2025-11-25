@@ -1,10 +1,47 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation} from "react-router-dom";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
+import { resetPassword } from "../services/authService";
+
 
 const ResetPasswordPage = () => {
+  const location = useLocation();
+  const phoneFromState = location.state?.phone ?? "";
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!newPassword || !confirmPassword) {
+      setError("Both password fields are required");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await resetPassword({ phone: phoneFromState, new_password: newPassword, confirm_password: confirmPassword });
+      setShowModal(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to reset password";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
@@ -19,26 +56,29 @@ const ResetPasswordPage = () => {
               className="h-30"
             />
           </div>
-          <form className="relative">
+          <form className="relative" onSubmit={handleSubmit}>
+            {error && <p className="text-red-500 text-center">{error}</p>}
             <div className="flex flex-col gap-3">
               <input
                 type="password"
                 placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
               />
               <input
                 type="password"
                 placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
               />
             </div>
             <div className="flex flex-col gap-3 w-full mt-3">
               <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowModal(true);
-                }}
-                name="Reset Password"
+                type="submit"
+                name={loading ? "Resetting..." : "Reset Password"}
+                disabled={loading}
               />
             </div>
           </form>

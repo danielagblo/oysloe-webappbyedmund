@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { useState } from "react";
-import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import OTPInput from "../components/OTPInput";
+import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -14,6 +14,8 @@ const VerificationPage = () => {
       : true;
 
   const { verifyOTP, loading, error } = useVerifyOTP();
+  const [localLoading, setLocalLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const phone = location.state?.phone ?? "";
@@ -29,15 +31,32 @@ const VerificationPage = () => {
     const otpValue = otp.join("");
     if (!phone || otpValue.length !== 6) {
       return;
-    };
+    }
 
     try {
-      await verifyOTP(phone, otpValue);
-      if (mode === "reset-password") navigate("/resetpassword");
-      else if (mode === "otp-login") navigate("/homepage");
-      else console.log("Fallback. Neither worked!");
+      if (mode === "otp-login") {
+        setLocalLoading(true);
+        setLocalError(null);
+        // const resp =
+        await verifyOTP(phone, otpValue);
+        // store token and user
+        // localStorage.setItem("oysloe_token", resp.token);
+        // localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
+        navigate("/homepage");
+      } else {
+        // reset-password flow
+        // const resp =
+        await verifyOTP(phone, otpValue);
+        // localStorage.setItem("oysloe_token", resp.token);
+        // localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
+        navigate("/resetpassword", { state: { phone } });
+      }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       console.error(err);
+      setLocalError(msg);
+    } finally {
+      setLocalLoading(false);
     }
 
 
@@ -57,11 +76,11 @@ const VerificationPage = () => {
             <p className="text-center font-extralight">
               Enter the code sent to your phone number
             </p>
-            {error && <p className="text-red-500 text-center">{error}</p>}
+            {(error || localError) && <p className="text-red-500 text-center">{error ?? localError}</p>}
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
                 type="submit"
-                name={loading ? "Verifying..." : "Submit"}
+                name={loading || localLoading ? "Verifying..." : "Submit"}
                 onClick={handleSubmit}
               />
             </div>
