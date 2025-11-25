@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import type { FormEvent, FormEventHandler } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
@@ -60,70 +60,93 @@ const SignInPage = () => {
   };
 
 
-  const handleSubmit = async (e: FormEvent) => {
-    console.log("Form Submitted")
-    e.preventDefault();
-    setError(null);
+const handleSubmit: FormEventHandler = async (e: FormEvent) => {
+  console.log("Form Submitted");
+  e.preventDefault();
+  setError(null);
 
-    // Validation
-    if (!formData.name || formData.name.trim() === "") {
-      setError("Name is required");
-      return;
-    }
-    if (!formData.agreedToTerms) {
-      setError("You must agree to the Privacy Policy and Terms & Conditions");
-      return;
-    }
+  const data = formData;
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+  // Name validation
+  if (!data.name?.trim()) {
+    console.log("Name is required");
+    setError("Name is required");
+    return;
+  }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
+  // Email validation (basic check)
+  if (!data.email?.trim()) {
+    console.log("Email is required");
+    setError("Email is required");
+    return;
+  }
 
-    if (!formData.phone.startsWith("+233")) {
-      setError("Phone number must start with +233");
-      return;
-    }
+  // Terms & conditions
+  if (!data.agreedToTerms) {
+    console.log("You must agree to the Privacy Policy and Terms & Conditions");
+    setError("You must agree to the Privacy Policy and Terms & Conditions");
+    return;
+  }
 
-    setIsLoading(true);
+  // Password validation
+  if (!data.password || data.password.length < 6) {
 
-    try {
-      console.log("Sending formdata to server...")
-      const registerData: RegisterRequest = {
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
-        name: formData.name || "",
-        address: formData.address || "",
-        referral_code: formData.referral_code || "",
-      };
+    console.log("Password must be at least 6 characters long");
+    setError("Password must be at least 6 characters long");
+    return;
+  }
 
-      const response = await register(registerData);
+  if (data.password !== data.confirmPassword) {
+    console.log("Passwords do not match");
+    setError("Passwords do not match");
+    return;
+  }
 
-      // Store token and user data
-      localStorage.setItem("oysloe_token", response.token);
-      localStorage.setItem("oysloe_user", JSON.stringify(response.user));
+  // Phone validation & sanitization
+  const phoneVal = data.phone.replace(/[^\d+]/g, "");
+  
+  // Phone validation (trust sanitization)
+  if (!data.phone || data.phone.length === 0) {
+    console.log("Phone number is required");
+    setError("Phone number is required");
+    return;
+  }
 
-      // Navigate to home or verification page
-      console.log("taking you to login..");
-      
-      navigate("/login");
-    } catch (err) {
-      console.log("could not log you in");
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : "Registration failed. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
+  setIsLoading(true);
+
+  try {
+    console.log("Sending formdata to server...");
+    const registerData: RegisterRequest = {
+      email: phoneVal === data.phone ? data.email : data.email, // no change needed here
+      phone: phoneVal,
+      password: data.password,
+      name: data.name || "",
+      address: data.address || "",
+      referral_code: data.referral_code || "",
+    };
+
+    const response = await register(registerData);
+
+    // Store token and user data
+    localStorage.setItem("oysloe_token", response.token);
+    localStorage.setItem("oysloe_user", JSON.stringify(response.user));
+
+    // Navigate to login
+    console.log("taking you to login...");
+    navigate("/login");
+  } catch (err) {
+    console.log("could not log you in");
+    const errorMessage =
+      err instanceof Error
+        ? err.message
+        : "Registration failed. Please try again.";
+    setError(errorMessage);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="h-screen w-screen flex items-center justify-center ">
@@ -211,6 +234,7 @@ const SignInPage = () => {
             </div>
             <div className="flex flex-col gap-3 w-full">
               <Button
+                type="submit"
                 name={isLoading ? "Signing up..." : "Sign up"}
                 disabled={isLoading}
               />

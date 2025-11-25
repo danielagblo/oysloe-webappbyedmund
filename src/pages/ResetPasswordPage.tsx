@@ -34,6 +34,7 @@ const ResetPasswordPage = () => {
             </div>
             <div className="flex flex-col gap-3 w-full mt-3">
               <Button
+                type="submit"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowModal(true);

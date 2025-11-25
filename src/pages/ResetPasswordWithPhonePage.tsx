@@ -78,9 +78,15 @@ const ResetPasswordWithPhonePage = ({
               We'll send a verification link to the number if it is in our
               system
             </p>
-            {error && <p className="text-red-500 text-center">{error}</p>}
+            {error && (
+              error.length < 20 
+                ? <p className="text-red-500 text-center">{error}</p>
+                : (console.log(error), null)
+            )}
+
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
+                type="submit"
                 name={loading ? "Sending..." : "Submit"}
                 onClick={handleSubmit}
               />
