@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { ResetDropdown } from "../components/ResetDropdown";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { register } from "../services/authService";
 import type { RegisterRequest } from "../types/Auth";
 import PhoneInput from "../components/PhoneInput";
@@ -90,7 +90,7 @@ const SignInPage = () => {
       localStorage.setItem("oysloe_user", JSON.stringify(response.user));
 
       // Navigate to home or verification page
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       const errorMessage =
         err instanceof Error
