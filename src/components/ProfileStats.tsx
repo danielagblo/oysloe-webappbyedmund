@@ -18,7 +18,7 @@ export default function ProfileStats({ user }: Props) {
         className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        {(user as any)?.name || (user as any)?.full_name || "Alexander Kowri"}
+        {(user as any)?.name || (user as any)?.full_name || " "}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
@@ -56,13 +56,13 @@ export default function ProfileStats({ user }: Props) {
   const AdStats = () => (
     <div className="flex gap-4 justify-center w-full text-sm">
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium md:text-[1.5vw]">900k</p>
+        <p className="font-medium md:text-[1.5vw]">{(user?.active_ads ?? 0).toLocaleString()}</p>
         <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
           Active Ads
         </p>
       </div>
       <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium md:text-[1.5vw]">900k</p>
+        <p className="font-medium md:text-[1.5vw]">{(user?.taken_ads ?? 0).toLocaleString()}</p>
         <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
           Sold Ads
         </p>
