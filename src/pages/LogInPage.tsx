@@ -3,6 +3,7 @@ import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { ResetDropdown } from "../components/ResetDropdown";
+import OTPLogin from "../components/OTPLogin";
 
 const LogInPage = () => {
   const navigate = useNavigate();
@@ -51,11 +52,8 @@ const LogInPage = () => {
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
 
-              <Link to={"/enterphone"}>
-                <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  OTP Login
-                </button>
-              </Link>
+              <OTPLogin />
+
             </div>
           </form>
         </div>

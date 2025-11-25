@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 export const ResetDropdown = () => {
+  // const navigate = useNavigate();
   const [showResetDropdown, setShowResetDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,14 +36,19 @@ export const ResetDropdown = () => {
       </button>
 
       {showResetDropdown && (
-        <div className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+        <div 
+          
+          className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
           <Link to="/reset-password/email">
             <button className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-t-lg whitespace-nowrap">
               Reset with Email
             </button>
           </Link>
 
-          <Link to="/reset-password/phone">
+          <Link
+            to="/reset-password/phone"
+            state={{ mode: "reset-password" }}
+          >
             <button className="w-full text-left px-4 py-2 text-[10px] hover:bg-gray-100 rounded-b-lg whitespace-nowrap">
               Reset with Phone
             </button>

@@ -7,6 +7,8 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { register } from "../services/authService";
 import type { RegisterRequest } from "../types/Auth";
+import PhoneInput from "../components/PhoneInput";
+import OTPLogin from "../components/OTPLogin";
 
 const SignInPage = () => {
   const isSmall = useIsSmallScreen();
@@ -32,7 +34,7 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -129,6 +131,12 @@ const SignInPage = () => {
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
+              <PhoneInput 
+                phone={formData.phone} 
+                onChange={handleInputChange}
+                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
+                required
+              />
               <input
                 type="tel"
                 name="phone"
@@ -136,7 +144,6 @@ const SignInPage = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 required
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <input
                 type="password"
@@ -202,11 +209,7 @@ const SignInPage = () => {
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
-              <Link to={"/enterphone"}>
-                <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  OTP Login
-                </button>
-              </Link>
+              <OTPLogin />
             </div>
           </form>
         </div>

@@ -4,7 +4,7 @@ import OnboardingScreen from "../components/OnboardingScreen";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { useState } from "react";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
-import OTPInput from "../components/OTPINput";
+import OTPInput from "../components/OTPInput";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -18,6 +18,8 @@ const VerificationPage = () => {
   const navigate = useNavigate();
   const phone = location.state?.phone ?? "";
 
+  const mode = location.state?.mode ?? "reset-password";
+
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,10 +29,29 @@ const VerificationPage = () => {
 
     try {
       await verifyOTP(phone, otpValue);
-      navigate("/homepage");
+
+      if (mode === "reset-password") {
+        navigate("/resetpassword");
+        console.log("reset password fired");
+        
+        
+      }
+      else if (mode === "otp-login") {
+        
+        
+        navigate("/homepage");
+        console.log("otp login fired");
+      }
+      else {
+        
+        navigate("/homepage")
+        console.log("Fallback. Neither worked!")
+      }
     } catch (err) {
       console.error(err);
     }
+
+
   };
 
   return (
