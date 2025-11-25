@@ -42,6 +42,10 @@ const SignInPage = () => {
     setError(null);
 
     // Validation
+    if (!formData.name || formData.name.trim() === "") {
+      setError("Name is required");
+      return;
+    }
     if (!formData.agreedToTerms) {
       setError("You must agree to the Privacy Policy and Terms & Conditions");
       return;
