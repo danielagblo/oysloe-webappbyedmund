@@ -1,37 +1,13 @@
-import { useEffect, useState } from "react";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import { timeAgo } from "../utils/timeAgo";
+import {  useAlerts } from "../features/alerts/useAlerts"
+
 const AlertsPanel = () => {
-  type Alert = { id: string; title: string; body: string; created_at: string };
 
-  const [loading, setLoading] = useState(true);
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-
-  useEffect(() => {
-    // simulate a fetch for alerts (replace with real fetch as needed)
-    const t = setTimeout(() => {
-      setAlerts([
-        {
-          id: "1",
-          title: "Welcome",
-          body: "Thanks for joining our platform.",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "2",
-          title: "Maintenance",
-          body: "Scheduled maintenance tonight at 11pm.",
-          created_at: new Date().toISOString(),
-        },
-      ]);
-      setLoading(false);
-    }, 400);
-
-    return () => clearTimeout(t);
-  }, []);
+  const { loading, alerts, error } = useAlerts();
 
   return (
     <div className="flex flex-col items-center lg:w-full text-[var(--dark-def)] ">
@@ -106,6 +82,8 @@ const AlertsPanel = () => {
                 </div>
               </div>
             ))
+          ) : error ? (
+            <p className="w-full text-center">There was an error retrieving your alerts</p>
           ) : alerts.length === 0 ? (
             <p className="w-full text-center">You have no alerts</p>
           ) : (
