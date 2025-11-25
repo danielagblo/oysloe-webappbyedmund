@@ -1,12 +1,12 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLogin } from "../features/Auth/useAuth";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
-import { ResetDropdown } from "../components/ResetDropdown";
 import OTPLogin from "../components/OTPLogin";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { login } from "../services/authService";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const LogInPage = () => {
   const navigate = useNavigate();
@@ -23,6 +23,7 @@ const LogInPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loginMutation = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -43,11 +44,7 @@ const LogInPage = () => {
 
     setIsLoading(true);
     try {
-      const creds = { email: formData.email, password: formData.password };
-      const resp = await login(creds);
-      // store token and user
-      localStorage.setItem("oysloe_token", resp.token);
-      localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
+      await (loginMutation as any).mutateAsync({ email: formData.email, password: formData.password });
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";

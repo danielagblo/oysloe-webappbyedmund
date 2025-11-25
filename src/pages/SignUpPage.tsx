@@ -1,14 +1,14 @@
 import type { FormEvent, FormEventHandler } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useRegister } from "../features/Auth/useAuth";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
-import { ResetDropdown } from "../components/ResetDropdown";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { register } from "../services/authService";
-import type { RegisterRequest } from "../types/Auth";
-import PhoneInput from "../components/PhoneInput";
 import OTPLogin from "../components/OTPLogin";
+import PhoneInput from "../components/PhoneInput";
+import { ResetDropdown } from "../components/ResetDropdown";
+import type { RegisterRequest } from "../types/Auth";
 
 const SignInPage = () => {
   const isSmall = useIsSmallScreen();
@@ -31,7 +31,7 @@ const SignInPage = () => {
     agreedToTerms: false,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const registerMutation = useRegister();
   const [error, setError] = useState<string | null>(null);
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -60,92 +60,84 @@ const SignInPage = () => {
   };
 
 
-const handleSubmit: FormEventHandler = async (e: FormEvent) => {
-  console.log("Form Submitted");
-  e.preventDefault();
-  setError(null);
+  const handleSubmit: FormEventHandler = async (e: FormEvent) => {
+    console.log("Form Submitted");
+    e.preventDefault();
+    setError(null);
 
-  const data = formData;
+    const data = formData;
 
-  // Name validation
-  if (!data.name?.trim()) {
-    console.log("Name is required");
-    setError("Name is required");
-    return;
-  }
+    // Name validation
+    if (!data.name?.trim()) {
+      console.log("Name is required");
+      setError("Name is required");
+      return;
+    }
 
-  // Email validation (basic check)
-  if (!data.email?.trim()) {
-    console.log("Email is required");
-    setError("Email is required");
-    return;
-  }
+    // Email validation (basic check)
+    if (!data.email?.trim()) {
+      console.log("Email is required");
+      setError("Email is required");
+      return;
+    }
 
-  // Terms & conditions
-  if (!data.agreedToTerms) {
-    console.log("You must agree to the Privacy Policy and Terms & Conditions");
-    setError("You must agree to the Privacy Policy and Terms & Conditions");
-    return;
-  }
+    // Terms & conditions
+    if (!data.agreedToTerms) {
+      console.log("You must agree to the Privacy Policy and Terms & Conditions");
+      setError("You must agree to the Privacy Policy and Terms & Conditions");
+      return;
+    }
 
-  // Password validation
-  if (!data.password || data.password.length < 6) {
+    // Password validation
+    if (!data.password || data.password.length < 6) {
 
-    console.log("Password must be at least 6 characters long");
-    setError("Password must be at least 6 characters long");
-    return;
-  }
+      console.log("Password must be at least 6 characters long");
+      setError("Password must be at least 6 characters long");
+      return;
+    }
 
-  if (data.password !== data.confirmPassword) {
-    console.log("Passwords do not match");
-    setError("Passwords do not match");
-    return;
-  }
+    if (data.password !== data.confirmPassword) {
+      console.log("Passwords do not match");
+      setError("Passwords do not match");
+      return;
+    }
 
-  // Phone validation & sanitization
-  const phoneVal = data.phone.replace(/[^\d+]/g, "");
-  
-  // Phone validation (trust sanitization)
-  if (!data.phone || data.phone.length === 0) {
-    console.log("Phone number is required");
-    setError("Phone number is required");
-    return;
-  }
+    // Phone validation & sanitization
+    const phoneVal = data.phone.replace(/[^\d+]/g, "");
+
+    // Phone validation (trust sanitization)
+    if (!data.phone || data.phone.length === 0) {
+      console.log("Phone number is required");
+      setError("Phone number is required");
+      return;
+    }
 
 
-  setIsLoading(true);
+    try {
+      console.log("Sending formdata to server...");
+      const registerData: RegisterRequest = {
+        email: phoneVal === data.phone ? data.email : data.email,
+        phone: phoneVal,
+        password: data.password,
+        name: data.name || "",
+        address: data.address || "",
+        referral_code: data.referral_code || "",
+      };
 
-  try {
-    console.log("Sending formdata to server...");
-    const registerData: RegisterRequest = {
-      email: phoneVal === data.phone ? data.email : data.email, // no change needed here
-      phone: phoneVal,
-      password: data.password,
-      name: data.name || "",
-      address: data.address || "",
-      referral_code: data.referral_code || "",
-    };
+      await registerMutation.mutateAsync(registerData as any);
 
-    const response = await register(registerData);
-
-    // Store token and user data
-    localStorage.setItem("oysloe_token", response.token);
-    localStorage.setItem("oysloe_user", JSON.stringify(response.user));
-
-    // Navigate to login
-    console.log("taking you to login...");
-    navigate("/login");
-  } catch (err) {
-    console.log("could not log you in");
-    const errorMessage =
-      err instanceof Error
-        ? err.message
-        : "Registration failed. Please try again.";
-    setError(errorMessage);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      // Navigate to login (mutation already stores token/user)
+      console.log("Registration successful, navigating to login...");
+      navigate("/login");
+    } catch (err) {
+      console.log("could not register user");
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : (err && typeof err === 'object' && 'message' in err ? (err as any).message : 'Registration failed. Please try again.');
+      setError(errorMessage as string);
+    }
+  };
 
 
   return (
@@ -179,9 +171,9 @@ const handleSubmit: FormEventHandler = async (e: FormEvent) => {
                 required
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
-              <PhoneInput 
+              <PhoneInput
                 name="phone"
-                phone={formData.phone} 
+                phone={formData.phone}
                 onChange={handleInputChange}
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
                 required
@@ -235,8 +227,8 @@ const handleSubmit: FormEventHandler = async (e: FormEvent) => {
             <div className="flex flex-col gap-3 w-full">
               <Button
                 type="submit"
-                name={isLoading ? "Signing up..." : "Sign up"}
-                disabled={isLoading}
+                name={registerMutation.status === "pending" ? "Signing up..." : "Sign up"}
+                disabled={registerMutation.status === "pending"}
               />
               <button
                 type="button"
