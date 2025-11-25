@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
+import RequireAuth from "./components/RequireAuth";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
+import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import InboxPage from "./pages/InboxPage.tsx";
 import LogInPage from "./pages/LogInPage.tsx";
@@ -13,7 +15,6 @@ import ResetPasswordWithPhonePage from "./pages/ResetPasswordWithPhonePage.tsx";
 import ReviewPage from "./pages/ReviewPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import VerificationPage from "./pages/VerificationPage.tsx";
-import AlertsPage from "./pages/AlertsPage.tsx";
 
 function App() {
   return (
@@ -42,14 +43,14 @@ function App() {
         />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
         <Route path="/resetpassword/new" element={<ResetPasswordPage />} />
-        <Route path="/" element={<HomePage />} />
-        <Route path="/homepage" element={<HomePage />} />
-        <Route path="/ads/:id" element={<AdsDetailsPage />} />
+        <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
+        <Route path="/homepage" element={<RequireAuth><HomePage /></RequireAuth>} />
+        <Route path="/ads/:id" element={<RequireAuth><AdsDetailsPage /></RequireAuth>} />
         <Route path="/reviews" element={<ReviewPage />} />
-        <Route path="/postad" element={<PostAdPage />} />
-        <Route path="/inbox" element={<InboxPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/alerts" element={<AlertsPage />} />
+        <Route path="/postad" element={<RequireAuth><PostAdPage /></RequireAuth>} />
+        <Route path="/inbox" element={<RequireAuth><InboxPage /></RequireAuth>} />
+        <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+        <Route path="/alerts" element={<RequireAuth><AlertsPage /></RequireAuth>} />
       </Routes>
     </div>
   );
