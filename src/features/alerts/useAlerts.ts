@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import * as AlertsService from "../../services/alertService";
+import * as AlertsService from "../../services/AlertService";
 import { type Alert } from "../../types/Alert";
 
 export function useAlerts() {

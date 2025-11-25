@@ -9,4 +9,10 @@ export const endpoints = {
     markRead: (id: number) => `/api-v1/alerts/${id}/mark-read/`,
     markAllRead: () => '/api-v1/alerts/mark-all-read/',
   },
+
+  verifyOTP: {
+    send: (phone: string) => `/api-v1/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    verify: () => `/api-v1/verifyotp/`,
+  },
+
 };
