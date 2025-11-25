@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
 import OnboardingScreen from "../components/OnboardingScreen";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { ResetDropdown } from "../components/ResetDropdown";
 import OTPLogin from "../components/OTPLogin";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const ResetPasswordWithEmailPage = () => {
   const [showModal, setShowModal] = useState(false);

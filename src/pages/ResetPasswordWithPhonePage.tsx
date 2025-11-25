@@ -1,12 +1,12 @@
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
-import { useState } from "react";
-import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
-import { ResetDropdown } from "../components/ResetDropdown";
-import PhoneInput from "../components/PhoneInput";
 import OTPLogin from "../components/OTPLogin";
+import PhoneInput from "../components/PhoneInput";
+import { ResetDropdown } from "../components/ResetDropdown";
+import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 
 const ResetPasswordWithPhonePage = ({
   page = "Reset Password",
@@ -24,19 +24,19 @@ const ResetPasswordWithPhonePage = ({
   const { sendOTP, loading, error } = useVerifyOTP();
   const [phone, setPhone] = useState("");
   const handlePhoneOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let val = e.target.value;
-        val = val.replace(/[^\d+]/g, "");
-        if (val.indexOf("+") > 0) {
-          val = val.replace(/\+/g, "");
-        }
-        if (val.startsWith("+233") && val.length > 13)
-          val = val.slice(0, 13);
-        else if (!val.startsWith("+") && val.length > 12)
-          val = val.slice(0, 12);
-        if (val.startsWith("0") && val.length > 10)
-          val = val.slice(0, 10);
-        setPhone(val);
-      }
+    let val = e.target.value;
+    val = val.replace(/[^\d+]/g, "");
+    if (val.indexOf("+") > 0) {
+      val = val.replace(/\+/g, "");
+    }
+    if (val.startsWith("+233") && val.length > 13)
+      val = val.slice(0, 13);
+    else if (!val.startsWith("+") && val.length > 12)
+      val = val.slice(0, 12);
+    if (val.startsWith("0") && val.length > 10)
+      val = val.slice(0, 10);
+    setPhone(val);
+  }
 
   const mode = location.state?.mode ?? "reset-password";
 
@@ -53,13 +53,13 @@ const ResetPasswordWithPhonePage = ({
       }
       navigate("/verification", { state: { phone, mode } });
 
-      
+
     } catch (err: unknown) {
       console.error(err);
 
       alert("Phone number not found in the system.");
     }
-    
+
 
   };
 
@@ -69,8 +69,8 @@ const ResetPasswordWithPhonePage = ({
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">{page}</h2>
           <form className="w-3/5 relative">
-            <PhoneInput 
-              phone = {phone} 
+            <PhoneInput
+              phone={phone}
               onChange={handlePhoneOnChange}
               className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
             />
@@ -79,7 +79,7 @@ const ResetPasswordWithPhonePage = ({
               system
             </p>
             {error && (
-              error.length < 20 
+              error.length < 20
                 ? <p className="text-red-500 text-center">{error}</p>
                 : (console.log(error), null)
             )}

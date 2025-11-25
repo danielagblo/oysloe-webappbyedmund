@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPInput from "../components/OTPInput";
-import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
+import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
