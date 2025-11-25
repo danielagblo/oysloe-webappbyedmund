@@ -1,12 +1,37 @@
+import { useEffect, useState } from "react";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
-import { useAlerts } from '../features/alerts/useAlerts';
 import { timeAgo } from "../utils/timeAgo";
-
 const AlertsPanel = () => {
-  const { alerts, loading } = useAlerts();
+  type Alert = { id: string; title: string; body: string; created_at: string };
+
+  const [loading, setLoading] = useState(true);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  useEffect(() => {
+    // simulate a fetch for alerts (replace with real fetch as needed)
+    const t = setTimeout(() => {
+      setAlerts([
+        {
+          id: "1",
+          title: "Welcome",
+          body: "Thanks for joining our platform.",
+          created_at: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          title: "Maintenance",
+          body: "Scheduled maintenance tonight at 11pm.",
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      setLoading(false);
+    }, 400);
+
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div className="flex flex-col items-center lg:w-full text-[var(--dark-def)] ">
