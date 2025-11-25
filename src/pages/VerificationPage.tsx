@@ -5,6 +5,8 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { useState } from "react";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import OTPInput from "../components/OTPInput";
+import OTPLogin from "../components/OTPLogin";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -45,10 +47,10 @@ const VerificationPage = () => {
 
   return (
     <div className="h-screen w-screen flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
+      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">OTP Login</h2>
-          <form className="w-4/5 h-4/5 overflow-y-auto relative">
+          <form className="w-4/5 relative">
             <div className="flex flex-col items-center p-8 bg-white rounded-lg">
               <div className="flex space-x-2" id="otp-container">
                 <OTPInput length={6} otp={otp} setOtp={setOtp} />
@@ -67,16 +69,8 @@ const VerificationPage = () => {
             </div>
             <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
-              <Link to={"/reset-password/email"}>
-                <button className="px-5 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  Password Reset
-                </button>
-              </Link>
-              <Link to={"/reset-password/phone"}>
-                <button className="px-8 py-3 w-full bg-[#F9F9F9] text-black rounded-full text-[9px]">
-                  OTP Login
-                </button>
-              </Link>
+              <ResetDropdown />
+              <OTPLogin />
             </div>
           </form>
         </div>
