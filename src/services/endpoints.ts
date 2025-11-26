@@ -22,6 +22,7 @@ export const endpoints = {
     sendOTP: (phone: string) => `/verifyotp/?phone=${encodeURIComponent(phone)}`,
     verifyOTP: "/verifyotp/",
   },
+
   reviews: {
     list: () => "/reviews/",
     listWithQuery: (qs: string) => `/reviews/${qs}`,
@@ -32,5 +33,24 @@ export const endpoints = {
     delete: (id: number) => `/reviews/${id}/`,
   },
 
-  
-};
+  categories: {
+    list: "/categories/",
+    detail: (id: number) => `/categories/${id}/`,
+    create: "/categories/",
+    update: (id: number) => `/categories/${id}/`,
+    patch: (id: number) => `/categories/${id}/`,
+    delete: (id: number) => `/categories/${id}/`,
+  },
+
+  products: {
+    list: "/products/",
+    create: "/products/",
+    detail: (id: number | string) => `/products/${id}/`,
+    update: (id: number | string) => `/products/${id}/`,
+    patch: (id: number | string) => `/products/${id}/`,
+    delete: (id: number | string) => `/products/${id}/`,
+    markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
+    setStatus: (id: number | string) => `/products/${id}/set-status/`,
+    related: "/products/related/",
+  },
+}
