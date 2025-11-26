@@ -6,57 +6,55 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import "../App.css";
+import useCategories from "../features/categories/useCategories";
+import type { Category } from "../types/Category";
+import { useProducts } from "../features/products/useProducts";
+import type { Product } from "../types/Product";
+import { formatMoney } from "../utils/formatMoney";
 
 const HomePage = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
-  const categories = [
-    { id: 1, name: "Electronics", icon: "electronics.png", adsCount: 120 },
-    { id: 2, name: "Furniture", icon: "furniture.png", adsCount: 80 },
-    { id: 3, name: "Vehicles", icon: "vehicle.png", adsCount: 60 },
-    { id: 4, name: "Industry", icon: "industrial.png", adsCount: 40 },
-    { id: 5, name: "Fashion", icon: "fashion.png", adsCount: 100 },
-    { id: 6, name: "Grocery", icon: "grocery.png", adsCount: 90 },
-    { id: 7, name: "Games", icon: "games.png", adsCount: 70 },
-    { id: 8, name: "Cosmetics", icon: "cosmetics.png", adsCount: 50 },
-    { id: 9, name: "Property", icon: "property.png", adsCount: 30 },
-    { id: 10, name: "Services", icon: "services.png", adsCount: 20 },
-  ];
+  const handleCategoryClick = (name: string) => {
+    const category = categories.find(c => c.name === name) || null;
+    setSelectedCategory(category);
+  };
+  const handleFilterSettings = () => setShowFilterPopup(true);
+  const closeFilterPopup = () => setShowFilterPopup(false);
 
-  const categ = categories.slice(0, 5);
+  if (categoriesError) console.error("Failed to load categories:", categoriesError);
 
-  const pics: string[] = Array.from(
-    { length: 10 },
-    () => "https://picsum.photos/200",
-  );
+  const { data: products = [] } = useProducts();
 
-  const ads = [
-    {
-      id: 1,
-      location: "Accra",
-      title: "Smartphone for sale",
-      price: "GHc 500",
-    },
-    { id: 2, location: "Kumasi", title: "Car", price: "GHc 300 for 6days" },
-    { id: 3, location: "Takoradi", title: "Laptop", price: "GHc 800" },
-    {
-      id: 4,
-      location: "Cape Coast",
-      title: "Bike",
-      price: "GHc 150 for 3days",
-    },
-    { id: 5, location: "Tamale", title: "Headphones", price: "GHc 200" },
-    { id: 6, location: "Ho", title: "Tablet", price: "GHc 400" },
-    { id: 7, location: "Tema", title: "Camera", price: "GHc 600" },
-    { id: 8, location: "Obuasi", title: "Smartwatch", price: "GHc 250" },
-    { id: 9, location: "Sunyani", title: "Printer", price: "GHc 250" },
-    { id: 10, location: "Wa", title: "Monitor", price: "GHc 450" },
-  ];
+  const categoriesWithCounts = categories.map((cat) => {
+    const count = products.filter((p) => p.category === cat.id).length;
+    return {
+      ...cat,
+      adsCount: count,
+    };
+  });
 
-  const sum = categories.reduce((acc, c) => acc + c.adsCount, 0);
+  const totalProducts = products.length;
 
-  const handleArrowClick = (direction: "left" | "right", id: string) => {
+  const productsByCategory = categories.reduce((acc, category) => {
+    const categoryProducts = products?.filter(p => p.category === category.id) || [];
+    
+    if (categoryProducts.length > 0) {
+      acc[category.id] = categoryProducts;
+    } else {
+      acc[category.id] = [];
+    }
+    return acc;
+  }, {} as Record<number, Product[]>);
+
+
+  /* API BIT ENDS HERE */
+  if (categoriesLoading) console.log("Loading up categories...");
+
+  const handleArrowClick = (direction: "left" | "right", id: string | number) => {
     const container = document.querySelector(
       `#move-${id}`,
     ) as HTMLElement | null;
@@ -69,11 +67,7 @@ const HomePage = () => {
     }
   };
 
-  const handleCategoryClick = (categoryName: string) =>
-    setSelectedCategory(categoryName);
   const handleBackToHome = () => setSelectedCategory(null);
-  const handleFilterSettings = () => setShowFilterPopup(true);
-  const closeFilterPopup = () => setShowFilterPopup(false);
 
   // Header condensed state for small screens: when true the header becomes fixed and inline
   const [isCondensed, setIsCondensed] = useState(false);
@@ -175,7 +169,7 @@ const HomePage = () => {
           <h2
             className={`${
               isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
-            } font-medium text-[var(--dark-def)] whitespace-nowrap`}
+            } font-medium text-(--dark-def) whitespace-nowrap`}
           >
             Oysloe
           </h2>
@@ -191,21 +185,22 @@ const HomePage = () => {
               <div className="rotating-bg" aria-hidden="true" />
               <div className="rotating-bg-inner" aria-hidden="true" />
 
-              <input
-                type="text"
-                placeholder="Search anything up for good"
-                className={`search-input ${
-                  isSmallScreen && isCondensed
-                    ? "text-[16px]"
-                    : "text-2xl sm:text-2xl"
-                } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
-              />
+              <div className="relative flex">
+                <input
+                  type="text"
+                  placeholder="Search anything up for good"
+                  className={`search-input ${
+                    isSmallScreen && isCondensed
+                      ? "text-[16px]"
+                      : "text-2xl sm:text-2xl"
+                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                />
 
-              {/* missing */}
-              <img
-                src="/search.svg"
-                className="absolute top-0 left-0 w-5 h-5 z-10"
-              />
+                <img
+                  src="/search.svg"
+                  className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-3 w-5 h-5 z-10"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -234,8 +229,8 @@ const HomePage = () => {
           </button>
 
           {/* Header */}
-          <p className="bg-[var(--div-active)] px-4 py-2 rounded-lg text-sm inline-flex items-center gap-3">
-            <span className="text-[length:var(--font-size)]">Category</span>
+          <p className="bg-(--div-active) px-4 py-2 rounded-lg text-sm inline-flex items-center gap-3">
+            <span className="text-length:--font-size)">Category</span>
             <svg
               width="18"
               height="18"
@@ -258,15 +253,15 @@ const HomePage = () => {
             {categories.map((category) => (
               <label
                 key={category.id}
-                className="text-[length:var(--font-size)] flex items-center gap-2 sm:gap-3 p-2 sm:p-3 w-fit border border-[var(--div-border)] rounded-lg hover:bg-gray-200 cursor-pointer text-sm sm:text-base"
+                className="text-(length:--font-size) flex items-center gap-2 sm:gap-3 p-2 sm:p-3 w-fit border border-(--div-border) rounded-lg hover:bg-gray-200 cursor-pointer text-sm sm:text-base"
               >
                 <input
                   type="radio"
                   name="category"
                   value={category.name}
-                  checked={selectedCategory === category.name}
-                  onChange={() => setSelectedCategory(category.name)}
-                  className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
+                  checked={selectedCategory?.id === category.id}
+                  onChange={() => setSelectedCategory(category)}
+                  className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-size-[18px_18px]"
                 />
                 <span>{category.name}</span>
               </label>
@@ -276,14 +271,17 @@ const HomePage = () => {
 
         {/* Search button */}
         <div className="flex justify-center mb-6 mt-8">
-          <button className="px-10 sm:px-20 py-3 sm:py-4 bg-[var(--div-active)] rounded-lg hover:bg-gray-200 text-xl sm:text-2xl">
+          <button className="px-10 sm:px-20 py-3 sm:py-4 bg-(--div-active) rounded-lg hover:bg-gray-200 text-xl sm:text-2xl">
             Search
           </button>
         </div>
       </div>
     </div>
   );
-  const SelectACategory = () => (
+  const SelectACategory = ({ categories, onCategoryClick }: {
+    categories: Category[];
+    onCategoryClick: (name: string) => void;
+  }) => (
     <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
       <div
         className="
@@ -301,23 +299,23 @@ const HomePage = () => {
         {categories.slice(0, 10).map((category) => (
           <div
             key={category.id}
-            onClick={() => handleCategoryClick(category.name)}
+            onClick={() => onCategoryClick(category.name)}
             className="
                     flex flex-col items-center justify-center
-                    min-w-[64px] min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
-                    bg-[var(--div-active)] rounded-lg 
+                    min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                    bg-(--div-active) rounded-lg 
                     p-2 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
                 "
           >
-            <div className="h-[45px] w-[45px] sm:h-[80px] sm:w-[80px] relative rounded-full bg-white">
+            <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
               <img
-                src={category.icon}
+                src={`/${category.name.toLowerCase()}.png`}
                 alt={category.name}
                 className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
               />
             </div>
-            <h3 className="text-center text-[10px] sm:text-[length:var(--font-size)] mt-1 truncate">
+            <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
               {category.name}
             </h3>
           </div>
@@ -356,11 +354,21 @@ const HomePage = () => {
       </button>
     </div>
   );
-  const CircularSummaries = () => (
-    <div className=" text-[var(--dark-def)] flex items-center justify-center w-full overflow-hidden my-[3rem]">
-      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 md:h-fit">
-        {categ.map((category) => {
-          const percentage = (category.adsCount / sum) * 100;
+
+  const CircularSummaries = ({ categories, total }: { categories: (Category & { adsCount: number })[], total: number }) => (
+    <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12">
+      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 md:h-fit gap-2">
+        {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
+        {categories
+          .sort((a, b) => b.adsCount - a.adsCount) 
+          .filter(cat => cat.adsCount > 0) 
+          .slice(0, 5)          
+          .concat(
+            categories.filter(cat => cat.adsCount === 0)
+          )
+          .slice(0, 5)                    
+          .map((category) => {
+          const percentage = (category.adsCount || 0) / total * 100;
           return (
             <div
               key={category.id}
@@ -376,11 +384,11 @@ const HomePage = () => {
                 }}
               />
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] md:text-sm min-w-[60px]">
+                <span className="text-[8px] md:text-xs min-w-[60px]">
                   {category.name}
                 </span>
-                <span className="text-[10px] md:text-xl font-bold text-[var(--accent-color)]">
-                  {category.adsCount}+
+                <span className="text-[10px] md:text-xl font-bold text-(--accent-color)">
+                  {category.adsCount}{category.adsCount > 0 && "+"}
                 </span>
               </div>
             </div>
@@ -390,142 +398,145 @@ const HomePage = () => {
     </div>
   );
 
-  const ScrollableAds = () =>
-    [
-      "Electronics",
-      "Furniture",
-      "Vehicles",
-      "Industry",
-      "Fashion",
-      "Grocery",
-      "Games",
-      "Cosmetics",
-      "Property",
-    ].map((section) => (
-      <div
-        key={section}
-        className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-[var(--dark-def)]"
-      >
-        <div className="flex items-center gap-3 mb-2 px-2">
-          <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-[var(--dark-def)]">
-            {section}
-          </h2>
-          <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
-            Show All
-          </button>
-          <div className="flex gap-2 ml-auto">
-            <button
-              onClick={() => handleArrowClick("left", section.toLowerCase())}
-              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-            >
-              <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
-            </button>
-            <button
-              onClick={() => handleArrowClick("right", section.toLowerCase())}
-              className="bg-gray-200 p-2 rounded-full flex-shrink-0"
-            >
-              <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
-            </button>
-          </div>
-        </div>
-
+  const ScrollableAds = () => {
+    return categories.map(category => {
+      const categoryProducts = productsByCategory[category.id] || [];
+      if (!categoryProducts || categoryProducts.length === 0) return;
+      
+      return (
         <div
-          id={`move-${section.toLowerCase()}`}
-          className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 [mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
+          key={category.id}
+          className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-(--dark-def)"
         >
-          <div className="flex gap-2 sm:gap-3 w-max">
-            {pics.map((pic, index) => (
-              <Link
-                key={index}
-                to={`/ads/${ads[index].id}`}
-                state={{ adData: ads[index] }}
-                className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+          <div className="flex items-center gap-3 mb-2 px-2">
+            <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-(--dark-def)">
+              {category.name}
+            </h2>
+            <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+              Show All
+            </button>
+            <div className="flex gap-2 ml-auto">
+              <button
+                onClick={() => handleArrowClick("left", category.id)}
+                className="bg-gray-200 p-2 rounded-full shrink-0"
               >
-                <img
-                  src={pic}
-                  alt={`${section} ${index}`}
-                  className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
-                />
-                <div className="flex items-center gap-1 px-2 py-1">
-                  <img
-                    src="/location.svg"
-                    alt=""
-                    className="w-3 sm:w-5 h-3 sm:h-5"
-                  />
-                  <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                    {ads[index].location}
-                  </p>
-                </div>
-                <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
-                  {ads[index].title}
-                </p>
-                <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
-                  {ads[index].price}
-                </p>
-              </Link>
-            ))}
+                <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
+              </button>
+              <button
+                onClick={() => handleArrowClick("right", category.id)}
+                className="bg-gray-200 p-2 rounded-full shrink-0"
+              >
+                <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
+              </button>
+            </div>
+          </div>
+
+          <div
+            id={`move-${category.id}`}
+            className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 mask-[linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
+          >
+            {categoryProducts.length > 0 ? (
+              <div className="flex gap-2 sm:gap-3 w-max">
+                {categoryProducts.map(ad => (
+                  <Link
+                    key={ad.id}
+                    to={`/ads/${ad.id}`}
+                    state={{ adData: ad }}
+                    className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                  >
+                    <img
+                      src={ad.image || "/public/no-image.png"} 
+                      alt={ad.name}
+                      className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+                    />
+                    <div className="flex items-center gap-1 px-2 py-1">
+                      <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5" />
+                      <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                        {ad.location.name || ad.location.region}
+                      </p>
+                    </div>
+                    <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                      {ad.name}
+                    </p>
+                    <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                      {formatMoney(ad.price, "GHS")}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="px-2 text-sm text-gray-500">No ads to show here...</p>
+            )}
           </div>
         </div>
-      </div>
-    ));
-
-  const ConditionalAds = () => (
-    <div className="bg-[var(--div-active)] w-full flex justify-center -mb-4">
-      <div
-        style={{ transform: "scale(0.9)" }}
-        className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw]  pb-[2rem]"
-      >
-        {pics.map((pic, index) => (
-          <div key={index} className="flex flex-col w-[100%] overflow-hidden">
-            <Link to={`/ads/${ads[index].id}`} state={{ adData: ads[index] }}>
-              <img
-                src={pic}
-                alt={`${selectedCategory} ${index}`}
-                className="w-full h-40 sm:h-48 object-cover rounded-2xl"
-              />
-              <div className="flex items-center gap-1 px-2 py-1">
-                <img src="/location.svg" alt="" className="w-4 h-4" />
-                <p className="text-xs text-gray-500">{ads[index].location}</p>
+      );
+    });
+  };
+  
+  const ConditionalAds = () => {
+    // Find the selected category's products
+    const categoryProducts = selectedCategory
+      ? productsByCategory[selectedCategory.id] || []
+      : [];
+    
+    return (
+      <div className="bg-(--div-active) w-full flex justify-center -mb-4">
+        <div
+          style={{ transform: "scale(0.9)" }}
+          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
+        >
+          {categoryProducts.length > 0 ? (
+            categoryProducts.map(ad => (
+              <div key={ad.id} className="flex flex-col w-full overflow-hidden">
+                <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
+                  <img
+                    src={ad.image || "/public/no-image.jpeg"}
+                    alt={ad.name}
+                    className="w-full h-40 sm:h-48 object-cover rounded-2xl"
+                  />
+                  <div className="flex items-center gap-1 px-2 py-1">
+                    <img src="/location.svg" alt="" className="w-4 h-4" />
+                    <p className="text-xs text-gray-500">{ad.location.name || ad.location.region}</p>
+                  </div>
+                  <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
+                  <p className="px-2 text-sm font-light text-gray-500">{ad.price}</p>
+                </Link>
               </div>
-              <p className="px-2 text-sm truncate text-gray-500">
-                {ads[index].title}
-              </p>
-              <p className="px-2 text-sm font-light text-gray-500">
-                {ads[index].price}
-              </p>
-            </Link>
-          </div>
-        ))}
-        <div className="h-10" />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 col-span-full">No ads to show here...</p>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
       <HomePageHeader />
       <div className="flex flex-col items-center justify-center">
-        <div className="bg-[var(--div-active)] w-[100vw]">
+        <div className="bg-(--div-active) w-screen">
           {selectedCategory && <CategoryFilters />}
         </div>
         {showFilterPopup && <ShowFilter />}
 
-        {/* Conditional Content */}
         {selectedCategory ? (
           <ConditionalAds />
         ) : (
           <>
             <div className="transform scale-90 sm:transform-none sm:scale-100">
-              {/* Categories Grid */}
-              <SelectACategory />
-
-              {/* Circular category summaries */}
-              <CircularSummaries />
+              <SelectACategory 
+                categories={categories} 
+                onCategoryClick={handleCategoryClick} 
+              />
+              <CircularSummaries 
+                categories={categoriesWithCounts} 
+                total={totalProducts}
+              />
             </div>
 
-            {/* === Scrollable Ad Sections === */}
-            <div className="bg-[var(--div-active)] w-[100vw]">
-              {<ScrollableAds />}
+            <div className="bg-(--div-active) w-screen">
+              <ScrollableAds />
               <div className="h-26" />
             </div>
           </>
