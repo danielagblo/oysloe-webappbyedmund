@@ -1,6 +1,7 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
+import ProgressBar from "./ProgressBar";
 import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
@@ -46,7 +47,14 @@ export default function ProfileStats() {
             {loading ? "" : (user as UserProfile)?.level || "High Level"}
           </p>
         </div>
-        <div className="w-full bg-green-200 h-[0.5vw] rounded" />
+        {/* Referral progress: use reusable ProgressBar */}
+        {(() => {
+          const points = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          let percent = Math.round(points * 100);
+          if (!isFinite(percent) || percent < 0) percent = 0;
+          if (percent > 100) percent = 100;
+          return <ProgressBar percent={percent} />;
+        })()}
       </div>
     </div>
   );

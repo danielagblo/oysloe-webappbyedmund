@@ -1,5 +1,6 @@
 import type { Feature, FeaturePayload } from "../types/Feature";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 export const getFeatures = async (params?: {
   ordering?: string;
@@ -13,33 +14,33 @@ export const getFeatures = async (params?: {
     qs.append("subcategory", String(params.subcategory));
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Feature[]>(`/features/${query}`);
+  return apiClient.get<Feature[]>(`${endpoints.features.list()}${query}`);
 };
 
 export const getFeature = async (id: number): Promise<Feature> => {
-  return apiClient.get<Feature>(`/features/${id}/`);
+  return apiClient.get<Feature>(endpoints.features.detail(id));
 };
 
 export const createFeature = async (body: FeaturePayload): Promise<Feature> => {
-  return apiClient.post<Feature>(`/features/`, body);
+  return apiClient.post<Feature>(endpoints.features.create(), body);
 };
 
 export const updateFeature = async (
   id: number,
   body: FeaturePayload,
 ): Promise<Feature> => {
-  return apiClient.put<Feature>(`/features/${id}/`, body);
+  return apiClient.put<Feature>(endpoints.features.update(id), body);
 };
 
 export const patchFeature = async (
   id: number,
   body: Partial<FeaturePayload>,
 ): Promise<Feature> => {
-  return apiClient.patch<Feature>(`/features/${id}/`, body);
+  return apiClient.patch<Feature>(endpoints.features.patch(id), body);
 };
 
 export const deleteFeature = async (id: number): Promise<void> => {
-  await apiClient.delete<void>(`/features/${id}/`);
+  await apiClient.delete<void>(endpoints.features.delete(id));
 };
 
 export default {

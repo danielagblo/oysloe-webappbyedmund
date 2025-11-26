@@ -21,7 +21,7 @@ export interface UserProfile {
   avatar?: string;
   admin_verified: boolean;
   deleted: boolean;
-  level: string;
+  level: Level;
   referral_points: number;
   referral_code?: string;
   is_active: boolean;
@@ -52,3 +52,4 @@ export interface OTPVerifyRequest {
 export interface MessageResponse {
   message: string;
 }
+export type Level = "SILVER" | "GOLD" | "DIAMOND";

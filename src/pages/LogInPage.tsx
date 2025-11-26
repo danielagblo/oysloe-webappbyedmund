@@ -1,12 +1,12 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useLogin } from "../features/Auth/useAuth";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
+import { useLogin } from "../features/Auth/useAuth";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const LogInPage = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const LogInPage = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const loginMutation = useLogin();
+  const loginMutation: ReturnType<typeof useLogin> = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,7 +44,7 @@ const LogInPage = () => {
 
     setIsLoading(true);
     try {
-      await (loginMutation as any).mutateAsync({ email: formData.email, password: formData.password });
+      await loginMutation.mutateAsync({ email: formData.email, password: formData.password });
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
@@ -72,7 +72,7 @@ const LogInPage = () => {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
+                className="border-gray-100 border-2 px-8 py-2 w-full bg-position-[8px_center] bg-size-[18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
               />
               <input
                 type="password"
@@ -80,7 +80,7 @@ const LogInPage = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
+                className="border-gray-100 border-2 px-8 py-2 w-full bg-position-[8px_center] bg-size-[18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
               />
             </div>
             <div className="flex flex-col gap-3 w-full mt-3">

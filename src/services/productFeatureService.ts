@@ -1,8 +1,9 @@
 import type {
-  ProductFeature,
-  ProductFeaturePayload,
+    ProductFeature,
+    ProductFeaturePayload,
 } from "../types/ProductFeature";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 export const getProductFeatures = async (params?: {
   feature?: number;
@@ -19,37 +20,37 @@ export const getProductFeatures = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<ProductFeature[]>(`/product-features/${query}`);
+  return apiClient.get<ProductFeature[]>(`${endpoints.productFeatures.list()}${query}`);
 };
 
 export const getProductFeature = async (
   id: number,
 ): Promise<ProductFeature> => {
-  return apiClient.get<ProductFeature>(`/product-features/${id}/`);
+  return apiClient.get<ProductFeature>(endpoints.productFeatures.detail(id));
 };
 
 export const createProductFeature = async (
   body: ProductFeaturePayload,
 ): Promise<ProductFeature> => {
-  return apiClient.post<ProductFeature>(`/product-features/`, body);
+  return apiClient.post<ProductFeature>(endpoints.productFeatures.create(), body);
 };
 
 export const updateProductFeature = async (
   id: number,
   body: ProductFeaturePayload,
 ): Promise<ProductFeature> => {
-  return apiClient.put<ProductFeature>(`/product-features/${id}/`, body);
+  return apiClient.put<ProductFeature>(endpoints.productFeatures.update(id), body);
 };
 
 export const patchProductFeature = async (
   id: number,
   body: Partial<ProductFeaturePayload>,
 ): Promise<ProductFeature> => {
-  return apiClient.patch<ProductFeature>(`/product-features/${id}/`, body);
+  return apiClient.patch<ProductFeature>(endpoints.productFeatures.patch(id), body);
 };
 
 export const deleteProductFeature = async (id: number): Promise<void> => {
-  await apiClient.delete<void>(`/product-features/${id}/`);
+  await apiClient.delete<void>(endpoints.productFeatures.delete(id));
 };
 
 export default {
