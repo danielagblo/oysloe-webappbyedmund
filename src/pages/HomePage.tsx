@@ -185,21 +185,22 @@ const HomePage = () => {
               <div className="rotating-bg" aria-hidden="true" />
               <div className="rotating-bg-inner" aria-hidden="true" />
 
-              <input
-                type="text"
-                placeholder="Search anything up for good"
-                className={`search-input ${
-                  isSmallScreen && isCondensed
-                    ? "text-[16px]"
-                    : "text-2xl sm:text-2xl"
-                } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
-              />
+              <div className="relative flex">
+                <input
+                  type="text"
+                  placeholder="Search anything up for good"
+                  className={`search-input ${
+                    isSmallScreen && isCondensed
+                      ? "text-[16px]"
+                      : "text-2xl sm:text-2xl"
+                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                />
 
-              {/* missing */}
-              <img
-                src="/search.svg"
-                className="absolute top-0 left-0 w-5 h-5 z-10"
-              />
+                <img
+                  src="/search.svg"
+                  className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-3 w-5 h-5 z-10"
+                />
+              </div>
             </div>
           </div>
         </div>
