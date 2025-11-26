@@ -1,6 +1,6 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
-import RatingReviews from "./RatingsReviews";
 import type { UserProfile } from "../types/UserProfile";
+import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
   const { profile: user, loading, error, refetchProfile } = useUserProfile();
@@ -12,7 +12,7 @@ export default function ProfileStats() {
           (user as UserProfile)?.avatar || "/userPfp2.jpg"
         }
         alt="pfp"
-        className="rounded-full object-cover mb-3 bg-pink-300 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
+        className="rounded-full object-cover mb-3 bg-green-100 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
         {loading ? "" : (user as UserProfile)?.name || " "}

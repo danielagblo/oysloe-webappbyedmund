@@ -1,7 +1,10 @@
-import { useState } from "react";
-import { PlusIcon, X } from "lucide-react";
-import mailGif from "../assets/mail.gif";
+import { Camera, PlusIcon, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import mailGif from "../assets/mail.gif";
+import useUserProfile from "../features/userProfile/useUserProfile";
+import { apiClient } from "../services/apiClient";
+import { endpoints } from "../services/endpoints";
 
 const EditProfilePage = ({
   setShowEdit,
@@ -13,21 +16,51 @@ const EditProfilePage = ({
   const [linkSent, setLinkSent] = useState(false);
   const setupProgress: number = 100;
 
-  const [selectedUser] = useState({
-    profileImage: "",
-    businessLogo: "",
-    name: "",
-    email: "",
-    phonePrimary: "",
-    phoneSecondary: "",
-    nationalId: "",
-    idFront: "",
-    idBack: "",
-    businessName: "",
-    accountName: "",
-    accountNumber: "",
-    mobileNetwork: "",
-  });
+  // load profile and prefill editable local state
+  const { profile, updateProfile } = useUserProfile();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [selectedUser, setSelectedUser] = useState<{
+    profileImage?: string;
+    businessLogo?: string;
+    name?: string;
+    email?: string;
+    phonePrimary?: string;
+    phoneSecondary?: string;
+    nationalId?: string;
+    idFront?: string;
+    idBack?: string;
+    businessName?: string;
+    accountName?: string;
+    accountNumber?: string;
+    mobileNetwork?: string;
+  }>({});
+
+  useEffect(() => {
+    if (profile) {
+      setSelectedUser({
+        profileImage: profile.avatar || undefined,
+        businessLogo: profile.business_logo || undefined,
+        name: profile.name || undefined,
+        email: profile.email || undefined,
+        phonePrimary: profile.phone || undefined,
+        phoneSecondary: profile.second_number || undefined,
+        nationalId: profile.id_number || undefined,
+        idFront: profile.id_front_page || undefined,
+        idBack: profile.id_back_page || undefined,
+        businessName: profile.business_name || undefined,
+        accountName: profile.account_name || undefined,
+        accountNumber: profile.account_number || undefined,
+        mobileNetwork: profile.mobile_network || undefined,
+      });
+    }
+  }, [profile]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSelectedUser((prev) => ({ ...prev, [name]: value }));
+  };
 
   const avatarPlaceholder =
     "https://placehold.co/100x100?text=Avatar&bg=EFEFEF&fg=666";
@@ -47,6 +80,10 @@ const EditProfilePage = ({
   };
 
   const navigate = useNavigate();
+
+  // hold chosen files to submit to backend directly
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   return (
     <div className="flex justify-between min-h-screen w-screen relative">
@@ -112,23 +149,61 @@ const EditProfilePage = ({
 
             {/* profile images area */}
             <div className="flex justify-around items-center w-full p-4 rounded-md">
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 relative">
                 <img
                   src={selectedUser?.profileImage || avatarPlaceholder}
                   alt="Profile"
-                  className="w-20 max-w-full h-auto rounded-full object-cover bg-gray-100"
+                  className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100"
                   onError={(e) => onImgError(e, avatarPlaceholder)}
                 />
                 <p className="text-xs">Profile Image</p>
+                <label htmlFor="avatar-file-input" className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer">
+                  <input
+                    id="avatar-file-input"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      if (f) {
+                        setAvatarFile(f);
+                        setSelectedUser((p) => ({ ...p, profileImage: URL.createObjectURL(f) }));
+                      }
+                    }}
+                  />
+                  <Camera size={16} />
+                </label>
+                {avatarFile && (
+                  <div className="text-[0.7rem] mt-1">Selected</div>
+                )}
               </div>
-              <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-col items-center gap-2 relative">
                 <img
                   src={selectedUser?.businessLogo || logoPlaceholder}
                   alt="Business Logo"
-                  className="w-20 max-w-full h-auto rounded-md object-cover bg-gray-100"
+                  className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100"
                   onError={(e) => onImgError(e, logoPlaceholder)}
                 />
                 <p className="text-xs">Business Logo</p>
+                <label htmlFor="logo-file-input" className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer">
+                  <input
+                    id="logo-file-input"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      if (f) {
+                        setLogoFile(f);
+                        setSelectedUser((p) => ({ ...p, businessLogo: URL.createObjectURL(f) }));
+                      }
+                    }}
+                  />
+                  <Camera size={16} />
+                </label>
+                {logoFile && (
+                  <div className="text-[0.7rem] mt-1">Selected</div>
+                )}
               </div>
             </div>
 
@@ -138,7 +213,9 @@ const EditProfilePage = ({
 
               <label className="text-xs text-gray-600">Name</label>
               <input
-                defaultValue={selectedUser?.name}
+                name="name"
+                value={selectedUser?.name ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
@@ -150,19 +227,25 @@ const EditProfilePage = ({
                 </p>
               </div>
               <input
-                defaultValue={selectedUser?.email}
+                name="email"
+                value={selectedUser?.email ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">First Number</label>
               <input
-                defaultValue={selectedUser?.phonePrimary}
+                name="phonePrimary"
+                value={selectedUser?.phonePrimary ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Second Number</label>
               <input
-                defaultValue={selectedUser?.phoneSecondary || "---"}
+                name="phoneSecondary"
+                value={selectedUser?.phoneSecondary ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
@@ -174,7 +257,9 @@ const EditProfilePage = ({
                 </p>
               </div>
               <input
-                defaultValue={selectedUser?.nationalId}
+                name="nationalId"
+                value={selectedUser?.nationalId ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
@@ -182,7 +267,9 @@ const EditProfilePage = ({
                 <>
                   <label>Business Name</label>
                   <input
-                    defaultValue={selectedUser?.businessName}
+                    name="businessName"
+                    value={selectedUser?.businessName ?? ""}
+                    onChange={handleInputChange}
                     className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
                   />
                 </>
@@ -217,7 +304,7 @@ const EditProfilePage = ({
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>
                 <p className="mb-3 text-center">
-                  We will send an email to agblod27@gmail.com. Click the link in
+                  We will send an email to {selectedUser?.email}. Click the link in
                   the email to verify your account.
                 </p>
                 <button
@@ -235,24 +322,86 @@ const EditProfilePage = ({
               <p className="mt-2 mb-1 text-sm font-medium">Payment Account</p>
               <label className="text-xs text-gray-600">Account Name</label>
               <input
-                defaultValue={selectedUser?.accountName}
+                name="accountName"
+                value={selectedUser?.accountName ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Account Number</label>
               <input
-                defaultValue={selectedUser?.accountNumber || "---"}
+                name="accountNumber"
+                value={selectedUser?.accountNumber ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Mobile Network</label>
               <input
-                defaultValue={selectedUser?.mobileNetwork}
+                name="mobileNetwork"
+                value={selectedUser?.mobileNetwork ?? ""}
+                onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
-              <button className="w-full bg-gray-200 py-4 rounded-xl text-[1.1rem] text-gray-800 mt-6">
-                {setupProgress === 100 ? "Finish" : "Save"}
+              {saveError && (
+                <div className="mb-2 text-sm text-red-600">{saveError}</div>
+              )}
+              <button
+                onClick={async () => {
+                  setSaveError(null);
+                  setIsSaving(true);
+                  try {
+                    // If files were selected, send multipart/form-data to backend
+                    if (avatarFile || logoFile) {
+                      const form = new FormData();
+                      if (avatarFile) form.append('avatar', avatarFile);
+                      if (logoFile) form.append('business_logo', logoFile);
+                      // other fields
+                      form.append('name', selectedUser?.name ?? '');
+                      form.append('email', selectedUser?.email ?? '');
+                      form.append('phone', selectedUser?.phonePrimary ?? '');
+                      if ((selectedUser as any)?.address) form.append('address', (selectedUser as any).address);
+                      if (selectedUser?.businessName) form.append('business_name', selectedUser.businessName);
+                      if (selectedUser?.accountName) form.append('account_name', selectedUser.accountName);
+                      if (selectedUser?.accountNumber) form.append('account_number', selectedUser.accountNumber);
+                      if (selectedUser?.mobileNetwork) form.append('mobile_network', selectedUser.mobileNetwork);
+                      form.append('preferred_notification_email', selectedUser?.email ?? '');
+                      form.append('preferred_notification_phone', selectedUser?.phonePrimary ?? '');
+
+                      await apiClient.put(endpoints.userProfile.userProfile, form);
+                    } else {
+                      // build JSON payload according to UserProfileUpdatePayload
+                      const payload: any = {
+                        name: selectedUser?.name,
+                        email: selectedUser?.email,
+                        phone: selectedUser?.phonePrimary,
+                        address: (selectedUser as any)?.address,
+                        avatar: selectedUser?.profileImage,
+                        business_logo: selectedUser?.businessLogo,
+                        business_name: selectedUser?.businessName,
+                        account_name: selectedUser?.accountName,
+                        account_number: selectedUser?.accountNumber,
+                        mobile_network: selectedUser?.mobileNetwork,
+                        preferred_notification_email: selectedUser?.email,
+                        preferred_notification_phone: selectedUser?.phonePrimary,
+                      };
+
+                      // reuse existing updateProfile when not sending files
+                      await updateProfile(payload);
+                    }
+                    // close edit view on success
+                    setShowEdit(false);
+                  } catch (err: any) {
+                    setSaveError(err?.message || 'Failed to save profile');
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}
+                disabled={isSaving}
+                className={`w-full py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? 'bg-gray-300 text-gray-500' : 'bg-gray-200 text-gray-800'}`}
+              >
+                {isSaving ? "Saving..." : setupProgress === 100 ? "Finish" : "Save"}
               </button>
             </div>
           </div>

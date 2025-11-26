@@ -15,7 +15,10 @@ async function request<T>(
   const cleanUrl = API_BASE_URL.endsWith("/") ? url.replace(/^\//, "") : url;
   const fullUrl = `${API_BASE_URL}${cleanUrl}`;
   // Build headers and attach Authorization automatically when token is present
-  const headers = { "Content-Type": "application/json", ...(options.headers ?? {}) } as Record<string, string>;
+  // If body is a FormData, do not set Content-Type so the browser can add the multipart boundary.
+  const isFormData = options.body instanceof FormData;
+  const headers = { ...(options.headers ?? {}) } as Record<string, string>;
+  if (!isFormData) headers['Content-Type'] = 'application/json';
 
   try {
     if (typeof window !== 'undefined') {
@@ -30,7 +33,7 @@ async function request<T>(
     // ignore localStorage errors (e.g., private mode) and continue without auth header
     void e;
   }
-  const body = options.body ? JSON.stringify(options.body) : undefined;
+  const body = options.body instanceof FormData ? options.body : options.body ? JSON.stringify(options.body) : undefined;
 
   let response: Response;
   try {
