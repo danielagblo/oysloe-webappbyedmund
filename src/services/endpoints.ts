@@ -52,5 +52,14 @@ export const endpoints = {
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
+
+    features: {
+      list: "/product-features/",
+      detail: (id: number) => `/product-features/${id}/`,
+      create: "/product-features/",
+      update: (id: number) => `/product-features/${id}/`,
+      patch: (id: number) => `/product-features/${id}/`,
+      delete: (id: number) => `/product-features/${id}/`,
+    },
   },
 }

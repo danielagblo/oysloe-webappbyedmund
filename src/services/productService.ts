@@ -39,9 +39,7 @@ export const getProduct = async (id: number | string): Promise<Product> => {
   return apiClient.get<Product>(products.detail(id));
 };
 
-// ---------------------
 // CREATE
-// ---------------------
 export const createProduct = async (body: ProductPayload): Promise<Product> => {
   if (useMocks) {
     const newProduct: Product = { 

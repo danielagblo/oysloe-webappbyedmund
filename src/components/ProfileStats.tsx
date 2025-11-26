@@ -13,7 +13,7 @@ export default function ProfileStats() {
           buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"
         }
         alt="pfp"
-        className="rounded-full object-cover mb-3 bg-green-100 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
+        className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
         {loading ? "" : (user as UserProfile)?.name || " "}
@@ -41,7 +41,7 @@ export default function ProfileStats() {
               fill="#374957"
             />
           </svg>
-          <p className="inline text-[length:10px] md:text-[0.9vw]">
+          <p className="inline text-[10px] md:text-[0.9vw]">
             {" "}
             {loading ? "" : (user as UserProfile)?.level || "High Level"}
           </p>
@@ -53,15 +53,15 @@ export default function ProfileStats() {
 
   const AdStats = () => (
     <div className="flex gap-4 justify-center w-full text-sm">
-      <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
+      <div className="text-center bg-(--div-active) p-2 rounded-lg flex-1 whitespace-nowrap">
         <p className="font-medium md:text-[1.5vw]">{(user?.active_ads ?? 0).toLocaleString()}</p>
-        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+        <p className="text-(--some-other-gray) text-xs md:text-[1.125vw]">
           Active Ads
         </p>
       </div>
-      <div className="text-center bg-[var(--div-active)] p-2 rounded-lg flex-1 whitespace-nowrap">
+      <div className="text-center bg-(--div-active) p-2 rounded-lg flex-1 whitespace-nowrap">
         <p className="font-medium md:text-[1.5vw]">{(user?.taken_ads ?? 0).toLocaleString()}</p>
-        <p className="text-[var(--some-other-gray)] text-xs md:text-[1.125vw]">
+        <p className="text-(--some-other-gray) text-xs md:text-[1.125vw]">
           Sold Ads
         </p>
       </div>
@@ -69,9 +69,9 @@ export default function ProfileStats() {
   );
 
   return (
-    <div className="w-[25vw] m-0 relative text-[var(--dark-def)] flex">
+    <div className="w-[25vw] m-0 relative text-(--dark-def) flex">
       {/* <MobileBanner /> */}
-      <div className="h-[100vh] w-[23vw] hidden sm:flex flex-col gap-2 justify-center items-center">
+      <div className="h-screen w-[23vw] hidden sm:flex flex-col gap-2 justify-center items-center">
         <div className="shadow-sm p-6 rounded-xl bg-white w-full h-[46vh] flex flex-col justify-around">
           <Profile />
           <AdStats />

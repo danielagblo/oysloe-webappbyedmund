@@ -13,9 +13,11 @@ const AdsDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const adDataFromState = location.state?.adData;
+  
 
   const { data: currentAdDataFromQuery, isLoading: adLoading, error: adError } = useProduct(numericId!);
   const { data: ads = [], isLoading: adsLoading } = useProducts();
+
 
   const touchStartX = useRef<number | null>(null);
 
@@ -26,7 +28,7 @@ const AdsDetailsPage = () => {
   const currentIndex = ads.findIndex(a => a.id === numericId) ?? 0;
   const totalAds = ads.length;
   const currentAdData = adDataFromState || currentAdDataFromQuery || ads[currentIndex];
-  console.log(currentAdData.product_features);
+
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -80,7 +82,7 @@ const AdsDetailsPage = () => {
 
   // mini components
   const MobileHeader = () => (
-    <div className="w-[100vw] flex sm:hidden justify-between items-center px-2 py-3 bg-[var(--div-active)] sticky top-0 z-50">
+    <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) sticky top-0 z-50">
       <button onClick={() => navigate(-1)} className="flex items-center gap-1">
         <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
         <span className="text-sm">Back</span>
@@ -160,37 +162,52 @@ const AdsDetailsPage = () => {
       </div>
     </div>
   );
-  const ImageGallery = () => (
+  const ImageGallery = () => {
+
+  let imageID = 0;
+  const max = currentAdDataFromQuery?.images.length || 0;
+
+  const getImageSrc = () => {
+    if (currentAdDataFromQuery?.images.length === 0) return "/public/no-image.jpeg";
+
+    const id = imageID;
+    imageID = (imageID + 1) % max;
+    console.log(id);
+    return currentAdDataFromQuery?.images[id].image;
+  };
+
+
+    return (
     <div className="w-full flex justify-center my-4 sm:mb-8">
       {/* Desktop */}
       <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
         <div className="flex w-full">
           <img
-            src="/3d-car-city-street.webp"
+            src={getImageSrc()}
             alt=""
             className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg"
           />
         </div>
         <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
           <img
-            src="/3d-car-city-street.webp"
+            src={getImageSrc()}
             alt=""
             className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
           />
           <img
-            src="/3d-car-city-street.webp"
+            src={getImageSrc()}
             alt=""
             className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
           />
         </div>
         <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
           <img
-            src="/3d-car-city-street.webp"
+            src={getImageSrc()}
             alt=""
             className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
           />
           <img
-            src="/3d-car-city-street.webp"
+            src={getImageSrc()}
             alt=""
             className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
           />
@@ -204,7 +221,7 @@ const AdsDetailsPage = () => {
         onTouchEnd={handleTouchEnd}
       >
         <img
-          src={images[currentIndex]}
+          src={getImageSrc()}
           alt="Ad main"
           className="object-cover w-full h-full"
         />
@@ -218,7 +235,8 @@ const AdsDetailsPage = () => {
         />
       </div>
     </div>
-  );
+    )
+  };
   const TitleAndPrice = () => (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
@@ -246,24 +264,26 @@ const AdsDetailsPage = () => {
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>
-        {currentAdData?.product_features.map((feat: ProductFeature) =>{
-          <li>
+        {currentAdDataFromQuery?.product_features.map((feat: ProductFeature) => (
+          <li key={feat.id}>
             <span className="font-bold">{feat.feature.name}&nbsp;</span>
-            <span>{feat.feature.description}</span>
+            <span>{feat.value}</span>
           </li>
-        })}
-        
-        <li>
-          <span className="font-bold">Location&nbsp;</span>{" "}
-          {currentAdData?.location?.name || "Accra"}
-        </li>
+        ))}
+        {currentAdData?.location?.name && 
+          <li>
+            <span className="font-bold">Location&nbsp;</span>{" "}
+            {currentAdData?.location?.name}
+          </li>
+        }           
+
       </ul>
     </div>
   );
   const SafetyTips = () => (
-    <div className="bg-white sm:bg-[var(--div-active)] sm:p-6 rounded-lg py-1 px-2 pb-5">
+    <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-lg py-1 px-2 pb-5">
       <h2 className="text-xl font-bold mb-2 md:text-[1.75vw]">Safety tips</h2>
-      <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-[var(--div-active)] sm:bg-white md:text-[0.9vw]">
+      <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-(--div-active) sm:bg-white md:text-[0.9vw]">
         Follow this tips and report any suspicious activity.
       </p>
       <ul className="list-disc ml-5 marker:text-black space-y-2 font-bold text-sm md:text-[1.125vw]">
@@ -344,7 +364,7 @@ const AdsDetailsPage = () => {
         {[1, 2, 3].map((comment) => (
           <div
             key={comment}
-            className="p-4 last:border-b-0 bg-[var(--div-active)] rounded-lg w-full"
+            className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -405,13 +425,13 @@ const AdsDetailsPage = () => {
       <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
         <button
           onClick={() => navigate("/reviews")}
-          className="bg-[var(--div-active)] text-[var(--dark-def)] px-6 py-3 rounded-full whitespace-nowrap"
+          className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap"
         >
           Make Review
         </button>
         <button
           onClick={() => navigate("/reviews")}
-          className="text-[var(--dark-def)] px-6 py-3 rounded-full bg-[var(--div-active)] whitespace-nowrap"
+          className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap"
         >
           Show reviews
         </button>
@@ -425,7 +445,7 @@ const AdsDetailsPage = () => {
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
           <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
-        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-400 sm:text-[var(--dark-def)] font-extralight justify-start">
+        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-400 sm:text-(--dark-def) font-extralight justify-start">
           {[
             "Is this Original?",
             "Do you have delivery options?",
@@ -434,7 +454,7 @@ const AdsDetailsPage = () => {
           ].map((text, i) => (
             <button
               key={i}
-              className="px-3 py-2 bg-[var(--div-active)] sm:bg-white rounded text-xs md:text-[0.9vw] hover:bg-gray-100 whitespace-nowrap w-fit"
+              className="px-3 py-2 bg-(--div-active) sm:bg-white rounded text-xs md:text-[0.9vw] hover:bg-gray-100 whitespace-nowrap w-fit"
             >
               {text}
             </button>
@@ -446,7 +466,7 @@ const AdsDetailsPage = () => {
             type="text"
             placeholder="Start a chat"
             style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-[length:20px_20px] bg-[center_right_12px] bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-[var(--dark-def)]"
+            className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-size-[20px_20px] bg-position-[center_right_12px] bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
           />
           <button
             style={{ border: "1px solid var(--div-border)" }}
@@ -461,13 +481,13 @@ const AdsDetailsPage = () => {
         </div>
         <div className="mt-4 space-y-2 text-[10px] inline-flex flex-wrap gap-2 text-gray-600">
           <div className="flex items-center justify-end relative">
-            <h4 className="bg-[var(--green)] h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
+            <h4 className="bg-(--green) h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
               Chat is secured
             </h4>
             <img
               src="/lock-on-svgrepo-com.svg"
               alt=""
-              className="bg-[var(--green)] z-10 rounded-full w-6 h-6 p-1 absolute"
+              className="bg-(--green) z-10 rounded-full w-6 h-6 p-1 absolute"
             />
           </div>
           <div className="flex -mt-2 items-center gap-1 md:text-[0.8vw]">
@@ -485,7 +505,7 @@ const AdsDetailsPage = () => {
   const SellerInfo = () => (
     <div className="sm:mt-4">
       {/* profile bit pc */}
-      <div className="hidden sm:flex flex-row gap-4 bg-[var(--div-active)] px-4 py-7 rounded-2xl mb-5">
+      <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
             src="/face.svg"
@@ -515,7 +535,7 @@ const AdsDetailsPage = () => {
             </span>
           </div>
         </div>
-        <button className="px-2 py-1 rounded text-sm md:text-[1vw] bg-[var(--div-active)]">
+        <button className="px-2 py-1 rounded text-sm md:text-[1vw] bg-(--div-active)">
           Seller Ads
         </button>
       </div>
@@ -531,27 +551,27 @@ const AdsDetailsPage = () => {
               <img
                 src="/fashion.png"
                 alt=""
-                className="bg-[var(--div-active)] w-23 h-23 object-cover rounded flex-shrink-0"
+                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
               />
               <img
                 src="/games.png"
                 alt=""
-                className="bg-[var(--div-active)] w-23 h-23 object-cover rounded flex-shrink-0"
+                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
               />
               <img
                 src="/grocery.png"
                 alt=""
-                className="bg-[var(--div-active)] w-23 h-23 object-cover rounded flex-shrink-0"
+                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
               />
               <img
                 src="/grocery.png"
                 alt=""
-                className="bg-[var(--div-active)] w-23 h-23 object-cover rounded flex-shrink-0"
+                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
               />
               <img
                 src="/grocery.png"
                 alt=""
-                className="bg-[var(--div-active)] w-23 h-23 object-cover rounded flex-shrink-0"
+                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
               />
             </div>
             <button className="absolute right-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
@@ -562,7 +582,7 @@ const AdsDetailsPage = () => {
       </div>
 
       {/* profile bit mobile*/}
-      <div className="sm:hidden flex flex-row gap-4 bg-[var(--div-active)] p-4 rounded-2xl mb-5">
+      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5">
         <div className="relative">
           <img src="/face.svg" alt="" className="w-15 h-15 rounded-full" />
           <img
@@ -580,7 +600,7 @@ const AdsDetailsPage = () => {
     </div>
   );
   const SimilarAds = () => (
-    <div className="bg-white sm:bg-[var(--div-active)] max-sm:p-4 sm:py-6 w-[100vw] md:px-12">
+    <div className="bg-white sm:bg-(--div-active) max-sm:p-4 sm:py-6 w-screen md:px-12">
       <h2 className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl">
         Similar Ads
       </h2>
@@ -591,7 +611,7 @@ const AdsDetailsPage = () => {
             key={index}
             to={`/ads/${ads[index].id}`}
             state={{ adData: ads[index] }}
-            className="inline-block rounded-2xl overflow-hidden flex-shrink-0 w-[38vw] sm:w-48 md:w-52"
+            className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
           >
             <img
               src={pic}
@@ -622,9 +642,18 @@ const AdsDetailsPage = () => {
 
   return (
     <div className="lg:pt-5">
+      {/* button for debugging. i'll remove when im done */}
+      <button 
+        name="sexy button. most useful button."
+        className="fixed top-10 left-10 bg-pink-200 p-3 cursor-pointer" 
+        onClick={() => console.log(currentAdDataFromQuery)}
+      >
+        Click
+      </button>
+
       <div
         style={{ color: "var(--dark-def)" }}
-        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-[var(--div-active)] sm:bg-white"
+        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
       >
         <MobileHeader />
 
@@ -673,7 +702,7 @@ const AdsDetailsPage = () => {
                   <CommentsSection />
                 </div>
                 <div className="p-6 rounded-lg w-full -mt-17">
-                  <div className="sm:bg-[var(--div-active)] w-full p-3 rounded-2xl">
+                  <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
                     <ActionButtons />
                     <QuickChat />
                   </div>
@@ -684,9 +713,9 @@ const AdsDetailsPage = () => {
           </div>
         </div>
       </div>
-      <div className="w-[100vw] p-0 lg:mt-15">
+      <div className="w-screen p-0 lg:mt-15">
         <SimilarAds />
-        <div className="p-8 sm:p-10 bg-[var(--div-active)]" />
+        <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
       <MenuButton />
     </div>
