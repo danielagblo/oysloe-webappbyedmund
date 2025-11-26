@@ -1,15 +1,16 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
+import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
 import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
-  const { profile: user, loading, error, refetchProfile } = useUserProfile();
+  const { profile: user, loading } = useUserProfile();
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
       <img
         src={
-          (user as UserProfile)?.avatar || "/userPfp2.jpg"
+          buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"
         }
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-green-100 h-[4rem] w-[4rem] md:h-[7vw] md:w-[7vw]"
