@@ -1,15 +1,28 @@
+import { useLatestPrivacyPolicy } from "../features/policy/usePolicy";
+
 const PrivacyPage = () => {
+  const { policy, isLoading, isError } = useLatestPrivacyPolicy();
+
   return (
-    <div className="flex justify-between h-screen w-full items-center gap-2 max-md:w-screen max-md:h-screen">
-      <div className="flex flex-col lg:flex-row w-full md:mr-2 h-full md:h-[95vh] justify-start gap-4">
-        <div className="bg-white w-full lg:w-1/2 lg:mt-2 max-lg:h-full flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs">
-          <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2">
-            <h3 className=" text-2xl">Privacy Policy</h3>
-            <h3 className="">Help us improve on our app</h3>
-          </div>
-        </div>
-        <div className="bg-white w-full lg:w-1/2 mt-2 hidden lg:flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs max-lg:mb-20">
-          <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2" />
+    <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center">
+      <div
+        className={`
+          shadow-lg rounded-2xl bg-white px-6 py-10 sm:px-5 sm:py-6 w-full 
+          flex flex-col items-center justify-center sm:shadow-lg sm:rounded-2xl 
+          h-screen sm:h-auto
+        `}
+      >
+        <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh]">
+          <h3 className="text-2xl">{policy?.title ?? "Privacy Policy"}</h3>
+          <p className="text-sm text-gray-500">{policy?.date ?? ""}</p>
+          {isLoading && <p className="mt-4">Loading...</p>}
+          {isError && <p className="mt-4 text-red-500">Failed to load policy.</p>}
+          {!isLoading && policy && (
+            <div
+              className="prose max-w-none mt-4 text-sm text-left pb-20"
+              dangerouslySetInnerHTML={{ __html: policy.body }}
+            />
+          )}
         </div>
       </div>
     </div>

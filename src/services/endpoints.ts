@@ -53,4 +53,8 @@ export const endpoints = {
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
   },
+  policies: {
+    privacyLatest: () => "/privacy-policies/latest/",
+    termsLatest: () => "/terms-and-conditions/latest/",
+  },
 }
