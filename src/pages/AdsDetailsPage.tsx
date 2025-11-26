@@ -1,61 +1,32 @@
-import { useRef } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
+import { useProduct, useProducts } from "../features/products/useProducts";
+import { useRef } from "react";
+import { formatMoney } from "../utils/formatMoney";
+import type { ProductFeature } from "../types/ProductFeature";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
+  const numericId = id ? +id : null;
   const navigate = useNavigate();
-  const adData = location.state?.adData;
+  const location = useLocation();
+  const adDataFromState = location.state?.adData;
 
-  // mock ads
-  const pics: string[] = Array.from(
-    { length: 10 },
-    () => "https://picsum.photos/200",
-  );
+  const { data: currentAdDataFromQuery, isLoading: adLoading, error: adError } = useProduct(numericId!);
+  const { data: ads = [], isLoading: adsLoading } = useProducts();
 
-  const ads = [
-    {
-      id: 1,
-      location: "Accra",
-      title: "Smartphone for sale",
-      price: "GHc 500",
-    },
-    { id: 2, location: "Kumasi", title: "Car", price: "GHc 300 for 6days" },
-    { id: 3, location: "Takoradi", title: "Laptop", price: "GHc 800" },
-    {
-      id: 4,
-      location: "Cape Coast",
-      title: "Bike",
-      price: "GHc 150 for 3days",
-    },
-    { id: 5, location: "Tamale", title: "Headphones", price: "GHc 200" },
-    { id: 6, location: "Ho", title: "Tablet", price: "GHc 400" },
-    { id: 7, location: "Tema", title: "Camera", price: "GHc 600" },
-    { id: 8, location: "Obuasi", title: "Smartwatch", price: "GHc 250" },
-    {
-      id: 9,
-      location: "Sunyani",
-      title: "Printer",
-      price: "GHc 250 GHc 250 GHc 250",
-    },
-    { id: 10, location: "Wa", title: "Monitor", price: "GHc 450" },
-  ];
+  const touchStartX = useRef<number | null>(null);
 
-  const images = [
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-  ];
+  if (!id || numericId === null) return <p className="h-screen w-screen m-0 flex items-center justify-center">Invalid ad ID</p>;
+  if (adLoading || adsLoading) return <p className="h-screen w-screen m-0 flex items-center justify-center">Loading...</p>;
+  if (adError) return <p className="h-screen w-screen m-0 flex items-center justify-center">Error loading ad: {String(adError)}</p>;
 
-  // navigation
-  const currentId = parseInt(id || "1");
-  const currentIndex = ads.findIndex((a) => a.id === currentId);
-  const currentAdData = adData || ads[currentIndex];
+  const currentIndex = ads.findIndex(a => a.id === numericId) ?? 0;
   const totalAds = ads.length;
+  const currentAdData = adDataFromState || currentAdDataFromQuery || ads[currentIndex];
+  console.log(currentAdData.product_features);
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -71,23 +42,41 @@ const AdsDetailsPage = () => {
     }
   };
 
-  // swipe support
-  const touchStartX = useRef<number | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        handleNext();
-      } else {
-        handlePrevious();
-      }
+      if (diff > 0) handleNext();
+      else handlePrevious();
       touchStartX.current = null;
     }
   };
+
+
+  /* Anything below was added before API integration */
+
+
+
+  // mock ads
+  const pics: string[] = Array.from(
+    { length: 10 },
+    () => "https://picsum.photos/200",
+  );
+
+  const images = [
+    "/3d-car-city-street.webp",
+    "/3d-car-city-street.webp",
+    "/3d-car-city-street.webp",
+    "/3d-car-city-street.webp",
+  ];
+
+  // navigation
+  const currentId = parseInt(id || "1");
+
 
   // mini components
   const MobileHeader = () => (
@@ -120,7 +109,7 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base md:text-[1.125vw]">
-          {currentAdData?.location || "Lashibi, Accra"}
+          {currentAdData?.location?.name || "Lashibi, Accra" }
         </h2>
       </div>
       <div className="flex items-center gap-2">
@@ -235,14 +224,18 @@ const AdsDetailsPage = () => {
       <div className="flex items-center gap-2">
         <img src="/location.svg" alt="" className="w-3 h-3" />
         <h2 className="text-sm md:text-[1.1vw]">
-          {currentAdData?.location || "Lashibi, Accra"}
+          {
+            currentAdData?.location?.name && currentAdData?.location?.region 
+              ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region` 
+              : "No location has been set for this user"
+          }
         </h2>
       </div>
       <h2 className="text-2xl md:text-[2vw] font-medium">
-        {currentAdData?.title || "Covet Hyundai csv salon 2025"}
+        {currentAdData?.name || "Untitled Product"}
       </h2>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
-        {currentAdData?.price || "₵25,000"}
+        {currentAdData?.price ? formatMoney(currentAdData?.price) : "Please Contact the Seller for the Price of this Product"}
       </h2>
     </div>
   );
@@ -253,27 +246,16 @@ const AdsDetailsPage = () => {
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>
-        <li>
-          <span className="font-bold">State&nbsp;</span> Brand new
-        </li>
-        <li>
-          <span className="font-bold">Body Type&nbsp;</span> Sedan
-        </li>
-        <li>
-          <span className="font-bold">Year&nbsp;</span> 2025
-        </li>
-        <li>
-          <span className="font-bold">Mileage&nbsp;</span> 0
-        </li>
-        <li>
-          <span className="font-bold">Color&nbsp;</span> Red
-        </li>
+        {currentAdData?.product_features.map((feat: ProductFeature) =>{
+          <li>
+            <span className="font-bold">{feat.feature.name}&nbsp;</span>
+            <span>{feat.feature.description}</span>
+          </li>
+        })}
+        
         <li>
           <span className="font-bold">Location&nbsp;</span>{" "}
-          {currentAdData?.location || "Accra"}
-        </li>
-        <li>
-          <span className="font-bold">Model:</span> Covet Hyundai csv salon
+          {currentAdData?.location?.name || "Accra"}
         </li>
       </ul>
     </div>
@@ -293,32 +275,65 @@ const AdsDetailsPage = () => {
       </ul>
     </div>
   );
-  const ActionButtons = () => (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-1">
-        {[
-          ["mark as taken.svg", "Mark as taken"],
-          ["flag.svg", "Report Ad"],
-          ["outgoing call.svg", "Caller 1"],
-          ["outgoing call.svg", "Caller 2"],
-          ["Make an offer.svg", "Make Offer"],
-          ["favorited.svg", "Favorites"],
-        ].map(([icon, label]) => (
-          <button
-            key={label}
-            className="flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-[var(--div-active)] sm:bg-white hover:bg-gray-50"
-          >
-            <img
-              src={`/${icon}`}
-              alt=""
-              className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
-            />
-            <p className="whitespace-nowrap">{label}</p>
-          </button>
-        ))}
+
+  const ActionButtons = ({
+    onMarkTaken = () => {},
+    onReportAd = () => {},
+    onCaller1 = () => {},
+    onCaller2 = () => {},
+    onMakeOffer = () => {},
+    onFavorite = () => {},
+  }: {
+    onMarkTaken?: () => void;
+    onReportAd?: () => void;
+    onCaller1?: () => void;
+    onCaller2?: () => void;
+    onMakeOffer?: () => void;
+    onFavorite?: () => void;
+  }) => {
+    const actions: Record<string, () => void> = {
+      "Mark as taken": onMarkTaken,
+      "Report Ad": onReportAd,
+      "Caller 1": onCaller1,
+      "Caller 2": onCaller2,
+      "Make Offer": onMakeOffer,
+      "Favorites": onFavorite,
+    };
+
+    return (
+      <div>
+        <div className="flex flex-wrap gap-2 mb-1">
+          {[
+            ["mark as taken.svg", "Mark as taken"],
+            ["flag.svg", "Report Ad"],
+            ["outgoing call.svg", "Caller 1"],
+            ["outgoing call.svg", "Caller 2"],
+            ["Make an offer.svg", "Make Offer"],
+            ["favorited.svg", "Favorites"],
+          ].map(([icon, label]) => (
+            <button
+              key={label}
+              className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
+                ${actions[label] 
+                  ? "cursor-pointer hover:scale-95 active:scale-105"
+                  : "cursor-not-allowed"
+                }
+              `}
+              onClick={actions[label]}
+            >
+              <img
+                src={`/${icon}`}
+                alt=""
+                className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
+              />
+              <p className="whitespace-nowrap">{label}</p>
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
   const CommentsSection = () => (
     <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
       <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
@@ -590,14 +605,14 @@ const AdsDetailsPage = () => {
                 className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
               />
               <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                {ads[index].location}
+                {ads[index].location.name}
               </p>
             </div>
             <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-              {ads[index].title}
+              {ads[index].name}
             </p>
             <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-              {ads[index].price}
+              {formatMoney(ads[index].price, "GHS")}
             </p>
           </Link>
         ))}
@@ -622,7 +637,7 @@ const AdsDetailsPage = () => {
           <div className="flex flex-col gap-4 w-full">
             <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
               <div className="flex w-full justify-between ad-details-page">
-                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6">
+                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px]">
                   <AdDetails />
                 </div>
                 <div className="flex flex-col space-y-6 w-full md:w-1/2">

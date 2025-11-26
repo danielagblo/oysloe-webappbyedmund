@@ -499,7 +499,7 @@ const HomePage = () => {
                     <p className="text-xs text-gray-500">{ad.location.name || ad.location.region}</p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
-                  <p className="px-2 text-sm font-light text-gray-500">{ad.price}</p>
+                  <p className="px-2 text-sm font-light text-gray-500">{formatMoney(ad.price, "GHS")}</p>
                 </Link>
               </div>
             ))
