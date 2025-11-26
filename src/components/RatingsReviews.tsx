@@ -1,5 +1,5 @@
 import React from "react";
-import useReviews from "../features/reviews/useReviews";
+import useReviews, { useReviewsByOwner } from "../features/reviews/useReviews";
 
 interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
@@ -17,7 +17,20 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
     ${fullWidth ? "w-[95vw]" : ""}
   `;
 
-  const { reviews, count, isLoading } = useReviews(userId ? { user: userId } : undefined);
+  let reviews: any[] = [];
+  let count = 0;
+  let isLoading = false;
+  if (userId) {
+    const ownerHook = useReviewsByOwner(userId);
+    reviews = ownerHook.reviews;
+    count = ownerHook.count;
+    isLoading = ownerHook.isLoading;
+  } else {
+    const normal = useReviews();
+    reviews = normal.reviews;
+    count = normal.count;
+    isLoading = normal.isLoading;
+  }
 
   // compute average rating from reviews (safe fallback to 0)
   const average = count > 0 ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / count : 0;
@@ -30,7 +43,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
       <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>{avgDisplay}</h3>
       <p className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className={i < filledStars ? "text-[var(--dark-def)]" : "text-gray-300"}>
+          <span key={i} className={i < filledStars ? "text-(--dark-def)" : "text-gray-300"}>
             ★
           </span>
         ))}
@@ -56,12 +69,12 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
           key={item.stars}
           className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
         >
-          <span className="text-[var(--dark-def)] w-8 text-xs md:text-[1.25vw]">
+          <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
             ★ {item.stars}
           </span>
           <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
             <div
-              className="h-full bg-[var(--dark-def)] rounded"
+              className="h-full bg-(--dark-def) rounded"
               style={{ width: `${Math.round(item.pct)}%` }}
             />
           </div>
@@ -80,22 +93,22 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
             <div className="flex-[0.65] ml-4">{barsSection}</div>
           </div>
           <div className="flex flex-row mt-2 gap-4 items-center justify-center md:justify-around md:px-[10%] md:text-[1.25vw]">
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ All
             </p>
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ 5
             </p>
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ 4
             </p>
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ 3
             </p>
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ 2
             </p>
-            <p className="bg-[var(--div-active)] py-1.5 px-2.5 rounded-full whitespace-nowrap">
+            <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ 1
             </p>
           </div>

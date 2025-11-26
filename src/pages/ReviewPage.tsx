@@ -1,9 +1,9 @@
 import { useState } from "react";
-import MenuButton from "../components/MenuButton";
-import ProfileStats from "../components/ProfileStats";
-import MobileBanner from "../components/MobileBanner";
-import LottieSuccess from "../components/LottieSuccess";
 import "../App.css";
+import LottieSuccess from "../components/LottieSuccess";
+import MenuButton from "../components/MenuButton";
+import MobileBanner from "../components/MobileBanner";
+import ProfileStats from "../components/ProfileStats";
 
 const ReviewPage = () => {
   const [sendSuccess, setSendSuccess] = useState(false);
@@ -11,7 +11,7 @@ const ReviewPage = () => {
   const [showMobileForm, setShowMobileForm] = useState(false);
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[var(--div-active)] text-[var(--dark-def)] relative">
+    <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-(--div-active) text-(--dark-def) relative">
       {/* Mobile header */}
       <div className="sm:hidden w-full fixed top-0 z-30">
         <MobileBanner page="Reviews" />
@@ -105,9 +105,8 @@ const ReviewPage = () => {
                 key={star}
                 src="/star.svg"
                 alt=""
-                className={`w-7 h-7 cursor-pointer transition ${
-                  star <= selectedStars ? "opacity-100" : "opacity-40"
-                }`}
+                className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
+                  }`}
                 onClick={() => setSelectedStars(star)}
               />
             ))}
@@ -225,9 +224,8 @@ const ReviewPage = () => {
                     key={star}
                     src="/star.svg"
                     alt=""
-                    className={`w-7 h-7 cursor-pointer transition ${
-                      star <= selectedStars ? "opacity-100" : "opacity-40"
-                    }`}
+                    className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
+                      }`}
                     onClick={() => setSelectedStars(star)}
                   />
                 ))}

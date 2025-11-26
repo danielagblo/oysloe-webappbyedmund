@@ -5,6 +5,7 @@ import mailGif from "../assets/mail.gif";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
+import { buildMediaUrl } from "../services/media";
 
 const EditProfilePage = ({
   setShowEdit,
@@ -151,7 +152,7 @@ const EditProfilePage = ({
             <div className="flex justify-around items-center w-full p-4 rounded-md">
               <div className="flex flex-col items-center gap-2 relative">
                 <img
-                  src={selectedUser?.profileImage || avatarPlaceholder}
+                  src={buildMediaUrl(selectedUser?.profileImage) || avatarPlaceholder}
                   alt="Profile"
                   className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100"
                   onError={(e) => onImgError(e, avatarPlaceholder)}
@@ -179,7 +180,7 @@ const EditProfilePage = ({
               </div>
               <div className="flex flex-col items-center gap-2 relative">
                 <img
-                  src={selectedUser?.businessLogo || logoPlaceholder}
+                  src={buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder}
                   alt="Business Logo"
                   className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100"
                   onError={(e) => onImgError(e, logoPlaceholder)}
