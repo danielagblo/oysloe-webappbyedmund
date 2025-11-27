@@ -458,6 +458,7 @@ const HomePage = () => {
             {categoryProducts.length > 0 ? (
               <div className="flex gap-2 sm:gap-3 w-max">
                 {categoryProducts.map((ad) => (
+                  ad.status === "ACTIVE" &&
                   <Link
                     key={ad.id}
                     to={`/ads/${ad.id}`}
