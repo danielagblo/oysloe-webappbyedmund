@@ -1,7 +1,7 @@
+import mockProductsRaw from "../assets/mocks/products.json";
 import type { Product, ProductPayload, ProductStatus } from "../types/Product";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
-import mockProductsRaw from "../assets/mocks/products.json";
 
 const products = endpoints.products;
 const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
@@ -156,6 +156,27 @@ export const getRelatedProducts = async (): Promise<Product[]> => {
   return apiClient.get<Product[]>(products.related);
 };
 
+// LIST PRODUCTS FOR OWNER
+export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> => {
+  // allow ownerId === 0 in case that's a valid id; only bail on null/undefined
+  if (ownerId == null) return [];
+
+  // Some backends don't support an `owner` query param. Fetch all products
+  // and filter client-side to ensure we return the owner's products.
+  const all = await getProducts();
+
+  const filtered = all.filter((p) => {
+    const o = p.owner as any;
+    if (typeof o === 'number') return o === ownerId;
+    if (o && typeof o === 'object' && typeof o.id === 'number') return o.id === ownerId;
+    return false;
+  });
+
+  if (import.meta.env.DEV) console.debug("getProductsForOwner -> filtered count:", filtered.length);
+
+  return filtered;
+};
+
 export default {
   getProducts,
   getProduct,
@@ -165,5 +186,6 @@ export default {
   deleteProduct,
   markProductAsTaken,
   setProductStatus,
+  getProductsForOwner,
   getRelatedProducts,
 };

@@ -6,12 +6,12 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import "../App.css";
+import DebuggerButton from "../components/DebuggerButton";
 import useCategories from "../features/categories/useCategories";
-import type { Category } from "../types/Category";
 import { useProducts } from "../features/products/useProducts";
+import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
-import DebuggerButton from "../components/DebuggerButton";
 
 const HomePage = () => {
 
@@ -42,7 +42,7 @@ const HomePage = () => {
 
   const productsByCategory = categories.reduce((acc, category) => {
     const categoryProducts = products?.filter(p => p.category === category.id) || [];
-    
+
     if (categoryProducts.length > 0) {
       acc[category.id] = categoryProducts;
     } else {
@@ -154,34 +154,30 @@ const HomePage = () => {
     return (
       <div
         ref={headerRef}
-        className={`w-full left-0 z-40 transition-all duration-300 ${
-          isSmallScreen && isCondensed
+        className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
             ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
             : "relative"
-        }`}
+          }`}
       >
         <div
-          className={`flex items-center transition-all duration-300 ${
-            isSmallScreen && isCondensed
+          className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
               ? "justify-between px-4 py-2 gap-3"
               : "flex-col items-center justify-center gap-8 mt-40"
-          }`}
+            }`}
         >
           <h2
-            className={`${
-              isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
-            } font-medium text-(--dark-def) whitespace-nowrap`}
+            className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+              } font-medium text-(--dark-def) whitespace-nowrap`}
           >
             Oysloe
           </h2>
 
           <div className="flex w-full px-200">
             <div
-              className={`relative flex items-center ${
-                isSmallScreen && isCondensed
+              className={`relative flex items-center ${isSmallScreen && isCondensed
                   ? "justify-end flex-1"
                   : "justify-center w-full max-w-[520px]"
-              }`}
+                }`}
             >
               <div className="rotating-bg" aria-hidden="true" />
               <div className="rotating-bg-inner" aria-hidden="true" />
@@ -190,11 +186,10 @@ const HomePage = () => {
                 <input
                   type="text"
                   placeholder="Search anything up for good"
-                  className={`search-input ${
-                    isSmallScreen && isCondensed
+                  className={`search-input ${isSmallScreen && isCondensed
                       ? "text-[16px]"
                       : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                    } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
                 />
 
                 <img
@@ -361,40 +356,40 @@ const HomePage = () => {
       <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 gap-2">
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
-          .sort((a, b) => b.adsCount - a.adsCount) 
-          .filter(cat => cat.adsCount > 0) 
-          .slice(0, 5)          
+          .sort((a, b) => b.adsCount - a.adsCount)
+          .filter(cat => cat.adsCount > 0)
+          .slice(0, 5)
           .concat(
             categories.filter(cat => cat.adsCount === 0)
           )
-          .slice(0, 5)                    
+          .slice(0, 5)
           .map((category) => {
-          const percentage = (category.adsCount || 0) / total * 100;
-          return (
-            <div
-              key={category.id}
-              className="relative w-auto h-17 lg:w-4/5 flex items-center justify-center"
-            >
-              <CircularProgressbar
-                value={percentage}
-                styles={{
-                  path: {
-                    stroke: "var(--dark-def)",
-                    strokeLinecap: "round",
-                  },
-                }}
-              />
-              <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
-                  {category.name}
-                </span>
-                <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
-                  {category.adsCount}{category.adsCount > 0 && "+"}
-                </span>
+            const percentage = (category.adsCount || 0) / total * 100;
+            return (
+              <div
+                key={category.id}
+                className="relative w-auto h-17 lg:w-4/5 flex items-center justify-center"
+              >
+                <CircularProgressbar
+                  value={percentage}
+                  styles={{
+                    path: {
+                      stroke: "var(--dark-def)",
+                      strokeLinecap: "round",
+                    },
+                  }}
+                />
+                <div className="absolute flex flex-col items-center justify-center text-center">
+                  <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
+                    {category.name}
+                  </span>
+                  <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
+                    {category.adsCount}{category.adsCount > 0 && "+"}
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );
@@ -403,7 +398,7 @@ const HomePage = () => {
     return categories.map(category => {
       const categoryProducts = productsByCategory[category.id] || [];
       if (!categoryProducts || categoryProducts.length === 0) return;
-      
+
       return (
         <div
           key={category.id}
@@ -447,14 +442,14 @@ const HomePage = () => {
                     className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
                   >
                     <img
-                      src={ad.image || "/public/no-image.jpeg"} 
+                      src={ad.image || "/public/no-image.jpeg"}
                       alt={ad.name}
                       className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                     />
                     <div className="flex items-center gap-1 px-2 py-1">
                       <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5" />
                       <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                        {ad.location.name || ad.location.region}
+                        {ad.location?.name ?? ad.location?.region ?? ""}
                       </p>
                     </div>
                     <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
@@ -474,13 +469,13 @@ const HomePage = () => {
       );
     });
   };
-  
+
   const ConditionalAds = () => {
     // Find the selected category's products
     const categoryProducts = selectedCategory
       ? productsByCategory[selectedCategory.id] || []
       : [];
-    
+
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
         <div
@@ -498,7 +493,7 @@ const HomePage = () => {
                   />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
-                    <p className="text-xs text-gray-500">{ad.location.name || ad.location.region}</p>
+                    <p className="text-xs text-gray-500">{ad.location?.name ?? ad.location?.region ?? ""}</p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
                   <p className="px-2 text-sm font-light text-gray-500">{formatMoney(ad.price, "GHS")}</p>
@@ -527,12 +522,12 @@ const HomePage = () => {
         ) : (
           <>
             <div className="transform scale-90 sm:transform-none sm:scale-100">
-              <SelectACategory 
-                categories={categories} 
-                onCategoryClick={handleCategoryClick} 
+              <SelectACategory
+                categories={categories}
+                onCategoryClick={handleCategoryClick}
               />
-              <CircularSummaries 
-                categories={categoriesWithCounts} 
+              <CircularSummaries
+                categories={categoriesWithCounts}
                 total={totalProducts}
               />
             </div>
