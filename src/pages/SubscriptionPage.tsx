@@ -1,9 +1,9 @@
 import Subscription from "../assets/Subscription.png";
 import {
-  useSubscriptions,
-  useUserSubscriptions,
   useCreateUserSubscription,
+  useSubscriptions,
   useUpdateUserSubscription,
+  useUserSubscriptions,
 } from "../features/subscriptions/useSubscriptions";
 
 const SubscriptionPage = () => {
@@ -65,9 +65,9 @@ const SubscriptionPage = () => {
                   <button
                     className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
                     onClick={() => handleRenew(activeUserSub.id, activeUserSub.subscription.id)}
-                    disabled={updateSub.isLoading}
+                    disabled={updateSub.isPending}
                   >
-                    {updateSub.isLoading ? "Processing..." : "Renew / Update"}
+                    {updateSub.isPending ? "Processing..." : "Renew / Update"}
                   </button>
                 </div>
               )}
@@ -116,9 +116,9 @@ const SubscriptionPage = () => {
                     <button
                       className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
                       onClick={() => handleSubscribe(s.id)}
-                      disabled={createSub.isLoading}
+                      disabled={createSub.isPending}
                     >
-                      {createSub.isLoading ? "Processing..." : "Subscribe / Pay Now"}
+                      {createSub.isPending ? "Processing..." : "Subscribe / Pay Now"}
                     </button>
                   </div>
                 </div>

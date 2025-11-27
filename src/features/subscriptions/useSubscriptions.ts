@@ -1,15 +1,15 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  queryOptions,
+    queryOptions,
+    useMutation,
+    useQuery,
+    useQueryClient,
 } from "@tanstack/react-query";
 
 import { getSubscriptions } from "../../services/subscriptionService";
 import {
-  getUserSubscriptions,
-  createUserSubscription,
-  updateUserSubscription,
+    createUserSubscription,
+    getUserSubscriptions,
+    updateUserSubscription,
 } from "../../services/userSubscriptionService";
 
 // query keys
