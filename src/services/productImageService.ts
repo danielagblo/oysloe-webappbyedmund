@@ -14,7 +14,9 @@ export const getProductImages = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<ProductImage[]>(`${endpoints.productImages.list()}${query}`);
+  return apiClient.get<ProductImage[]>(
+    `${endpoints.productImages.list()}${query}`,
+  );
 };
 
 export const getProductImage = async (id: number): Promise<ProductImage> => {

@@ -29,14 +29,11 @@ const ResetPasswordWithPhonePage = ({
     if (val.indexOf("+") > 0) {
       val = val.replace(/\+/g, "");
     }
-    if (val.startsWith("+233") && val.length > 13)
-      val = val.slice(0, 13);
-    else if (!val.startsWith("+") && val.length > 12)
-      val = val.slice(0, 12);
-    if (val.startsWith("0") && val.length > 10)
-      val = val.slice(0, 10);
+    if (val.startsWith("+233") && val.length > 13) val = val.slice(0, 13);
+    else if (!val.startsWith("+") && val.length > 12) val = val.slice(0, 12);
+    if (val.startsWith("0") && val.length > 10) val = val.slice(0, 10);
     setPhone(val);
-  }
+  };
 
   const mode = location.state?.mode ?? "reset-password";
 
@@ -52,15 +49,11 @@ const ResetPasswordWithPhonePage = ({
         return;
       }
       navigate("/verification", { state: { phone, mode } });
-
-
     } catch (err: unknown) {
       console.error(err);
 
       alert("Phone number not found in the system.");
     }
-
-
   };
 
   return (
@@ -78,11 +71,12 @@ const ResetPasswordWithPhonePage = ({
               We'll send a verification link to the number if it is in our
               system
             </p>
-            {error && (
-              error.length < 20
-                ? <p className="text-red-500 text-center">{error}</p>
-                : (console.log(error), null)
-            )}
+            {error &&
+              (error.length < 20 ? (
+                <p className="text-red-500 text-center">{error}</p>
+              ) : (
+                (console.log(error), null)
+              ))}
 
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button

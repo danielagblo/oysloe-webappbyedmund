@@ -6,7 +6,10 @@ import mockAlertsRaw from "../assets/mocks/alerts.json";
 const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
 const mockAlerts: Alert[] = mockAlertsRaw as Alert[];
 
-export const getAlerts = async (params?: { ordering?: string; search?: string }): Promise<Alert[]> => {
+export const getAlerts = async (params?: {
+  ordering?: string;
+  search?: string;
+}): Promise<Alert[]> => {
   if (useMocks) return mockAlerts;
 
   const qs = new URLSearchParams();
@@ -27,7 +30,10 @@ export const createAlert = async (body: Partial<Alert>): Promise<Alert> => {
   return apiClient.post<Alert>(endpoints.alerts.create(), body);
 };
 
-export const updateAlert = async (id: number, body: Partial<Alert>): Promise<Alert> => {
+export const updateAlert = async (
+  id: number,
+  body: Partial<Alert>,
+): Promise<Alert> => {
   if (useMocks) {
     const existing = mockAlerts.find((a) => a.id === id);
     return { ...existing, ...body } as Alert;

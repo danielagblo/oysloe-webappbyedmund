@@ -6,21 +6,19 @@ import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
   const { profile: user, loading } = useUserProfile();
-  let name = (user as UserProfile)?.name
+  let name = (user as UserProfile)?.name;
   // break names into single entities by the space ok
   const nameParts = name?.split(" ") || [];
-  const names = []
-  names.push(nameParts[0] || "")
-  names.push(nameParts[nameParts.length - 1] || "")
+  const names = [];
+  names.push(nameParts[0] || "");
+  names.push(nameParts[nameParts.length - 1] || "");
   name = names.join(" ");
 
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
       <img
-        src={
-          buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"
-        }
+        src={buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"}
         alt="pfp"
         className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
       />
@@ -57,7 +55,8 @@ export default function ProfileStats() {
         </div>
         {/* Referral progress: use reusable ProgressBar */}
         {(() => {
-          const points = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          const points =
+            Number((user as UserProfile)?.referral_points ?? 0) || 0;
           let percent = Math.round(points * 100);
           if (!isFinite(percent) || percent < 0) percent = 0;
           if (percent > 100) percent = 100;
@@ -70,13 +69,17 @@ export default function ProfileStats() {
   const AdStats = () => (
     <div className="flex gap-4 justify-center w-full text-sm">
       <div className="text-center bg-(--div-active) p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium md:text-[1.5vw]">{(user?.active_ads ?? 0).toLocaleString()}</p>
+        <p className="font-medium md:text-[1.5vw]">
+          {(user?.active_ads ?? 0).toLocaleString()}
+        </p>
         <p className="text-(--some-other-gray) text-xs md:text-[1.125vw]">
           Active Ads
         </p>
       </div>
       <div className="text-center bg-(--div-active) p-2 rounded-lg flex-1 whitespace-nowrap">
-        <p className="font-medium md:text-[1.5vw]">{(user?.taken_ads ?? 0).toLocaleString()}</p>
+        <p className="font-medium md:text-[1.5vw]">
+          {(user?.taken_ads ?? 0).toLocaleString()}
+        </p>
         <p className="text-(--some-other-gray) text-xs md:text-[1.125vw]">
           Sold Ads
         </p>

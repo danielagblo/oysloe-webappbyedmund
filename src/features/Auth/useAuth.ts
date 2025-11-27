@@ -1,10 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { login, logout as logoutService, otpLogin, register } from '../../services/authService';
-import userProfileService from '../../services/userProfileService';
-import type { LoginRequest, OTPLoginRequest, RegisterRequest } from '../../types/Auth';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  login,
+  logout as logoutService,
+  otpLogin,
+  register,
+} from "../../services/authService";
+import userProfileService from "../../services/userProfileService";
+import type {
+  LoginRequest,
+  OTPLoginRequest,
+  RegisterRequest,
+} from "../../types/Auth";
 
-const STORAGE_TOKEN_KEY = 'oysloe_token';
-const STORAGE_USER_KEY = 'oysloe_user';
+const STORAGE_TOKEN_KEY = "oysloe_token";
+const STORAGE_USER_KEY = "oysloe_user";
 
 export function useLogin() {
   const qc = useQueryClient();
@@ -13,31 +22,39 @@ export function useLogin() {
     onSuccess: (data) => {
       localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
       localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
-      qc.setQueryData(['currentUser'], data.user);
+      qc.setQueryData(["currentUser"], data.user);
     },
   });
 }
 
 export function useRegister() {
   const qc = useQueryClient();
-  return useMutation<Awaited<ReturnType<typeof register>>, Error, RegisterRequest>({
+  return useMutation<
+    Awaited<ReturnType<typeof register>>,
+    Error,
+    RegisterRequest
+  >({
     mutationFn: register,
     onSuccess: (data) => {
       localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
       localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
-      qc.setQueryData(['currentUser'], data.user);
+      qc.setQueryData(["currentUser"], data.user);
     },
   });
 }
 
 export function useOTPLogin() {
   const qc = useQueryClient();
-  return useMutation<Awaited<ReturnType<typeof otpLogin>>, Error, OTPLoginRequest>({
+  return useMutation<
+    Awaited<ReturnType<typeof otpLogin>>,
+    Error,
+    OTPLoginRequest
+  >({
     mutationFn: otpLogin,
     onSuccess: (data) => {
       localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
       localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
-      qc.setQueryData(['currentUser'], data.user);
+      qc.setQueryData(["currentUser"], data.user);
     },
   });
 }
@@ -48,14 +65,14 @@ export function useLogout() {
     onSuccess: () => {
       localStorage.removeItem(STORAGE_TOKEN_KEY);
       localStorage.removeItem(STORAGE_USER_KEY);
-      qc.removeQueries({ queryKey: ['currentUser'] });
+      qc.removeQueries({ queryKey: ["currentUser"] });
     },
   });
 }
 
 export function useCurrentUser() {
   return useQuery({
-    queryKey: ['currentUser'],
+    queryKey: ["currentUser"],
     queryFn: async () => {
       // Try to read localStorage first
       const raw = localStorage.getItem(STORAGE_USER_KEY);

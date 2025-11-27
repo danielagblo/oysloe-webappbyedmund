@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { getReviews } from '../../services/reviewService';
-import type { Review } from '../../types/Review';
+import { useQuery } from "@tanstack/react-query";
+import { getReviews } from "../../services/reviewService";
+import type { Review } from "../../types/Review";
 
 export type UseReviewsParams = {
   product?: number;
@@ -10,7 +10,7 @@ export type UseReviewsParams = {
 };
 
 export function useReviews(params?: UseReviewsParams) {
-  const queryKey = ['reviews', params ?? {}] as const;
+  const queryKey = ["reviews", params ?? {}] as const;
 
   const query = useQuery<Review[]>({
     queryKey,
@@ -32,12 +32,13 @@ export function useReviews(params?: UseReviewsParams) {
 }
 
 export function useReviewsByOwner(ownerId?: number) {
-  const queryKey = ['reviews', 'owner', ownerId] as const;
+  const queryKey = ["reviews", "owner", ownerId] as const;
   const query = useQuery<Review[]>({
     queryKey,
     queryFn: async () => {
       if (!ownerId) return [];
-      const { getReviewsForOwner } = await import('../../services/reviewService');
+      const { getReviewsForOwner } =
+        await import("../../services/reviewService");
       const res = await getReviewsForOwner(ownerId);
       return res;
     },

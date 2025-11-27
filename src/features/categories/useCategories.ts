@@ -35,7 +35,8 @@ export function useCategories(params?: { ordering?: string; search?: string }) {
   // create category
   const createCategoryMutation = useMutation<Category, Error, CategoryPayload>({
     mutationFn: (body) => categoryService.createCategory(body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories }),
     onError: (err) => console.error("Create category failed:", err.message),
   });
 
@@ -70,7 +71,8 @@ export function useCategories(params?: { ordering?: string; search?: string }) {
   // delete category
   const deleteCategoryMutation = useMutation<void, Error, number>({
     mutationFn: (id) => categoryService.deleteCategory(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.categories }),
     onError: (err) => console.error("Delete category failed:", err.message),
   });
 

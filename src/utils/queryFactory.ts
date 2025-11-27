@@ -6,7 +6,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
  */
 export function createQueryHook<TArgs extends unknown[], TData>(
   key: string,
-  fn: (...args: TArgs) => Promise<TData>
+  fn: (...args: TArgs) => Promise<TData>,
 ) {
   return (...args: TArgs) =>
     useQuery<TData>({
@@ -21,7 +21,7 @@ export function createQueryHook<TArgs extends unknown[], TData>(
  */
 export function createMutationHook<TVars, TData>(
   key: string,
-  fn: (vars: TVars) => Promise<TData>
+  fn: (vars: TVars) => Promise<TData>,
 ) {
   return () =>
     useMutation<TData, unknown, TVars>({

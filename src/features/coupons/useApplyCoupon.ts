@@ -22,8 +22,8 @@ export function useApplyCoupon() {
       const redeemed = await redeemCoupon(coupon.id);
       return redeemed;
     },
-      onSuccess: (data) => {
-        console.log(data)
+    onSuccess: (data) => {
+      console.log(data);
       // Invalidate related caches so UI can refresh
       qc.invalidateQueries({ queryKey: QUERY_KEYS.coupons });
       qc.invalidateQueries({ queryKey: QUERY_KEYS.profile });

@@ -37,11 +37,13 @@ const ReferPage = () => {
   const REDEEM_BLOCK_VALUE_GHC = 500;
   const redeemableBlocks = Math.floor(points / REDEEM_BLOCK_POINTS);
   const redeemableGhc = redeemableBlocks * REDEEM_BLOCK_VALUE_GHC;
-  const equivalentGhcExact = (points * (REDEEM_BLOCK_VALUE_GHC / REDEEM_BLOCK_POINTS));
+  const equivalentGhcExact =
+    points * (REDEEM_BLOCK_VALUE_GHC / REDEEM_BLOCK_POINTS);
 
-  const redrawTooltip = redeemableBlocks > 0
-    ? `You can redraw only ${REDEEM_BLOCK_POINTS.toLocaleString()} points for GH₵${REDEEM_BLOCK_VALUE_GHC} per block. You have ${redeemableBlocks} block${redeemableBlocks > 1 ? 's' : ''} (GH₵${redeemableGhc.toLocaleString()}).`
-    : `You can't redraw — you need at least ${REDEEM_BLOCK_POINTS.toLocaleString()} points to redraw.`;
+  const redrawTooltip =
+    redeemableBlocks > 0
+      ? `You can redraw only ${REDEEM_BLOCK_POINTS.toLocaleString()} points for GH₵${REDEEM_BLOCK_VALUE_GHC} per block. You have ${redeemableBlocks} block${redeemableBlocks > 1 ? "s" : ""} (GH₵${redeemableGhc.toLocaleString()}).`
+      : `You can't redraw — you need at least ${REDEEM_BLOCK_POINTS.toLocaleString()} points to redraw.`;
 
   // normalize level string
   const profileLevelTyped = (profile?.level || "") as Level | "";
@@ -91,11 +93,17 @@ const ReferPage = () => {
   let silverPercent = Math.round((points / Math.max(1, THRESHOLDS.gold)) * 100);
   if (!isFinite(silverPercent) || silverPercent < 0) silverPercent = 0;
   if (silverPercent > 100) silverPercent = 100;
-  let goldPercent = Math.round(((points - THRESHOLDS.gold) / Math.max(1, THRESHOLDS.diamond - THRESHOLDS.gold)) * 100);
+  let goldPercent = Math.round(
+    ((points - THRESHOLDS.gold) /
+      Math.max(1, THRESHOLDS.diamond - THRESHOLDS.gold)) *
+      100,
+  );
   if (!isFinite(goldPercent) || goldPercent < 0) goldPercent = 0;
   if (goldPercent > 100) goldPercent = 100;
   const diamondPointsText = `${points.toLocaleString()} points`;
-  let diamondPercent = Math.round((points / Math.max(1, THRESHOLDS.diamond)) * 100);
+  let diamondPercent = Math.round(
+    (points / Math.max(1, THRESHOLDS.diamond)) * 100,
+  );
   if (!isFinite(diamondPercent) || diamondPercent < 0) diamondPercent = 0;
   if (diamondPercent > 100) diamondPercent = 100;
 
@@ -137,7 +145,8 @@ const ReferPage = () => {
       </div>
       {/* compute display percent from profile */}
       <div className="flex gap-4 w-full px-2 md:px-0">
-        <div className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm"
+        <div
+          className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm"
           onClick={() => {
             setHow(true);
             setApply(false);
@@ -185,7 +194,9 @@ const ReferPage = () => {
         }}
       >
         <div className="flex flex-col justify-between w-full">
-          <h2 className="text-sm md:text-[1.2vw]">{(profile ? profile.level : 'Gold') + " (Level)"}</h2>
+          <h2 className="text-sm md:text-[1.2vw]">
+            {(profile ? profile.level : "Gold") + " (Level)"}
+          </h2>
           <h3 className="text-xs text-gray-400 md:text-[1vw]">{nextText}</h3>
           <div className="my-2 w-full">
             <ProgressBar percent={displayPercent} />
@@ -336,7 +347,7 @@ const ReferPage = () => {
       try {
         await redeem();
         // refresh profile so UI updates; call refetchProfile if available
-        if (typeof refetchProfile === 'function') await refetchProfile();
+        if (typeof refetchProfile === "function") await refetchProfile();
       } catch {
         // errors handled by hook; optionally show toast
       }
@@ -354,10 +365,15 @@ const ReferPage = () => {
         </div>
         <div className="mt-2">
           {isError && (
-            <p className="text-sm text-red-500">{error?.message ?? 'Redeem failed'}</p>
+            <p className="text-sm text-red-500">
+              {error?.message ?? "Redeem failed"}
+            </p>
           )}
           {data && (
-            <p className="text-sm text-green-600">Redeemed GH₵{Number(data.cash_amount).toLocaleString()} — remaining points: {data.remaining_points}</p>
+            <p className="text-sm text-green-600">
+              Redeemed GH₵{Number(data.cash_amount).toLocaleString()} —
+              remaining points: {data.remaining_points}
+            </p>
           )}
         </div>
       </div>
@@ -386,7 +402,11 @@ const ReferPage = () => {
           </div>
           <div className="flex justify-between w-full text-xs text-gray-600">
             <h2>Get Cash equivalent</h2>
-            <h2>{data && typeof data.discount_value !== 'undefined' ? `GH₵${Number(data.discount_value).toLocaleString()}` : "₵0"}</h2>
+            <h2>
+              {data && typeof data.discount_value !== "undefined"
+                ? `GH₵${Number(data.discount_value).toLocaleString()}`
+                : "₵0"}
+            </h2>
           </div>
           <div className="relative flex flex-row gap-3 justify-center items-center">
             <input
@@ -405,8 +425,17 @@ const ReferPage = () => {
             </button>
           </div>
           <div className="w-full mt-0">
-            {isError && <p className="text-sm text-red-500">{error?.message ?? "Failed to apply coupon"}</p>}
-            {data && <p className="text-sm text-green-600">Coupon {data.code} applied — discount: {data.discount_type} {data.discount_value}</p>}
+            {isError && (
+              <p className="text-sm text-red-500">
+                {error?.message ?? "Failed to apply coupon"}
+              </p>
+            )}
+            {data && (
+              <p className="text-sm text-green-600">
+                Coupon {data.code} applied — discount: {data.discount_type}{" "}
+                {data.discount_value}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -417,14 +446,18 @@ const ReferPage = () => {
       <div className="w-full h-full flex flex-col md:justify-center gap-2 md:py-8">
         <div className=" flex rounded-lg flex-col justify-between bg-[#F9F9F9] p-3">
           <h2 className="text-sm">Silver</h2>
-          <h3 className="text-xs text-gray-500">{remainingToGold.toLocaleString()} points to gold</h3>
+          <h3 className="text-xs text-gray-500">
+            {remainingToGold.toLocaleString()} points to gold
+          </h3>
           <div className="my-2 w-full">
             <ProgressBar percent={silverPercent} />
           </div>
         </div>
         <div className=" flex flex-col rounded-lg justify-between bg-[#F9F9F9] p-3">
-          <h2 className="text-sm">{'Gold'}</h2>
-          <h3 className="text-xs text-gray-500">{remainingToDiamond.toLocaleString()} points to diamond</h3>
+          <h2 className="text-sm">{"Gold"}</h2>
+          <h3 className="text-xs text-gray-500">
+            {remainingToDiamond.toLocaleString()} points to diamond
+          </h3>
           <div className="my-2 w-full">
             <ProgressBar percent={goldPercent} />
           </div>
@@ -441,7 +474,7 @@ const ReferPage = () => {
         </h2>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="h-screen max-sm:w-screen lg:w-full max-lg:w-full bg-[var(--background)] mb-5 relative">
@@ -449,7 +482,15 @@ const ReferPage = () => {
         <Refer />
         <div className="md:w-full md:overflow-auto no-scrollbar">
           <div className="hidden md:h-full md:block md:min-h-[94vh]">
-            {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : showLevel ? <Level /> : null}
+            {how ? (
+              <How />
+            ) : apply ? (
+              <Apply />
+            ) : redraw ? (
+              <Redraw />
+            ) : showLevel ? (
+              <Level />
+            ) : null}
             <div className="w-full h-17" />
           </div>
         </div>
@@ -473,7 +514,15 @@ const ReferPage = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            {how ? <How /> : apply ? <Apply /> : redraw ? <Redraw /> : showLevel ? <Level /> : null}
+            {how ? (
+              <How />
+            ) : apply ? (
+              <Apply />
+            ) : redraw ? (
+              <Redraw />
+            ) : showLevel ? (
+              <Level />
+            ) : null}
           </div>
         </div>
       )}

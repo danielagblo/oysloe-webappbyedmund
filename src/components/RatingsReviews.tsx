@@ -6,14 +6,19 @@ interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
   fullWidth?: boolean; // default: false
   userId?: number; // optional filter to get reviews by a specific user
-  reviewsOverride?: Review[]; 
+  rd?: {
+    sum: number;
+    count: number;
+    avg: number;
+    stars: { "5": number; "4": number; "3": number; "2": number; "1": number };
+  }; //product rating distribution
 }
 
 export const RatingReviews: React.FC<RatingReviewsProps> = ({
   layout = "column",
   fullWidth = false,
   userId,
-  reviewsOverride
+  rd,
 }) => {
   const containerClasses = `
     flex px-3 md:px-1.5 pb-2 w-full ${layout === "row" ? "-ml-4 flex-row items-center justify-between" : "flex-col items-center justify-center"}
@@ -23,82 +28,108 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   let reviews: Review[] = [];
   let count = 0;
   let isLoading = false;
-  let avg = 0;
-
-  const activeReviews = reviewsOverride && reviewsOverride.length > 0 
-    ? reviewsOverride 
-    : reviews; 
-
-  if (reviewsOverride) {
-    const sum = reviewsOverride.reduce(
-      (sum, r) => sum + r.rating,
-      0
-    );
-    count = reviewsOverride.length;
-    avg = sum / count;
-  } else if (userId) {
-    const ownerHook = useReviewsByOwner(userId);
-    reviews = ownerHook.reviews;
-    count = ownerHook.count;
-    isLoading = ownerHook.isLoading;
-  } else {
-    const normal = useReviews();
-    reviews = normal.reviews;
-    count = normal.count;
-    isLoading = normal.isLoading;
-}
-
+  if (userId) {
+    if (userId) {
+      const ownerHook = useReviewsByOwner(userId);
+      reviews = ownerHook.reviews;
+      count = ownerHook.count;
+      isLoading = ownerHook.isLoading;
+    } else {
+      const normal = useReviews();
+      reviews = normal.reviews;
+      count = normal.count;
+      isLoading = normal.isLoading;
+    }
+  }
 
   // compute average rating from reviews (safe fallback to 0)
-  const average = count > 0 ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / count : 0;
+  const average =
+    count > 0 ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / count : 0;
   const avgDisplay = average ? average.toFixed(1) : "0.0";
   // number of filled stars (rounded)
-  const filledStars = avg ? Math.round(avg) : Math.round(average);
+  const filledStars = Math.round(average);
 
   const ratingSection = (
     <div className={`flex flex-col items-center justify-center`}>
-      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>{avg || avgDisplay}</h3>
-      <p className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}>
+      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>
+        {rd ? rd.avg.toFixed(1) : avgDisplay}
+      </h3>
+      <p
+        className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}
+      >
         {Array.from({ length: 5 }).map((_, i) => (
-          <span key={i} className={i < filledStars ? "text-(--dark-def)" : "text-gray-300"}>
+          <span
+            key={i}
+            className={
+              i < (rd ? Math.round(rd.sum / rd.count) : filledStars)
+                ? "text-(--dark-def)"
+                : "text-gray-300"
+            }
+          >
             ★
           </span>
         ))}
       </p>
-      <p className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}>
-        {isLoading ? "..." : `${count} Reviews`}
+      <p
+        className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}
+      >
+        {isLoading ? "..." : `${rd?.count || count} Reviews`}
       </p>
     </div>
   );
-
-
-  // compute distribution for stars 5..1
-  const total = activeReviews.length;
+  const total = reviews.length;
   const distribution = [5, 4, 3, 2, 1].map((s) => {
-    const c = activeReviews.filter((r) => Math.round(r.rating) === s).length;
+    const c = reviews.filter((r) => Math.round(r.rating) === s).length;
     const pct = total > 0 ? (c / total) * 100 : 0;
     return { stars: s, count: c, pct };
   });
 
   const barsSection = (
     <div className="w-full flex flex-col justify-center items-center md:gap-2 md:px-2">
-      {distribution.map((item) => (
-        <div
-          key={item.stars}
-          className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
-        >
-          <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
-            ★ {item.stars}
-          </span>
-          <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+      {rd
+        ? Object.entries(rd.stars)
+            .sort((a, b) => Number(b[0]) - Number(a[0]))
+            .map(([star, count]) => {
+              const pct = rd.count > 0 ? (count / rd.count) * 100 : 0;
+              return (
+                <div
+                  key={star}
+                  className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+                >
+                  <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+                    ★ {star}
+                  </span>
+                  <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+                    <div
+                      className="h-full bg-(--dark-def) rounded"
+                      style={{ width: `${Math.round(pct)}%` }}
+                    />
+                  </div>
+                  <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+                    {Math.round(pct)}%
+                  </span>
+                </div>
+              );
+            })
+        : distribution.map((item) => (
             <div
-              className="h-full bg-(--dark-def) rounded"
-              style={{ width: `${Math.round(item.pct)}%` }}
-            />
-          </div>
-          <span className="text-sm md:text-[1vw] text-gray-500 w-8">{Math.round(item.pct)}%</span>
-        </div>
-      ))}
+              key={item.stars}
+              className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+            >
+              <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+                ★ {item.stars}
+              </span>
+              <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+                <div
+                  className="h-full bg-(--dark-def) rounded"
+                  style={{ width: `${Math.round(item.pct)}%` }}
+                />
+              </div>
+              <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+                {Math.round(item.pct)}%
+              </span>
+            </div>
+          ))}
     </div>
   );
 

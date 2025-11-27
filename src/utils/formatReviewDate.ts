@@ -15,17 +15,13 @@ export function formatReviewDate(isoString: string): string {
   if (minutes < 60)
     return minutes === 1 ? "1 minute ago" : `${minutes} minutes ago`;
 
-  if (hours < 24)
-    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
 
-  if (days < 7)
-    return days === 1 ? "1 day ago" : `${days} days ago`;
+  if (days < 7) return days === 1 ? "1 day ago" : `${days} days ago`;
 
-  if (weeks < 4)
-    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+  if (weeks < 4) return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
 
-  if (months < 6)
-    return months === 1 ? "1 month ago" : `${months} months ago`;
+  if (months < 6) return months === 1 ? "1 month ago" : `${months} months ago`;
 
   const day = date.getDate();
   const monthName = date.toLocaleString("en-US", { month: "long" });

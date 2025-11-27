@@ -60,8 +60,6 @@ const VerificationPage = () => {
     } finally {
       setLocalLoading(false);
     }
-
-
   };
 
   return (
@@ -78,7 +76,9 @@ const VerificationPage = () => {
             <p className="text-center font-extralight">
               Enter the code sent to your phone number
             </p>
-            {(error || localError) && <p className="text-red-500 text-center">{error ?? localError}</p>}
+            {(error || localError) && (
+              <p className="text-red-500 text-center">{error ?? localError}</p>
+            )}
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
                 type="submit"

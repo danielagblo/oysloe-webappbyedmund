@@ -35,7 +35,10 @@ export function useVerifyOTP() {
     setLoading(true);
     setError(null);
     try {
-      const response = await VerifyOTPService.verifyOTP({ phone, otp }) as Record<string, unknown>;
+      const response = (await VerifyOTPService.verifyOTP({
+        phone,
+        otp,
+      })) as Record<string, unknown>;
       // only set message if the response actually contains a message property
       if (response && typeof response["message"] === "string") {
         setMessage(response["message"] as string);

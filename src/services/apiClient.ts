@@ -1,9 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.oysloe.com/api-v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "https://api.oysloe.com/api-v1";
 // Set VITE_API_CREDENTIALS to 'include' when you need cookies; default to 'omit'
 // to avoid CORS issues in local development.
-const CREDENTIALS_MODE = (import.meta.env.VITE_API_CREDENTIALS as string) || 'omit';
+const CREDENTIALS_MODE =
+  (import.meta.env.VITE_API_CREDENTIALS as string) || "omit";
 // Authorization scheme (Bearer by default). Set VITE_API_AUTH_SCHEME if backend expects a different prefix.
-const AUTH_SCHEME = (import.meta.env.VITE_API_AUTH_SCHEME as string) || 'Bearer';
+const AUTH_SCHEME =
+  (import.meta.env.VITE_API_AUTH_SCHEME as string) || "Bearer";
 
 type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
@@ -18,26 +21,39 @@ async function request<T>(
   // If body is a FormData, do not set Content-Type so the browser can add the multipart boundary.
   const isFormData = options.body instanceof FormData;
   const headers = { ...(options.headers ?? {}) } as Record<string, string>;
-  if (!isFormData) headers['Content-Type'] = 'application/json';
+  if (!isFormData) headers["Content-Type"] = "application/json";
 
   try {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('oysloe_token');
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("oysloe_token");
       // Only add Authorization if not already provided and we have a token
-      if (token && !headers['Authorization'] && !headers['authorization']) {
-        const tokenValue = token.startsWith('Bearer ') || token.startsWith('Token ') ? token : `${AUTH_SCHEME} ${token}`;
-        headers['Authorization'] = tokenValue;
+      if (token && !headers["Authorization"] && !headers["authorization"]) {
+        const tokenValue =
+          token.startsWith("Bearer ") || token.startsWith("Token ")
+            ? token
+            : `${AUTH_SCHEME} ${token}`;
+        headers["Authorization"] = tokenValue;
       }
     }
   } catch (e) {
     // ignore localStorage errors (e.g., private mode) and continue without auth header
     void e;
   }
-  const body = options.body instanceof FormData ? options.body : options.body ? JSON.stringify(options.body) : undefined;
+  const body =
+    options.body instanceof FormData
+      ? options.body
+      : options.body
+        ? JSON.stringify(options.body)
+        : undefined;
 
   let response: Response;
   try {
-    response = await fetch(fullUrl, { ...options, headers, body, credentials: CREDENTIALS_MODE as RequestCredentials });
+    response = await fetch(fullUrl, {
+      ...options,
+      headers,
+      body,
+      credentials: CREDENTIALS_MODE as RequestCredentials,
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`Network request failed: ${fullUrl}`, err);
@@ -46,14 +62,19 @@ async function request<T>(
 
   if (!response.ok) {
     // Try to read response body for more details (may be empty)
-    let text = '';
+    let text = "";
     try {
       text = await response.text();
     } catch (e) {
       void e;
     }
-    console.error(`Request failed: ${fullUrl}`, { status: response.status, body: text });
-    throw new Error(`${options.method ?? 'GET'} ${fullUrl} failed (${response.status}) ${text}`);
+    console.error(`Request failed: ${fullUrl}`, {
+      status: response.status,
+      body: text,
+    });
+    throw new Error(
+      `${options.method ?? "GET"} ${fullUrl} failed (${response.status}) ${text}`,
+    );
   }
   // Some endpoints (DELETE, mark-all-read) return 204 No Content — handle that safely
   if (response.status === 204) return undefined as unknown as T;

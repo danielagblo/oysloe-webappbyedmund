@@ -152,13 +152,19 @@ const EditProfilePage = ({
             <div className="flex justify-around items-center w-full p-4 rounded-md">
               <div className="flex flex-col items-center gap-2 relative">
                 <img
-                  src={buildMediaUrl(selectedUser?.profileImage) || avatarPlaceholder}
+                  src={
+                    buildMediaUrl(selectedUser?.profileImage) ||
+                    avatarPlaceholder
+                  }
                   alt="Profile"
                   className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100"
                   onError={(e) => onImgError(e, avatarPlaceholder)}
                 />
                 <p className="text-xs">Profile Image</p>
-                <label htmlFor="avatar-file-input" className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer">
+                <label
+                  htmlFor="avatar-file-input"
+                  className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                >
                   <input
                     id="avatar-file-input"
                     type="file"
@@ -168,7 +174,10 @@ const EditProfilePage = ({
                       const f = e.target.files?.[0] ?? null;
                       if (f) {
                         setAvatarFile(f);
-                        setSelectedUser((p) => ({ ...p, profileImage: URL.createObjectURL(f) }));
+                        setSelectedUser((p) => ({
+                          ...p,
+                          profileImage: URL.createObjectURL(f),
+                        }));
                       }
                     }}
                   />
@@ -180,13 +189,18 @@ const EditProfilePage = ({
               </div>
               <div className="flex flex-col items-center gap-2 relative">
                 <img
-                  src={buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder}
+                  src={
+                    buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder
+                  }
                   alt="Business Logo"
                   className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100"
                   onError={(e) => onImgError(e, logoPlaceholder)}
                 />
                 <p className="text-xs">Business Logo</p>
-                <label htmlFor="logo-file-input" className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer">
+                <label
+                  htmlFor="logo-file-input"
+                  className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                >
                   <input
                     id="logo-file-input"
                     type="file"
@@ -196,15 +210,16 @@ const EditProfilePage = ({
                       const f = e.target.files?.[0] ?? null;
                       if (f) {
                         setLogoFile(f);
-                        setSelectedUser((p) => ({ ...p, businessLogo: URL.createObjectURL(f) }));
+                        setSelectedUser((p) => ({
+                          ...p,
+                          businessLogo: URL.createObjectURL(f),
+                        }));
                       }
                     }}
                   />
                   <Camera size={16} />
                 </label>
-                {logoFile && (
-                  <div className="text-[0.7rem] mt-1">Selected</div>
-                )}
+                {logoFile && <div className="text-[0.7rem] mt-1">Selected</div>}
               </div>
             </div>
 
@@ -305,8 +320,8 @@ const EditProfilePage = ({
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>
                 <p className="mb-3 text-center">
-                  We will send an email to {selectedUser?.email}. Click the link in
-                  the email to verify your account.
+                  We will send an email to {selectedUser?.email}. Click the link
+                  in the email to verify your account.
                 </p>
                 <button
                   onClick={() => {
@@ -356,21 +371,41 @@ const EditProfilePage = ({
                     // If files were selected, send multipart/form-data to backend
                     if (avatarFile || logoFile) {
                       const form = new FormData();
-                      if (avatarFile) form.append('avatar', avatarFile);
-                      if (logoFile) form.append('business_logo', logoFile);
+                      if (avatarFile) form.append("avatar", avatarFile);
+                      if (logoFile) form.append("business_logo", logoFile);
                       // other fields
-                      form.append('name', selectedUser?.name ?? '');
-                      form.append('email', selectedUser?.email ?? '');
-                      form.append('phone', selectedUser?.phonePrimary ?? '');
-                      if ((selectedUser as any)?.address) form.append('address', (selectedUser as any).address);
-                      if (selectedUser?.businessName) form.append('business_name', selectedUser.businessName);
-                      if (selectedUser?.accountName) form.append('account_name', selectedUser.accountName);
-                      if (selectedUser?.accountNumber) form.append('account_number', selectedUser.accountNumber);
-                      if (selectedUser?.mobileNetwork) form.append('mobile_network', selectedUser.mobileNetwork);
-                      form.append('preferred_notification_email', selectedUser?.email ?? '');
-                      form.append('preferred_notification_phone', selectedUser?.phonePrimary ?? '');
+                      form.append("name", selectedUser?.name ?? "");
+                      form.append("email", selectedUser?.email ?? "");
+                      form.append("phone", selectedUser?.phonePrimary ?? "");
+                      if ((selectedUser as any)?.address)
+                        form.append("address", (selectedUser as any).address);
+                      if (selectedUser?.businessName)
+                        form.append("business_name", selectedUser.businessName);
+                      if (selectedUser?.accountName)
+                        form.append("account_name", selectedUser.accountName);
+                      if (selectedUser?.accountNumber)
+                        form.append(
+                          "account_number",
+                          selectedUser.accountNumber,
+                        );
+                      if (selectedUser?.mobileNetwork)
+                        form.append(
+                          "mobile_network",
+                          selectedUser.mobileNetwork,
+                        );
+                      form.append(
+                        "preferred_notification_email",
+                        selectedUser?.email ?? "",
+                      );
+                      form.append(
+                        "preferred_notification_phone",
+                        selectedUser?.phonePrimary ?? "",
+                      );
 
-                      await apiClient.put(endpoints.userProfile.userProfile, form);
+                      await apiClient.put(
+                        endpoints.userProfile.userProfile,
+                        form,
+                      );
                     } else {
                       // build JSON payload according to UserProfileUpdatePayload
                       const payload: any = {
@@ -385,7 +420,8 @@ const EditProfilePage = ({
                         account_number: selectedUser?.accountNumber,
                         mobile_network: selectedUser?.mobileNetwork,
                         preferred_notification_email: selectedUser?.email,
-                        preferred_notification_phone: selectedUser?.phonePrimary,
+                        preferred_notification_phone:
+                          selectedUser?.phonePrimary,
                       };
 
                       // reuse existing updateProfile when not sending files
@@ -394,15 +430,19 @@ const EditProfilePage = ({
                     // close edit view on success
                     setShowEdit(false);
                   } catch (err: any) {
-                    setSaveError(err?.message || 'Failed to save profile');
+                    setSaveError(err?.message || "Failed to save profile");
                   } finally {
                     setIsSaving(false);
                   }
                 }}
                 disabled={isSaving}
-                className={`w-full py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? 'bg-gray-300 text-gray-500' : 'bg-gray-200 text-gray-800'}`}
+                className={`w-full py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? "bg-gray-300 text-gray-500" : "bg-gray-200 text-gray-800"}`}
               >
-                {isSaving ? "Saving..." : setupProgress === 100 ? "Finish" : "Save"}
+                {isSaving
+                  ? "Saving..."
+                  : setupProgress === 100
+                    ? "Finish"
+                    : "Save"}
               </button>
             </div>
           </div>

@@ -17,10 +17,12 @@ const LogInPage = () => {
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
 
-  const [formData, setFormData] = useState<{ email: string; password: string }>({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState<{ email: string; password: string }>(
+    {
+      email: "",
+      password: "",
+    },
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loginMutation: ReturnType<typeof useLogin> = useLogin();
@@ -44,7 +46,10 @@ const LogInPage = () => {
 
     setIsLoading(true);
     try {
-      await loginMutation.mutateAsync({ email: formData.email, password: formData.password });
+      await loginMutation.mutateAsync({
+        email: formData.email,
+        password: formData.password,
+      });
       navigate("/");
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
@@ -84,7 +89,11 @@ const LogInPage = () => {
               />
             </div>
             <div className="flex flex-col gap-3 w-full mt-3">
-              <Button type="submit" name={isLoading ? 'Signing in...' : 'Sign In'} disabled={isLoading} />
+              <Button
+                type="submit"
+                name={isLoading ? "Signing in..." : "Sign In"}
+                disabled={isLoading}
+              />
               <button className="flex items-center justify-center bg-[#F9F9F9] px-3 py-2.5 w-full rounded-lg text-black gap-3">
                 <img
                   src="https://toppng.com/uploads/preview/google-g-logo-icon-11609362962anodywxeaz.png"
@@ -99,7 +108,6 @@ const LogInPage = () => {
               <ResetDropdown />
 
               <OTPLogin />
-
             </div>
           </form>
         </div>
@@ -122,4 +130,3 @@ const LogInPage = () => {
 };
 
 export default LogInPage;
-

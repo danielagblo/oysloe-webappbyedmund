@@ -43,14 +43,63 @@ function App() {
         />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
         <Route path="/resetpassword/new" element={<ResetPasswordPage />} />
-        <Route path="/" element={<RequireAuth><HomePage /></RequireAuth>} />
-        <Route path="/homepage" element={<RequireAuth><HomePage /></RequireAuth>} />
-        <Route path="/ads/:id" element={<RequireAuth><AdsDetailsPage /></RequireAuth>} />
+        <Route
+          path="/"
+          element={
+            <RequireAuth>
+              <HomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/homepage"
+          element={
+            <RequireAuth>
+              <HomePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/ads/:id"
+          element={
+            <RequireAuth>
+              <AdsDetailsPage />
+            </RequireAuth>
+          }
+        />
         <Route path="/reviews" element={<ReviewPage />} />
-        <Route path="/postad" element={<RequireAuth><PostAdPage /></RequireAuth>} />
-        <Route path="/inbox" element={<RequireAuth><InboxPage /></RequireAuth>} />
-        <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-        <Route path="/alerts" element={<RequireAuth><AlertsPage /></RequireAuth>} />
+        <Route
+          path="/postad"
+          element={
+            <RequireAuth>
+              <PostAdPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/inbox"
+          element={
+            <RequireAuth>
+              <InboxPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth>
+              <ProfilePage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/alerts"
+          element={
+            <RequireAuth>
+              <AlertsPage />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </div>
   );

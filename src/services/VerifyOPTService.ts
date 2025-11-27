@@ -12,8 +12,6 @@ export interface GenericMessage {
 }
 
 export async function sendOTP(phone: string): Promise<GenericMessage> {
-  
-
   try {
     const response = await apiClient.get<GenericMessage>(
       endpoints.verifyOTP.send(phone),
@@ -41,6 +39,8 @@ export async function sendOTP(phone: string): Promise<GenericMessage> {
 export async function verifyOTP(
   payload: VerifyOTPRequest,
 ): Promise<{ phone: string }> {
-
-  return apiClient.post<{ phone: string }>(endpoints.verifyOTP.verify(), payload);
+  return apiClient.post<{ phone: string }>(
+    endpoints.verifyOTP.verify(),
+    payload,
+  );
 }

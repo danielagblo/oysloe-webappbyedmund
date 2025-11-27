@@ -11,22 +11,27 @@ import type { Category } from "../types/Category";
 import { useProducts } from "../features/products/useProducts";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
-import DebuggerButton from "../components/DebuggerButton";
 
 const HomePage = () => {
-
-  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
   const handleCategoryClick = (name: string) => {
-    const category = categories.find(c => c.name === name) || null;
+    const category = categories.find((c) => c.name === name) || null;
     setSelectedCategory(category);
   };
   const handleFilterSettings = () => setShowFilterPopup(true);
   const closeFilterPopup = () => setShowFilterPopup(false);
 
-  if (categoriesError) console.error("Failed to load categories:", categoriesError);
+  if (categoriesError)
+    console.error("Failed to load categories:", categoriesError);
 
   const { data: products = [] } = useProducts();
 
@@ -40,22 +45,28 @@ const HomePage = () => {
 
   const totalProducts = products.length;
 
-  const productsByCategory = categories.reduce((acc, category) => {
-    const categoryProducts = products?.filter(p => p.category === category.id) || [];
-    
-    if (categoryProducts.length > 0) {
-      acc[category.id] = categoryProducts;
-    } else {
-      acc[category.id] = [];
-    }
-    return acc;
-  }, {} as Record<number, Product[]>);
+  const productsByCategory = categories.reduce(
+    (acc, category) => {
+      const categoryProducts =
+        products?.filter((p) => p.category === category.id) || [];
 
+      if (categoryProducts.length > 0) {
+        acc[category.id] = categoryProducts;
+      } else {
+        acc[category.id] = [];
+      }
+      return acc;
+    },
+    {} as Record<number, Product[]>,
+  );
 
   /* API BIT ENDS HERE */
   if (categoriesLoading) console.log("Loading up categories...");
 
-  const handleArrowClick = (direction: "left" | "right", id: string | number) => {
+  const handleArrowClick = (
+    direction: "left" | "right",
+    id: string | number,
+  ) => {
     const container = document.querySelector(
       `#move-${id}`,
     ) as HTMLElement | null;
@@ -211,9 +222,9 @@ const HomePage = () => {
 
   const ShowFilter = () => (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto shadow-lg">
+      <div className="relative pt-30 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
         {/* Close button */}
-        <div className="p-4 sm:p-6">
+        <div className="absolute top-0 left-0 p-4 sm:p-6">
           <button onClick={closeFilterPopup} className="block mb-3">
             <svg
               width="55"
@@ -279,7 +290,10 @@ const HomePage = () => {
       </div>
     </div>
   );
-  const SelectACategory = ({ categories, onCategoryClick }: {
+  const SelectACategory = ({
+    categories,
+    onCategoryClick,
+  }: {
     categories: Category[];
     onCategoryClick: (name: string) => void;
   }) => (
@@ -356,54 +370,59 @@ const HomePage = () => {
     </div>
   );
 
-  const CircularSummaries = ({ categories, total }: { categories: (Category & { adsCount: number })[], total: number }) => (
+  const CircularSummaries = ({
+    categories,
+    total,
+  }: {
+    categories: (Category & { adsCount: number })[];
+    total: number;
+  }) => (
     <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 h-50">
-      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 gap-2">
+      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2">
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
-          .sort((a, b) => b.adsCount - a.adsCount) 
-          .filter(cat => cat.adsCount > 0) 
-          .slice(0, 5)          
-          .concat(
-            categories.filter(cat => cat.adsCount === 0)
-          )
-          .slice(0, 5)                    
+          .sort((a, b) => b.adsCount - a.adsCount)
+          .filter((cat) => cat.adsCount > 0)
+          .slice(0, 5)
+          .concat(categories.filter((cat) => cat.adsCount === 0))
+          .slice(0, 5)
           .map((category) => {
-          const percentage = (category.adsCount || 0) / total * 100;
-          return (
-            <div
-              key={category.id}
-              className="relative w-auto h-17 lg:w-4/5 flex items-center justify-center"
-            >
-              <CircularProgressbar
-                value={percentage}
-                styles={{
-                  path: {
-                    stroke: "var(--dark-def)",
-                    strokeLinecap: "round",
-                  },
-                }}
-              />
-              <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
-                  {category.name}
-                </span>
-                <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
-                  {category.adsCount}{category.adsCount > 0 && "+"}
-                </span>
+            const percentage = ((category.adsCount || 0) / total) * 100;
+            return (
+              <div
+                key={category.id}
+                className="relative w-auto h-17 lg:w-4/5 flex items-center justify-center"
+              >
+                <CircularProgressbar
+                  value={percentage}
+                  styles={{
+                    path: {
+                      stroke: "var(--dark-def)",
+                      strokeLinecap: "round",
+                    },
+                  }}
+                />
+                <div className="absolute flex flex-col items-center justify-center text-center">
+                  <span className="text-[8px] sm:text-[10px] lg:text-sm min-w-[60px]">
+                    {category.name}
+                  </span>
+                  <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
+                    {category.adsCount}
+                    {category.adsCount > 0 && "+"}
+                  </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </div>
   );
 
   const ScrollableAds = () => {
-    return categories.map(category => {
+    return categories.map((category) => {
       const categoryProducts = productsByCategory[category.id] || [];
       if (!categoryProducts || categoryProducts.length === 0) return;
-      
+
       return (
         <div
           key={category.id}
@@ -431,7 +450,6 @@ const HomePage = () => {
               </button>
             </div>
           </div>
-          <DebuggerButton title="products" data={products} />
 
           <div
             id={`move-${category.id}`}
@@ -439,7 +457,7 @@ const HomePage = () => {
           >
             {categoryProducts.length > 0 ? (
               <div className="flex gap-2 sm:gap-3 w-max">
-                {categoryProducts.map(ad => (
+                {categoryProducts.map((ad) => (
                   <Link
                     key={ad.id}
                     to={`/ads/${ad.id}`}
@@ -447,12 +465,16 @@ const HomePage = () => {
                     className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
                   >
                     <img
-                      src={ad.image || "/public/no-image.jpeg"} 
+                      src={ad.image || "/public/no-image.jpeg"}
                       alt={ad.name}
                       className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                     />
                     <div className="flex items-center gap-1 px-2 py-1">
-                      <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5" />
+                      <img
+                        src="/location.svg"
+                        alt=""
+                        className="w-3 sm:w-5 h-3 sm:h-5"
+                      />
                       <p className="text-[10px] sm:text-sm text-gray-500 truncate">
                         {ad.location.name || ad.location.region}
                       </p>
@@ -467,20 +489,22 @@ const HomePage = () => {
                 ))}
               </div>
             ) : (
-              <p className="px-2 text-sm text-gray-500">No ads to show here...</p>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
             )}
           </div>
         </div>
       );
     });
   };
-  
+
   const ConditionalAds = () => {
     // Find the selected category's products
     const categoryProducts = selectedCategory
       ? productsByCategory[selectedCategory.id] || []
       : [];
-    
+
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
         <div
@@ -488,7 +512,7 @@ const HomePage = () => {
           className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
         >
           {categoryProducts.length > 0 ? (
-            categoryProducts.map(ad => (
+            categoryProducts.map((ad) => (
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
                 <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
                   <img
@@ -498,15 +522,23 @@ const HomePage = () => {
                   />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
-                    <p className="text-xs text-gray-500">{ad.location.name || ad.location.region}</p>
+                    <p className="text-xs text-gray-500">
+                      {ad.location.name || ad.location.region}
+                    </p>
                   </div>
-                  <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
-                  <p className="px-2 text-sm font-light text-gray-500">{formatMoney(ad.price, "GHS")}</p>
+                  <p className="px-2 text-sm truncate text-gray-500">
+                    {ad.name}
+                  </p>
+                  <p className="px-2 text-sm font-light text-gray-500">
+                    {formatMoney(ad.price, "GHS")}
+                  </p>
                 </Link>
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 col-span-full">No ads to show here...</p>
+            <p className="text-center text-gray-500 col-span-full">
+              No ads to show here...
+            </p>
           )}
         </div>
       </div>
@@ -527,12 +559,12 @@ const HomePage = () => {
         ) : (
           <>
             <div className="transform scale-90 sm:transform-none sm:scale-100">
-              <SelectACategory 
-                categories={categories} 
-                onCategoryClick={handleCategoryClick} 
+              <SelectACategory
+                categories={categories}
+                onCategoryClick={handleCategoryClick}
               />
-              <CircularSummaries 
-                categories={categoriesWithCounts} 
+              <CircularSummaries
+                categories={categoriesWithCounts}
                 total={totalProducts}
               />
             </div>

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import useFeedbacks, { useCreateFeedback } from "../features/feedback/useFeedback";
+import useFeedbacks, {
+  useCreateFeedback,
+} from "../features/feedback/useFeedback";
 
 const FeedbackPage = () => {
   const [selectedStars, setSelectedStars] = useState<number>(0);
@@ -47,7 +49,9 @@ const FeedbackPage = () => {
                   );
                 })}
               </div>
-              <p className="text-gray-500">{selectedStars === 0 ? "No rating" : `${selectedStars} / 5`}</p>
+              <p className="text-gray-500">
+                {selectedStars === 0 ? "No rating" : `${selectedStars} / 5`}
+              </p>
             </div>
           </div>
         </div>

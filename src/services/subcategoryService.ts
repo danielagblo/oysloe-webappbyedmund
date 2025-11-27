@@ -14,7 +14,9 @@ export const getSubcategories = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Subcategory[]>(`${endpoints.subcategories.list()}${query}`);
+  return apiClient.get<Subcategory[]>(
+    `${endpoints.subcategories.list()}${query}`,
+  );
 };
 
 export const getSubcategory = async (id: number): Promise<Subcategory> => {

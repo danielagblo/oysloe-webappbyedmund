@@ -1,4 +1,7 @@
-export function formatMoney(amount: number | string, currency: string = "GHS"): string {
+export function formatMoney(
+  amount: number | string,
+  currency: string = "GHS",
+): string {
   if (typeof amount === "string") {
     amount = parseFloat(amount);
     if (isNaN(amount)) return "Invalid amount";
@@ -22,7 +25,10 @@ export function formatMoney(amount: number | string, currency: string = "GHS"): 
       symbol = currency + " ";
   }
 
-  const formatted = amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatted = amount.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
   return `${symbol}${formatted}`;
 }

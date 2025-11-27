@@ -1,6 +1,6 @@
 import type {
-    AccountDeleteRequest,
-    AccountDeleteRequestStatus,
+  AccountDeleteRequest,
+  AccountDeleteRequestStatus,
 } from "../types/AccountDeleteRequest";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";

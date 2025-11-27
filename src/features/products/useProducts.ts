@@ -17,10 +17,7 @@ import {
   getRelatedProducts,
 } from "../../services/productService";
 
-import type {
-  ProductPayload,
-  ProductStatus,
-} from "../../types/Product";
+import type { ProductPayload, ProductStatus } from "../../types/Product";
 
 // query keys
 export const productKeys = {
@@ -30,23 +27,19 @@ export const productKeys = {
     [...productKeys.lists(), params] as const,
 
   details: () => [...productKeys.all, "detail"] as const,
-  detail: (id: number | string) =>
-    [...productKeys.details(), id] as const,
+  detail: (id: number | string) => [...productKeys.details(), id] as const,
 
   related: () => [...productKeys.all, "related"] as const,
 };
 
 // useProducts
-export const useProducts = (
-  params?: { search?: string; ordering?: string }
-) =>
+export const useProducts = (params?: { search?: string; ordering?: string }) =>
   useQuery(
     queryOptions({
       queryKey: productKeys.list(params),
       queryFn: () => getProducts(params),
-    })
+    }),
   );
-
 
 // useProduct
 export const useProduct = (id: number | string) =>
@@ -55,9 +48,8 @@ export const useProduct = (id: number | string) =>
       queryKey: productKeys.detail(id),
       queryFn: () => getProduct(id),
       enabled: !!id,
-    })
+    }),
   );
-
 
 // useRelatedProduct
 export const useRelatedProducts = () =>
@@ -65,9 +57,8 @@ export const useRelatedProducts = () =>
     queryOptions({
       queryKey: productKeys.related(),
       queryFn: getRelatedProducts,
-    })
+    }),
   );
-
 
 // useCreateProduct
 export const useCreateProduct = () => {
@@ -82,19 +73,13 @@ export const useCreateProduct = () => {
   });
 };
 
-
 // useUpdateProduct
 export const useUpdateProduct = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      body,
-    }: {
-      id: number | string;
-      body: ProductPayload;
-    }) => updateProduct(id, body),
+    mutationFn: ({ id, body }: { id: number | string; body: ProductPayload }) =>
+      updateProduct(id, body),
 
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({
@@ -105,7 +90,6 @@ export const useUpdateProduct = () => {
     },
   });
 };
-
 
 // usePatchProduct
 export const usePatchProduct = () => {
@@ -129,7 +113,6 @@ export const usePatchProduct = () => {
   });
 };
 
-
 // useDeleteProduct
 export const useDeleteProduct = () => {
   const qc = useQueryClient();
@@ -142,7 +125,6 @@ export const useDeleteProduct = () => {
     },
   });
 };
-
 
 // useMarkProductAsTaken
 export const useMarkProductAsTaken = () => {
@@ -165,7 +147,6 @@ export const useMarkProductAsTaken = () => {
     },
   });
 };
-
 
 // useSetProductStatus
 export const useSetProductStatus = () => {
@@ -191,5 +172,3 @@ export const useSetProductStatus = () => {
     },
   });
 };
-
-
