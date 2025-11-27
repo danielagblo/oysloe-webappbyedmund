@@ -329,16 +329,20 @@ const ReferPage = () => {
     </div>
   );
   function RedrawInner() {
-    const { redeem, isLoading, isError, data, error } = useRedeemPoints();
+    const { redeem, isError, data, error } = useRedeemPoints();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleRedeem = async () => {
       if (redeemableBlocks === 0) return;
+      setIsLoading(true);
       try {
         await redeem();
         // refresh profile so UI updates; call refetchProfile if available
         if (typeof refetchProfile === 'function') await refetchProfile();
       } catch {
         // errors handled by hook; optionally show toast
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -365,7 +369,7 @@ const ReferPage = () => {
   }
   const Apply = () => {
     const [code, setCode] = useState("");
-    const { apply, isLoading, isError, data, error } = useApplyCoupon();
+    const { apply, isPending, isError, data, error } = useApplyCoupon();
 
     const handleApply = async () => {
       if (!code) return;
@@ -399,9 +403,9 @@ const ReferPage = () => {
             <button
               className="absolute right-1 top-1 bg-white rounded-lg px-3 py-2"
               onClick={handleApply}
-              disabled={isLoading || !code}
+              disabled={isPending || !code}
             >
-              {isLoading ? "Applying..." : "Apply"}
+              {isPending ? "Applying..." : "Apply"}
             </button>
           </div>
           <div className="w-full mt-0">

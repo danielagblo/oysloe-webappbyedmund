@@ -69,16 +69,6 @@ const AdsDetailsPage = () => {
   };
 
 
-  /* Anything below was added before API integration */
-
-
-
-  // mock ads
-  const pics: string[] = Array.from(
-    { length: 10 },
-    () => "https://picsum.photos/200",
-  );
-
   // navigation
   const currentId = parseInt(id || "1");
 
