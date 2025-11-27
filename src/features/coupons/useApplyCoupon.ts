@@ -22,16 +22,16 @@ export function useApplyCoupon() {
       const redeemed = await redeemCoupon(coupon.id);
       return redeemed;
     },
-    onSuccess: (data) => {
+      onSuccess: (data) => {
+        console.log(data)
       // Invalidate related caches so UI can refresh
-      qc.invalidateQueries(QUERY_KEYS.coupons as any);
-      qc.invalidateQueries(QUERY_KEYS.profile as any);
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.coupons });
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.profile });
     },
   });
 
   return {
     apply: mutation.mutateAsync,
-    isLoading: mutation.isLoading,
     isError: mutation.isError,
     error: mutation.error,
     data: mutation.data,

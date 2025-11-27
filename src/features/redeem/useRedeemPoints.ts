@@ -17,7 +17,7 @@ export function useRedeemPoints() {
     onSuccess: (data) => {
       // Refresh or update user profile so points/wallet reflect redemption
       // We don't know the exact profile shape returned, so invalidate the profile query
-      queryClient.invalidateQueries(QUERY_KEYS.profile as any);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.profile });
       console.info("Redeem successful:", data);
     },
 
@@ -28,7 +28,6 @@ export function useRedeemPoints() {
 
   return {
     redeem: mutation.mutateAsync,
-    isLoading: mutation.isLoading,
     isError: mutation.isError,
     error: mutation.error,
     data: mutation.data,

@@ -29,7 +29,7 @@ export function useCreateFeedback() {
       return feedbackService.createFeedback(payload);
     },
     onSuccess: () => {
-      qc.invalidateQueries(["feedbacks"]);
+      qc.invalidateQueries({ queryKey: ["feedbacks"] });
     },
   });
 
