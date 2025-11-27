@@ -3,9 +3,13 @@ import "../App.css";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import { useProduct, useProducts } from "../features/products/useProducts";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { formatMoney } from "../utils/formatMoney";
 import type { ProductFeature } from "../types/ProductFeature";
+import useReviews from "../features/reviews/useReviews";
+import type { Review } from "../types/Review";
+import { formatReviewDate } from "../utils/formatReviewDate";
+import DebuggerButton from "../components/DebuggerButton";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +21,12 @@ const AdsDetailsPage = () => {
 
   const { data: currentAdDataFromQuery, isLoading: adLoading, error: adError } = useProduct(numericId!);
   const { data: ads = [], isLoading: adsLoading } = useProducts();
+  const { reviews: reviews = [] } = useReviews();
+
+  const productReviews = useMemo(() => {
+  if (!reviews || reviews.length === 0) return [];
+  return reviews.filter((r: Review) => r.product?.id === numericId);
+}, [reviews, numericId]);
 
 
   const touchStartX = useRef<number | null>(null);
@@ -68,13 +78,6 @@ const AdsDetailsPage = () => {
     { length: 10 },
     () => "https://picsum.photos/200",
   );
-
-  const images = [
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-    "/3d-car-city-street.webp",
-  ];
 
   // navigation
   const currentId = parseInt(id || "1");
@@ -172,7 +175,6 @@ const AdsDetailsPage = () => {
 
     const id = imageID;
     imageID = (imageID + 1) % max;
-    console.log(id);
     return currentAdDataFromQuery?.images[id].image;
   };
 
@@ -361,45 +363,33 @@ const AdsDetailsPage = () => {
         Comments
       </h2>
       <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
-        {[1, 2, 3].map((comment) => (
+        {productReviews.length === 0 && <p>No <span className="max-sm:hidden">comments</span><span className="sm:hidden">reviews</span> to show. Leave one?</p>}
+        {productReviews.map((review: Review) => (
           <div
-            key={comment}
+            key={review.id}
             className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img src="/face.svg" alt="" className="w-10 h-10 rounded-lg" />
+                <img src={review.user.avatar || "/public/userPfp2.jpg"}alt="" className="w-10 h-10 rounded-lg" />
                 <div className="flex flex-col">
                   <p className="text-[10px] text-gray-500 md:text-[0.9vw]">
-                    1st April
+                    {formatReviewDate(review.created_at)}
                   </p>
-                  <h3 className="font-semibold md:text-[1.2vw]">Sandra</h3>
-                  <div className="flex">
-                    <img
-                      src="/star.svg"
-                      alt=""
-                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
-                    />
-                    <img
-                      src="/star.svg"
-                      alt=""
-                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
-                    />
-                    <img
-                      src="/star.svg"
-                      alt=""
-                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
-                    />
-                    <img
-                      src="/star.svg"
-                      alt=""
-                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
-                    />
-                    <img
-                      src="/star.svg"
-                      alt=""
-                      className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
-                    />
+                  <h3 className="font-semibold md:text-[1.2vw]">
+                    {review.user.account_name || "User"}
+                  </h3>
+                  <div className="flex mb-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <p
+                        key={i}
+                        className={`inline-flex justify-center items-center w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]  
+                          ${i < review.rating ? "text-gray-700" : "text-gray-300"}`
+                        }
+                      > 
+                      ★
+                      </p>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -416,8 +406,7 @@ const AdsDetailsPage = () => {
               </div>
             </div>
             <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">
-              This is a great car with excellent features. I had a wonderful
-              experience driving it around the city.
+              {review.comment}
             </p>
           </div>
         ))}
@@ -425,13 +414,13 @@ const AdsDetailsPage = () => {
       <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
         <button
           onClick={() => navigate("/reviews")}
-          className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap"
+          className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
         >
           Make Review
         </button>
         <button
           onClick={() => navigate("/reviews")}
-          className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap"
+          className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
         >
           Show reviews
         </button>
@@ -606,16 +595,16 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
-        {pics.map((pic, index) => (
+        {ads.map((ad) => (
           <Link
-            key={index}
-            to={`/ads/${ads[index].id}`}
-            state={{ adData: ads[index] }}
+            key={ad.id}
+            to={`/ads/${ad.id}`}
+            state={{ adData: ad }}
             className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
           >
             <img
-              src={pic}
-              alt={`${index}`}
+              src={ad.image || "/public/no-image.jpeg"}
+              alt={ad.name.slice(0, 10)}
               className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
             />
             <div className="flex items-center gap-1 px-2 py-1">
@@ -625,14 +614,14 @@ const AdsDetailsPage = () => {
                 className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
               />
               <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                {ads[index].location.name}
+                {ad.location?.name}
               </p>
             </div>
             <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-              {ads[index].name}
+              {ad.name}
             </p>
             <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-              {formatMoney(ads[index].price, "GHS")}
+              {formatMoney(ad.price, "GHS")}
             </p>
           </Link>
         ))}
@@ -642,15 +631,7 @@ const AdsDetailsPage = () => {
 
   return (
     <div className="lg:pt-5">
-      {/* button for debugging. i'll remove when im done */}
-      <button 
-        name="sexy button. most useful button."
-        className="fixed top-10 left-10 bg-pink-200 p-3 cursor-pointer" 
-        onClick={() => console.log(currentAdDataFromQuery)}
-      >
-        Click
-      </button>
-
+      <DebuggerButton title="current ad" data={currentAdData} />
       <div
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
@@ -683,10 +664,10 @@ const AdsDetailsPage = () => {
                 <div className="bg-white p-6 rounded-lg w-full">
                   <SellerInfo />
                   <div className="hidden md:block">
-                    <RatingReviews layout="row" fullWidth />
+                    <RatingReviews layout="row" fullWidth reviewsOverride={productReviews}/>
                   </div>
                   <div className="md:hidden">
-                    <RatingReviews fullWidth />
+                    <RatingReviews fullWidth reviewsOverride={productReviews} />
                   </div>
                 </div>
 

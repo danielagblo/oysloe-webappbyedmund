@@ -11,6 +11,7 @@ import type { Category } from "../types/Category";
 import { useProducts } from "../features/products/useProducts";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
+import DebuggerButton from "../components/DebuggerButton";
 
 const HomePage = () => {
 
@@ -356,8 +357,8 @@ const HomePage = () => {
   );
 
   const CircularSummaries = ({ categories, total }: { categories: (Category & { adsCount: number })[], total: number }) => (
-    <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12">
-      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 md:h-fit gap-2">
+    <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 h-50">
+      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 gap-2">
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
           .sort((a, b) => b.adsCount - a.adsCount) 
@@ -372,7 +373,7 @@ const HomePage = () => {
           return (
             <div
               key={category.id}
-              className="relative w-17 h-17 lg:h-4/5 lg:w-4/5 flex items-center justify-center"
+              className="relative w-auto h-17 lg:w-4/5 flex items-center justify-center"
             >
               <CircularProgressbar
                 value={percentage}
@@ -384,10 +385,10 @@ const HomePage = () => {
                 }}
               />
               <div className="absolute flex flex-col items-center justify-center text-center">
-                <span className="text-[8px] md:text-xs min-w-[60px]">
+                <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
                   {category.name}
                 </span>
-                <span className="text-[10px] md:text-xl font-bold text-(--accent-color)">
+                <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
                   {category.adsCount}{category.adsCount > 0 && "+"}
                 </span>
               </div>
@@ -430,6 +431,7 @@ const HomePage = () => {
               </button>
             </div>
           </div>
+          <DebuggerButton title="products" data={products} />
 
           <div
             id={`move-${category.id}`}
@@ -445,7 +447,7 @@ const HomePage = () => {
                     className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
                   >
                     <img
-                      src={ad.image || "/public/no-image.png"} 
+                      src={ad.image || "/public/no-image.jpeg"} 
                       alt={ad.name}
                       className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                     />

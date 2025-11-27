@@ -1,26 +1,42 @@
 import React from "react";
 import useReviews, { useReviewsByOwner } from "../features/reviews/useReviews";
+import type { Review } from "../types/Review";
 
 interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
   fullWidth?: boolean; // default: false
   userId?: number; // optional filter to get reviews by a specific user
+  reviewsOverride?: Review[]; 
 }
 
 export const RatingReviews: React.FC<RatingReviewsProps> = ({
   layout = "column",
   fullWidth = false,
   userId,
+  reviewsOverride
 }) => {
   const containerClasses = `
     flex px-3 md:px-1.5 pb-2 w-full ${layout === "row" ? "-ml-4 flex-row items-center justify-between" : "flex-col items-center justify-center"}
     ${fullWidth ? "w-[95vw]" : ""}
   `;
 
-  let reviews: any[] = [];
+  let reviews: Review[] = [];
   let count = 0;
   let isLoading = false;
-  if (userId) {
+  let avg = 0;
+
+  const activeReviews = reviewsOverride && reviewsOverride.length > 0 
+    ? reviewsOverride 
+    : reviews; 
+
+  if (reviewsOverride) {
+    const sum = reviewsOverride.reduce(
+      (sum, r) => sum + r.rating,
+      0
+    );
+    count = reviewsOverride.length;
+    avg = sum / count;
+  } else if (userId) {
     const ownerHook = useReviewsByOwner(userId);
     reviews = ownerHook.reviews;
     count = ownerHook.count;
@@ -30,17 +46,18 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
     reviews = normal.reviews;
     count = normal.count;
     isLoading = normal.isLoading;
-  }
+}
+
 
   // compute average rating from reviews (safe fallback to 0)
   const average = count > 0 ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / count : 0;
   const avgDisplay = average ? average.toFixed(1) : "0.0";
   // number of filled stars (rounded)
-  const filledStars = Math.round(average);
+  const filledStars = avg ? Math.round(avg) : Math.round(average);
 
   const ratingSection = (
     <div className={`flex flex-col items-center justify-center`}>
-      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>{avgDisplay}</h3>
+      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>{avg || avgDisplay}</h3>
       <p className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}>
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} className={i < filledStars ? "text-(--dark-def)" : "text-gray-300"}>
@@ -54,10 +71,11 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
     </div>
   );
 
+
   // compute distribution for stars 5..1
-  const total = reviews.length;
+  const total = activeReviews.length;
   const distribution = [5, 4, 3, 2, 1].map((s) => {
-    const c = reviews.filter((r) => Math.round(r.rating) === s).length;
+    const c = activeReviews.filter((r) => Math.round(r.rating) === s).length;
     const pct = total > 0 ? (c / total) * 100 : 0;
     return { stars: s, count: c, pct };
   });
