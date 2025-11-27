@@ -1,10 +1,19 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
+import ProgressBar from "./ProgressBar";
 import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
   const { profile: user, loading } = useUserProfile();
+  let name = (user as UserProfile)?.name
+  // break names into single entities by the space ok
+  const nameParts = name?.split(" ") || [];
+  const names = []
+  names.push(nameParts[0] || "")
+  names.push(nameParts[nameParts.length - 1] || "")
+  name = names.join(" ");
+
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
@@ -16,7 +25,7 @@ export default function ProfileStats() {
         className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        {loading ? "" : (user as UserProfile)?.name || " "}
+        {loading ? "" : name || " "}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
@@ -46,7 +55,14 @@ export default function ProfileStats() {
             {loading ? "" : (user as UserProfile)?.level || "High Level"}
           </p>
         </div>
-        <div className="w-full bg-green-200 h-[0.5vw] rounded" />
+        {/* Referral progress: use reusable ProgressBar */}
+        {(() => {
+          const points = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          let percent = Math.round(points * 100);
+          if (!isFinite(percent) || percent < 0) percent = 0;
+          if (percent > 100) percent = 100;
+          return <ProgressBar percent={percent} />;
+        })()}
       </div>
     </div>
   );

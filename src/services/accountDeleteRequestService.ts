@@ -1,8 +1,9 @@
 import type {
-  AccountDeleteRequest,
-  AccountDeleteRequestStatus,
+    AccountDeleteRequest,
+    AccountDeleteRequestStatus,
 } from "../types/AccountDeleteRequest";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 export const getUserAccountDeleteRequests = async (params?: {
   ordering?: string;
@@ -16,7 +17,7 @@ export const getUserAccountDeleteRequests = async (params?: {
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
   const response = await apiClient.get<AccountDeleteRequest[]>(
-    `/account-delete-requests/${query}`,
+    `${endpoints.accountDeleteRequests.list()}${query}`,
   );
   return response;
 };
@@ -25,12 +26,12 @@ export const createAccountDeleteRequest = async (body: {
   reason: string;
 }): Promise<AccountDeleteRequest> => {
   const response = await apiClient.post<AccountDeleteRequest>(
-    `/account-delete-requests/`,
+    endpoints.accountDeleteRequests.create(),
     body,
   );
   return response;
 };
 
 export const deleteAccountDeleteRequest = async (id: number): Promise<void> => {
-  await apiClient.delete<void>(`/account-delete-requests/${id}/`);
+  await apiClient.delete<void>(endpoints.accountDeleteRequests.delete(id));
 };

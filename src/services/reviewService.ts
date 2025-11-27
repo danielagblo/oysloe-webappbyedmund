@@ -82,7 +82,7 @@ export const getReviewsForOwner = async (ownerId: number): Promise<Review[]> => 
   }
 
   // Fallback: fetch products owned by the owner, then fetch reviews for each product and combine
-  const productsResp = await apiClient.get<any>(`/products/?owner=${ownerId}`);
+  const productsResp = await apiClient.get<any>(`${endpoints.products.list}?owner=${ownerId}`);
   // support both array and paginated responses
   const products = Array.isArray(productsResp)
     ? productsResp

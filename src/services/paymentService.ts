@@ -4,6 +4,7 @@ import type {
   PaystackInitiateRequest,
 } from "../types/Payment";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 export const getPayments = async (params?: {
   ordering?: string;
@@ -21,21 +22,21 @@ export const getPayments = async (params?: {
     qs.append("subscription", String(params.subscription));
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Payment[]>(`/payments/${query}`);
+  return apiClient.get<Payment[]>(`${endpoints.payments.list()}${query}`);
 };
 
 export const getPayment = async (id: number): Promise<Payment> => {
-  return apiClient.get<Payment>(`/payments/${id}/`);
+  return apiClient.get<Payment>(endpoints.payments.detail(id));
 };
 
 export const initiatePaystackPayment = async (
   body: PaystackInitiateRequest,
 ): Promise<void> => {
-  await apiClient.post<void>(`/paystack/initiate/`, body);
+  await apiClient.post<void>(endpoints.paystack.initiate(), body);
 };
 
 export const paystackWebhook = async (body: unknown): Promise<void> => {
-  await apiClient.post<void>(`/paystack/webhook/`, body);
+  await apiClient.post<void>(endpoints.paystack.webhook(), body);
 };
 
 export default {

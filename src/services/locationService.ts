@@ -1,5 +1,6 @@
 import type { Location, LocationPayload, Region } from "../types/Location";
 import { apiClient } from "./apiClient";
+import { endpoints } from "./endpoints";
 
 export const getLocations = async (params?: {
   name?: string;
@@ -14,35 +15,35 @@ export const getLocations = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Location[]>(`/locations/${query}`);
+  return apiClient.get<Location[]>(`${endpoints.locations.list()}${query}`);
 };
 
 export const getLocation = async (id: number): Promise<Location> => {
-  return apiClient.get<Location>(`/locations/${id}/`);
+  return apiClient.get<Location>(endpoints.locations.detail(id));
 };
 
 export const createLocation = async (
   body: LocationPayload,
 ): Promise<Location> => {
-  return apiClient.post<Location>(`/locations/`, body);
+  return apiClient.post<Location>(endpoints.locations.create(), body);
 };
 
 export const updateLocation = async (
   id: number,
   body: LocationPayload,
 ): Promise<Location> => {
-  return apiClient.put<Location>(`/locations/${id}/`, body);
+  return apiClient.put<Location>(endpoints.locations.update(id), body);
 };
 
 export const patchLocation = async (
   id: number,
   body: Partial<LocationPayload>,
 ): Promise<Location> => {
-  return apiClient.patch<Location>(`/locations/${id}/`, body);
+  return apiClient.patch<Location>(endpoints.locations.patch(id), body);
 };
 
 export const deleteLocation = async (id: number): Promise<void> => {
-  await apiClient.delete<void>(`/locations/${id}/`);
+  await apiClient.delete<void>(endpoints.locations.delete(id));
 };
 
 export default {

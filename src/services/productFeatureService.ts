@@ -1,6 +1,6 @@
 import type {
-  ProductFeature,
-  ProductFeaturePayload,
+    ProductFeature,
+    ProductFeaturePayload,
 } from "../types/ProductFeature";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
