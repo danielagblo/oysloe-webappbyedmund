@@ -9,7 +9,6 @@ import type { ProductFeature } from "../types/ProductFeature";
 import useReviews from "../features/reviews/useReviews";
 import type { Review } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import DebuggerButton from "../components/DebuggerButton";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,28 +16,70 @@ const AdsDetailsPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const adDataFromState = location.state?.adData;
-  
 
-  const { data: currentAdDataFromQuery, isLoading: adLoading, error: adError } = useProduct(numericId!);
+  const {
+    data: currentAdDataFromQuery,
+    isLoading: adLoading,
+    error: adError,
+  } = useProduct(numericId!);
   const { data: ads = [], isLoading: adsLoading } = useProducts();
   const { reviews: reviews = [] } = useReviews();
 
   const productReviews = useMemo(() => {
-  if (!reviews || reviews.length === 0) return [];
-  return reviews.filter((r: Review) => r.product?.id === numericId);
-}, [reviews, numericId]);
+    if (!reviews || reviews.length === 0) return [];
+    return reviews.filter((r: Review) => r.product?.id === numericId);
+  }, [reviews, numericId]);
 
+  const thisProductsReviews = reviews.filter(
+    (review) => review?.product.id === numericId,
+  );
+
+  const reviewDeconstruction = thisProductsReviews.reduce(
+    (acc, p) => {
+      const star = Math.round(p.rating) as 5 | 4 | 3 | 2 | 1;
+      return {
+        sum: acc.sum + p.rating,
+        count: acc.count + 1,
+        avg: (acc.sum + p.rating) / (acc.count + 1),
+        stars: {
+          ...acc.stars,
+          [star]: (acc.stars[star] || 0) + 1,
+        },
+      };
+    },
+    {
+      sum: 0,
+      count: 0,
+      avg: 0,
+      stars: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+    },
+  );
 
   const touchStartX = useRef<number | null>(null);
 
-  if (!id || numericId === null) return <p className="h-screen w-screen m-0 flex items-center justify-center">Invalid ad ID</p>;
-  if (adLoading || adsLoading) return <p className="h-screen w-screen m-0 flex items-center justify-center">Loading...</p>;
-  if (adError) return <p className="h-screen w-screen m-0 flex items-center justify-center">Error loading ad: {String(adError)}</p>;
+  if (!id || numericId === null)
+    return (
+      <p className="h-screen w-screen m-0 flex items-center justify-center">
+        Invalid ad ID
+      </p>
+    );
+  if (adLoading || adsLoading)
+    return (
+      <p className="h-screen w-screen m-0 flex items-center justify-center">
+        Loading...
+      </p>
+    );
+  if (adError)
+    return (
+      <p className="h-screen w-screen m-0 flex items-center justify-center">
+        Error loading ad: {String(adError)}
+      </p>
+    );
 
-  const currentIndex = ads.findIndex(a => a.id === numericId) ?? 0;
+  const currentIndex = ads.findIndex((a) => a.id === numericId) ?? 0;
   const totalAds = ads.length;
-  const currentAdData = adDataFromState || currentAdDataFromQuery || ads[currentIndex];
-
+  const currentAdData =
+    adDataFromState || currentAdDataFromQuery || ads[currentIndex];
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -72,7 +113,6 @@ const AdsDetailsPage = () => {
   // navigation
   const currentId = parseInt(id || "1");
 
-
   // mini components
   const MobileHeader = () => (
     <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) sticky top-0 z-50">
@@ -104,7 +144,7 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base md:text-[1.125vw]">
-          {currentAdData?.location?.name || "Lashibi, Accra" }
+          {currentAdData?.location?.name || "Lashibi, Accra"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
@@ -113,7 +153,15 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base  md:text-[1.125vw]">4.5 20 reviews</h2>
+        <h2 className="text-base  md:text-[1.125vw]">
+          {reviewDeconstruction.count
+            ? (reviewDeconstruction.sum / reviewDeconstruction.count).toFixed(1)
+            : "0.0"}{" "}
+          &nbsp;&nbsp;&nbsp;{reviewDeconstruction.count || "No"} Review
+          {(reviewDeconstruction.count > 1 ||
+            reviewDeconstruction.count === 0) &&
+            "s"}
+        </h2>
       </div>
       <div className="flex items-center gap-2">
         <img
@@ -156,96 +204,103 @@ const AdsDetailsPage = () => {
     </div>
   );
   const ImageGallery = () => {
+    let imageID = 0;
+    const max = currentAdDataFromQuery?.images.length || 0;
 
-  let imageID = 0;
-  const max = currentAdDataFromQuery?.images.length || 0;
+    const getImageSrc = () => {
+      if (
+        currentAdDataFromQuery?.images.length === 0 &&
+        currentAdDataFromQuery?.image
+      )
+        return currentAdDataFromQuery?.image; //if there are no images, but there is an image (the cover), use the cover
+      if (
+        currentAdDataFromQuery?.images.length === 0 &&
+        !currentAdDataFromQuery?.image
+      )
+        return "/public/no-image.jpeg"; //if there are no images, and there is no image (cover), use this placeholder
 
-  const getImageSrc = () => {
-    if (currentAdDataFromQuery?.images.length === 0) return "/public/no-image.jpeg";
-
-    const id = imageID;
-    imageID = (imageID + 1) % max;
-    return currentAdDataFromQuery?.images[id].image;
-  };
-
+      const id = imageID;
+      imageID = (imageID + 1) % max;
+      return currentAdDataFromQuery?.images[id].image;
+    };
 
     return (
-    <div className="w-full flex justify-center my-4 sm:mb-8">
-      {/* Desktop */}
-      <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
-        <div className="flex w-full">
-          <img
-            src={getImageSrc()}
-            alt=""
-            className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg"
-          />
+      <div className="w-full flex justify-center my-4 sm:mb-8">
+        {/* Desktop */}
+        <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
+          <div className="flex w-full">
+            <img
+              src={getImageSrc()}
+              alt=""
+              className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg"
+            />
+          </div>
+          <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
+            <img
+              src={getImageSrc()}
+              alt=""
+              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
+            />
+            <img
+              src={getImageSrc()}
+              alt=""
+              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
+            />
+          </div>
+          <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
+            <img
+              src={getImageSrc()}
+              alt=""
+              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
+            />
+            <img
+              src={getImageSrc()}
+              alt=""
+              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
+            />
+          </div>
         </div>
-        <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
-          <img
-            src={getImageSrc()}
-            alt=""
-            className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-          />
-          <img
-            src={getImageSrc()}
-            alt=""
-            className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-          />
-        </div>
-        <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
-          <img
-            src={getImageSrc()}
-            alt=""
-            className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-          />
-          <img
-            src={getImageSrc()}
-            alt=""
-            className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-          />
-        </div>
-      </div>
 
-      {/* Mobile */}
-      <div
-        className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <img
-          src={getImageSrc()}
-          alt="Ad main"
-          className="object-cover w-full h-full"
-        />
+        {/* Mobile */}
         <div
-          onClick={handlePrevious}
-          className="absolute top-0 left-0 w-[30%] h-full z-20"
-        />
-        <div
-          onClick={handleNext}
-          className="absolute top-0 right-0 w-[30%] h-full z-20"
-        />
+          className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <img
+            src={getImageSrc()}
+            alt="Ad main"
+            className="object-cover w-full h-full"
+          />
+          <div
+            onClick={handlePrevious}
+            className="absolute top-0 left-0 w-[30%] h-full z-20"
+          />
+          <div
+            onClick={handleNext}
+            className="absolute top-0 right-0 w-[30%] h-full z-20"
+          />
+        </div>
       </div>
-    </div>
-    )
+    );
   };
   const TitleAndPrice = () => (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
         <img src="/location.svg" alt="" className="w-3 h-3" />
         <h2 className="text-sm md:text-[1.1vw]">
-          {
-            currentAdData?.location?.name && currentAdData?.location?.region 
-              ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region` 
-              : "No location has been set for this user"
-          }
+          {currentAdData?.location?.name && currentAdData?.location?.region
+            ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region`
+            : "No location has been set for this user"}
         </h2>
       </div>
       <h2 className="text-2xl md:text-[2vw] font-medium">
         {currentAdData?.name || "Untitled Product"}
       </h2>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
-        {currentAdData?.price ? formatMoney(currentAdData?.price) : "Please Contact the Seller for the Price of this Product"}
+        {currentAdData?.price
+          ? formatMoney(currentAdData?.price)
+          : "Please Contact the Seller for the Price of this Product"}
       </h2>
     </div>
   );
@@ -256,19 +311,20 @@ const AdsDetailsPage = () => {
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>
-        {currentAdDataFromQuery?.product_features.map((feat: ProductFeature) => (
-          <li key={feat.id}>
-            <span className="font-bold">{feat.feature.name}&nbsp;</span>
-            <span>{feat.value}</span>
-          </li>
-        ))}
-        {currentAdData?.location?.name && 
+        {currentAdDataFromQuery?.product_features.map(
+          (feat: ProductFeature) => (
+            <li key={feat.id}>
+              <span className="font-bold">{feat.feature.name}&nbsp;</span>
+              <span>{feat.value}</span>
+            </li>
+          ),
+        )}
+        {currentAdData?.location?.name && (
           <li>
             <span className="font-bold">Location&nbsp;</span>{" "}
             {currentAdData?.location?.name}
           </li>
-        }           
-
+        )}
       </ul>
     </div>
   );
@@ -309,7 +365,7 @@ const AdsDetailsPage = () => {
       "Caller 1": onCaller1,
       "Caller 2": onCaller2,
       "Make Offer": onMakeOffer,
-      "Favorites": onFavorite,
+      Favorites: onFavorite,
     };
 
     return (
@@ -326,9 +382,10 @@ const AdsDetailsPage = () => {
             <button
               key={label}
               className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                ${actions[label] 
-                  ? "cursor-pointer hover:scale-95 active:scale-105"
-                  : "cursor-not-allowed"
+                ${
+                  actions[label]
+                    ? "cursor-pointer hover:scale-95 active:scale-105"
+                    : "cursor-not-allowed"
                 }
               `}
               onClick={actions[label]}
@@ -346,77 +403,89 @@ const AdsDetailsPage = () => {
     );
   };
 
-  const CommentsSection = () => (
-    <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
-      <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
-      <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">
-        Comments
-      </h2>
-      <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
-        {productReviews.length === 0 && <p>No <span className="max-sm:hidden">comments</span><span className="sm:hidden">reviews</span> to show. Leave one?</p>}
-        {productReviews.map((review: Review) => (
-          <div
-            key={review.id}
-            className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <img src={review.user.avatar || "/public/userPfp2.jpg"}alt="" className="w-10 h-10 rounded-lg" />
-                <div className="flex flex-col">
-                  <p className="text-[10px] text-gray-500 md:text-[0.9vw]">
-                    {formatReviewDate(review.created_at)}
-                  </p>
-                  <h3 className="font-semibold md:text-[1.2vw]">
-                    {review.user.account_name || "User"}
-                  </h3>
-                  <div className="flex mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <p
-                        key={i}
-                        className={`inline-flex justify-center items-center w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]  
-                          ${i < review.rating ? "text-gray-700" : "text-gray-300"}`
-                        }
-                      > 
-                      ★
-                      </p>
-                    ))}
+  const CommentsSection = () => {
+    return (
+      <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
+        <h2 className="text-2xl font-medium sm:hidden inline">
+          Seller Reviews
+        </h2>
+        <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">
+          Comments
+        </h2>
+        <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
+          {productReviews.length === 0 && (
+            <p>
+              No <span className="max-sm:hidden">comments</span>
+              <span className="sm:hidden">reviews</span> to show. Leave one?
+            </p>
+          )}
+          {productReviews.map((review: Review) => (
+            <div
+              key={review.id}
+              className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={review.user.avatar || "/public/userPfp2.jpg"}
+                    alt=""
+                    className="w-10 h-10 rounded-lg"
+                  />
+                  <div className="flex flex-col">
+                    <p className="text-[10px] text-gray-500 md:text-[0.9vw]">
+                      {formatReviewDate(review.created_at)}
+                    </p>
+                    <h3 className="font-semibold md:text-[1.2vw]">
+                      {review.user.account_name || "User"}
+                    </h3>
+                    <div className="flex mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <p
+                          key={i}
+                          className={`inline-flex justify-center items-center w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]  
+                          ${i < review.rating ? "text-gray-700" : "text-gray-300"}`}
+                        >
+                          ★
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
+                <div className="flex items-center gap-1">
+                  <button className="flex items-center gap-1 m-2 md:text-[1vw]">
+                    <img
+                      src="/like.svg"
+                      alt=""
+                      className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]"
+                    />
+                    <h3>Like</h3>
+                  </button>
+                  <span className="text-sm md:text-[1vw]">20</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <button className="flex items-center gap-1 m-2 md:text-[1vw]">
-                  <img
-                    src="/like.svg"
-                    alt=""
-                    className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]"
-                  />
-                  <h3>Like</h3>
-                </button>
-                <span className="text-sm md:text-[1vw]">20</span>
-              </div>
+              <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">
+                {review.comment}
+              </p>
             </div>
-            <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">
-              {review.comment}
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
+        <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
+          <button
+            onClick={() => navigate("/reviews")}
+            className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
+          >
+            Make Review
+          </button>
+          <button
+            onClick={() => navigate("/reviews")}
+            className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
+          >
+            Show reviews
+          </button>
+        </div>
       </div>
-      <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
-        <button
-          onClick={() => navigate("/reviews")}
-          className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
-        >
-          Make Review
-        </button>
-        <button
-          onClick={() => navigate("/reviews")}
-          className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
-        >
-          Show reviews
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
   const QuickChat = () => (
     <div className="w-full">
       <div className="pt-4 w-full">
@@ -621,7 +690,6 @@ const AdsDetailsPage = () => {
 
   return (
     <div className="lg:pt-5">
-      <DebuggerButton title="current ad" data={currentAdData} />
       <div
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
@@ -654,10 +722,10 @@ const AdsDetailsPage = () => {
                 <div className="bg-white p-6 rounded-lg w-full">
                   <SellerInfo />
                   <div className="hidden md:block">
-                    <RatingReviews layout="row" fullWidth reviewsOverride={productReviews}/>
+                    <RatingReviews layout="row" />
                   </div>
                   <div className="md:hidden">
-                    <RatingReviews fullWidth reviewsOverride={productReviews} />
+                    <RatingReviews fullWidth rd={reviewDeconstruction} />
                   </div>
                 </div>
 
@@ -669,7 +737,7 @@ const AdsDetailsPage = () => {
               {/* desktop layout */}
               <div className=" hidden sm:grid sm:grid-cols-2 gap-1.5 w-full ad-details-page">
                 <div className="flex flex-col w-full space-y-6 p-6 lg:p-0 mb-5">
-                  <RatingReviews layout="row" />
+                  <RatingReviews layout="row" rd={reviewDeconstruction} />
                   <CommentsSection />
                 </div>
                 <div className="p-6 rounded-lg w-full -mt-17">

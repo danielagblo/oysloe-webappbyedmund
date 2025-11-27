@@ -16,7 +16,9 @@ const PrivacyPage = () => {
           <h3 className="text-2xl">{policy?.title ?? "Privacy Policy"}</h3>
           <p className="text-sm text-gray-500">{policy?.date ?? ""}</p>
           {isLoading && <p className="mt-4">Loading...</p>}
-          {isError && <p className="mt-4 text-red-500">Failed to load policy.</p>}
+          {isError && (
+            <p className="mt-4 text-red-500">Failed to load policy.</p>
+          )}
           {!isLoading && policy && (
             <div
               className="prose max-w-none mt-4 text-sm text-left pb-20"

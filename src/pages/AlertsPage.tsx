@@ -3,10 +3,9 @@ import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import { timeAgo } from "../utils/timeAgo";
-import {  useAlerts } from "../features/alerts/useAlerts"
+import { useAlerts } from "../features/alerts/useAlerts";
 
 const AlertsPanel = () => {
-
   const { loading, alerts, error } = useAlerts();
 
   return (
@@ -83,7 +82,9 @@ const AlertsPanel = () => {
               </div>
             ))
           ) : error ? (
-            <p className="w-full text-center">There was an error retrieving your alerts</p>
+            <p className="w-full text-center">
+              There was an error retrieving your alerts
+            </p>
           ) : alerts.length === 0 ? (
             <p className="w-full text-center">You have no alerts</p>
           ) : (

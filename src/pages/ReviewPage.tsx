@@ -105,8 +105,9 @@ const ReviewPage = () => {
                 key={star}
                 src="/star.svg"
                 alt=""
-                className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
-                  }`}
+                className={`w-7 h-7 cursor-pointer transition ${
+                  star <= selectedStars ? "opacity-100" : "opacity-40"
+                }`}
                 onClick={() => setSelectedStars(star)}
               />
             ))}
@@ -224,8 +225,9 @@ const ReviewPage = () => {
                     key={star}
                     src="/star.svg"
                     alt=""
-                    className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
-                      }`}
+                    className={`w-7 h-7 cursor-pointer transition ${
+                      star <= selectedStars ? "opacity-100" : "opacity-40"
+                    }`}
                     onClick={() => setSelectedStars(star)}
                   />
                 ))}

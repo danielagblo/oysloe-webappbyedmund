@@ -11,8 +11,7 @@ export const endpoints = {
   },
 
   verifyOTP: {
-    send: (phone: string) =>
-      `/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    send: (phone: string) => `/verifyotp/?phone=${encodeURIComponent(phone)}`,
     verify: () => `/verifyotp/`,
   },
 
@@ -27,7 +26,8 @@ export const endpoints = {
   userProfile: {
     userPreferences: "/userpreferences/",
     userProfile: "/userprofile/",
-    sendOTP: (phone: string) => `/verifyotp/?phone=${encodeURIComponent(phone)}`,
+    sendOTP: (phone: string) =>
+      `/verifyotp/?phone=${encodeURIComponent(phone)}`,
     verifyOTP: "/verifyotp/",
   },
 
@@ -157,6 +157,6 @@ export const endpoints = {
     detail: (id: number) => `/coupons/${id}/`,
     redeem: (id: number) => `/coupons/${id}/redeem/`,
   },
-}
+};
 
 export default endpoints;

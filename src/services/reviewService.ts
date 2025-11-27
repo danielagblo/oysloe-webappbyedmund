@@ -58,11 +58,19 @@ export default {
   deleteReview,
 };
 
-export const getReviewsForOwner = async (ownerId: number): Promise<Review[]> => {
+export const getReviewsForOwner = async (
+  ownerId: number,
+): Promise<Review[]> => {
   // First, try to fetch reviews filtering by product owner (backend may support product__owner)
   try {
-    const direct = await apiClient.get<any>(endpoints.reviews.listWithQuery(`?product__owner=${ownerId}`));
-    const directList: any[] = Array.isArray(direct) ? direct : direct && Array.isArray(direct.results) ? direct.results : [];
+    const direct = await apiClient.get<any>(
+      endpoints.reviews.listWithQuery(`?product__owner=${ownerId}`),
+    );
+    const directList: any[] = Array.isArray(direct)
+      ? direct
+      : direct && Array.isArray(direct.results)
+        ? direct.results
+        : [];
     if (directList.length > 0) {
       // Filter out any reviews whose product.owner is null or doesn't match ownerId
       const filtered = directList.filter((rev: any) => {
@@ -70,8 +78,9 @@ export const getReviewsForOwner = async (ownerId: number): Promise<Review[]> => 
         if (!prod) return false;
         const o = prod.owner;
         if (o == null) return false;
-        if (typeof o === 'number') return o === ownerId;
-        if (typeof o === 'object' && typeof o.id === 'number') return o.id === ownerId;
+        if (typeof o === "number") return o === ownerId;
+        if (typeof o === "object" && typeof o.id === "number")
+          return o.id === ownerId;
         return false;
       });
       return filtered as Review[];
@@ -82,13 +91,15 @@ export const getReviewsForOwner = async (ownerId: number): Promise<Review[]> => 
   }
 
   // Fallback: fetch products owned by the owner, then fetch reviews for each product and combine
-  const productsResp = await apiClient.get<any>(`${endpoints.products.list}?owner=${ownerId}`);
+  const productsResp = await apiClient.get<any>(
+    `${endpoints.products.list}?owner=${ownerId}`,
+  );
   // support both array and paginated responses
   const products = Array.isArray(productsResp)
     ? productsResp
     : productsResp && Array.isArray(productsResp.results)
-    ? productsResp.results
-    : [];
+      ? productsResp.results
+      : [];
   if (products.length === 0) return [];
   // Filter products to those that are actually owned by ownerId (skip null owners)
   const ownedProducts = products.filter((p: any) => {
@@ -96,19 +107,28 @@ export const getReviewsForOwner = async (ownerId: number): Promise<Review[]> => 
     const o = p.owner;
     if (o == null) return false;
     if (typeof o === "number") return o === ownerId;
-    if (typeof o === "object" && typeof o.id === "number") return o.id === ownerId;
+    if (typeof o === "object" && typeof o.id === "number")
+      return o.id === ownerId;
     return false;
   });
   if (ownedProducts.length === 0) return [];
   const productIds: number[] = ownedProducts
     .map((p: any) => p.id)
-    .filter((id: any): id is number => typeof id === 'number');
+    .filter((id: any): id is number => typeof id === "number");
   if (productIds.length === 0) return [];
-  const promises = productIds.map((pid: number) => getReviews({ product: pid }));
+  const promises = productIds.map((pid: number) =>
+    getReviews({ product: pid }),
+  );
   const results = await Promise.all(promises);
   const flat = results.flat();
   // ensure we only return reviews for the productIds we collected (defensive)
   const idSet = new Set(productIds);
-  const final = flat.filter((r: any) => r && r.product && typeof r.product.id === 'number' && idSet.has(r.product.id));
+  const final = flat.filter(
+    (r: any) =>
+      r &&
+      r.product &&
+      typeof r.product.id === "number" &&
+      idSet.has(r.product.id),
+  );
   return final as Review[];
 };

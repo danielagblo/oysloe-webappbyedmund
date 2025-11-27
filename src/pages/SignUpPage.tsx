@@ -59,7 +59,6 @@ const SignInPage = () => {
     }));
   };
 
-
   const handleSubmit: FormEventHandler = async (e: FormEvent) => {
     console.log("Form Submitted");
     e.preventDefault();
@@ -83,14 +82,15 @@ const SignInPage = () => {
 
     // Terms & conditions
     if (!data.agreedToTerms) {
-      console.log("You must agree to the Privacy Policy and Terms & Conditions");
+      console.log(
+        "You must agree to the Privacy Policy and Terms & Conditions",
+      );
       setError("You must agree to the Privacy Policy and Terms & Conditions");
       return;
     }
 
     // Password validation
     if (!data.password || data.password.length < 6) {
-
       console.log("Password must be at least 6 characters long");
       setError("Password must be at least 6 characters long");
       return;
@@ -111,7 +111,6 @@ const SignInPage = () => {
       setError("Phone number is required");
       return;
     }
-
 
     try {
       console.log("Sending formdata to server...");
@@ -134,11 +133,12 @@ const SignInPage = () => {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : (err && typeof err === 'object' && 'message' in err ? (err as any).message : 'Registration failed. Please try again.');
+          : err && typeof err === "object" && "message" in err
+            ? (err as any).message
+            : "Registration failed. Please try again.";
       setError(errorMessage as string);
     }
   };
-
 
   return (
     <div className="h-screen w-screen flex items-center justify-center ">
@@ -227,7 +227,11 @@ const SignInPage = () => {
             <div className="flex flex-col gap-3 w-full">
               <Button
                 type="submit"
-                name={registerMutation.status === "pending" ? "Signing up..." : "Sign up"}
+                name={
+                  registerMutation.status === "pending"
+                    ? "Signing up..."
+                    : "Sign up"
+                }
                 disabled={registerMutation.status === "pending"}
               />
               <button

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Link, useLocation} from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
 import { resetPassword } from "../services/authService";
-
 
 const ResetPasswordPage = () => {
   const location = useLocation();
@@ -33,10 +32,15 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
     try {
-      await resetPassword({ phone: phoneFromState, new_password: newPassword, confirm_password: confirmPassword });
+      await resetPassword({
+        phone: phoneFromState,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      });
       setShowModal(true);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to reset password";
+      const msg =
+        err instanceof Error ? err.message : "Failed to reset password";
       setError(msg);
     } finally {
       setLoading(false);

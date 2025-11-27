@@ -6,7 +6,9 @@ export function useFeedbacks(userId?: number) {
   const query = useQuery<Feedback[]>({
     queryKey: ["feedbacks", userId ?? "all"],
     queryFn: async () => {
-      const res = await feedbackService.getFeedbacks(userId ? { user: userId } : undefined);
+      const res = await feedbackService.getFeedbacks(
+        userId ? { user: userId } : undefined,
+      );
       return res;
     },
     staleTime: 1000 * 60 * 2,

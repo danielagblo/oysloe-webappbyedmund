@@ -33,8 +33,30 @@
       }
     ],
     "product_features": [
-      { "id": 1001, "product": 101, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "1200" },
-      { "id": 1002, "product": 101, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "2" }
+      {
+        "id": 1001,
+        "product": 101,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "1200"
+      },
+      {
+        "id": 1002,
+        "product": 101,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "2"
+      }
     ],
     "created_at": "2024-01-01T08:00:00Z",
     "updated_at": "2024-01-01T08:00:00Z"
@@ -51,13 +73,40 @@
     "price": 500000,
     "duration": null,
     "category": 1,
-    "owner": { "id": 502, "email": "land.seller@mail.com", "phone": "+233501112233", "name": "Tema Estates" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 502,
+      "email": "land.seller@mail.com",
+      "phone": "+233501112233",
+      "name": "Tema Estates"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1003, "product": 102, "image": "https://picsum.photos/200", "created_at": "2024-01-01T09:00:00Z" }
+      {
+        "id": 1003,
+        "product": 102,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1004, "product": 102, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "43560" }
+      {
+        "id": 1004,
+        "product": 102,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "43560"
+      }
     ],
     "created_at": "2024-01-01T09:00:00Z",
     "updated_at": "2024-01-01T09:00:00Z"
@@ -74,14 +123,52 @@
     "price": 9500,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1005, "product": 103, "image": "https://picsum.photos/200", "created_at": "2024-01-01T10:00:00Z" }
+      {
+        "id": 1005,
+        "product": 103,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1006, "product": 103, "feature": { "id": 3, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Battery Life (hrs)", "subcategory": 2 }, "value": "8" },
-      { "id": 1007, "product": 103, "feature": { "id": 4, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Processor", "subcategory": 2 }, "value": "i9-14900HX" }
+      {
+        "id": 1006,
+        "product": 103,
+        "feature": {
+          "id": 3,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Battery Life (hrs)",
+          "subcategory": 2
+        },
+        "value": "8"
+      },
+      {
+        "id": 1007,
+        "product": 103,
+        "feature": {
+          "id": 4,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Processor",
+          "subcategory": 2
+        },
+        "value": "i9-14900HX"
+      }
     ],
     "created_at": "2024-01-01T10:00:00Z",
     "updated_at": "2024-01-01T10:00:00Z"
@@ -98,10 +185,26 @@
     "price": 5200,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1008, "product": 104, "image": "https://picsum.photos/200", "created_at": "2024-01-01T11:00:00Z" }
+      {
+        "id": 1008,
+        "product": 104,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T11:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T11:00:00Z",
@@ -119,14 +222,52 @@
     "price": 120000,
     "duration": null,
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1009, "product": 105, "image": "https://picsum.photos/200", "created_at": "2024-01-01T12:00:00Z" }
+      {
+        "id": 1009,
+        "product": 105,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1010, "product": 105, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "1.8L I4" },
-      { "id": 1011, "product": 105, "feature": { "id": 6, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Mileage (km)", "subcategory": 3 }, "value": "45000" }
+      {
+        "id": 1010,
+        "product": 105,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "1.8L I4"
+      },
+      {
+        "id": 1011,
+        "product": 105,
+        "feature": {
+          "id": 6,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Mileage (km)",
+          "subcategory": 3
+        },
+        "value": "45000"
+      }
     ],
     "created_at": "2024-01-01T12:00:00Z",
     "updated_at": "2024-01-01T12:00:00Z"
@@ -143,13 +284,40 @@
     "price": "800",
     "duration": "day",
     "category": 3,
-    "owner": { "id": 505, "email": "rentals@buscorp.net", "phone": "+233206665544", "name": "Bus Corp" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 505,
+      "email": "rentals@buscorp.net",
+      "phone": "+233206665544",
+      "name": "Bus Corp"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1012, "product": 106, "image": "https://picsum.photos/200", "created_at": "2024-01-01T13:00:00Z" }
+      {
+        "id": 1012,
+        "product": 106,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T13:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1013, "product": 106, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "Diesel" }
+      {
+        "id": 1013,
+        "product": 106,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "Diesel"
+      }
     ],
     "created_at": "2024-01-01T13:00:00Z",
     "updated_at": "2024-01-01T13:00:00Z"
@@ -166,13 +334,40 @@
     "price": 15000,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1014, "product": 107, "image": "https://picsum.photos/200", "created_at": "2024-01-01T14:00:00Z" }
+      {
+        "id": 1014,
+        "product": 107,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T14:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1015, "product": 107, "feature": { "id": 7, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Capacity (L)", "subcategory": 4 }, "value": "1000" }
+      {
+        "id": 1015,
+        "product": 107,
+        "feature": {
+          "id": 7,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Capacity (L)",
+          "subcategory": 4
+        },
+        "value": "1000"
+      }
     ],
     "created_at": "2024-01-01T14:00:00Z",
     "updated_at": "2024-01-01T14:00:00Z"
@@ -189,13 +384,40 @@
     "price": "Quote",
     "duration": null,
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1016, "product": 108, "image": "https://picsum.photos/200", "created_at": "2024-01-01T15:00:00Z" }
+      {
+        "id": 1016,
+        "product": 108,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T15:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1017, "product": 108, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "10" }
+      {
+        "id": 1017,
+        "product": 108,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "10"
+      }
     ],
     "created_at": "2024-01-01T15:00:00Z",
     "updated_at": "2024-01-01T15:00:00Z"
@@ -212,13 +434,40 @@
     "price": "150",
     "duration": "hour",
     "category": 5,
-    "owner": { "id": 508, "email": "digital@expert.com", "phone": "+233502221133", "name": "Marketing Pro" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 508,
+      "email": "digital@expert.com",
+      "phone": "+233502221133",
+      "name": "Marketing Pro"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1018, "product": 109, "image": "https://picsum.photos/200", "created_at": "2024-01-01T16:00:00Z" }
+      {
+        "id": 1018,
+        "product": 109,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T16:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1019, "product": 109, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "5" }
+      {
+        "id": 1019,
+        "product": 109,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "5"
+      }
     ],
     "created_at": "2024-01-01T16:00:00Z",
     "updated_at": "2024-01-01T16:00:00Z"
@@ -235,10 +484,26 @@
     "price": 850,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1020, "product": 110, "image": "https://picsum.photos/200", "created_at": "2024-01-01T17:00:00Z" }
+      {
+        "id": 1020,
+        "product": 110,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T17:00:00Z",
@@ -256,10 +521,26 @@
     "price": 1200,
     "duration": null,
     "category": 6,
-    "owner": { "id": 510, "email": "textiles@local.com", "phone": "+233551110099", "name": "Weavers Guild" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 510,
+      "email": "textiles@local.com",
+      "phone": "+233551110099",
+      "name": "Weavers Guild"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1021, "product": 111, "image": "https://picsum.photos/200", "created_at": "2024-01-01T18:00:00Z" }
+      {
+        "id": 1021,
+        "product": 111,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T18:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T18:00:00Z",
@@ -277,10 +558,26 @@
     "price": 700,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1022, "product": 112, "image": "https://picsum.photos/200", "created_at": "2024-01-01T19:00:00Z" }
+      {
+        "id": 1022,
+        "product": 112,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T19:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T19:00:00Z",
@@ -298,10 +595,26 @@
     "price": 3000,
     "duration": null,
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1023, "product": 113, "image": "https://picsum.photos/200", "created_at": "2024-01-01T20:00:00Z" }
+      {
+        "id": 1023,
+        "product": 113,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T20:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T20:00:00Z",
@@ -319,10 +632,26 @@
     "price": 1500,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1024, "product": 114, "image": "https://picsum.photos/200", "created_at": "2024-01-01T21:00:00Z" }
+      {
+        "id": 1024,
+        "product": 114,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T21:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T21:00:00Z",
@@ -340,10 +669,26 @@
     "price": 450,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1025, "product": 115, "image": "https://picsum.photos/200", "created_at": "2024-01-01T22:00:00Z" }
+      {
+        "id": 1025,
+        "product": 115,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-01T22:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-01T22:00:00Z",
@@ -361,14 +706,52 @@
     "price": 850000,
     "duration": null,
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1026, "product": 116, "image": "https://picsum.photos/200", "created_at": "2024-01-02T08:00:00Z" }
+      {
+        "id": 1026,
+        "product": 116,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1027, "product": 116, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "1800" },
-      { "id": 1028, "product": 116, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "3" }
+      {
+        "id": 1027,
+        "product": 116,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "1800"
+      },
+      {
+        "id": 1028,
+        "product": 116,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "3"
+      }
     ],
     "created_at": "2024-01-02T08:00:00Z",
     "updated_at": "2024-01-02T08:00:00Z"
@@ -385,14 +768,52 @@
     "price": "800",
     "duration": "month",
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1029, "product": 117, "image": "https://picsum.photos/200", "created_at": "2024-01-02T09:00:00Z" }
+      {
+        "id": 1029,
+        "product": 117,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1030, "product": 117, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "450" },
-      { "id": 1031, "product": 117, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "0" }
+      {
+        "id": 1030,
+        "product": 117,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "450"
+      },
+      {
+        "id": 1031,
+        "product": 117,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "0"
+      }
     ],
     "created_at": "2024-01-02T09:00:00Z",
     "updated_at": "2024-01-02T09:00:00Z"
@@ -409,10 +830,26 @@
     "price": 14000,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1032, "product": 118, "image": "https://picsum.photos/200", "created_at": "2024-01-02T10:00:00Z" }
+      {
+        "id": 1032,
+        "product": 118,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T10:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T10:00:00Z",
@@ -430,10 +867,26 @@
     "price": 300,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1033, "product": 119, "image": "https://picsum.photos/200", "created_at": "2024-01-02T11:00:00Z" }
+      {
+        "id": 1033,
+        "product": 119,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T11:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T11:00:00Z",
@@ -451,13 +904,40 @@
     "price": "1500",
     "duration": "day",
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1034, "product": 120, "image": "https://picsum.photos/200", "created_at": "2024-01-02T12:00:00Z" }
+      {
+        "id": 1034,
+        "product": 120,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1035, "product": 120, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "V6" }
+      {
+        "id": 1035,
+        "product": 120,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "V6"
+      }
     ],
     "created_at": "2024-01-02T12:00:00Z",
     "updated_at": "2024-01-02T12:00:00Z"
@@ -474,13 +954,40 @@
     "price": 8000,
     "duration": null,
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1036, "product": 121, "image": "https://picsum.photos/200", "created_at": "2024-01-02T13:00:00Z" }
+      {
+        "id": 1036,
+        "product": 121,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T13:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1037, "product": 121, "feature": { "id": 6, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Mileage (km)", "subcategory": 3 }, "value": "15000" }
+      {
+        "id": 1037,
+        "product": 121,
+        "feature": {
+          "id": 6,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Mileage (km)",
+          "subcategory": 3
+        },
+        "value": "15000"
+      }
     ],
     "created_at": "2024-01-02T13:00:00Z",
     "updated_at": "2024-01-02T13:00:00Z"
@@ -497,13 +1004,40 @@
     "price": 2500,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1038, "product": 122, "image": "https://picsum.photos/200", "created_at": "2024-01-02T14:00:00Z" }
+      {
+        "id": 1038,
+        "product": 122,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T14:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1039, "product": 122, "feature": { "id": 7, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Capacity (L)", "subcategory": 4 }, "value": "10" }
+      {
+        "id": 1039,
+        "product": 122,
+        "feature": {
+          "id": 7,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Capacity (L)",
+          "subcategory": 4
+        },
+        "value": "10"
+      }
     ],
     "created_at": "2024-01-02T14:00:00Z",
     "updated_at": "2024-01-02T14:00:00Z"
@@ -520,13 +1054,40 @@
     "price": 400,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1040, "product": 123, "image": "https://picsum.photos/200", "created_at": "2024-01-02T15:00:00Z" }
+      {
+        "id": 1040,
+        "product": 123,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T15:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1041, "product": 123, "feature": { "id": 8, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Power (W)", "subcategory": 4 }, "value": "800" }
+      {
+        "id": 1041,
+        "product": 123,
+        "feature": {
+          "id": 8,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Power (W)",
+          "subcategory": 4
+        },
+        "value": "800"
+      }
     ],
     "created_at": "2024-01-02T15:00:00Z",
     "updated_at": "2024-01-02T15:00:00Z"
@@ -543,13 +1104,40 @@
     "price": "30",
     "duration": "per person",
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1042, "product": 124, "image": "https://picsum.photos/200", "created_at": "2024-01-02T16:00:00Z" }
+      {
+        "id": 1042,
+        "product": 124,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T16:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1043, "product": 124, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "7" }
+      {
+        "id": 1043,
+        "product": 124,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "7"
+      }
     ],
     "created_at": "2024-01-02T16:00:00Z",
     "updated_at": "2024-01-02T16:00:00Z"
@@ -566,13 +1154,40 @@
     "price": "50",
     "duration": "per wash",
     "category": 5,
-    "owner": { "id": 508, "email": "digital@expert.com", "phone": "+233502221133", "name": "Marketing Pro" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 508,
+      "email": "digital@expert.com",
+      "phone": "+233502221133",
+      "name": "Marketing Pro"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1044, "product": 125, "image": "https://picsum.photos/200", "created_at": "2024-01-02T17:00:00Z" }
+      {
+        "id": 1044,
+        "product": 125,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T17:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1045, "product": 125, "feature": { "id": 10, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Response Time (hrs)", "subcategory": 5 }, "value": "1" }
+      {
+        "id": 1045,
+        "product": 125,
+        "feature": {
+          "id": 10,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Response Time (hrs)",
+          "subcategory": 5
+        },
+        "value": "1"
+      }
     ],
     "created_at": "2024-01-02T17:00:00Z",
     "updated_at": "2024-01-02T17:00:00Z"
@@ -589,10 +1204,26 @@
     "price": 2500,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1046, "product": 126, "image": "https://picsum.photos/200", "created_at": "2024-01-02T18:00:00Z" }
+      {
+        "id": 1046,
+        "product": 126,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T18:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T18:00:00Z",
@@ -610,10 +1241,26 @@
     "price": 1800,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1047, "product": 127, "image": "https://picsum.photos/200", "created_at": "2024-01-02T19:00:00Z" }
+      {
+        "id": 1047,
+        "product": 127,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T19:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T19:00:00Z",
@@ -631,10 +1278,26 @@
     "price": 4000,
     "duration": null,
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1048, "product": 128, "image": "https://picsum.photos/200", "created_at": "2024-01-02T20:00:00Z" }
+      {
+        "id": 1048,
+        "product": 128,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T20:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T20:00:00Z",
@@ -652,10 +1315,26 @@
     "price": 600,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1049, "product": 129, "image": "https://picsum.photos/200", "created_at": "2024-01-02T21:00:00Z" }
+      {
+        "id": 1049,
+        "product": 129,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T21:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T21:00:00Z",
@@ -673,10 +1352,26 @@
     "price": 750,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1050, "product": 130, "image": "https://picsum.photos/200", "created_at": "2024-01-02T22:00:00Z" }
+      {
+        "id": 1050,
+        "product": 130,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-02T22:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-02T22:00:00Z",
@@ -694,13 +1389,40 @@
     "price": "150",
     "duration": "night",
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1051, "product": 131, "image": "https://picsum.photos/200", "created_at": "2024-01-03T08:00:00Z" }
+      {
+        "id": 1051,
+        "product": 131,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1052, "product": 131, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "1" }
+      {
+        "id": 1052,
+        "product": 131,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "1"
+      }
     ],
     "created_at": "2024-01-03T08:00:00Z",
     "updated_at": "2024-01-03T08:00:00Z"
@@ -717,13 +1439,40 @@
     "price": 1100,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1053, "product": 132, "image": "https://picsum.photos/200", "created_at": "2024-01-03T09:00:00Z" }
+      {
+        "id": 1053,
+        "product": 132,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1054, "product": 132, "feature": { "id": 3, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Battery Life (hrs)", "subcategory": 2 }, "value": "30" }
+      {
+        "id": 1054,
+        "product": 132,
+        "feature": {
+          "id": 3,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Battery Life (hrs)",
+          "subcategory": 2
+        },
+        "value": "30"
+      }
     ],
     "created_at": "2024-01-03T09:00:00Z",
     "updated_at": "2024-01-03T09:00:00Z"
@@ -740,13 +1489,40 @@
     "price": "1200",
     "duration": "day",
     "category": 3,
-    "owner": { "id": 505, "email": "rentals@buscorp.net", "phone": "+233206665544", "name": "Bus Corp" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 505,
+      "email": "rentals@buscorp.net",
+      "phone": "+233206665544",
+      "name": "Bus Corp"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1055, "product": 133, "image": "https://picsum.photos/200", "created_at": "2024-01-03T10:00:00Z" }
+      {
+        "id": 1055,
+        "product": 133,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1056, "product": 133, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "Diesel" }
+      {
+        "id": 1056,
+        "product": 133,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "Diesel"
+      }
     ],
     "created_at": "2024-01-03T10:00:00Z",
     "updated_at": "2024-01-03T10:00:00Z"
@@ -763,13 +1539,40 @@
     "price": 150,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1057, "product": 134, "image": "https://picsum.photos/200", "created_at": "2024-01-03T11:00:00Z" }
+      {
+        "id": 1057,
+        "product": 134,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T11:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1058, "product": 134, "feature": { "id": 8, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Power (W)", "subcategory": 4 }, "value": "1500" }
+      {
+        "id": 1058,
+        "product": 134,
+        "feature": {
+          "id": 8,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Power (W)",
+          "subcategory": 4
+        },
+        "value": "1500"
+      }
     ],
     "created_at": "2024-01-03T11:00:00Z",
     "updated_at": "2024-01-03T11:00:00Z"
@@ -786,13 +1589,40 @@
     "price": "100",
     "duration": "hour",
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1059, "product": 135, "image": "https://picsum.photos/200", "created_at": "2024-01-03T12:00:00Z" }
+      {
+        "id": 1059,
+        "product": 135,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1060, "product": 135, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "3" }
+      {
+        "id": 1060,
+        "product": 135,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "3"
+      }
     ],
     "created_at": "2024-01-03T12:00:00Z",
     "updated_at": "2024-01-03T12:00:00Z"
@@ -809,10 +1639,26 @@
     "price": "3000",
     "duration": "per suit",
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1061, "product": 136, "image": "https://picsum.photos/200", "created_at": "2024-01-03T13:00:00Z" }
+      {
+        "id": 1061,
+        "product": 136,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T13:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-03T13:00:00Z",
@@ -830,10 +1676,26 @@
     "price": 3600,
     "duration": "year",
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1062, "product": 137, "image": "https://picsum.photos/200", "created_at": "2024-01-03T14:00:00Z" }
+      {
+        "id": 1062,
+        "product": 137,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-03T14:00:00Z",
@@ -851,10 +1713,26 @@
     "price": "500",
     "duration": "course",
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1063, "product": 138, "image": "https://picsum.photos/200", "created_at": "2024-01-03T15:00:00Z" }
+      {
+        "id": 1063,
+        "product": 138,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-03T15:00:00Z",
@@ -872,10 +1750,26 @@
     "price": 250,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1064, "product": 139, "image": "https://picsum.photos/200", "created_at": "2024-01-03T16:00:00Z" }
+      {
+        "id": 1064,
+        "product": 139,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-03T16:00:00Z",
@@ -893,10 +1787,26 @@
     "price": 180,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1065, "product": 140, "image": "https://picsum.photos/200", "created_at": "2024-01-03T17:00:00Z" }
+      {
+        "id": 1065,
+        "product": 140,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-03T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-03T17:00:00Z",
@@ -914,13 +1824,40 @@
     "price": 1500000,
     "duration": null,
     "category": 1,
-    "owner": { "id": 502, "email": "land.seller@mail.com", "phone": "+233501112233", "name": "Tema Estates" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 502,
+      "email": "land.seller@mail.com",
+      "phone": "+233501112233",
+      "name": "Tema Estates"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1066, "product": 141, "image": "https://picsum.photos/200", "created_at": "2024-01-04T08:00:00Z" }
+      {
+        "id": 1066,
+        "product": 141,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1067, "product": 141, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "20000" }
+      {
+        "id": 1067,
+        "product": 141,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "20000"
+      }
     ],
     "created_at": "2024-01-04T08:00:00Z",
     "updated_at": "2024-01-04T08:00:00Z"
@@ -937,13 +1874,40 @@
     "price": "200",
     "duration": "day",
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1068, "product": 142, "image": "https://picsum.photos/200", "created_at": "2024-01-04T09:00:00Z" }
+      {
+        "id": 1068,
+        "product": 142,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1069, "product": 142, "feature": { "id": 3, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Battery Life (hrs)", "subcategory": 2 }, "value": "4" }
+      {
+        "id": 1069,
+        "product": 142,
+        "feature": {
+          "id": 3,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Battery Life (hrs)",
+          "subcategory": 2
+        },
+        "value": "4"
+      }
     ],
     "created_at": "2024-01-04T09:00:00Z",
     "updated_at": "2024-01-04T09:00:00Z"
@@ -960,13 +1924,40 @@
     "price": 45000,
     "duration": null,
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1070, "product": 143, "image": "https://picsum.photos/200", "created_at": "2024-01-04T10:00:00Z" }
+      {
+        "id": 1070,
+        "product": 143,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1071, "product": 143, "feature": { "id": 6, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Mileage (km)", "subcategory": 3 }, "value": "120000" }
+      {
+        "id": 1071,
+        "product": 143,
+        "feature": {
+          "id": 6,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Mileage (km)",
+          "subcategory": 3
+        },
+        "value": "120000"
+      }
     ],
     "created_at": "2024-01-04T10:00:00Z",
     "updated_at": "2024-01-04T10:00:00Z"
@@ -983,13 +1974,40 @@
     "price": 650,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1072, "product": 144, "image": "https://picsum.photos/200", "created_at": "2024-01-04T11:00:00Z" }
+      {
+        "id": 1072,
+        "product": 144,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T11:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1073, "product": 144, "feature": { "id": 8, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Power (W)", "subcategory": 4 }, "value": "1000" }
+      {
+        "id": 1073,
+        "product": 144,
+        "feature": {
+          "id": 8,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Power (W)",
+          "subcategory": 4
+        },
+        "value": "1000"
+      }
     ],
     "created_at": "2024-01-04T11:00:00Z",
     "updated_at": "2024-01-04T11:00:00Z"
@@ -1006,13 +2024,40 @@
     "price": "Quote",
     "duration": null,
     "category": 5,
-    "owner": { "id": 508, "email": "digital@expert.com", "phone": "+233502221133", "name": "Marketing Pro" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 508,
+      "email": "digital@expert.com",
+      "phone": "+233502221133",
+      "name": "Marketing Pro"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1074, "product": 145, "image": "https://picsum.photos/200", "created_at": "2024-01-04T12:00:00Z" }
+      {
+        "id": 1074,
+        "product": 145,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1075, "product": 145, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "12" }
+      {
+        "id": 1075,
+        "product": 145,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "12"
+      }
     ],
     "created_at": "2024-01-04T12:00:00Z",
     "updated_at": "2024-01-04T12:00:00Z"
@@ -1029,10 +2074,26 @@
     "price": 300,
     "duration": null,
     "category": 6,
-    "owner": { "id": 510, "email": "textiles@local.com", "phone": "+233551110099", "name": "Weavers Guild" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 510,
+      "email": "textiles@local.com",
+      "phone": "+233551110099",
+      "name": "Weavers Guild"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1076, "product": 146, "image": "https://picsum.photos/200", "created_at": "2024-01-04T13:00:00Z" }
+      {
+        "id": 1076,
+        "product": 146,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T13:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-04T13:00:00Z",
@@ -1050,10 +2111,26 @@
     "price": 2800,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1077, "product": 147, "image": "https://picsum.photos/200", "created_at": "2024-01-04T14:00:00Z" }
+      {
+        "id": 1077,
+        "product": 147,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-04T14:00:00Z",
@@ -1071,10 +2148,26 @@
     "price": "400",
     "duration": "course",
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1078, "product": 148, "image": "https://picsum.photos/200", "created_at": "2024-01-04T15:00:00Z" }
+      {
+        "id": 1078,
+        "product": 148,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-04T15:00:00Z",
@@ -1092,10 +2185,26 @@
     "price": 180,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1079, "product": 149, "image": "https://picsum.photos/200", "created_at": "2024-01-04T16:00:00Z" }
+      {
+        "id": 1079,
+        "product": 149,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-04T16:00:00Z",
@@ -1113,10 +2222,26 @@
     "price": 1200,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1080, "product": 150, "image": "https://picsum.photos/200", "created_at": "2024-01-04T17:00:00Z" }
+      {
+        "id": 1080,
+        "product": 150,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-04T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-04T17:00:00Z",
@@ -1134,13 +2259,40 @@
     "price": "5000",
     "duration": "month",
     "category": 1,
-    "owner": { "id": 502, "email": "land.seller@mail.com", "phone": "+233501112233", "name": "Tema Estates" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 502,
+      "email": "land.seller@mail.com",
+      "phone": "+233501112233",
+      "name": "Tema Estates"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1081, "product": 151, "image": "https://picsum.photos/200", "created_at": "2024-01-05T08:00:00Z" }
+      {
+        "id": 1081,
+        "product": 151,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1082, "product": 151, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "5000" }
+      {
+        "id": 1082,
+        "product": 151,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "5000"
+      }
     ],
     "created_at": "2024-01-05T08:00:00Z",
     "updated_at": "2024-01-05T08:00:00Z"
@@ -1157,10 +2309,26 @@
     "price": 800,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1083, "product": 152, "image": "https://picsum.photos/200", "created_at": "2024-01-05T09:00:00Z" }
+      {
+        "id": 1083,
+        "product": 152,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T09:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T09:00:00Z",
@@ -1178,13 +2346,40 @@
     "price": 80000,
     "duration": null,
     "category": 3,
-    "owner": { "id": 505, "email": "rentals@buscorp.net", "phone": "+233206665544", "name": "Bus Corp" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 505,
+      "email": "rentals@buscorp.net",
+      "phone": "+233206665544",
+      "name": "Bus Corp"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1084, "product": 153, "image": "https://picsum.photos/200", "created_at": "2024-01-05T10:00:00Z" }
+      {
+        "id": 1084,
+        "product": 153,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1085, "product": 153, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "Diesel" }
+      {
+        "id": 1085,
+        "product": 153,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "Diesel"
+      }
     ],
     "created_at": "2024-01-05T10:00:00Z",
     "updated_at": "2024-01-05T10:00:00Z"
@@ -1201,13 +2396,40 @@
     "price": 1800,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1086, "product": 154, "image": "https://picsum.photos/200", "created_at": "2024-01-05T11:00:00Z" }
+      {
+        "id": 1086,
+        "product": 154,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T11:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1087, "product": 154, "feature": { "id": 8, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Power (W)", "subcategory": 4 }, "value": "500" }
+      {
+        "id": 1087,
+        "product": 154,
+        "feature": {
+          "id": 8,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Power (W)",
+          "subcategory": 4
+        },
+        "value": "500"
+      }
     ],
     "created_at": "2024-01-05T11:00:00Z",
     "updated_at": "2024-01-05T11:00:00Z"
@@ -1224,13 +2446,40 @@
     "price": "250",
     "duration": "per visit",
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1088, "product": 155, "image": "https://picsum.photos/200", "created_at": "2024-01-05T12:00:00Z" }
+      {
+        "id": 1088,
+        "product": 155,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1089, "product": 155, "feature": { "id": 10, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Response Time (hrs)", "subcategory": 5 }, "value": "3" }
+      {
+        "id": 1089,
+        "product": 155,
+        "feature": {
+          "id": 10,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Response Time (hrs)",
+          "subcategory": 5
+        },
+        "value": "3"
+      }
     ],
     "created_at": "2024-01-05T12:00:00Z",
     "updated_at": "2024-01-05T12:00:00Z"
@@ -1247,10 +2496,26 @@
     "price": 950,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1090, "product": 156, "image": "https://picsum.photos/200", "created_at": "2024-01-05T13:00:00Z" }
+      {
+        "id": 1090,
+        "product": 156,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T13:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T13:00:00Z",
@@ -1268,10 +2533,26 @@
     "price": "100",
     "duration": "day",
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1091, "product": 157, "image": "https://picsum.photos/200", "created_at": "2024-01-05T14:00:00Z" }
+      {
+        "id": 1091,
+        "product": 157,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T14:00:00Z",
@@ -1289,10 +2570,26 @@
     "price": "700",
     "duration": "week",
     "category": 8,
-    "owner": { "id": 510, "email": "textiles@local.com", "phone": "+233551110099", "name": "Weavers Guild" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 510,
+      "email": "textiles@local.com",
+      "phone": "+233551110099",
+      "name": "Weavers Guild"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1092, "product": 158, "image": "https://picsum.photos/200", "created_at": "2024-01-05T15:00:00Z" }
+      {
+        "id": 1092,
+        "product": 158,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T15:00:00Z",
@@ -1310,10 +2607,26 @@
     "price": "200",
     "duration": "year",
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1093, "product": 159, "image": "https://picsum.photos/200", "created_at": "2024-01-05T16:00:00Z" }
+      {
+        "id": 1093,
+        "product": 159,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T16:00:00Z",
@@ -1331,10 +2644,26 @@
     "price": "150",
     "duration": "per visit",
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1094, "product": 160, "image": "https://picsum.photos/200", "created_at": "2024-01-05T17:00:00Z" }
+      {
+        "id": 1094,
+        "product": 160,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-05T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-05T17:00:00Z",
@@ -1352,13 +2681,40 @@
     "price": "1500",
     "duration": "month",
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1095, "product": 161, "image": "https://picsum.photos/200", "created_at": "2024-01-06T08:00:00Z" }
+      {
+        "id": 1095,
+        "product": 161,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1096, "product": 161, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "2" }
+      {
+        "id": 1096,
+        "product": 161,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "2"
+      }
     ],
     "created_at": "2024-01-06T08:00:00Z",
     "updated_at": "2024-01-06T08:00:00Z"
@@ -1375,13 +2731,40 @@
     "price": 25000,
     "duration": null,
     "category": 1,
-    "owner": { "id": 502, "email": "land.seller@mail.com", "phone": "+233501112233", "name": "Tema Estates" },
-    "location": { "id": 6, "region": "Volta", "name": "Hohoe Outskirts", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 502,
+      "email": "land.seller@mail.com",
+      "phone": "+233501112233",
+      "name": "Tema Estates"
+    },
+    "location": {
+      "id": 6,
+      "region": "Volta",
+      "name": "Hohoe Outskirts",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1097, "product": 162, "image": "https://picsum.photos/200", "created_at": "2024-01-06T09:00:00Z" }
+      {
+        "id": 1097,
+        "product": 162,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1098, "product": 162, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "87120" }
+      {
+        "id": 1098,
+        "product": 162,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "87120"
+      }
     ],
     "created_at": "2024-01-06T09:00:00Z",
     "updated_at": "2024-01-06T09:00:00Z"
@@ -1398,10 +2781,26 @@
     "price": 4500,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1099, "product": 163, "image": "https://picsum.photos/200", "created_at": "2024-01-06T10:00:00Z" }
+      {
+        "id": 1099,
+        "product": 163,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T10:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T10:00:00Z",
@@ -1419,13 +2818,40 @@
     "price": 1200,
     "duration": null,
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1100, "product": 164, "image": "https://picsum.photos/200", "created_at": "2024-01-06T11:00:00Z" }
+      {
+        "id": 1100,
+        "product": 164,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T11:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1101, "product": 164, "feature": { "id": 6, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Mileage (km)", "subcategory": 3 }, "value": "100" }
+      {
+        "id": 1101,
+        "product": 164,
+        "feature": {
+          "id": 6,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Mileage (km)",
+          "subcategory": 3
+        },
+        "value": "100"
+      }
     ],
     "created_at": "2024-01-06T11:00:00Z",
     "updated_at": "2024-01-06T11:00:00Z"
@@ -1442,13 +2868,40 @@
     "price": 3200,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1102, "product": 165, "image": "https://picsum.photos/200", "created_at": "2024-01-06T12:00:00Z" }
+      {
+        "id": 1102,
+        "product": 165,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1103, "product": 165, "feature": { "id": 8, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Power (W)", "subcategory": 4 }, "value": "1800" }
+      {
+        "id": 1103,
+        "product": 165,
+        "feature": {
+          "id": 8,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Power (W)",
+          "subcategory": 4
+        },
+        "value": "1800"
+      }
     ],
     "created_at": "2024-01-06T12:00:00Z",
     "updated_at": "2024-01-06T12:00:00Z"
@@ -1465,13 +2918,40 @@
     "price": "5000",
     "duration": "per project",
     "category": 5,
-    "owner": { "id": 508, "email": "digital@expert.com", "phone": "+233502221133", "name": "Marketing Pro" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 508,
+      "email": "digital@expert.com",
+      "phone": "+233502221133",
+      "name": "Marketing Pro"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1104, "product": 166, "image": "https://picsum.photos/200", "created_at": "2024-01-06T13:00:00Z" }
+      {
+        "id": 1104,
+        "product": 166,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T13:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1105, "product": 166, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "8" }
+      {
+        "id": 1105,
+        "product": 166,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "8"
+      }
     ],
     "created_at": "2024-01-06T13:00:00Z",
     "updated_at": "2024-01-06T13:00:00Z"
@@ -1488,10 +2968,26 @@
     "price": 400,
     "duration": null,
     "category": 6,
-    "owner": { "id": 510, "email": "textiles@local.com", "phone": "+233551110099", "name": "Weavers Guild" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 510,
+      "email": "textiles@local.com",
+      "phone": "+233551110099",
+      "name": "Weavers Guild"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1106, "product": 167, "image": "https://picsum.photos/200", "created_at": "2024-01-06T14:00:00Z" }
+      {
+        "id": 1106,
+        "product": 167,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T14:00:00Z",
@@ -1509,10 +3005,26 @@
     "price": 350,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1107, "product": 168, "image": "https://picsum.photos/200", "created_at": "2024-01-06T15:00:00Z" }
+      {
+        "id": 1107,
+        "product": 168,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T15:00:00Z",
@@ -1530,10 +3042,26 @@
     "price": 1800,
     "duration": null,
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1108, "product": 169, "image": "https://picsum.photos/200", "created_at": "2024-01-06T16:00:00Z" }
+      {
+        "id": 1108,
+        "product": 169,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T16:00:00Z",
@@ -1551,10 +3079,26 @@
     "price": 150,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1109, "product": 170, "image": "https://picsum.photos/200", "created_at": "2024-01-06T17:00:00Z" }
+      {
+        "id": 1109,
+        "product": 170,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T17:00:00Z",
@@ -1572,10 +3116,26 @@
     "price": "120",
     "duration": "per session",
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1110, "product": 171, "image": "https://picsum.photos/200", "created_at": "2024-01-06T18:00:00Z" }
+      {
+        "id": 1110,
+        "product": 171,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-06T18:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-06T18:00:00Z",
@@ -1593,13 +3153,40 @@
     "price": "4000",
     "duration": "month",
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1111, "product": 172, "image": "https://picsum.photos/200", "created_at": "2024-01-07T08:00:00Z" }
+      {
+        "id": 1111,
+        "product": 172,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1112, "product": 172, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "1500" }
+      {
+        "id": 1112,
+        "product": 172,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "1500"
+      }
     ],
     "created_at": "2024-01-07T08:00:00Z",
     "updated_at": "2024-01-07T08:00:00Z"
@@ -1616,13 +3203,40 @@
     "price": 18000,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1113, "product": 173, "image": "https://picsum.photos/200", "created_at": "2024-01-07T09:00:00Z" }
+      {
+        "id": 1113,
+        "product": 173,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1114, "product": 173, "feature": { "id": 4, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Processor", "subcategory": 2 }, "value": "Ryzen 9" }
+      {
+        "id": 1114,
+        "product": 173,
+        "feature": {
+          "id": 4,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Processor",
+          "subcategory": 2
+        },
+        "value": "Ryzen 9"
+      }
     ],
     "created_at": "2024-01-07T09:00:00Z",
     "updated_at": "2024-01-07T09:00:00Z"
@@ -1639,13 +3253,40 @@
     "price": "100",
     "duration": "day",
     "category": 3,
-    "owner": { "id": 505, "email": "rentals@buscorp.net", "phone": "+233206665544", "name": "Bus Corp" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 505,
+      "email": "rentals@buscorp.net",
+      "phone": "+233206665544",
+      "name": "Bus Corp"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1115, "product": 174, "image": "https://picsum.photos/200", "created_at": "2024-01-07T10:00:00Z" }
+      {
+        "id": 1115,
+        "product": 174,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1116, "product": 174, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "Gasoline" }
+      {
+        "id": 1116,
+        "product": 174,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "Gasoline"
+      }
     ],
     "created_at": "2024-01-07T10:00:00Z",
     "updated_at": "2024-01-07T10:00:00Z"
@@ -1662,10 +3303,26 @@
     "price": 900,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1117, "product": 175, "image": "https://picsum.photos/200", "created_at": "2024-01-07T11:00:00Z" }
+      {
+        "id": 1117,
+        "product": 175,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T11:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T11:00:00Z",
@@ -1683,13 +3340,40 @@
     "price": "300",
     "duration": "hour",
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1118, "product": 176, "image": "https://picsum.photos/200", "created_at": "2024-01-07T12:00:00Z" }
+      {
+        "id": 1118,
+        "product": 176,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1119, "product": 176, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "15" }
+      {
+        "id": 1119,
+        "product": 176,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "15"
+      }
     ],
     "created_at": "2024-01-07T12:00:00Z",
     "updated_at": "2024-01-07T12:00:00Z"
@@ -1706,10 +3390,26 @@
     "price": 450,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1120, "product": 177, "image": "https://picsum.photos/200", "created_at": "2024-01-07T13:00:00Z" }
+      {
+        "id": 1120,
+        "product": 177,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T13:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T13:00:00Z",
@@ -1727,10 +3427,26 @@
     "price": 950,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1121, "product": 178, "image": "https://picsum.photos/200", "created_at": "2024-01-07T14:00:00Z" }
+      {
+        "id": 1121,
+        "product": 178,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T14:00:00Z",
@@ -1748,10 +3464,26 @@
     "price": "5000",
     "duration": "per piece",
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1122, "product": 179, "image": "https://picsum.photos/200", "created_at": "2024-01-07T15:00:00Z" }
+      {
+        "id": 1122,
+        "product": 179,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T15:00:00Z",
@@ -1769,10 +3501,26 @@
     "price": 120,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1123, "product": 180, "image": "https://picsum.photos/200", "created_at": "2024-01-07T16:00:00Z" }
+      {
+        "id": 1123,
+        "product": 180,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T16:00:00Z",
@@ -1790,10 +3538,26 @@
     "price": 6000,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1124, "product": 181, "image": "https://picsum.photos/200", "created_at": "2024-01-07T17:00:00Z" }
+      {
+        "id": 1124,
+        "product": 181,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-07T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-07T17:00:00Z",
@@ -1811,14 +3575,52 @@
     "price": 2500000,
     "duration": null,
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1125, "product": 182, "image": "https://picsum.photos/200", "created_at": "2024-01-08T08:00:00Z" }
+      {
+        "id": 1125,
+        "product": 182,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1126, "product": 182, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "3500" },
-      { "id": 1127, "product": 182, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "4" }
+      {
+        "id": 1126,
+        "product": 182,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "3500"
+      },
+      {
+        "id": 1127,
+        "product": 182,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "4"
+      }
     ],
     "created_at": "2024-01-08T08:00:00Z",
     "updated_at": "2024-01-08T08:00:00Z"
@@ -1835,13 +3637,40 @@
     "price": "700",
     "duration": "month",
     "category": 1,
-    "owner": { "id": 502, "email": "land.seller@mail.com", "phone": "+233501112233", "name": "Tema Estates" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 502,
+      "email": "land.seller@mail.com",
+      "phone": "+233501112233",
+      "name": "Tema Estates"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1128, "product": 183, "image": "https://picsum.photos/200", "created_at": "2024-01-08T09:00:00Z" }
+      {
+        "id": 1128,
+        "product": 183,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1129, "product": 183, "feature": { "id": 1, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Size (sq ft)", "subcategory": 1 }, "value": "300" }
+      {
+        "id": 1129,
+        "product": 183,
+        "feature": {
+          "id": 1,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Size (sq ft)",
+          "subcategory": 1
+        },
+        "value": "300"
+      }
     ],
     "created_at": "2024-01-08T09:00:00Z",
     "updated_at": "2024-01-08T09:00:00Z"
@@ -1858,10 +3687,26 @@
     "price": 3800,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1130, "product": 184, "image": "https://picsum.photos/200", "created_at": "2024-01-08T10:00:00Z" }
+      {
+        "id": 1130,
+        "product": 184,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T10:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T10:00:00Z",
@@ -1879,13 +3724,40 @@
     "price": 7500,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1131, "product": 185, "image": "https://picsum.photos/200", "created_at": "2024-01-08T11:00:00Z" }
+      {
+        "id": 1131,
+        "product": 185,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T11:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1132, "product": 185, "feature": { "id": 4, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Processor", "subcategory": 2 }, "value": "Custom 8-Core" }
+      {
+        "id": 1132,
+        "product": 185,
+        "feature": {
+          "id": 4,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Processor",
+          "subcategory": 2
+        },
+        "value": "Custom 8-Core"
+      }
     ],
     "created_at": "2024-01-08T11:00:00Z",
     "updated_at": "2024-01-08T11:00:00Z"
@@ -1902,14 +3774,52 @@
     "price": 450000,
     "duration": null,
     "category": 3,
-    "owner": { "id": 504, "email": "car.trader@mail.com", "phone": "+233509998877", "name": "Reliable Rides" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 504,
+      "email": "car.trader@mail.com",
+      "phone": "+233509998877",
+      "name": "Reliable Rides"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1133, "product": 186, "image": "https://picsum.photos/200", "created_at": "2024-01-08T12:00:00Z" }
+      {
+        "id": 1133,
+        "product": 186,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1134, "product": 186, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "V8" },
-      { "id": 1135, "product": 186, "feature": { "id": 6, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Mileage (km)", "subcategory": 3 }, "value": "20000" }
+      {
+        "id": 1134,
+        "product": 186,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "V8"
+      },
+      {
+        "id": 1135,
+        "product": 186,
+        "feature": {
+          "id": 6,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Mileage (km)",
+          "subcategory": 3
+        },
+        "value": "20000"
+      }
     ],
     "created_at": "2024-01-08T12:00:00Z",
     "updated_at": "2024-01-08T12:00:00Z"
@@ -1926,13 +3836,40 @@
     "price": 250,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1136, "product": 187, "image": "https://picsum.photos/200", "created_at": "2024-01-08T13:00:00Z" }
+      {
+        "id": 1136,
+        "product": 187,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T13:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1137, "product": 187, "feature": { "id": 7, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Capacity (L)", "subcategory": 4 }, "value": "1.8" }
+      {
+        "id": 1137,
+        "product": 187,
+        "feature": {
+          "id": 7,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Capacity (L)",
+          "subcategory": 4
+        },
+        "value": "1.8"
+      }
     ],
     "created_at": "2024-01-08T13:00:00Z",
     "updated_at": "2024-01-08T13:00:00Z"
@@ -1949,13 +3886,40 @@
     "price": "500",
     "duration": "session",
     "category": 5,
-    "owner": { "id": 508, "email": "digital@expert.com", "phone": "+233502221133", "name": "Marketing Pro" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 508,
+      "email": "digital@expert.com",
+      "phone": "+233502221133",
+      "name": "Marketing Pro"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1138, "product": 188, "image": "https://picsum.photos/200", "created_at": "2024-01-08T14:00:00Z" }
+      {
+        "id": 1138,
+        "product": 188,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T14:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1139, "product": 188, "feature": { "id": 9, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Experience (Years)", "subcategory": 5 }, "value": "10" }
+      {
+        "id": 1139,
+        "product": 188,
+        "feature": {
+          "id": 9,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Experience (Years)",
+          "subcategory": 5
+        },
+        "value": "10"
+      }
     ],
     "created_at": "2024-01-08T14:00:00Z",
     "updated_at": "2024-01-08T14:00:00Z"
@@ -1972,10 +3936,26 @@
     "price": 750,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1140, "product": 189, "image": "https://picsum.photos/200", "created_at": "2024-01-08T15:00:00Z" }
+      {
+        "id": 1140,
+        "product": 189,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T15:00:00Z",
@@ -1993,10 +3973,26 @@
     "price": 5000,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1141, "product": 190, "image": "https://picsum.photos/200", "created_at": "2024-01-08T16:00:00Z" }
+      {
+        "id": 1141,
+        "product": 190,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T16:00:00Z",
@@ -2014,10 +4010,26 @@
     "price": "800",
     "duration": "per job",
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1142, "product": 191, "image": "https://picsum.photos/200", "created_at": "2024-01-08T17:00:00Z" }
+      {
+        "id": 1142,
+        "product": 191,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T17:00:00Z",
@@ -2035,10 +4047,26 @@
     "price": 300,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1143, "product": 192, "image": "https://picsum.photos/200", "created_at": "2024-01-08T18:00:00Z" }
+      {
+        "id": 1143,
+        "product": 192,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T18:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T18:00:00Z",
@@ -2056,10 +4084,26 @@
     "price": 100,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1144, "product": 193, "image": "https://picsum.photos/200", "created_at": "2024-01-08T19:00:00Z" }
+      {
+        "id": 1144,
+        "product": 193,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-08T19:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-08T19:00:00Z",
@@ -2077,13 +4121,40 @@
     "price": "500",
     "duration": "night",
     "category": 1,
-    "owner": { "id": 501, "email": "owner.r1@mail.com", "phone": "+233240001010", "name": "Kwame Properties" },
-    "location": { "id": 6, "region": "Volta", "name": "Hohoe Outskirts", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 501,
+      "email": "owner.r1@mail.com",
+      "phone": "+233240001010",
+      "name": "Kwame Properties"
+    },
+    "location": {
+      "id": 6,
+      "region": "Volta",
+      "name": "Hohoe Outskirts",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1145, "product": 194, "image": "https://picsum.photos/200", "created_at": "2024-01-09T08:00:00Z" }
+      {
+        "id": 1145,
+        "product": 194,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T08:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1146, "product": 194, "feature": { "id": 2, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Bedrooms", "subcategory": 1 }, "value": "3" }
+      {
+        "id": 1146,
+        "product": 194,
+        "feature": {
+          "id": 2,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Bedrooms",
+          "subcategory": 1
+        },
+        "value": "3"
+      }
     ],
     "created_at": "2024-01-09T08:00:00Z",
     "updated_at": "2024-01-09T08:00:00Z"
@@ -2100,13 +4171,40 @@
     "price": 450,
     "duration": null,
     "category": 2,
-    "owner": { "id": 503, "email": "tech.hub@mail.com", "phone": "+233273334455", "name": "Gadget Hub" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 503,
+      "email": "tech.hub@mail.com",
+      "phone": "+233273334455",
+      "name": "Gadget Hub"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1147, "product": 195, "image": "https://picsum.photos/200", "created_at": "2024-01-09T09:00:00Z" }
+      {
+        "id": 1147,
+        "product": 195,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T09:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1148, "product": 195, "feature": { "id": 3, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Battery Life (hrs)", "subcategory": 2 }, "value": "12" }
+      {
+        "id": 1148,
+        "product": 195,
+        "feature": {
+          "id": 3,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Battery Life (hrs)",
+          "subcategory": 2
+        },
+        "value": "12"
+      }
     ],
     "created_at": "2024-01-09T09:00:00Z",
     "updated_at": "2024-01-09T09:00:00Z"
@@ -2123,13 +4221,40 @@
     "price": "150",
     "duration": "day",
     "category": 3,
-    "owner": { "id": 505, "email": "rentals@buscorp.net", "phone": "+233206665544", "name": "Bus Corp" },
-    "location": { "id": 5, "region": "Northern", "name": "Tamale North", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 505,
+      "email": "rentals@buscorp.net",
+      "phone": "+233206665544",
+      "name": "Bus Corp"
+    },
+    "location": {
+      "id": 5,
+      "region": "Northern",
+      "name": "Tamale North",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1149, "product": 196, "image": "https://picsum.photos/200", "created_at": "2024-01-09T10:00:00Z" }
+      {
+        "id": 1149,
+        "product": 196,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T10:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1150, "product": 196, "feature": { "id": 5, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Engine Type", "subcategory": 3 }, "value": "Gasoline" }
+      {
+        "id": 1150,
+        "product": 196,
+        "feature": {
+          "id": 5,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Engine Type",
+          "subcategory": 3
+        },
+        "value": "Gasoline"
+      }
     ],
     "created_at": "2024-01-09T10:00:00Z",
     "updated_at": "2024-01-09T10:00:00Z"
@@ -2146,10 +4271,26 @@
     "price": 300,
     "duration": null,
     "category": 4,
-    "owner": { "id": 506, "email": "kitchen.outfit@mail.com", "phone": "+233554443322", "name": "Kitchen Outlet" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 506,
+      "email": "kitchen.outfit@mail.com",
+      "phone": "+233554443322",
+      "name": "Kitchen Outlet"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1151, "product": 197, "image": "https://picsum.photos/200", "created_at": "2024-01-09T11:00:00Z" }
+      {
+        "id": 1151,
+        "product": 197,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T11:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T11:00:00Z",
@@ -2167,13 +4308,40 @@
     "price": "Quote",
     "duration": null,
     "category": 5,
-    "owner": { "id": 507, "email": "fixit@plumbers.com", "phone": "+233248887766", "name": "Fix It Plumbers" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 507,
+      "email": "fixit@plumbers.com",
+      "phone": "+233248887766",
+      "name": "Fix It Plumbers"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1152, "product": 198, "image": "https://picsum.photos/200", "created_at": "2024-01-09T12:00:00Z" }
+      {
+        "id": 1152,
+        "product": 198,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T12:00:00Z"
+      }
     ],
     "product_features": [
-      { "id": 1153, "product": 198, "feature": { "id": 10, "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z", "name": "Response Time (hrs)", "subcategory": 5 }, "value": "24" }
+      {
+        "id": 1153,
+        "product": 198,
+        "feature": {
+          "id": 10,
+          "created_at": "2024-01-01T08:00:00Z",
+          "updated_at": "2024-01-01T08:00:00Z",
+          "name": "Response Time (hrs)",
+          "subcategory": 5
+        },
+        "value": "24"
+      }
     ],
     "created_at": "2024-01-09T12:00:00Z",
     "updated_at": "2024-01-09T12:00:00Z"
@@ -2190,10 +4358,26 @@
     "price": 250,
     "duration": null,
     "category": 6,
-    "owner": { "id": 509, "email": "shoes@boutique.com", "phone": "+233246665544", "name": "Footwear Palace" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 509,
+      "email": "shoes@boutique.com",
+      "phone": "+233246665544",
+      "name": "Footwear Palace"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1154, "product": 199, "image": "https://picsum.photos/200", "created_at": "2024-01-09T13:00:00Z" }
+      {
+        "id": 1154,
+        "product": 199,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T13:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T13:00:00Z",
@@ -2211,10 +4395,26 @@
     "price": 600,
     "duration": null,
     "category": 7,
-    "owner": { "id": 511, "email": "sports@store.com", "phone": "+233207776655", "name": "Sports Central" },
-    "location": { "id": 2, "region": "Greater Accra", "name": "Tema Harbor", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 511,
+      "email": "sports@store.com",
+      "phone": "+233207776655",
+      "name": "Sports Central"
+    },
+    "location": {
+      "id": 2,
+      "region": "Greater Accra",
+      "name": "Tema Harbor",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1155, "product": 200, "image": "https://picsum.photos/200", "created_at": "2024-01-09T14:00:00Z" }
+      {
+        "id": 1155,
+        "product": 200,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T14:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T14:00:00Z",
@@ -2232,10 +4432,26 @@
     "price": 350,
     "duration": null,
     "category": 8,
-    "owner": { "id": 512, "email": "gallery@artspace.org", "phone": "+233279998877", "name": "The Art Gallery" },
-    "location": { "id": 1, "region": "Greater Accra", "name": "Accra Central", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 512,
+      "email": "gallery@artspace.org",
+      "phone": "+233279998877",
+      "name": "The Art Gallery"
+    },
+    "location": {
+      "id": 1,
+      "region": "Greater Accra",
+      "name": "Accra Central",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1156, "product": 201, "image": "https://picsum.photos/200", "created_at": "2024-01-09T15:00:00Z" }
+      {
+        "id": 1156,
+        "product": 201,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T15:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T15:00:00Z",
@@ -2253,10 +4469,26 @@
     "price": 280,
     "duration": null,
     "category": 9,
-    "owner": { "id": 513, "email": "rarebooks@collector.com", "phone": "+233503332211", "name": "Book Collector" },
-    "location": { "id": 3, "region": "Ashanti", "name": "Kumasi Oforikrom", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 513,
+      "email": "rarebooks@collector.com",
+      "phone": "+233503332211",
+      "name": "Book Collector"
+    },
+    "location": {
+      "id": 3,
+      "region": "Ashanti",
+      "name": "Kumasi Oforikrom",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1157, "product": 202, "image": "https://picsum.photos/200", "created_at": "2024-01-09T16:00:00Z" }
+      {
+        "id": 1157,
+        "product": 202,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T16:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T16:00:00Z",
@@ -2274,10 +4506,26 @@
     "price": 500,
     "duration": null,
     "category": 10,
-    "owner": { "id": 514, "email": "petsupply@mail.com", "phone": "+233244443322", "name": "Pet Supply Store" },
-    "location": { "id": 4, "region": "Western", "name": "Takoradi Beach", "created_at": "2024-01-01T08:00:00Z", "updated_at": "2024-01-01T08:00:00Z" },
+    "owner": {
+      "id": 514,
+      "email": "petsupply@mail.com",
+      "phone": "+233244443322",
+      "name": "Pet Supply Store"
+    },
+    "location": {
+      "id": 4,
+      "region": "Western",
+      "name": "Takoradi Beach",
+      "created_at": "2024-01-01T08:00:00Z",
+      "updated_at": "2024-01-01T08:00:00Z"
+    },
     "images": [
-      { "id": 1158, "product": 203, "image": "https://picsum.photos/200", "created_at": "2024-01-09T17:00:00Z" }
+      {
+        "id": 1158,
+        "product": 203,
+        "image": "https://picsum.photos/200",
+        "created_at": "2024-01-09T17:00:00Z"
+      }
     ],
     "product_features": [],
     "created_at": "2024-01-09T17:00:00Z",

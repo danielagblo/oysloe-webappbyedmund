@@ -1,6 +1,6 @@
 import type {
-    RedeemPointsRequest,
-    RedeemPointsResponse,
+  RedeemPointsRequest,
+  RedeemPointsResponse,
 } from "../types/RedeemPoints";
 import { apiClient } from "./apiClient";
 import endpoints from "./endpoints";

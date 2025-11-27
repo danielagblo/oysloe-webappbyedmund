@@ -6,7 +6,6 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import "../App.css";
-import DebuggerButton from "../components/DebuggerButton";
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 import type { Category } from "../types/Category";
@@ -14,19 +13,25 @@ import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
 
 const HomePage = () => {
-
-  const { categories, loading: categoriesLoading, error: categoriesError } = useCategories();
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
   const [showFilterPopup, setShowFilterPopup] = useState(false);
 
   const handleCategoryClick = (name: string) => {
-    const category = categories.find(c => c.name === name) || null;
+    const category = categories.find((c) => c.name === name) || null;
     setSelectedCategory(category);
   };
   const handleFilterSettings = () => setShowFilterPopup(true);
   const closeFilterPopup = () => setShowFilterPopup(false);
 
-  if (categoriesError) console.error("Failed to load categories:", categoriesError);
+  if (categoriesError)
+    console.error("Failed to load categories:", categoriesError);
 
   const { data: products = [] } = useProducts();
 
@@ -52,10 +57,14 @@ const HomePage = () => {
   }, {} as Record<number, Product[]>);
 
 
+
   /* API BIT ENDS HERE */
   if (categoriesLoading) console.log("Loading up categories...");
 
-  const handleArrowClick = (direction: "left" | "right", id: string | number) => {
+  const handleArrowClick = (
+    direction: "left" | "right",
+    id: string | number,
+  ) => {
     const container = document.querySelector(
       `#move-${id}`,
     ) as HTMLElement | null;
@@ -206,9 +215,9 @@ const HomePage = () => {
 
   const ShowFilter = () => (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto shadow-lg">
+      <div className="relative pt-30 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
         {/* Close button */}
-        <div className="p-4 sm:p-6">
+        <div className="absolute top-0 left-0 p-4 sm:p-6">
           <button onClick={closeFilterPopup} className="block mb-3">
             <svg
               width="55"
@@ -274,7 +283,10 @@ const HomePage = () => {
       </div>
     </div>
   );
-  const SelectACategory = ({ categories, onCategoryClick }: {
+  const SelectACategory = ({
+    categories,
+    onCategoryClick,
+  }: {
     categories: Category[];
     onCategoryClick: (name: string) => void;
   }) => (
@@ -351,9 +363,15 @@ const HomePage = () => {
     </div>
   );
 
-  const CircularSummaries = ({ categories, total }: { categories: (Category & { adsCount: number })[], total: number }) => (
+  const CircularSummaries = ({
+    categories,
+    total,
+  }: {
+    categories: (Category & { adsCount: number })[];
+    total: number;
+  }) => (
     <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 h-50">
-      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 md:w-3/5 gap-2">
+      <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2">
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
           .sort((a, b) => b.adsCount - a.adsCount)
@@ -395,7 +413,7 @@ const HomePage = () => {
   );
 
   const ScrollableAds = () => {
-    return categories.map(category => {
+    return categories.map((category) => {
       const categoryProducts = productsByCategory[category.id] || [];
       if (!categoryProducts || categoryProducts.length === 0) return;
 
@@ -426,7 +444,6 @@ const HomePage = () => {
               </button>
             </div>
           </div>
-          <DebuggerButton title="products" data={products} />
 
           <div
             id={`move-${category.id}`}
@@ -434,7 +451,8 @@ const HomePage = () => {
           >
             {categoryProducts.length > 0 ? (
               <div className="flex gap-2 sm:gap-3 w-max">
-                {categoryProducts.map(ad => (
+                {categoryProducts.map((ad) => (
+                  ad.status === "ACTIVE" &&
                   <Link
                     key={ad.id}
                     to={`/ads/${ad.id}`}
@@ -447,7 +465,11 @@ const HomePage = () => {
                       className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                     />
                     <div className="flex items-center gap-1 px-2 py-1">
-                      <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5" />
+                      <img
+                        src="/location.svg"
+                        alt=""
+                        className="w-3 sm:w-5 h-3 sm:h-5"
+                      />
                       <p className="text-[10px] sm:text-sm text-gray-500 truncate">
                         {ad.location?.name ?? ad.location?.region ?? ""}
                       </p>
@@ -462,7 +484,9 @@ const HomePage = () => {
                 ))}
               </div>
             ) : (
-              <p className="px-2 text-sm text-gray-500">No ads to show here...</p>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
             )}
           </div>
         </div>
@@ -483,7 +507,7 @@ const HomePage = () => {
           className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
         >
           {categoryProducts.length > 0 ? (
-            categoryProducts.map(ad => (
+            categoryProducts.map((ad) => (
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
                 <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
                   <img
@@ -493,15 +517,23 @@ const HomePage = () => {
                   />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
-                    <p className="text-xs text-gray-500">{ad.location?.name ?? ad.location?.region ?? ""}</p>
+                    <p className="text-xs text-gray-500">
+                      {ad.location.name || ad.location.region}
+                    </p>
                   </div>
-                  <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
-                  <p className="px-2 text-sm font-light text-gray-500">{formatMoney(ad.price, "GHS")}</p>
+                  <p className="px-2 text-sm truncate text-gray-500">
+                    {ad.name}
+                  </p>
+                  <p className="px-2 text-sm font-light text-gray-500">
+                    {formatMoney(ad.price, "GHS")}
+                  </p>
                 </Link>
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 col-span-full">No ads to show here...</p>
+            <p className="text-center text-gray-500 col-span-full">
+              No ads to show here...
+            </p>
           )}
         </div>
       </div>

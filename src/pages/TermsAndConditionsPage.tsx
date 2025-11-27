@@ -16,14 +16,15 @@ function TermsAndConditionsPage() {
           <h3 className="text-2xl">{policy?.title ?? "Terms & Conditions"}</h3>
           <p className="text-sm text-gray-500">{policy?.date ?? ""}</p>
           {isLoading && <p className="mt-4">Loading...</p>}
-          {isError && <p className="mt-4 text-red-500">Failed to load terms.</p>}
+          {isError && (
+            <p className="mt-4 text-red-500">Failed to load terms.</p>
+          )}
           {!isLoading && policy && (
             <div
               className="prose max-w-none mt-4 pb-20 text-sm text-left"
               dangerouslySetInnerHTML={{ __html: policy.body }}
             />
           )}
-
         </div>
       </div>
     </div>

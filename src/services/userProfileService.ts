@@ -15,7 +15,10 @@ export const getUserPreferences = async (): Promise<UserProfile> => {
 export const updateUserPreferences = async (
   body: UserProfileUpdatePayload,
 ): Promise<UserProfile> => {
-  return apiClient.put<UserProfile>(endpoints.userProfile.userPreferences, body);
+  return apiClient.put<UserProfile>(
+    endpoints.userProfile.userPreferences,
+    body,
+  );
 };
 
 // User Profile
