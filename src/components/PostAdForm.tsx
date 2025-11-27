@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { toast } from 'sonner';
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import DropdownPopup from "./DropDownPopup";
 import uploadImg from "../assets/upload.png";
@@ -134,7 +135,7 @@ export default function PostAdForm() {
 
     if (errors.length > 0) {
       console.warn("Validation errors:", errors);
-      alert("Please fix: " + errors.join(" "));
+      toast.error("Please fix: " + errors.join(" "));
       setIsSubmitting(false);
       return;
     }
@@ -168,19 +169,13 @@ export default function PostAdForm() {
     try {
       const result = await api.uploadAd(metadata);
       console.log("Server response:", result);
-      // alert(result.message || "Ad saved successfully!");
+      // show success modal and toast
+      toast.success(result?.message || 'Ad saved successfully!');
       setShowSuccess(true);
     } catch (err: unknown) {
       console.error("Upload failed:", err);
-
-      if (err instanceof Error) {
-        alert(
-          err.message ||
-            "An error occurred while saving. See console for details.",
-        );
-      } else {
-        alert("An unexpected error occurred. See console for details.");
-      }
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(msg || 'An error occurred while saving.');
     } finally {
       setIsSubmitting(false);
     }

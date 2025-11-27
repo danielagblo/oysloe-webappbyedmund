@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPInput from "../components/OTPInput";
 import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -40,10 +40,13 @@ const VerificationPage = () => {
         setLocalLoading(true);
         setLocalError(null);
         // const resp =
-        await verifyOTP(phone, otpValue);
+        const resp = (await verifyOTP(phone, otpValue)) as {
+          token: string;
+          user: unknown;
+        };
         // store token and user
-        // localStorage.setItem("oysloe_token", resp.token);
-        // localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
+        localStorage.setItem("oysloe_token", resp.token);
+        localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
         navigate("/homepage");
       } else {
         // reset-password flow

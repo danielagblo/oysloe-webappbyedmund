@@ -1,6 +1,7 @@
 import { Camera, PlusIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from 'sonner';
 import mailGif from "../assets/mail.gif";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
@@ -78,6 +79,17 @@ const EditProfilePage = ({
   ) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = fallback;
+  };
+
+  const stripAssetPath = (val?: string) => {
+    if (!val) return val;
+    try {
+      // If the value is an assets path, return just the filename
+      if (val.includes('/assets/')) return val.split('/').pop();
+    } catch {
+      // ignore
+    }
+    return val;
   };
 
   const navigate = useNavigate();
@@ -370,7 +382,7 @@ const EditProfilePage = ({
                       form.append('preferred_notification_email', selectedUser?.email ?? '');
                       form.append('preferred_notification_phone', selectedUser?.phonePrimary ?? '');
 
-                      await apiClient.put(endpoints.userProfile.userProfile, form);
+                      await apiClient.patch(endpoints.userProfile.userProfile, form);
                     } else {
                       // build JSON payload according to UserProfileUpdatePayload
                       const payload: any = {
@@ -378,8 +390,9 @@ const EditProfilePage = ({
                         email: selectedUser?.email,
                         phone: selectedUser?.phonePrimary,
                         address: (selectedUser as any)?.address,
-                        avatar: selectedUser?.profileImage,
-                        business_logo: selectedUser?.businessLogo,
+                        // strip local asset paths so backend doesn't try to process them
+                        avatar: stripAssetPath(selectedUser?.profileImage),
+                        business_logo: stripAssetPath(selectedUser?.businessLogo),
                         business_name: selectedUser?.businessName,
                         account_name: selectedUser?.accountName,
                         account_number: selectedUser?.accountNumber,
@@ -393,8 +406,11 @@ const EditProfilePage = ({
                     }
                     // close edit view on success
                     setShowEdit(false);
+                    toast.success('Profile saved');
                   } catch (err: any) {
-                    setSaveError(err?.message || 'Failed to save profile');
+                    const msg = err instanceof Error ? err.message : String(err);
+                    setSaveError(msg || 'Failed to save profile');
+                    toast.error(msg || 'Failed to save profile');
                   } finally {
                     setIsSaving(false);
                   }

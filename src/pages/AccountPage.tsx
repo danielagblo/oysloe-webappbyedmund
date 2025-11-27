@@ -1,16 +1,34 @@
 import { useState } from "react";
+import { toast } from 'sonner';
+import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 import EditProfilePage from "./EditProfilePage";
 
 const AccountPage = () => {
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
+  const { create } = useAccountDeleteRequest();
 
-  const handleDelete = () => {
-    // TODO: call API with deleteReason
-    console.log("Deleting account for reason:", deleteReason);
-    setShowDeleteModal(false);
-    setDeleteReason("");
+  const handleDelete = async () => {
+    if (!deleteReason) {
+      toast.warning("Delete reason required");
+      return;
+    }
+
+    if (typeof create !== "function") {
+      toast.error("Account delete action is not available");
+      return;
+    }
+
+    try {
+      await create({ reason: deleteReason });
+      setShowDeleteModal(false);
+      setDeleteReason("");
+      toast.success("Account delete request submitted successfully");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Failed to submit delete request: ${msg}`);
+    }
   };
 
   if (showEdit) {
