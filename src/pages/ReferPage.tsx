@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from 'sonner';
 import "../App.css";
 import Button from "../components/Button";
 import CopyButton from "../components/CopyButton";
@@ -340,16 +341,21 @@ const ReferPage = () => {
     </div>
   );
   function RedrawInner() {
-    const { redeem, isLoading, isError, data, error } = useRedeemPoints();
+    const { redeem, isError, data, error } = useRedeemPoints();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleRedeem = async () => {
       if (redeemableBlocks === 0) return;
+      setIsLoading(true);
       try {
         await redeem();
         // refresh profile so UI updates; call refetchProfile if available
-        if (typeof refetchProfile === "function") await refetchProfile();
+        if (typeof refetchProfile === 'function') await refetchProfile();
+        toast.success(`Redeemed GH₵${redeemableGhc.toLocaleString()}`);
       } catch {
-        // errors handled by hook; optionally show toast
+        toast.error('Redeem failed. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -387,9 +393,10 @@ const ReferPage = () => {
       if (!code) return;
       try {
         await apply(code);
+        toast.success('Coupon applied successfully');
         setCode("");
       } catch {
-        // error surfaced via isError / error
+        toast.error('Failed to apply coupon');
       }
     };
 

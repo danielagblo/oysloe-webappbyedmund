@@ -1,8 +1,8 @@
 import type {
-  MessageResponse,
-  OTPVerifyRequest,
-  UserProfile,
-  UserProfileUpdatePayload,
+    MessageResponse,
+    OTPVerifyRequest,
+    UserProfile,
+    UserProfileUpdatePayload,
 } from "../types/UserProfile";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
@@ -29,7 +29,7 @@ export const getUserProfile = async (): Promise<UserProfile> => {
 export const updateUserProfile = async (
   body: UserProfileUpdatePayload,
 ): Promise<UserProfile> => {
-  return apiClient.put<UserProfile>(endpoints.userProfile.userProfile, body);
+  return apiClient.patch<UserProfile>(endpoints.userProfile.userProfile, body);
 };
 
 // OTP Verification

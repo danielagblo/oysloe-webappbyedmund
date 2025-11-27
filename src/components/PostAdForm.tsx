@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import DropdownPopup from "./DropDownPopup";
-import uploadImg from "../assets/upload.png";
-import sample from "/sample.png";
-import { ghanaRegionsAndPlaces } from "../data/regions";
-import { categoryOptions } from "../data/categories";
-import LocationSelector from "./LocationSelector";
+import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import { useEffect, useRef, useState } from "react";
+import { toast } from 'sonner';
 import { mockPostAd } from "../api/mock";
 import { postAd } from "../api/postAd";
-import { type AdMetadata } from "../types/AdMetaData";
 import submittedGif from "../assets/Submitted.gif";
+import uploadImg from "../assets/upload.png";
+import { categoryOptions } from "../data/categories";
+import { ghanaRegionsAndPlaces } from "../data/regions";
+import { type AdMetadata } from "../types/AdMetaData";
+import DropdownPopup from "./DropDownPopup";
+import LocationSelector from "./LocationSelector";
+import sample from "/sample.png";
 
 // mock || realApi toggle, currently using mock
 const useMock = true;
@@ -134,7 +135,7 @@ export default function PostAdForm() {
 
     if (errors.length > 0) {
       console.warn("Validation errors:", errors);
-      alert("Please fix: " + errors.join(" "));
+      toast.error("Please fix: " + errors.join(" "));
       setIsSubmitting(false);
       return;
     }
@@ -150,10 +151,10 @@ export default function PostAdForm() {
       },
       location: mapSelection
         ? {
-            type: "map",
-            placeName: mapSelection.placeName,
-            coords: mapSelection.coords,
-          }
+          type: "map",
+          placeName: mapSelection.placeName,
+          coords: mapSelection.coords,
+        }
         : { type: "region", value: regionLocation },
       images: uploadedImages.map((img) => ({
         id: img.id,
@@ -168,19 +169,13 @@ export default function PostAdForm() {
     try {
       const result = await api.uploadAd(metadata);
       console.log("Server response:", result);
-      // alert(result.message || "Ad saved successfully!");
+      // show success modal and toast
+      toast.success(result?.message || 'Ad saved successfully!');
       setShowSuccess(true);
     } catch (err: unknown) {
       console.error("Upload failed:", err);
-
-      if (err instanceof Error) {
-        alert(
-          err.message ||
-            "An error occurred while saving. See console for details.",
-        );
-      } else {
-        alert("An unexpected error occurred. See console for details.");
-      }
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(msg || 'An error occurred while saving.');
     } finally {
       setIsSubmitting(false);
     }
@@ -334,27 +329,27 @@ export default function PostAdForm() {
                       options={
                         label.trigger === "daily"
                           ? [
-                              "30 days - 1 month",
-                              "60 days - 2 months",
-                              "90 days - 3 months",
-                            ]
+                            "30 days - 1 month",
+                            "60 days - 2 months",
+                            "90 days - 3 months",
+                          ]
                           : label.trigger === "weekly"
                             ? [
-                                "8 weeks - 2 months",
-                                "12 weeks - 3 months",
-                                "16 weeks - 4 months",
-                                "20 weeks - 5 months",
-                              ]
+                              "8 weeks - 2 months",
+                              "12 weeks - 3 months",
+                              "16 weeks - 4 months",
+                              "20 weeks - 5 months",
+                            ]
                             : [
-                                "4 months",
-                                "5 months",
-                                "6 months",
-                                "7 months",
-                                "8 months",
-                                "9 months",
-                                "10 months",
-                                "12 months",
-                              ]
+                              "4 months",
+                              "5 months",
+                              "6 months",
+                              "7 months",
+                              "8 months",
+                              "9 months",
+                              "10 months",
+                              "12 months",
+                            ]
                       }
                       onSelect={(opt) => handleSelect(label.trigger, opt)}
                     />

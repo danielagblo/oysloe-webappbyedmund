@@ -109,7 +109,6 @@ const AdsDetailsPage = () => {
     }
   };
 
-  /* Anything below was added before API integration */
 
   // navigation
   const currentId = parseInt(id || "1");
