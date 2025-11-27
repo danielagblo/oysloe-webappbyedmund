@@ -1,5 +1,5 @@
-import MenuButton from "../components/MenuButton";
 import { useState } from "react";
+import MenuButton from "../components/MenuButton";
 import { ads } from "../data/ads";
 
 const AdsPage = () => {
@@ -12,21 +12,20 @@ const AdsPage = () => {
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
         <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
-          <div className="hidden md:flex justify-around items-center px-4 pb-2">
+          <div className="hidden sm:flex justify-around items-center px-4 pb-2">
             {["Active", "Pending", "Taken", "Suspended"].map((status) => (
               <div
                 key={status}
                 onClick={() => setActiveTab(status)}
-                className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors ${
-                  activeTab === status
-                    ? "border-[var(--dark-def)]"
-                    : "border-transparent hover:border-gray-300"
-                }`}
+                className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors ${activeTab === status
+                  ? "border-[var(--dark-def)]"
+                  : "border-transparent hover:border-gray-300"
+                  }`}
               >
                 <img
                   src={`/${status.toLowerCase()}.svg`}
                   alt={status}
-                  className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5"
+                  className="w-10 h-auto hidden md:block bg-[#f3f4f6] rounded-full p-2.5"
                 />
                 <div>
                   <h2>{ads.filter((ad) => ad.status === status).length} Ads</h2>
