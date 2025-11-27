@@ -8,11 +8,12 @@ import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
 
-const EditProfilePage = ({
-  setShowEdit,
-}: {
-  setShowEdit: (value: boolean) => void;
-}) => {
+// const EditProfilePage = ({
+//   setShowEdit,
+// }: {
+//   setShowEdit: (value: boolean) => void;
+// }) => {
+const EditProfilePage = () => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -22,6 +23,10 @@ const EditProfilePage = ({
   const { profile, updateProfile } = useUserProfile();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  //readonly toggle
+  const [isReadonly, setIsReadonly] = useState<boolean>(true);
+  const [isReadonlyRight, setIsReadonlyRight] = useState<boolean>(true);
 
   const [selectedUser, setSelectedUser] = useState<{
     profileImage?: string;
@@ -111,14 +116,14 @@ const EditProfilePage = ({
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
-            <button
+            {/* <button
               className="absolute top-4 max-lg:top-7 max-lg:left-20 left-4 flex items-center justify-center bg-white shadow-sm px-2 rounded-lg hover:scale-95 cursor-pointer hover:bg-gray-100 transition"
               onClick={() => setShowEdit(false)}
             >
               <span className="text-2xl">← </span>
               &nbsp;
               <span className="text-sm">Back</span>
-            </button>
+            </button> */}
             {closeProgress && (
               <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
                 {setupProgress === 100 && (
@@ -237,11 +242,17 @@ const EditProfilePage = ({
 
             {/* general details */}
             <div className="w-[95%] bg-white p-4 rounded-md">
-              <p className="mb-2 text-sm font-medium">General Details</p>
-
+              <div className="flex gap-6 items-center mb-2">
+                <p className="text-sm font-medium">General Details</p>
+                <button
+                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                  onClick={() => setIsReadonly(!isReadonly)}
+                >{isReadonly ? "Edit" : "Preview"}</button>
+              </div>  
               <label className="text-xs text-gray-600">Name</label>
               <input
                 name="name"
+                readOnly={isReadonly}
                 value={selectedUser?.name ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -256,6 +267,7 @@ const EditProfilePage = ({
               </div>
               <input
                 name="email"
+                readOnly={isReadonly}
                 value={selectedUser?.email ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -264,6 +276,7 @@ const EditProfilePage = ({
               <label className="text-xs text-gray-600">First Number</label>
               <input
                 name="phonePrimary"
+                readOnly={isReadonly}
                 value={selectedUser?.phonePrimary ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -272,6 +285,7 @@ const EditProfilePage = ({
               <label className="text-xs text-gray-600">Second Number</label>
               <input
                 name="phoneSecondary"
+                readOnly={isReadonly}
                 value={selectedUser?.phoneSecondary ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -286,6 +300,7 @@ const EditProfilePage = ({
               </div>
               <input
                 name="nationalId"
+                readOnly={isReadonly}
                 value={selectedUser?.nationalId ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -296,6 +311,7 @@ const EditProfilePage = ({
                   <label>Business Name</label>
                   <input
                     name="businessName"
+                    readOnly={isReadonly}
                     value={selectedUser?.businessName ?? ""}
                     onChange={handleInputChange}
                     className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -325,7 +341,7 @@ const EditProfilePage = ({
           </div>
         </div>
 
-        {/* RIGHT COLUMN: full width on small screens, half on md+; content grows naturally */}
+        {/* business details */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-0 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
             {!linkSent && (
@@ -347,10 +363,17 @@ const EditProfilePage = ({
             )}
 
             <div className="w-[95%] bg-white p-4 rounded-md">
-              <p className="mt-2 mb-1 text-sm font-medium">Payment Account</p>
+              <div className="flex gap-6 items-center my-2">
+                <p className="text-sm font-medium">Payment Account</p>
+                <button
+                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                  onClick={() => setIsReadonlyRight(!isReadonlyRight)}
+                >{isReadonlyRight ? "Edit" : "Preview"}</button>
+              </div>
               <label className="text-xs text-gray-600">Account Name</label>
               <input
                 name="accountName"
+                readOnly={isReadonlyRight}
                 value={selectedUser?.accountName ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -359,6 +382,7 @@ const EditProfilePage = ({
               <label className="text-xs text-gray-600">Account Number</label>
               <input
                 name="accountNumber"
+                readOnly={isReadonlyRight}
                 value={selectedUser?.accountNumber ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -367,6 +391,7 @@ const EditProfilePage = ({
               <label className="text-xs text-gray-600">Mobile Network</label>
               <input
                 name="mobileNetwork"
+                readOnly={isReadonlyRight}
                 value={selectedUser?.mobileNetwork ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -438,7 +463,7 @@ const EditProfilePage = ({
                       await updateProfile(payload);
                     }
                     // close edit view on success
-                    setShowEdit(false);
+                    // setShowEdit(false);
                     toast.success('Profile saved');
                   } catch (err: any) {
                     const msg = err instanceof Error ? err.message : String(err);

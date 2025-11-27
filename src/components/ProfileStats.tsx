@@ -1,6 +1,7 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
+import DebuggerButton from "./DebuggerButton";
 import ProgressBar from "./ProgressBar";
 import RatingReviews from "./RatingsReviews";
 
@@ -9,10 +10,7 @@ export default function ProfileStats() {
   let name = (user as UserProfile)?.name;
   // break names into single entities by the space ok
   const nameParts = name?.split(" ") || [];
-  const names = [];
-  names.push(nameParts[0] || "");
-  names.push(nameParts[nameParts.length - 1] || "");
-  name = names.join(" ");
+  name = (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "");
 
   // mini components
   const Profile = () => (
@@ -23,7 +21,7 @@ export default function ProfileStats() {
         className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        {loading ? "" : name || " "}
+        {loading ? "User" : (name !== " ") ? name : "User"}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>

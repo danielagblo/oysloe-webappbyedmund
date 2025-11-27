@@ -2,7 +2,7 @@ import { useState } from "react";
 import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
-import AccountPage from "./AccountPage";
+// import AccountPage from "./AccountPage";
 import AdsPage from "./AdsPage";
 import FavouritesPage from "./FavouritesPage";
 import FeedbackPage from "./FeedbackPage";
@@ -10,6 +10,7 @@ import PrivacyPage from "./PrivacyPage";
 import ReferPage from "./ReferPage";
 import SubscriptionPage from "./SubscriptionPage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
+import EditProfilePage from "./EditProfilePage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -17,7 +18,7 @@ const ProfilePage = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "profile":
-        return <AccountPage />;
+        return <EditProfilePage />;
       case "favorite":
         return <FavouritesPage />;
       case "ads":

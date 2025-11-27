@@ -231,3 +231,6 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-out;
 }
+input[read-only] {
+  cursor: not-allowed;
+}

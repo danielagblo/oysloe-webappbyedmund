@@ -575,7 +575,7 @@ export default function PostAdForm() {
 
             {isMobile && (
               <>
-                <div className="w-full flex justify-center items-center">
+                <div className="w-full flex justify-center items-center sm:hidden">
                   <button
                     onClick={() => setMobileStep("form")}
                     type="button"
