@@ -369,7 +369,7 @@ const ReferPage = () => {
   }
   const Apply = () => {
     const [code, setCode] = useState("");
-    const { apply, isPending, isError, data, error } = useApplyCoupon();
+    const { apply, isLoading, isError, data, error } = useApplyCoupon();
 
     const handleApply = async () => {
       if (!code) return;
@@ -403,9 +403,9 @@ const ReferPage = () => {
             <button
               className="absolute right-1 top-1 bg-white rounded-lg px-3 py-2"
               onClick={handleApply}
-              disabled={isPending || !code}
+              disabled={isLoading || !code}
             >
-              {isPending ? "Applying..." : "Apply"}
+              {isLoading ? "Applying..." : "Apply"}
             </button>
           </div>
           <div className="w-full mt-0">
