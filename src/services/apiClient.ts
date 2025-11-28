@@ -39,6 +39,15 @@ async function request<T>(
     // ignore localStorage errors (e.g., private mode) and continue without auth header
     void e;
   }
+  // DEV-only: log the final headers so we can verify Authorization is attached
+  if (import.meta.env.DEV) {
+    try {
+       
+      console.debug("apiClient request:", { fullUrl, headers });
+    } catch (e) {
+      void e;
+    }
+  }
   const body =
     options.body instanceof FormData
       ? options.body

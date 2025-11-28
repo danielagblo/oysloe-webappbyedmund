@@ -3,7 +3,7 @@ import type { ProductFeature } from "./ProductFeature";
 import type { ProductImage } from "./ProductImage";
 
 export type ProductType = "SALE" | "RENT" | "SERVICE";
-export type ProductStatus = "ACTIVE" | "INACTIVE" | "SOLD" | "RENTED";
+export type ProductStatus = "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED";
 
 export interface ProductOwner {
   id: number;

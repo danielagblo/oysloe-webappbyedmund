@@ -1,4 +1,5 @@
 import mockProductsRaw from "../assets/mocks/products.json";
+// NOTE: AdMetadata import removed because this helper accepts metadata that may include File objects
 import type { Product, ProductPayload, ProductStatus } from "../types/Product";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
@@ -183,22 +184,188 @@ export const getRelatedProducts = async (): Promise<Product[]> => {
 export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> => {
   // allow ownerId === 0 in case that's a valid id; only bail on null/undefined
   if (ownerId == null) return [];
-
-  // Some backends don't support an `owner` query param. Fetch all products
-  // and filter client-side to ensure we return the owner's products.
   const all = await getProducts();
 
   const filtered = all.filter((p) => {
-    const o = p.owner as any;
+     const o = p.owner as unknown;
     if (typeof o === 'number') return o === ownerId;
-    if (o && typeof o === 'object' && typeof o.id === 'number') return o.id === ownerId;
+    const obj = o as { id?: unknown };
+    if (obj && typeof obj.id === 'number') return obj.id === ownerId;
     return false;
   });
 
-  if (import.meta.env.DEV) console.debug("getProductsForOwner -> filtered count:", filtered.length);
-
   return filtered;
 };
+
+export const createProductFromAd = async (metadata: any) => {
+  // Map purpose -> ProductType
+  const mapType = (p?: string) => {
+    if (!p) return ("SALE") as const;
+    if (p.toLowerCase() === "sale") return ("SALE") as const;
+    if (p.toLowerCase() === "rent") return ("RENT") as const;
+    return ("SERVICE") as const;
+  };
+
+  const price =
+    metadata.pricing?.monthly?.value ?? metadata.pricing?.weekly?.value ?? metadata.pricing?.daily?.value ?? 0;
+
+  const categoryId = Number(metadata.category as unknown as string) || 0;
+
+  const payload: ProductPayload = {
+    pid: `ad_${Date.now()}`,
+    name: metadata.title,
+    image: "",
+    type: mapType(metadata.purpose),
+    status: "ACTIVE",
+    is_taken: false,
+    description: `Posted via app on ${new Date(metadata.createdAt).toLocaleString()}`,
+    price: price as unknown as string | number,
+    duration: metadata.pricing?.monthly?.duration ?? metadata.pricing?.weekly?.duration ?? metadata.pricing?.daily?.duration ?? "",
+    category: categoryId,
+    // note: some backends accept subcategory; include if provided in metadata
+    ...(metadata.subcategory ? { subcategory: Number(metadata.subcategory) } : {}),
+  };
+
+  // Helper: convert blob: URL to File by fetching it
+  const blobUrlToFile = async (url: string, defaultName = "image") => {
+    try {
+      // Handle data: URIs directly
+      if (url.startsWith("data:")) {
+        const parts = url.split(",");
+        const meta = parts[0];
+        const b64 = parts[1];
+        const mimeMatch = meta.match(/data:([^;]+);/);
+        const mime = (mimeMatch && mimeMatch[1]) || "image/jpeg";
+        const byteString = atob(b64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        const blob = new Blob([ab], { type: mime });
+        const ext = mime.split("/")[1] || "jpg";
+        const name = `${defaultName}-${Date.now()}.${ext}`;
+        return new File([blob], name, { type: mime });
+      }
+
+      // Fallback for blob: or http(s) URLs
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const mime = blob.type || "image/jpeg";
+      const ext = mime.split("/")[1] || "jpg";
+      const name = `${defaultName}-${Date.now()}.${ext}`;
+      return new File([blob], name, { type: mime });
+    } catch (e) {
+      console.warn("Failed to convert blob/data URL to File:", e);
+      return null;
+    }
+  };
+
+  const imgs = Array.isArray(metadata.images) ? metadata.images : [];
+
+  
+
+  // Always create the product first via JSON, then upload images individually
+  const created: Product = await createProduct(payload);
+
+  // created product returned from API (owner should be set)
+
+  // If the product was created but the owner is null/undefined, abort
+  // attachments — this indicates the server didn't associate the auth
+  // token with the create request (owner null). Surface a helpful error
+  // instead of continuing to upload images/features to an unauthenticated product.
+  const ownerObj = (created as any).owner;
+  const ownerId = ownerObj && (typeof ownerObj === "object") ? Number(ownerObj.id) : null;
+  if (!ownerId) {
+     
+    console.error("Product created without owner. Aborting attachments. Created:", created);
+    throw new Error("Product was created but owner is null. Ensure the Authorization token is sent with the product creation request.");
+  }
+
+  if (imgs.length > 0) {
+    for (let i = 0; i < imgs.length; i++) {
+      const img = imgs[i];
+      try {
+        let fileObj: File | null = null;
+        if (img && img.file instanceof File) {
+          fileObj = img.file;
+        } else if (img && typeof img.url === "string") {
+          fileObj = await blobUrlToFile(img.url, `image-${i}`);
+        }
+        if (!fileObj) continue;
+
+        const fd = new FormData();
+        fd.append("product", String(created.id));
+        // include filename explicitly
+        fd.append("image", fileObj, fileObj.name);
+
+        // proceed to upload the file
+
+        try {
+          await apiClient.post(endpoints.productImages.create(), fd);
+        } catch (err) {
+          // Log the error with some context so we can inspect server details
+           
+          console.error("productImages upload failed for", { product: created.id, file: fileObj.name }, err);
+          throw err;
+        }
+      } catch (e) {
+        console.error("Failed to upload product image:", e);
+      }
+    }
+  }
+
+  // Attach product features from explicit feature definitions (metadata.featureValues)
+  if (Array.isArray((metadata as any).featureValues) && (metadata as any).featureValues.length > 0) {
+    for (const fv of (metadata as any).featureValues) {
+      try {
+        // fv shape: { feature: number, value: string }
+        const payloadFeatureById = {
+          product: (created as any).id,
+          feature: Number(fv.feature),
+          value: String(fv.value ?? ""),
+        };
+        try {
+          await apiClient.post(endpoints.productFeatures.create(), payloadFeatureById);
+        } catch (err) {
+          console.error("product-features (by id) failed", payloadFeatureById, err);
+          // Try an alternative payload key in case backend expects `feature_id`
+          try {
+            const alt = { ...payloadFeatureById, feature_id: payloadFeatureById.feature } as { [k: string]: unknown };
+            delete (alt as { [k: string]: unknown }).feature;
+            await apiClient.post(endpoints.productFeatures.create(), alt);
+          } catch (err2) {
+            console.error("Retry attaching product feature also failed", err2);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to attach product feature (by id):", e);
+      }
+    }
+  }
+  // No catalog feature creation here — features must exist on the server and are attached below.
+
+  // Attach product features if provided as free-text keyFeatures (metadata.keyFeatures should be an array of strings)
+  if (Array.isArray((metadata as any).keyFeatures) && (metadata as any).keyFeatures.length > 0) {
+    for (const feat of (metadata as any).keyFeatures) {
+      try {
+        // backend expects `value` for product-features
+        const payloadFeatureValue = {
+          product: (created as any).id,
+          value: String(feat ?? ""),
+        };
+        try {
+          await apiClient.post(endpoints.productFeatures.create(), payloadFeatureValue);
+        } catch (err) {
+          console.error("product-features (value) failed", payloadFeatureValue, err);
+        }
+      } catch (e) {
+        console.error("Failed to attach product feature (value):", e);
+      }
+    }
+  }
+
+  return created;
+};
+ 
 
 export default {
   getProducts,
@@ -211,4 +378,6 @@ export default {
   setProductStatus,
   getProductsForOwner,
   getRelatedProducts,
+  // Helper moved to named export
+  createProductFromAd,
 };

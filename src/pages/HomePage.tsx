@@ -164,14 +164,14 @@ const HomePage = () => {
       <div
         ref={headerRef}
         className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-            ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-            : "relative"
+          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+          : "relative"
           }`}
       >
         <div
           className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
-              ? "justify-between px-4 py-2 gap-3"
-              : "flex-col items-center justify-center gap-8 mt-40"
+            ? "justify-between px-4 py-2 gap-3"
+            : "flex-col items-center justify-center gap-8 mt-40"
             }`}
         >
           <h2
@@ -184,8 +184,8 @@ const HomePage = () => {
           <div className="flex w-full px-200">
             <div
               className={`relative flex items-center ${isSmallScreen && isCondensed
-                  ? "justify-end flex-1"
-                  : "justify-center w-full max-w-[520px]"
+                ? "justify-end flex-1"
+                : "justify-center w-full max-w-[520px]"
                 }`}
             >
               <div className="rotating-bg" aria-hidden="true" />
@@ -196,8 +196,8 @@ const HomePage = () => {
                   type="text"
                   placeholder="Search anything up for good"
                   className={`search-input ${isSmallScreen && isCondensed
-                      ? "text-[16px]"
-                      : "text-2xl sm:text-2xl"
+                    ? "text-[16px]"
+                    : "text-2xl sm:text-2xl"
                     } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
                 />
 
@@ -518,7 +518,7 @@ const HomePage = () => {
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
                     <p className="text-xs text-gray-500">
-                      {ad.location.name || ad.location.region}
+                      {ad.location?.name ?? ad.location?.region ?? ""}
                     </p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">

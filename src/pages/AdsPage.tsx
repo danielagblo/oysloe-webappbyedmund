@@ -92,7 +92,7 @@ const AdsPage = () => {
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
                   className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
-                  src={ad.image || ad.images?.[0]?.url || "/placeholder.png"}
+                  src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/placeholder.png"}
                   alt={ad.name}
                 />
                 <button
