@@ -1,8 +1,8 @@
 import type {
-    MessageResponse,
-    OTPVerifyRequest,
-    UserProfile,
-    UserProfileUpdatePayload,
+  MessageResponse,
+  OTPVerifyRequest,
+  UserProfile,
+  UserProfileUpdatePayload,
 } from "../types/UserProfile";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";

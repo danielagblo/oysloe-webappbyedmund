@@ -116,6 +116,18 @@ export const endpoints = {
     patch: (id: number) => `/product-images/${id}/`,
     delete: (id: number) => `/product-images/${id}/`,
   },
+  // Chat / Messaging
+  chat: {
+    // Resolve a chatroom id (by participants or context) if supported
+    resolveChatroomId: () => "/chatroomid/",
+    chatrooms: () => "/chatrooms/",
+    chatroomDetail: (id: number | string) => `/chatrooms/${id}/`,
+    chatroomMarkRead: (id: number | string) => `/chatrooms/${id}/mark-read/`,
+    chatroomMessages: (id: number | string) => `/chatrooms/${id}/messages/`,
+    chatroomSend: (id: number | string) => `/chatrooms/${id}/send/`,
+    messages: () => "/messages/",
+    messageDetail: (id: number | string) => `/messages/${id}/`,
+  },
   subcategories: {
     list: () => "/subcategories/",
     detail: (id: number) => `/subcategories/${id}/`,

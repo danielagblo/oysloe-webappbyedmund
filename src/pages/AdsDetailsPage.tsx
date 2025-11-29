@@ -1,13 +1,14 @@
+import { useMemo, useRef } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
-import { useProduct, useProducts } from "../features/products/useProducts";
-import { useMemo, useRef } from "react";
-import { formatMoney } from "../utils/formatMoney";
-import type { ProductFeature } from "../types/ProductFeature";
+import { useOwnerProducts, useProduct, useProducts } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
+import useUserProfile from "../features/userProfile/useUserProfile";
+import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
+import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
 
 const AdsDetailsPage = () => {
@@ -23,7 +24,17 @@ const AdsDetailsPage = () => {
     error: adError,
   } = useProduct(numericId!);
   const { data: ads = [], isLoading: adsLoading } = useProducts();
+  const { profile: currentUserProfile } = useUserProfile();
   const { reviews: reviews = [] } = useReviews();
+
+  // Determine a candidate owner id early so hooks can be called unconditionally
+  const ownerIdCandidate =
+    adDataFromState?.owner?.id ?? currentAdDataFromQuery?.owner?.id ??
+    ads.find((a) => a.id === numericId)?.owner?.id ?? undefined;
+
+  // fetch seller's products from backend via hook (call unconditionally)
+  const ownerProductsQuery = useOwnerProducts(ownerIdCandidate as number | undefined);
+  const sellerProducts = ownerProductsQuery.data ?? [];
 
   const productReviews = useMemo(() => {
     if (!reviews || reviews.length === 0) return [];
@@ -80,6 +91,8 @@ const AdsDetailsPage = () => {
   const totalAds = ads.length;
   const currentAdData =
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
+
+  const ownerId = currentAdData?.owner?.id ?? null;
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -345,12 +358,12 @@ const AdsDetailsPage = () => {
   );
 
   const ActionButtons = ({
-    onMarkTaken = () => {},
-    onReportAd = () => {},
-    onCaller1 = () => {},
-    onCaller2 = () => {},
-    onMakeOffer = () => {},
-    onFavorite = () => {},
+    onMarkTaken = () => { },
+    onReportAd = () => { },
+    onCaller1 = () => { },
+    onCaller2 = () => { },
+    onMakeOffer = () => { },
+    onFavorite = () => { },
   }: {
     onMarkTaken?: () => void;
     onReportAd?: () => void;
@@ -382,10 +395,9 @@ const AdsDetailsPage = () => {
             <button
               key={label}
               className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                ${
-                  actions[label]
-                    ? "cursor-pointer hover:scale-95 active:scale-105"
-                    : "cursor-not-allowed"
+                ${actions[label]
+                  ? "cursor-pointer hover:scale-95 active:scale-105"
+                  : "cursor-not-allowed"
                 }
               `}
               onClick={actions[label]}
@@ -556,8 +568,8 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src="/face.svg"
-            alt=""
+            src={currentAdData?.owner?.avatar || "/userPfp2.jpg"}
+            alt={currentAdData?.owner?.name || "Seller"}
             className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
           />
           <img
@@ -567,19 +579,27 @@ const AdsDetailsPage = () => {
           />
         </div>
         <div>
-          <h2 className="text-sm text-gray-500 md:text-[1vw]">Jan,2024</h2>
-          <h3 className="font-semibold md:text-[1.2vw]">Alexander Kowri</h3>
-          <h3 className="text-sm text-gray-600 md:text-[1vw]">Total Ads: 2k</h3>
+          <h2 className="text-sm text-gray-500 md:text-[1vw]">
+            {currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}
+          </h2>
+          <h3 className="font-semibold md:text-[1.2vw]">{currentAdData?.owner?.name ?? "Seller"}</h3>
+          <h3 className="text-sm text-gray-600 md:text-[1vw]">Total Ads: {sellerProducts.length}</h3>
         </div>
       </div>
       {/* store name */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-start gap-2 flex-col">
-          <h4 className="text-xl md:text-[1.5vw]">ElectroMart Gh Ltd</h4>
+          <h4 className="text-xl md:text-[1.5vw]">{currentAdData?.owner?.name ?? "Seller"}</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
             <span className="text-[10px] md:text-[0.9vw] text-green-800">
-              High level
+              {(() => {
+                // prefer level from product owner if available, otherwise from current user profile when viewing own ad
+                const ownerLevel = (currentAdData?.owner as unknown as { level?: string })?.level as string | undefined;
+                if (ownerLevel) return ownerLevel;
+                if (currentUserProfile && currentUserProfile.id === ownerId) return currentUserProfile.level;
+                return "High level";
+              })()}
             </span>
           </div>
         </div>
@@ -588,7 +608,7 @@ const AdsDetailsPage = () => {
         </button>
       </div>
 
-      {/* product slideshow */}
+      {/* product slideshow (keeps static visuals) */}
       <div className="flex items-center justify-center mb-4 w-full">
         <div className="pt-4 overflow-x-hidden w-full">
           <div className="relative flex items-center justify-center gap-2 w-full">
@@ -596,31 +616,28 @@ const AdsDetailsPage = () => {
               <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
             </button>
             <div className="flex gap-2 overflow-x-auto flex-1 no-scrollbar">
-              <img
-                src="/fashion.png"
-                alt=""
-                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
-              />
-              <img
-                src="/games.png"
-                alt=""
-                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
-              />
-              <img
-                src="/grocery.png"
-                alt=""
-                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
-              />
-              <img
-                src="/grocery.png"
-                alt=""
-                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
-              />
-              <img
-                src="/grocery.png"
-                alt=""
-                className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0"
-              />
+              {sellerProducts && sellerProducts.length > 0 ? (
+                sellerProducts.slice(0, 6).map((p) => (
+                  <img
+                    key={p.id}
+                    src={p.image || "/public/no-image.jpeg"}
+                    alt={p.name || "Seller product"}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => navigate(`/ads/${p.id}`, { state: { adData: p } })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        navigate(`/ads/${p.id}`, { state: { adData: p } });
+                      }
+                    }}
+                    className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
+                  />
+                ))
+              ) : (
+                <>
+                  <p className="text-gray-500 md:text-[1vw]">No other ads from this seller.</p>
+                </>
+              )}
             </div>
             <button className="absolute right-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
               <img src="/arrowright.svg" alt="" className="w-4 h-4" />
@@ -632,17 +649,13 @@ const AdsDetailsPage = () => {
       {/* profile bit mobile*/}
       <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5">
         <div className="relative">
-          <img src="/face.svg" alt="" className="w-15 h-15 rounded-full" />
-          <img
-            src="/verified.svg"
-            alt=""
-            className="absolute -bottom-1 -right-2 w-8 h-8"
-          />
+          <img src={currentAdData?.owner?.avatar || "/userPfp2.jpg"} alt="" className="w-15 h-15 rounded-full" />
+          <img src="/verified.svg" alt="" className="absolute -bottom-1 -right-2 w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-sm text-gray-500">Jan,2024</h2>
-          <h3 className="font-semibold">Alexander Kowri</h3>
-          <h3 className="text-sm text-gray-600">Total Ads: 2k</h3>
+          <h2 className="text-sm text-gray-500">{currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}</h2>
+          <h3 className="font-semibold">{currentAdData?.owner?.name ?? "Seller"}</h3>
+          <h3 className="text-sm text-gray-600">Total Ads: {ads.filter(a => a.owner?.id === currentAdData?.owner?.id).length || 0}</h3>
         </div>
       </div>
     </div>

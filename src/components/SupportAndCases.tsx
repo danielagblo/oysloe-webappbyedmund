@@ -1,5 +1,7 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import type { ChatRoom } from "../services/chatService";
+import chatService from "../services/chatService";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -83,28 +85,42 @@ export default function SupportAndCases({
           </span>
         </button>
       </div>
+      <ChatsList />
+    </div>
+  );
+
+  function ChatsList() {
+    const [rooms, setRooms] = useState<ChatRoom[] | null>(null);
+
+    useEffect(() => {
+      let mounted = true;
+      (async () => {
+        try {
+          const data = await chatService.listChatRooms();
+          if (mounted) setRooms(data);
+        } catch (e) {
+          console.error("Failed to load chat rooms", e);
+          if (mounted) setRooms([]);
+        }
+      })();
+      return () => {
+        mounted = false;
+      };
+    }, []);
+
+    if (!rooms) return <p className="text-sm text-gray-500">Loading chats…</p>;
+    if (rooms.length === 0) return <p className="text-sm text-gray-500">No recent chats</p>;
+
+    return (
       <div className="flex flex-col gap-2 mb-3">
-        {[
-          {
-            id: "C1235",
-            name: "John Doe",
-            last: "Thanks, I'll check it out",
-            time: "1d",
-          },
-          {
-            id: "C1236",
-            name: "Seller X",
-            last: "Are you still interested?",
-            time: "3d",
-          },
-        ].map((c) => (
+        {rooms.map((r) => (
           <button
-            key={c.id}
-            onClick={() => onSelectChat?.(c.id)}
+            key={r.id}
+            onClick={() => onSelectChat?.(String(r.id))}
             className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
           >
             <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
-              {c.name
+              {r.name
                 .split(" ")
                 .map((s) => s[0])
                 .slice(0, 2)
@@ -112,16 +128,16 @@ export default function SupportAndCases({
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{c.name}</p>
-                <span className="text-xs text-gray-400">{c.time}</span>
+                <p className="text-sm font-medium">{r.name}</p>
+                <span className="text-xs text-gray-400">{r.messages?.length ? `${Math.max(0, r.messages!.length - 1)}m` : ""}</span>
               </div>
-              <p className="text-xs text-gray-500 truncate">{c.last}</p>
+              <p className="text-xs text-gray-500 truncate">{r.messages && r.messages.length ? r.messages[r.messages.length - 1].content : ""}</p>
             </div>
           </button>
         ))}
       </div>
-    </div>
-  );
+    );
+  }
 
   const GetHelp = () => (
     <div className="mb-8">

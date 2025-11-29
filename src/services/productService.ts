@@ -184,13 +184,41 @@ export const getRelatedProducts = async (): Promise<Product[]> => {
 export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> => {
   // allow ownerId === 0 in case that's a valid id; only bail on null/undefined
   if (ownerId == null) return [];
+  // First try server-side filtering via query param: /products/?owner=<id>
+  try {
+    const resp = await apiClient.get<unknown>(`${endpoints.products.list}?owner=${ownerId}`);
+    const list = Array.isArray(resp)
+      ? (resp as unknown[])
+      : resp && typeof resp === "object" && Array.isArray((resp as any).results)
+      ? (resp as any).results
+      : [];
+    if (list.length > 0) {
+      // Defensive: ensure returned items are actually owned by ownerId (server may return mixed shapes)
+      const owned = list.filter((p: unknown) => {
+        if (!p || typeof p !== "object") return false;
+        const pi = p as { owner?: unknown };
+        const o = pi.owner;
+        if (o == null) return false;
+        if (typeof o === "number") return o === ownerId;
+        if (typeof o === "object" && typeof (o as any).id === "number") return (o as any).id === ownerId;
+        return false;
+      });
+      if (owned.length > 0) return owned as Product[];
+      // if server returned items but none match defensively, fall through to client-side filtering
+    }
+  } catch (e) {
+    // ignore and fall back to fetching all and filtering client-side
+    void e;
+  }
+
+  // Fallback: fetch all products and filter client-side (keeps existing behavior for servers without owner query)
   const all = await getProducts();
 
   const filtered = all.filter((p) => {
-     const o = p.owner as unknown;
-    if (typeof o === 'number') return o === ownerId;
+    const o = p.owner as unknown;
+    if (typeof o === "number") return o === ownerId;
     const obj = o as { id?: unknown };
-    if (obj && typeof obj.id === 'number') return obj.id === ownerId;
+    if (obj && typeof obj.id === "number") return obj.id === ownerId;
     return false;
   });
 
