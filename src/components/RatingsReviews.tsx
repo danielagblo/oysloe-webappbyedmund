@@ -28,19 +28,13 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   let reviews: Review[] = [];
   let count = 0;
   let isLoading = false;
-  if (userId) {
-    if (userId) {
-      const ownerHook = useReviewsByOwner(userId);
-      reviews = ownerHook.reviews;
-      count = ownerHook.count;
-      isLoading = ownerHook.isLoading;
-    } else {
-      const normal = useReviews();
-      reviews = normal.reviews;
-      count = normal.count;
-      isLoading = normal.isLoading;
-    }
-  }
+  // Call hooks unconditionally to preserve hook order.
+  const normalHook = useReviews();
+  const ownerHook = useReviewsByOwner(userId);
+  const source = userId != null ? ownerHook : normalHook;
+  reviews = source.reviews;
+  count = source.count;
+  isLoading = source.isLoading;
 
   // compute average rating from reviews (safe fallback to 0)
   const average =
@@ -88,48 +82,48 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
     <div className="w-full flex flex-col justify-center items-center md:gap-2 md:px-2">
       {rd
         ? Object.entries(rd.stars)
-            .sort((a, b) => Number(b[0]) - Number(a[0]))
-            .map(([star, count]) => {
-              const pct = rd.count > 0 ? (count / rd.count) * 100 : 0;
-              return (
-                <div
-                  key={star}
-                  className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
-                >
-                  <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
-                    ★ {star}
-                  </span>
-                  <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
-                    <div
-                      className="h-full bg-(--dark-def) rounded"
-                      style={{ width: `${Math.round(pct)}%` }}
-                    />
-                  </div>
-                  <span className="text-sm md:text-[1vw] text-gray-500 w-8">
-                    {Math.round(pct)}%
-                  </span>
+          .sort((a, b) => Number(b[0]) - Number(a[0]))
+          .map(([star, count]) => {
+            const pct = rd.count > 0 ? (count / rd.count) * 100 : 0;
+            return (
+              <div
+                key={star}
+                className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+              >
+                <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+                  ★ {star}
+                </span>
+                <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+                  <div
+                    className="h-full bg-(--dark-def) rounded"
+                    style={{ width: `${Math.round(pct)}%` }}
+                  />
                 </div>
-              );
-            })
-        : distribution.map((item) => (
-            <div
-              key={item.stars}
-              className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
-            >
-              <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
-                ★ {item.stars}
-              </span>
-              <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
-                <div
-                  className="h-full bg-(--dark-def) rounded"
-                  style={{ width: `${Math.round(item.pct)}%` }}
-                />
+                <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+                  {Math.round(pct)}%
+                </span>
               </div>
-              <span className="text-sm md:text-[1vw] text-gray-500 w-8">
-                {Math.round(item.pct)}%
-              </span>
+            );
+          })
+        : distribution.map((item) => (
+          <div
+            key={item.stars}
+            className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+          >
+            <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+              ★ {item.stars}
+            </span>
+            <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+              <div
+                className="h-full bg-(--dark-def) rounded"
+                style={{ width: `${Math.round(item.pct)}%` }}
+              />
             </div>
-          ))}
+            <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+              {Math.round(item.pct)}%
+            </span>
+          </div>
+        ))}
     </div>
   );
 

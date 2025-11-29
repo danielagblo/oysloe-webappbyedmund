@@ -1,23 +1,21 @@
+import { apiClient } from "../services/apiClient";
+import { endpoints } from "../services/endpoints";
 import { type AdMetadata } from "../types/AdMetaData";
 
 export const postAd = {
-  // async uploadAd(metadata: Record<string, unknown>) {
   async uploadAd(metadata: AdMetadata) {
-    const response = await fetch("/api/ads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(metadata),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Upload failed: ${response.status}`);
+    // Send AdMetadata to the products create endpoint. The backend
+    // should accept the payload or map it server-side. If your API
+    // expects a different shape, update the mapping here.
+    try {
+      const res = await apiClient.post<{ success: boolean; message: string; adId?: number }>(
+        endpoints.products.create,
+        metadata,
+      );
+      return res;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new Error(`Upload failed: ${msg}`);
     }
-
-    return (await response.json()) as {
-      success: boolean;
-      message: string;
-      // [key: string]: unknown;
-      adId?: number;
-    };
   },
 };

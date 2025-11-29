@@ -1,23 +1,20 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useEffect, useRef, useState } from "react";
 import { toast } from 'sonner';
-import { mockPostAd } from "../api/mock";
-import { postAd } from "../api/postAd";
 import submittedGif from "../assets/Submitted.gif";
 import uploadImg from "../assets/upload.png";
-import { categoryOptions } from "../data/categories";
-import { ghanaRegionsAndPlaces } from "../data/regions";
+import usePostAd from "../features/ad/usePostAd";
+import useCategories from "../features/categories/useCategories";
+import useLocations from "../features/locations/useLocations";
+import { getFeatures } from "../services/featureService";
+import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
 import DropdownPopup from "./DropDownPopup";
 import LocationSelector from "./LocationSelector";
-import sample from "/sample.png";
 
-// mock || realApi toggle, currently using mock
-const useMock = true;
-const api = useMock ? mockPostAd : postAd;
+// (mock toggle not used here; kept in file earlier) 
 
 const isMobile = window.innerWidth < 1024;
-const placeholderImages = [sample, sample, sample, sample, sample, sample];
 
 interface UploadedImage {
   id: number;
@@ -28,7 +25,11 @@ interface UploadedImage {
 
 export default function PostAdForm() {
   const [mobileStep, setMobileStep] = useState("images");
-  const [category, setCategory] = useState("Select product Category");
+  const [category, setCategory] = useState("Select Product Category");
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [subcategoryId, setSubcategoryId] = useState<number | "">("");
+  const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
+  const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
 
@@ -40,13 +41,69 @@ export default function PostAdForm() {
   const [weeklyDuration, setWeeklyDuration] = useState("Duration");
   const [monthlyValue, setMonthlyValue] = useState<number | "">("");
   const [monthlyDuration, setMonthlyDuration] = useState("Duration");
+  const [price, setPrice] = useState<number | "">("");
+  const [keyFeatures, setKeyFeatures] = useState<string[]>(["", ""]);
+  // creation of catalog features is disabled for regular users; we only fetch existing definitions
+  const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
+  const [featureValues, setFeatureValues] = useState<Record<number, string>>({});
 
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>(
-    placeholderImages.map((url, i) => ({ id: i + 1, url })),
-  );
+  // Fetch subcategories whenever categoryId changes
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (typeof categoryId === "number" && !isNaN(categoryId)) {
+          const subs = await getSubcategories({ category: categoryId });
+          if (!mounted) return;
+          setSubcategories(subs.map((s) => ({ id: s.id, name: s.name })));
+        } else {
+          setSubcategories([]);
+        }
+      } catch (e) {
+        console.warn("Failed to fetch subcategories", e);
+        setSubcategories([]);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [categoryId]);
+
+  // Fetch feature definitions for chosen subcategory
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
+          const feats = await getFeatures({ subcategory: Number(subcategoryId) });
+          if (!mounted) return;
+          setFeatureDefinitions(feats.map((f) => ({ id: f.id, name: f.name })));
+          // initialize values map for these features
+          const map: Record<number, string> = {};
+          feats.forEach((f) => {
+            map[f.id] = "";
+          });
+          setFeatureValues(map);
+        } else {
+          setFeatureDefinitions([]);
+          setFeatureValues({});
+        }
+      } catch (e) {
+        console.warn("Failed to fetch feature definitions", e);
+        setFeatureDefinitions([]);
+        setFeatureValues({});
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [subcategoryId]);
+
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
   const [regionLocation, setRegionLocation] = useState<string | null>(null);
+  const { groupedLocations = {}, loading: locationsLoading } = useLocations();
   const [mapSelection, setMapSelection] = useState<{
     coords: { lat: number; lng: number };
     placeName: string;
@@ -56,15 +113,50 @@ export default function PostAdForm() {
   const gridRef = useRef<HTMLDivElement | null>(null);
   const [showSaveLocationModal, setShowSaveLocationModal] = useState(false);
   const [newLocationName, setNewLocationName] = useState("");
-  const [savedLocations, setSavedLocations] = useState([
-    "Home Spintex",
-    "Shop Accra",
-    "Shop East Legon",
-    "Shop Kumasi",
-  ]);
+  const STORAGE_KEY = "oysloe.savedLocations";
+
+  type SavedLocation = {
+    label: string;
+    region: string;
+    place: string;
+  };
+
+  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (!Array.isArray(parsed)) return [];
+
+      // Support legacy string-array entries by converting them to objects
+      if (parsed.length > 0 && typeof parsed[0] === "string") {
+        return parsed.map((s: string) => ({ label: s, region: "", place: s }));
+      }
+
+      // Already in object shape?
+      return parsed.map((p: any) => ({
+        label: typeof p.label === "string" ? p.label : String(p),
+        region: typeof p.region === "string" ? p.region : "",
+        place: typeof p.place === "string" ? p.place : (p.label ?? ""),
+      }));
+    } catch {
+      return [];
+    }
+  });
+
+  // persist saved locations to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLocations));
+    } catch {
+      // ignore storage errors
+    }
+  }, [savedLocations]);
   const [tempSelectedLocation, setTempSelectedLocation] = useState<
     string | null
   >(null);
+
+  // Mutation hook for posting ads
+  const postAdMutation = usePostAd();
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -128,8 +220,7 @@ export default function PostAdForm() {
 
     const errors: string[] = [];
     if (!title.trim()) errors.push("Title is required.");
-    if (!category || category === "Select product Category")
-      errors.push("Category is required.");
+    if (!categoryId) errors.push("Category is required.");
     if (!mapSelection && !regionLocation)
       errors.push("Please choose a location (map or region).");
 
@@ -140,14 +231,31 @@ export default function PostAdForm() {
       return;
     }
 
-    const metadata: AdMetadata = {
+    // Build pricing object and apply `price` as a fallback if no specific
+    // daily/weekly/monthly values were provided by the user.
+    const pricingObj = {
+      daily: { value: dailyValue || null, duration: dailyDuration },
+      weekly: { value: weeklyValue || null, duration: weeklyDuration },
+      monthly: { value: monthlyValue || null, duration: monthlyDuration },
+    } as {
+      daily: { value: number | null; duration: string };
+      weekly: { value: number | null; duration: string };
+      monthly: { value: number | null; duration: string };
+    };
+
+    if (!pricingObj.daily.value && !pricingObj.weekly.value && !pricingObj.monthly.value && price !== "") {
+      pricingObj.daily.value = price as number;
+    }
+
+    const metadata: AdMetadata & { price?: number | "" } = {
       title: title.trim(),
-      category,
+      // backend expects category PK (number) but AdMetadata.category is a string type; cast to string
+      category: String(categoryId ?? ""),
       purpose,
       pricing: {
-        daily: { value: dailyValue || null, duration: dailyDuration },
-        weekly: { value: weeklyValue || null, duration: weeklyDuration },
-        monthly: { value: monthlyValue || null, duration: monthlyDuration },
+        daily: { value: pricingObj.daily.value ?? null, duration: pricingObj.daily.duration },
+        weekly: { value: pricingObj.weekly.value ?? null, duration: pricingObj.weekly.duration },
+        monthly: { value: pricingObj.monthly.value ?? null, duration: pricingObj.monthly.duration },
       },
       location: mapSelection
         ? {
@@ -160,22 +268,50 @@ export default function PostAdForm() {
         id: img.id,
         url: img.url,
         hasFile: !!img.file,
+        // include file object for upload handling (will be stripped/handled server-side)
+        file: img.file ?? null,
       })),
       createdAt: new Date().toISOString(),
+      ...(price !== "" ? { price } : {}),
+      ...(subcategoryId !== "" && subcategoryId != null ? { subcategory: String(subcategoryId) } : {}),
+      // include keyFeatures if user added any (filter out empty strings)
+      ...(keyFeatures && Array.isArray(keyFeatures) && keyFeatures.filter((k) => k.trim() !== "").length > 0
+        ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
+        : {}),
+      // catalog feature creation disabled; do not include createCatalogFeatures flag
+      // attach explicit feature values from fetched definitions
+      ...(featureValues && Object.keys(featureValues).length > 0
+        ? {
+          featureValues: Object.entries(featureValues)
+            .map(([k, v]) => ({ feature: Number(k), value: v }))
+            .filter((f) => f.value && String(f.value).trim() !== "")
+        }
+        : {}),
     };
 
     console.log("Ad metadata (JSON):", metadata);
 
+    // quick guard: ensure at least one actual File is present when there are images
+    const hasFile = metadata.images && Array.isArray(metadata.images)
+      ? metadata.images.some((i: any) => i && i.file instanceof File)
+      : false;
+    if (uploadedImages.length > 0 && !hasFile) {
+      toast.error("One or more images are not actual files. Please re-upload images.");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      const result = await api.uploadAd(metadata);
+      // pass the metadata including file objects (mutation handler will detect files)
+      const result = await postAdMutation.mutateAsync(metadata as any);
       console.log("Server response:", result);
-      // show success modal and toast
-      toast.success(result?.message || 'Ad saved successfully!');
+      const serverMessage = (result as { message?: string })?.message;
+      toast.success(serverMessage ?? "Ad saved successfully!");
       setShowSuccess(true);
     } catch (err: unknown) {
       console.error("Upload failed:", err);
       const msg = err instanceof Error ? err.message : String(err);
-      toast.error(msg || 'An error occurred while saving.');
+      toast.error(msg || "An error occurred while saving.");
     } finally {
       setIsSubmitting(false);
     }
@@ -201,7 +337,10 @@ export default function PostAdForm() {
   const resetForm = () => {
     setTitle("");
     setCategory("Select Product Category");
+    setCategoryId(null);
+    setSubcategoryId("");
     setPurpose("Sale");
+    setPrice("");
     setDailyValue("");
     setWeeklyValue("");
     setMonthlyValue("");
@@ -211,6 +350,7 @@ export default function PostAdForm() {
     setMapSelection(null);
     setRegionLocation("Ad Area Location");
     setUploadedImages([]);
+    setKeyFeatures(["", ""]);
     setShowSuccess(false);
     setIsSubmitting(false);
   };
@@ -239,13 +379,31 @@ export default function PostAdForm() {
                 <DropdownPopup
                   triggerLabel={category}
                   supportsSubmenu
-                  options={categoryOptions}
+                  options={fetchedCategories.map((c) => c.name)}
                   onSelect={(opt) => {
+                    const match = fetchedCategories.find((c) => c.name === opt);
                     setCategory(opt);
-                    console.log("category chosen:", opt);
+                    setCategoryId(match ? Number(match.id) : null);
+                    console.log("category chosen:", opt, "id:", match?.id ?? null);
                   }}
-                  title="Select Category"
+                  title={categoriesLoading ? "Loading categories..." : "Select Category"}
                 />
+                <div className="mt-2">
+                  <label className="block mb-1">Subcategory (optional)</label>
+                  <DropdownPopup
+                    triggerLabel={
+                      subcategoryId && subcategories.find((s) => s.id === subcategoryId)
+                        ? subcategories.find((s) => s.id === subcategoryId)!.name
+                        : "Select subcategory"
+                    }
+                    options={subcategories.map((s) => s.name)}
+                    onSelect={(opt) => {
+                      const m = subcategories.find((s) => s.name === opt);
+                      setSubcategoryId(m ? Number(m.id) : "");
+                    }}
+                    title={"Select Subcategory"}
+                  />
+                </div>
               </div>
 
               <div>
@@ -257,6 +415,19 @@ export default function PostAdForm() {
                   placeholder="Add a title"
                   className="w-full p-3 border rounded-xl border-[var(--div-border)]"
                 />
+              </div>
+              <div>
+                <p className="mb-1 font-medium">Price</p>
+                <div className="relative">
+                  <input
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                    type="number"
+                    placeholder="0"
+                    className="w-full border rounded-xl border-[var(--div-border)] p-3 pl-7"
+                  />
+                  <p className="absolute inline top-3.25 left-3">₵</p>
+                </div>
               </div>
             </div>
 
@@ -362,22 +533,25 @@ export default function PostAdForm() {
               <div>
                 <DropdownPopup
                   triggerLabel={regionLocation ?? "Ad Area Location"}
-                  options={ghanaRegionsAndPlaces}
+                  options={groupedLocations}
                   onSelect={(opt) => handleRegionSelect(opt)}
                   supportsSubmenu
-                  title="Select Region / Place"
+                  title={locationsLoading ? "Loading locations..." : "Select Region / Place"}
                 />
               </div>
 
               <div className="flex flex-wrap gap-2 lg:gap-1 my-1 font-bold">
                 {savedLocations.map((loc) => (
                   <button
-                    key={loc}
+                    key={`${loc.label}|${loc.place}`}
                     type="button"
                     className="p-1 bg-gray-100 rounded-xs text-[8px] hover:bg-gray-200"
-                    onClick={() => setRegionLocation(loc)}
+                    onClick={() => {
+                      const display = loc.place + (loc.region ? `, ${loc.region}` : "");
+                      setRegionLocation(display);
+                    }}
                   >
-                    {loc}
+                    {loc.label}
                   </button>
                 ))}
               </div>
@@ -418,21 +592,6 @@ export default function PostAdForm() {
                 selectedLocation={mapSelection}
               />
               <div className="flex flex-wrap gap-2 lg:gap-1 my-1 font-bold">
-                {[
-                  "Home Spintex",
-                  "Shop Accra",
-                  "Shop East Legon",
-                  "Shop Kumasi",
-                ].map((loc) => (
-                  <button
-                    key={loc}
-                    type="button"
-                    className="p-1 bg-gray-100 rounded-xs text-[8px] hover:bg-gray-200"
-                    onClick={() => setRegionLocation(loc)}
-                  >
-                    {loc}
-                  </button>
-                ))}
               </div>
             </div>
 
@@ -441,16 +600,64 @@ export default function PostAdForm() {
                 Key Features
               </label>
               <div className="flex flex-col gap-2">
-                <input
-                  type="text"
-                  placeholder="Key 1"
-                  className="w-full border rounded-xl border-[var(--div-border)] p-3"
-                />
-                <input
-                  type="text"
-                  placeholder="Key 2"
-                  className="w-full border rounded-xl border-[var(--div-border)] p-3"
-                />
+                {keyFeatures.map((kf, idx) => (
+                  <div key={`feature-${idx}`} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder={`Feature ${idx + 1}`}
+                      value={kf}
+                      onChange={(e) =>
+                        setKeyFeatures((prev) => prev.map((p, i) => (i === idx ? e.target.value : p)))
+                      }
+                      className="flex-1 w-full border rounded-xl border-[var(--div-border)] p-3"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setKeyFeatures((prev) => prev.filter((_, i) => i !== idx))}
+                      className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs"
+                      aria-label={`Remove feature ${idx + 1}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setKeyFeatures((prev) => [...prev, ""])}
+                    className="px-4 py-2 bg-[var(--div-active)] rounded-xl text-sm"
+                  >
+                    + Add feature
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setKeyFeatures(["", ""])}
+                    className="px-4 py-2 bg-gray-100 rounded-xl text-sm"
+                  >
+                    Reset features
+                  </button>
+                </div>
+                <div className="mt-2 text-sm text-gray-500">Feature creation is disabled; select an existing subcategory to load feature definitions.</div>
+                {featureDefinitions.length > 0 && (
+                  <div className="mt-4">
+                    <label className="block mb-1 font-medium">Features for selected subcategory</label>
+                    <div className="flex flex-col gap-2">
+                      {featureDefinitions.map((fd) => (
+                        <div key={`def-${fd.id}`} className="flex items-center gap-2">
+                          <div className="w-1/3 text-sm">{fd.name}</div>
+                          <input
+                            type="text"
+                            placeholder={`Value for ${fd.name}`}
+                            value={featureValues[fd.id] ?? ""}
+                            onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                            className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               {isMobile && (
                 <div className=" w-full flex items-center justify-center -ml-4 max-sm:ml-0">
@@ -664,14 +871,37 @@ export default function PostAdForm() {
                     <button
                       onClick={() => {
                         if (tempSelectedLocation) {
-                          setRegionLocation(tempSelectedLocation);
-                          if (newLocationName.trim() !== "") {
-                            setSavedLocations((prev) => [
-                              ...prev,
-                              newLocationName.trim(),
-                            ]);
+                          // find region for the chosen place (if available)
+                          let regionFound = "";
+                          try {
+                            for (const r of Object.keys(groupedLocations)) {
+                              const places = groupedLocations[r] ?? [];
+                              if (places.includes(tempSelectedLocation)) {
+                                regionFound = r;
+                                break;
+                              }
+                            }
+                          } catch {
+                            regionFound = "";
                           }
+
+                          // set as currently selected location for the ad (show place,region)
+                          const display = tempSelectedLocation + (regionFound ? `, ${regionFound}` : "");
+                          setRegionLocation(display);
+
+                          // determine label to save: prefer a provided name, otherwise the chosen place
+                          const label = newLocationName.trim() !== "" ? newLocationName.trim() : tempSelectedLocation;
+
+                          // only add if not already present (same place + region)
+                          setSavedLocations((prev) => {
+                            if (prev.some((p) => p.place === tempSelectedLocation && p.region === regionFound)) return prev;
+                            const next = [...prev, { label, region: regionFound, place: tempSelectedLocation }];
+                            return next;
+                          });
+
+                          toast.success("Saved location locally");
                         }
+
                         setNewLocationName("");
                         setTempSelectedLocation(null);
                         setShowSaveLocationModal(false);

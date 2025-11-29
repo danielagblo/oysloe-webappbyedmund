@@ -1,23 +1,28 @@
 import {
-  useQuery,
-  useMutation,
-  useQueryClient,
   queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 
 import {
-  getProducts,
-  getProduct,
   createProduct,
-  updateProduct,
-  patchProduct,
   deleteProduct,
-  markProductAsTaken,
-  setProductStatus,
+  getProduct,
+  getProducts,
+  getProductsForOwner,
   getRelatedProducts,
+  markProductAsTaken,
+  patchProduct,
+  setProductStatus,
+  updateProduct,
 } from "../../services/productService";
 
-import type { ProductPayload, ProductStatus } from "../../types/Product";
+import type {
+  Product,
+  ProductPayload,
+  ProductStatus,
+} from "../../types/Product";
 
 // query keys
 export const productKeys = {
@@ -170,5 +175,19 @@ export const useSetProductStatus = () => {
       });
       qc.invalidateQueries({ queryKey: productKeys.all });
     },
+  });
+};
+
+
+// useProductsForOwner
+export const useOwnerProducts = (ownerId?: number | null) => {
+  const queryKey = [...productKeys.all, "for-owner", ownerId] as const;
+
+  return useQuery<Product[]>({
+    queryKey,
+    // only run when ownerId is not null/undefined (allow 0)
+    enabled: ownerId != null,
+    queryFn: () => getProductsForOwner(ownerId as number),
+    staleTime: 1000 * 60 * 2,
   });
 };

@@ -1,7 +1,8 @@
-import MobileBanner from "../components/MobileBanner";
-import ProfileStats from "../components/ProfileStats";
 import MenuButton from "../components/MenuButton";
+import MobileBanner from "../components/MobileBanner";
 import PostAdForm from "../components/PostAdForm";
+import ProfileStats from "../components/ProfileStats";
+import RequireAuth from "../components/RequireAuth";
 
 function PostAdPage() {
   return (
@@ -15,7 +16,9 @@ function PostAdPage() {
       </div>
 
       <div className="flex items-center justify-center no-scrollbar w-full lg:w-[75vw] lg:h-full max-md:-mt-5">
-        <PostAdForm />
+        <RequireAuth>
+          <PostAdForm />
+        </RequireAuth>
       </div>
 
       <MenuButton />

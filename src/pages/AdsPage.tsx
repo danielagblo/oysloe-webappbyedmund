@@ -1,24 +1,48 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
-import { ads } from "../data/ads";
+import {
+  useDeleteProduct,
+  useMarkProductAsTaken,
+  useOwnerProducts,
+  useSetProductStatus,
+} from "../features/products/useProducts";
+import useUserProfile from "../features/userProfile/useUserProfile";
 
 const AdsPage = () => {
   const [activeTab, setActiveTab] = useState("Active");
-  const [selectedAd, setSelectedAd] = useState<null | (typeof ads)[0]>(null);
+  const [selectedAd, setSelectedAd] = useState<null | any>(null);
 
-  const filteredAds = ads.filter((ad) => ad.status === activeTab);
+  const { profile } = useUserProfile();
+  const ownerId = profile?.id;
+
+  const { data: products = [] } = useOwnerProducts(ownerId);
+
+  const deleteMutation = useDeleteProduct();
+  const markTakenMutation = useMarkProductAsTaken();
+  const setStatusMutation = useSetProductStatus();
+
+  const mapToLabel = (p: any) => {
+    if (p.is_taken) return "Taken";
+    if (p.status === "ACTIVE") return "Active";
+    if (p.status === "PENDING") return "Pending";
+    if (p.status === "SUSPENDED") return "Suspended"
+    return "Other";
+  };
+
+  const filteredAds = products.filter((ad) => mapToLabel(ad) === activeTab);
 
   return (
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
         <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
           <div className="hidden sm:flex justify-around items-center px-4 pb-2">
-            {["Active", "Pending", "Taken", "Suspended"].map((status) => (
+            {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
               <div
                 key={status}
                 onClick={() => setActiveTab(status)}
                 className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors ${activeTab === status
-                  ? "border-[var(--dark-def)]"
+                  ? "border-(--dark-def)"
                   : "border-transparent hover:border-gray-300"
                   }`}
               >
@@ -28,7 +52,7 @@ const AdsPage = () => {
                   className="w-10 h-auto hidden md:block bg-[#f3f4f6] rounded-full p-2.5"
                 />
                 <div>
-                  <h2>{ads.filter((ad) => ad.status === status).length} Ads</h2>
+                  <h2>{products.filter((ad) => mapToLabel(ad) === status).length} Ads</h2>
                   <p className="text-xs">{status}</p>
                 </div>
               </div>
@@ -42,16 +66,16 @@ const AdsPage = () => {
                 onChange={(e) => setActiveTab(e.target.value)}
                 className="w-3/4 border border-gray-400 rounded-xl p-2 px-3 text-sm focus:outline-none focus:ring-transparent"
               >
-                {["Active", "Pending", "Taken", "Suspended"].map((status) => (
+                {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
                   <option key={status} value={status}>
-                    {status} ({ads.filter((ad) => ad.status === status).length})
+                    {status} ({products.filter((ad) => mapToLabel(ad) === status).length})
                   </option>
                 ))}
               </select>
 
               <div className="w-full text-center my-2">
                 <h2 className="text-lg font-semibold">
-                  {ads.filter((ad) => ad.status === activeTab).length} Ads
+                  {products.filter((ad) => mapToLabel(ad) === activeTab).length} Ads
                 </h2>
                 <p className="text-sm text-gray-500">{activeTab}</p>
               </div>
@@ -60,15 +84,15 @@ const AdsPage = () => {
         </div>
 
         <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-evenly">
-          {filteredAds.map((ad, index) => (
+          {filteredAds.map((ad) => (
             <div
-              key={index}
+              key={ad.id}
               className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
             >
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
                   className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
-                  src={ad.img}
+                  src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/placeholder.png"}
                   alt={ad.name}
                 />
                 <button
@@ -97,16 +121,46 @@ const AdsPage = () => {
                 +
               </button>
 
-              {selectedAd.status === "Suspended" ? (
+              {mapToLabel(selectedAd) === "Suspended" || mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
+                      onClick={async () => {
+                        try {
+                          await setStatusMutation.mutateAsync({ id: selectedAd.id, status: "ACTIVE" });
+                          toast.success("Ad reposted");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
                       Repost Ad
                     </button>
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40"
+                      onClick={async () => {
+                        try {
+                          await deleteMutation.mutateAsync(selectedAd.id);
+                          toast.success("Ad deleted");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
                       Delete Ad
                     </button>
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        // navigate to edit page or open edit UI (not implemented)
+                        toast.info("Edit details not implemented yet");
+                      }}
+                    >
                       Edit Details
                     </button>
                   </div>
@@ -137,7 +191,7 @@ const AdsPage = () => {
                       <p className=" text-xs text-gray-700 ">Note</p>
                     </div>
 
-                    <p className=" mt-2 ml-2 text-sm text-gray-700 border border-[var(--div-border)] rounded-xl p-2">
+                    <p className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
                       Your ad does not meet our acceptable ad posting
                       requirements. We kindly advise you to consider the use of
                       words when submitting an ad. Review and submit again.
@@ -152,23 +206,88 @@ const AdsPage = () => {
                     </p>
                   </div>
                 </div>
-              ) : selectedAd.status === "Active" ? (
+              ) : mapToLabel(selectedAd) === "Pending" ? (
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40">
-                      Mark as Taken
-                    </button>
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
+                      onClick={async () => {
+                        try {
+                          await deleteMutation.mutateAsync(selectedAd.id);
+                          toast.success("Ad deleted");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
                       Delete Ad
                     </button>
-                    <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        // navigate to edit page or open edit UI (not implemented)
+                        toast.info("Edit details not implemented yet");
+                      }}
+                    >
+                      Edit Details
+                    </button>
+                  </div>
+                </div>
+              ) : mapToLabel(selectedAd) === "Active" ? (
+                <div className="flex flex-col gap-3 mt-6 font-medium">
+                  <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40"
+                      onClick={async () => {
+                        try {
+                          await markTakenMutation.mutateAsync({ id: selectedAd.id });
+                          toast.success("Marked as taken");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
+                      Mark as Taken
+                    </button>
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
+                      onClick={async () => {
+                        try {
+                          await deleteMutation.mutateAsync(selectedAd.id);
+                          toast.success("Ad deleted");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
+                      Delete Ad
+                    </button>
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={async () => {
+                        try {
+                          await setStatusMutation.mutateAsync({ id: selectedAd.id, status: "SUSPENDED" });
+                          toast.success("Ad suspended");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
+                      }}
+                    >
                       Suspend
                     </button>
                   </div>
                 </div>
               ) : (
                 <p className="mt-6 text-center text-gray-600">
-                  No actions available for {selectedAd.status} ads.
+                  No actions available for {mapToLabel(selectedAd)} ads.
                 </p>
               )}
             </div>

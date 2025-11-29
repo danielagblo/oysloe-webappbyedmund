@@ -7,8 +7,8 @@ import "react-circular-progressbar/dist/styles.css";
 
 import "../App.css";
 import useCategories from "../features/categories/useCategories";
-import type { Category } from "../types/Category";
 import { useProducts } from "../features/products/useProducts";
+import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
 
@@ -45,20 +45,18 @@ const HomePage = () => {
 
   const totalProducts = products.length;
 
-  const productsByCategory = categories.reduce(
-    (acc, category) => {
-      const categoryProducts =
-        products?.filter((p) => p.category === category.id) || [];
+  const productsByCategory = categories.reduce((acc, category) => {
+    const categoryProducts = products?.filter(p => p.category === category.id) || [];
 
-      if (categoryProducts.length > 0) {
-        acc[category.id] = categoryProducts;
-      } else {
-        acc[category.id] = [];
-      }
-      return acc;
-    },
-    {} as Record<number, Product[]>,
-  );
+    if (categoryProducts.length > 0) {
+      acc[category.id] = categoryProducts;
+    } else {
+      acc[category.id] = [];
+    }
+    return acc;
+  }, {} as Record<number, Product[]>);
+
+
 
   /* API BIT ENDS HERE */
   if (categoriesLoading) console.log("Loading up categories...");
@@ -165,34 +163,30 @@ const HomePage = () => {
     return (
       <div
         ref={headerRef}
-        className={`w-full left-0 z-40 transition-all duration-300 ${
-          isSmallScreen && isCondensed
-            ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-            : "relative"
-        }`}
+        className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
+          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+          : "relative"
+          }`}
       >
         <div
-          className={`flex items-center transition-all duration-300 ${
-            isSmallScreen && isCondensed
-              ? "justify-between px-4 py-2 gap-3"
-              : "flex-col items-center justify-center gap-8 mt-40"
-          }`}
+          className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
+            ? "justify-between px-4 py-2 gap-3"
+            : "flex-col items-center justify-center gap-8 mt-40"
+            }`}
         >
           <h2
-            className={`${
-              isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
-            } font-medium text-(--dark-def) whitespace-nowrap`}
+            className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+              } font-medium text-(--dark-def) whitespace-nowrap`}
           >
             Oysloe
           </h2>
 
           <div className="flex w-full px-200">
             <div
-              className={`relative flex items-center ${
-                isSmallScreen && isCondensed
-                  ? "justify-end flex-1"
-                  : "justify-center w-full max-w-[520px]"
-              }`}
+              className={`relative flex items-center ${isSmallScreen && isCondensed
+                ? "justify-end flex-1"
+                : "justify-center w-full max-w-[520px]"
+                }`}
             >
               <div className="rotating-bg" aria-hidden="true" />
               <div className="rotating-bg-inner" aria-hidden="true" />
@@ -201,11 +195,10 @@ const HomePage = () => {
                 <input
                   type="text"
                   placeholder="Search anything up for good"
-                  className={`search-input ${
-                    isSmallScreen && isCondensed
-                      ? "text-[16px]"
-                      : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                  className={`search-input ${isSmallScreen && isCondensed
+                    ? "text-[16px]"
+                    : "text-2xl sm:text-2xl"
+                    } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
                 />
 
                 <img
@@ -382,12 +375,14 @@ const HomePage = () => {
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
           .sort((a, b) => b.adsCount - a.adsCount)
-          .filter((cat) => cat.adsCount > 0)
+          .filter(cat => cat.adsCount > 0)
           .slice(0, 5)
-          .concat(categories.filter((cat) => cat.adsCount === 0))
+          .concat(
+            categories.filter(cat => cat.adsCount === 0)
+          )
           .slice(0, 5)
           .map((category) => {
-            const percentage = ((category.adsCount || 0) / total) * 100;
+            const percentage = (category.adsCount || 0) / total * 100;
             return (
               <div
                 key={category.id}
@@ -403,12 +398,11 @@ const HomePage = () => {
                   }}
                 />
                 <div className="absolute flex flex-col items-center justify-center text-center">
-                  <span className="text-[8px] sm:text-[10px] lg:text-sm min-w-[60px]">
+                  <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
                     {category.name}
                   </span>
                   <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
-                    {category.adsCount}
-                    {category.adsCount > 0 && "+"}
+                    {category.adsCount}{category.adsCount > 0 && "+"}
                   </span>
                 </div>
               </div>
@@ -477,7 +471,7 @@ const HomePage = () => {
                         className="w-3 sm:w-5 h-3 sm:h-5"
                       />
                       <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                        {ad.location.name || ad.location.region}
+                        {ad.location?.name ?? ad.location?.region ?? ""}
                       </p>
                     </div>
                     <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
@@ -524,7 +518,7 @@ const HomePage = () => {
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
                     <p className="text-xs text-gray-500">
-                      {ad.location.name || ad.location.region}
+                      {ad.location?.name ?? ad.location?.region ?? ""}
                     </p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">
