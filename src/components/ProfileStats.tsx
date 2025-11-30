@@ -1,7 +1,6 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
-import DebuggerButton from "./DebuggerButton";
 import ProgressBar from "./ProgressBar";
 import RatingReviews from "./RatingsReviews";
 

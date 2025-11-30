@@ -14,13 +14,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   useEffect(() => {
     if (!caseId) return;
 
-    let mounted = true;
-
     // hook handles loading and websocket lifecycle
     // nothing to do here anymore
-    return () => {
-      mounted = false;
-    };
   }, [caseId]);
 
   useEffect(() => {

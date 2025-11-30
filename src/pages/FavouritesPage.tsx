@@ -6,7 +6,7 @@ import type { Product } from "../types/Product";
 const FavouritesPage = () => {
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
-  const { data: favourites = [], isLoading, isError, toggleFavourite } = useFavourites();
+  const { data: favourites = [], isLoading, isError } = useFavourites();
 
   return (
     <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent">
