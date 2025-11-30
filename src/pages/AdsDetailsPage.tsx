@@ -1,10 +1,10 @@
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
-import { useOwnerProducts, useProduct, useProducts, useMarkProductAsTaken } from "../features/products/useProducts";
 import useFavourites from "../features/products/useFavourites";
+import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProducts } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { ProductFeature } from "../types/ProductFeature";
@@ -443,7 +443,7 @@ const AdsDetailsPage = () => {
     const isTaken = Boolean((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken);
 
     const actions: Record<string, () => void> = {
-      "Mark as taken": isTaken ? () => {} : (onMarkTaken || (() => {})),
+      "Mark as taken": isTaken ? () => { } : (onMarkTaken || (() => { })),
       "Report Ad": onReportAd,
       "Caller 1": onCaller1,
       "Caller 2": onCaller2,

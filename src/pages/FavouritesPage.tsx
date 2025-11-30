@@ -1,7 +1,7 @@
 import { useState } from "react";
+import MenuButton from "../components/MenuButton";
 import useFavourites from "../features/products/useFavourites";
 import type { Product } from "../types/Product";
-import MenuButton from "../components/MenuButton";
 
 const FavouritesPage = () => {
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
