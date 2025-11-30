@@ -150,7 +150,11 @@ export const markProductAsTaken = async (
     return mockProducts[idx];
   }
 
-  return apiClient.post<Product>(products.markAsTaken(id), body);
+  // Ensure payload includes `product` field if backend requires it
+  const payload = { ...(body || {}) } as Record<string, unknown>;
+  if (payload.product == null) payload.product = Number(id);
+
+  return apiClient.post<Product>(products.markAsTaken(id), payload);
 };
 
 // ---------------------
@@ -178,6 +182,29 @@ export const getRelatedProducts = async (): Promise<Product[]> => {
   if (useMocks) return [...mockProducts];
 
   return apiClient.get<Product[]>(products.related);
+};
+
+// ---------------------
+// FAVOURITES
+// ---------------------
+export const getFavourites = async (): Promise<Product[]> => {
+  if (useMocks) {
+    return mockProducts.filter(p => Boolean((p as any).favourited_by_user));
+  }
+
+  return apiClient.get<Product[]>(endpoints.products.favouritesList());
+};
+
+export const toggleFavourite = async (id: number | string): Promise<Product> => {
+  if (useMocks) {
+    const idx = mockProducts.findIndex(p => p.id === +id);
+    if (idx === -1) throw new Error("Mock product not found");
+    // toggle favourited flag
+    const curr = (mockProducts[idx] as any).favourited_by_user;
+    (mockProducts[idx] as any).favourited_by_user = !curr;
+    return mockProducts[idx];
+  }
+  return apiClient.post<Product>(endpoints.products.favourite(id), {});
 };
 
 // LIST PRODUCTS FOR OWNER

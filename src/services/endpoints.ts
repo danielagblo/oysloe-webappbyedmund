@@ -60,6 +60,8 @@ export const endpoints = {
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
+    favourite: (id: number | string) => `/products/${id}/favourite/`,
+    favouritesList: () => `/products/favourites/`,
 
     features: {
       list: "/product-features/",
