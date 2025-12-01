@@ -68,11 +68,11 @@ const SubscriptionPage = () => {
 
   return (
     <div className="flex justify-between h-screen w-screen items-center gap-2 no-scrollbar">
-      <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-4 h-full md:py-[2vh] min-h-0 max-h-[100vh] max-lg:overflow-auto lg:overflow-hidden justify-start gap-4 no-scrollbar">
+      <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-4 h-full md:py-[2vh] min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden justify-start gap-4 no-scrollbar">
         <div className="lg:w-1/2 lg:overflow-y-auto no-scrollbar">
           <div className="w-full md:bg-white md:min-h-[92vh] lg:w-full pt-20 md:mt-0 flex flex-col justify-start items-center gap-4 px-3 md:py-3 rounded-2xl text-xs">
             <div className="flex pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full">
-              <div className="bg-[var(--div-active)] flex p-4 rounded-2xl justify-between items-center gap-2 w-full">
+              <div className="bg-(--div-active) flex p-4 rounded-2xl justify-between items-center gap-2 w-full">
                 <div className="w-full flex flex-col justify-start items-start gap-4">
                   <p className="md:text-[1.25rem] max-md:text-[0.8rem]  font-light text-nowrap">
                     You're currently subscribed
@@ -103,7 +103,7 @@ const SubscriptionPage = () => {
               {activeUserSub && (
                 <div className="w-full px-2">
                   <button
-                    className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
+                    className="bg-(--div-active) w-full py-3 rounded text-center mt-2"
                     onClick={() => handleRenew(activeUserSub.id, activeUserSub.subscription.id)}
                     disabled={updatingId === activeUserSub.id}
                   >
@@ -124,7 +124,7 @@ const SubscriptionPage = () => {
               {subsQuery.isError && <p className="text-center text-red-500">Failed to load plans</p>}
 
               {subscriptions.map((s) => (
-                <div key={s.id} className="relative bg-[var(--div-active)] rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full">
+                <div key={s.id} className="relative bg-(--div-active) rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full">
                   {s.discount_percentage && (
                     <div className="absolute top-[-10%] right-10 z-10 py-1 px-2 rounded-2xl bg-gray-900 text-white text-center text-xs">
                       {s.discount_percentage}% off
@@ -154,7 +154,8 @@ const SubscriptionPage = () => {
 
                   <div className="w-full">
                     <button
-                      className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
+                      className="bg-gray-200 hover:scale-95 active:scale-105 hover:bg-gray-100 cursor-pointer lg:w-4/5 transition w-full py-3 rounded text-center mt-2"
+                      title="clicking this will open Paystack in a new tab"
                       onClick={() => handleSubscribe(s.id)}
                       disabled={subscribingId === s.id}
                     >

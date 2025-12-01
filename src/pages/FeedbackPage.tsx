@@ -7,12 +7,31 @@ const FeedbackPage = () => {
   const [selectedStars, setSelectedStars] = useState<number>(0);
   const [comment, setComment] = useState<string>("");
   const [sent, setSent] = useState(false);
+  const [noRating, setNoRating] = useState(false);
+  const [noReviewMessage, setNoReviewMessage] = useState(false);
+
 
   useFeedbacks();
   const create = useCreateFeedback();
 
   const submit = async () => {
-    if (selectedStars < 1 || selectedStars > 5) return;
+    setNoRating(false);
+    setNoReviewMessage(false);
+
+    let hasError = false;
+
+    if (selectedStars < 1) {
+      setNoRating(true);
+      hasError = true;
+    }
+
+    if (!comment.trim()) {
+      setNoReviewMessage(true);
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     try {
       await create.mutateAsync({ rating: selectedStars, message: comment });
       setComment("");
@@ -23,6 +42,7 @@ const FeedbackPage = () => {
       console.error("Failed to submit feedback", err);
     }
   };
+
 
   return (
     <div className="flex justify-between h-screen w-screen items-center gap-2">
@@ -65,11 +85,14 @@ const FeedbackPage = () => {
           <button
             onClick={submit}
             disabled={create.status === "pending"}
-            className="w-full cursor-pointer bg-gray-100 p-5 rounded-md"
+            className="w-full cursor-pointer bg-gray-100 p-5 rounded-md hover:scale-95 active:scale-105 hover:bg-gray-200 transition"
           >
             {create.status === "pending" ? "Sending..." : "Send Review"}
           </button>
-          {sent && <p className="text-green-600">Thanks — feedback sent.</p>}
+
+          {noRating && <p className="text-red-600">Please choose a rating.</p>}
+          {noReviewMessage && <p className="text-red-600">Please enter a review message.</p>}
+          {sent && <p className="text-green-600">Thank you. Your feedback has been sent!</p>}
         </div>
       </div>
     </div>
