@@ -9,7 +9,7 @@ export default function ProfileStats() {
   let name = (user as UserProfile)?.name;
   // break names into single entities by the space ok
   const nameParts = name?.split(" ") || [];
-  name = (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "");
+  name = nameParts.length > 1 ? (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "") : nameParts[0];
 
   // mini components
   const Profile = () => (
