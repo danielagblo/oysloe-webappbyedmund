@@ -7,6 +7,7 @@ import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
 import { getFeatures } from "../services/featureService";
+import { getProductFeatures } from "../services/productFeatureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
 import DropdownPopup from "./DropDownPopup";
@@ -50,6 +51,7 @@ export default function PostAdForm() {
   // creation of catalog features is disabled for regular users; we only fetch existing definitions
   const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
   const [featureValues, setFeatureValues] = useState<Record<number, string>>({});
+  const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
 
   // Fetch subcategories whenever categoryId changes
   useEffect(() => {
@@ -88,6 +90,34 @@ export default function PostAdForm() {
             map[f.id] = "";
           });
           setFeatureValues(map);
+          // fetch possible values for each feature using product-features endpoint
+          try {
+            const normalized: Record<number, string[]> = {};
+            const perFeaturePromises = feats.map((f) =>
+              getProductFeatures({ feature: f.id })
+                .then((res) => ({ fid: f.id, res }))
+                .catch(() => ({ fid: f.id, res: null })),
+            );
+            const perFeatureResults = await Promise.all(perFeaturePromises);
+            perFeatureResults.forEach(({ fid, res }) => {
+              if (!res || !Array.isArray(res)) return;
+              const valuesSet = new Set<string>();
+              res.forEach((pf: any) => {
+                const nested = pf?.feature?.values ?? pf?.values ?? [];
+                if (Array.isArray(nested)) {
+                  nested.forEach((v: any) => {
+                    if (v && typeof v.value === "string") valuesSet.add(v.value);
+                  });
+                }
+                if (pf && typeof pf.value === "string") valuesSet.add(pf.value);
+              });
+              normalized[Number(fid)] = Array.from(valuesSet);
+            });
+            setPossibleFeatureValues(normalized);
+          } catch (e) {
+            console.warn("Failed to fetch product feature values", e);
+            setPossibleFeatureValues({});
+          }
         } else {
           setFeatureDefinitions([]);
           setFeatureValues({});
@@ -113,6 +143,47 @@ export default function PostAdForm() {
       }
     }
   }, [featureDefinitions]);
+
+  // Ensure possible values are fetched when an attached feature is selected
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const toFetch = attachedFeatures
+          .map((a) => a.feature)
+          .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
+        if (toFetch.length === 0) return;
+        const promises = toFetch.map((fid) =>
+          getProductFeatures({ feature: fid })
+            .then((r) => ({ fid, r }))
+            .catch(() => ({ fid, r: null })),
+        );
+        const results = await Promise.all(promises);
+        if (!mounted) return;
+        const next = { ...possibleFeatureValues };
+        results.forEach(({ fid, r }) => {
+          if (!r || !Array.isArray(r)) return;
+          const valuesSet = new Set<string>();
+          (r as any[]).forEach((pf) => {
+            const nested = pf?.feature?.values ?? pf?.values ?? [];
+            if (Array.isArray(nested)) {
+              nested.forEach((v: any) => {
+                if (v && typeof v.value === "string") valuesSet.add(v.value);
+              });
+            }
+            if (pf && typeof pf.value === "string") valuesSet.add(pf.value);
+          });
+          next[Number(fid)] = Array.from(valuesSet);
+        });
+        setPossibleFeatureValues(next);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [attachedFeatures, possibleFeatureValues]);
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -628,62 +699,35 @@ export default function PostAdForm() {
             </div>
 
             <div>
-              <label className="block gap-2 mb-1 font-medium">Key Features</label>
               <div className="flex flex-col gap-2">
-                {keyFeatures.map((kf, idx) => (
-                  <div key={`feature-${idx}`} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      placeholder={`Feature ${idx + 1}`}
-                      value={kf}
-                      onChange={(e) =>
-                        setKeyFeatures((prev) => prev.map((p, i) => (i === idx ? e.target.value : p)))
-                      }
-                      className="flex-1 w-full border rounded-xl border-[var(--div-border)] p-3"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setKeyFeatures((prev) => prev.filter((_, i) => i !== idx))}
-                      className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs"
-                      aria-label={`Remove feature ${idx + 1}`}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setKeyFeatures((prev) => [...prev, ""])}
-                    className="px-4 py-2 bg-[var(--div-active)] rounded-xl text-sm"
-                  >
-                    + Add feature
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setKeyFeatures(["", ""])}
-                    className="px-4 py-2 bg-gray-100 rounded-xl text-sm"
-                  >
-                    Reset features
-                  </button>
-                </div>
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
                     <label className="block mb-1 font-medium">Features for selected subcategory</label>
                     <div className="flex flex-col gap-2">
-                      {featureDefinitions.map((fd) => (
-                        <div key={`def-${fd.id}`} className="flex items-center gap-2">
-                          <div className="w-1/3 text-sm">{fd.name}</div>
-                          <input
-                            type="text"
-                            placeholder={`Value for ${fd.name}`}
-                            value={featureValues[fd.id] ?? ""}
-                            onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                            className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
-                          />
-                        </div>
-                      ))}
+                      {featureDefinitions.map((fd) => {
+                        const values = possibleFeatureValues[fd.id] ?? [];
+                        return (
+                          <div key={`def-${fd.id}`} className="flex items-center gap-2">
+                            <div className="w-1/3 text-sm">{fd.name}</div>
+                            {values && values.length > 0 ? (
+                              <DropdownPopup
+                                triggerLabel={featureValues[fd.id] && featureValues[fd.id] !== "" ? featureValues[fd.id] : `Select ${fd.name}`}
+                                options={values}
+                                onSelect={(opt) => setFeatureValues((prev) => ({ ...prev, [fd.id]: opt }))}
+                                title={`Select ${fd.name}`}
+                              />
+                            ) : (
+                              <input
+                                type="text"
+                                placeholder={`Value for ${fd.name}`}
+                                value={featureValues[fd.id] ?? ""}
+                                onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                              />
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -708,13 +752,22 @@ export default function PostAdForm() {
                             ))}
                           </select>
 
-                          <input
-                            type="text"
-                            placeholder="Value"
-                            value={af.value}
-                            onChange={(e) => setAttachedFeatures((prev) => prev.map((p, i) => (i === idx ? { ...p, value: e.target.value } : p)))}
-                            className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
-                          />
+                          {typeof af.feature === 'number' && possibleFeatureValues[af.feature] && possibleFeatureValues[af.feature].length > 0 ? (
+                            <DropdownPopup
+                              triggerLabel={af.value && af.value !== "" ? af.value : "Value"}
+                              options={possibleFeatureValues[af.feature]}
+                              onSelect={(opt) => setAttachedFeatures((prev) => prev.map((p, i) => (i === idx ? { ...p, value: opt } : p)))}
+                              title={`Select value for ${featureDefinitions.find((f) => f.id === af.feature)?.name ?? "Feature"}`}
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              placeholder="Value"
+                              value={af.value}
+                              onChange={(e) => setAttachedFeatures((prev) => prev.map((p, i) => (i === idx ? { ...p, value: e.target.value } : p)))}
+                              className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                            />
+                          )}
 
                           <button
                             type="button"

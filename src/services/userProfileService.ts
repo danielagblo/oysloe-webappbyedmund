@@ -29,7 +29,7 @@ export const getUserProfile = async (): Promise<UserProfile> => {
 export const updateUserProfile = async (
   body: UserProfileUpdatePayload,
 ): Promise<UserProfile> => {
-  return apiClient.patch<UserProfile>(endpoints.userProfile.userProfile, body);
+  return apiClient.put<UserProfile>(endpoints.userProfile.userProfile, body);
 };
 
 // OTP Verification

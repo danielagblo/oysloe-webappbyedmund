@@ -43,6 +43,18 @@ export const deleteFeature = async (id: number): Promise<void> => {
   await apiClient.delete<void>(endpoints.features.delete(id));
 };
 
+export const getPossibleFeatureValues = async (params?: {
+  feature?: number;
+  subcategory?: number;
+}): Promise<Record<number, string[]>> => {
+  const qs = new URLSearchParams();
+  if (typeof params?.feature === "number") qs.append("feature", String(params.feature));
+  if (typeof params?.subcategory === "number") qs.append("subcategory", String(params.subcategory));
+
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+  return apiClient.get<Record<number, string[]>>(`${endpoints.possibleFeatureValues.list()}${query}`);
+};
+
 export default {
   getFeatures,
   getFeature,
