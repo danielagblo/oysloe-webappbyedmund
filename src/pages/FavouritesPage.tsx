@@ -44,7 +44,7 @@ const FavouritesPage = () => {
           ) : isError ? (
             <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">Failed to load favourites.</p>
           ) : favourites.length === 0 ? (
-            <div className="text-center col-span-full h-full min-h-[67vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
+            <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
               <img 
                 src="/public/nothing-to-show.png" 
                 alt="Nothing to show here" 

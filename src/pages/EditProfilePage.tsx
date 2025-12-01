@@ -272,6 +272,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <input
                 name="email"
                 readOnly={isReadonly}
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
                 value={selectedUser?.email ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
@@ -281,6 +282,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <input
                 name="phonePrimary"
                 readOnly={isReadonly}
+                pattern="^\+?[0-9\s-]{7,15}$"
                 value={selectedUser?.phonePrimary ?? ""}
                 onChange={handleInputChange}
                 className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -290,6 +292,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <input
                 name="phoneSecondary"
                 readOnly={isReadonly}
+                pattern="^\+?[0-9\s-]{7,15}$"
                 value={selectedUser?.phoneSecondary ?? ""}
                 onChange={handleInputChange}
                 className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -305,6 +308,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <input
                 name="nationalId"
                 readOnly={isReadonly}
+                pattern="^GHA-\d{9}-\d$"
                 value={selectedUser?.nationalId ?? ""}
                 onChange={handleInputChange}
                 className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
@@ -373,6 +377,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <label className="text-xs text-gray-600">Account Name</label>
               <input
                 name="accountName"
+                pattern="^[A-Za-z][A-Za-z\s\.\-]{1,}$"
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountName ?? ""}
                 onChange={handleInputChange}
@@ -382,6 +387,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
               <label className="text-xs text-gray-600">Account Number</label>
               <input
                 name="accountNumber"
+                pattern="^\d{6,20}$"
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountNumber ?? ""}
                 onChange={handleInputChange}
