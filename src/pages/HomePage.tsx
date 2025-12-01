@@ -564,7 +564,7 @@ const HomePage = () => {
     
     return categories.map((category) => {
       const categoryProducts = productsByCategory[category.id] || [];
-      if (!categoryProducts || categoryProducts.length === 0) return <p>No ads to show here...</p>
+      if (!categoryProducts || categoryProducts.length === 0) return;;
 
       return (
         <div
