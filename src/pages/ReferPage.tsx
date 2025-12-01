@@ -127,7 +127,7 @@ const ReferPage = () => {
           </div>
           <div className="flex flex-col gap-1">
             <div
-              className="flex gap-6 justify-between"
+              className="flex gap-6 items-center justify-end"
               onClick={() => {
                 setHow(false);
                 setApply(false);
@@ -136,10 +136,10 @@ const ReferPage = () => {
               }}
             >
               <span className="text-xl">{points.toLocaleString()}</span>
-              <img className="md:-mr-2" src="/arrowright.svg" alt="" />
+              <img className="" src="/arrowright.svg" alt="" />
             </div>
-            <span className="-m-3 pt-1 pl-4 text-xs text-gray-400">
-              {`equals GH₵${equivalentGhcExact.toFixed(2)}`}
+            <span className="-m-3 pt-2 pr-8.5 text-xs text-gray-400">
+              {`= GH₵${equivalentGhcExact.toFixed(2)}`}
             </span>
           </div>
         </div>
@@ -149,9 +149,9 @@ const ReferPage = () => {
         <div
           className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm"
           onClick={() => {
-            setHow(true);
-            setApply(false);
             setRedraw(false);
+            setHow(false);
+            setApply(true);
             setShowLevel(false);
           }}
         >
@@ -362,7 +362,7 @@ const ReferPage = () => {
     return (
       <div className="flex items-center p-3 mt-4 flex-col">
         <p className="text-4xl">{`₵ ${equivalentGhcExact.toFixed(2)}`}</p>
-        <div title={redrawTooltip}>
+        <div className="w-4/5" title={redrawTooltip}>
           <Button
             name={isLoading ? "Processing..." : "Redraw"}
             disabled={redeemableBlocks === 0 || isLoading}

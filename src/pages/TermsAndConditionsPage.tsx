@@ -22,7 +22,7 @@ function TermsAndConditionsPage() {
           {!isLoading && policy && (
             <div
               className="prose max-w-none mt-4 pb-20 text-sm text-left"
-              dangerouslySetInnerHTML={{ __html: policy.body }}
+              dangerouslySetInnerHTML={{ __html: (policy.body).split('\n').join('<br/><br/>') }}
             />
           )}
         </div>

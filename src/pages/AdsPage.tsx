@@ -36,14 +36,15 @@ const AdsPage = () => {
     <div className="flex justify-between h-screen w-screen items-center bg-transparent">
       <div className="w-full flex flex-col h-full items-center gap-2 relative">
         <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
-          <div className="hidden sm:flex justify-around items-center px-4 pb-2">
+          <div className="hidden sm:flex justify-around items-center px-4 max-sm:pb-2">
             {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
               <div
                 key={status}
                 onClick={() => setActiveTab(status)}
-                className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors ${activeTab === status
-                  ? "border-(--dark-def)"
-                  : "border-transparent hover:border-gray-300"
+                className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors 
+                  ${activeTab === status
+                    ? "border-(--dark-def)"
+                    : "border-transparent hover:border-gray-300"
                   }`}
               >
                 <img
@@ -84,19 +85,28 @@ const AdsPage = () => {
         </div>
 
         <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-evenly">
-          {filteredAds.map((ad) => (
+          {filteredAds.length < 1 
+            ? <div className="text-center col-span-full h-full min-h-[67vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
+                <img 
+                  src="/public/nothing-to-show.png" 
+                  alt="Nothing to show here" 
+                  className="h-40 lg:h-50 w-auto"
+                />
+                <p className="text-xl text-(--dark-def)">No {activeTab} ads to show.</p>
+              </div>
+            : filteredAds.map((ad) => (
             <div
               key={ad.id}
               className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
             >
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
-                  className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
+                  className="bg-gray-300 h-20 w-auto rounded-lg object-cover"
                   src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/placeholder.png"}
                   alt={ad.name}
                 />
                 <button
-                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2 "
+                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-(--div-active) px-4 rounded-full pb-2 "
                   onClick={() => setSelectedAd(ad)}
                 >
                   ...

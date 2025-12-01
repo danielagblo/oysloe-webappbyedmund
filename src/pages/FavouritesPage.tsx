@@ -40,11 +40,18 @@ const FavouritesPage = () => {
 
         <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center md:justify-evenly">
           {isLoading ? (
-            <p className="text-center col-span-full">Loading favourites...</p>
+            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">Loading favourites...</p>
           ) : isError ? (
-            <p className="text-center col-span-full">Failed to load favourites.</p>
+            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">Failed to load favourites.</p>
           ) : favourites.length === 0 ? (
-            <p className="text-center col-span-full">You have no favourited ads.</p>
+            <div className="text-center col-span-full h-full min-h-[67vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
+              <img 
+                src="/public/nothing-to-show.png" 
+                alt="Nothing to show here" 
+                className="h-40 lg:h-50 w-auto"
+              />
+              <p className="text-xl text-(--dark-def)">You have no favourited ads.</p>
+            </div>
           ) : (
             favourites.map((ad, index) => (
               <div
