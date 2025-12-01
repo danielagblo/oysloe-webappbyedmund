@@ -1,5 +1,5 @@
 import { Camera, PlusIcon, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'sonner';
 import mailGif from "../assets/mail.gif";
@@ -12,10 +12,32 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
-  const setupProgress: number = 100;
+  // derive setup progress from profile completeness
 
   // load profile and prefill editable local state
   const { profile, updateProfile } = useUserProfile();
+  // compute setup progress after profile is available
+  const setupProgress: number = useMemo(() => {
+    if (!profile) return 0;
+    // fields to consider for profile completeness
+    const fields = [
+      profile.name,
+      profile.email,
+      profile.phone,
+      profile.business_name,
+      profile.business_logo,
+      profile.avatar,
+      profile.id_number,
+      profile.id_front_page,
+      profile.id_back_page,
+      profile.account_name,
+      profile.account_number,
+      profile.mobile_network,
+    ];
+    const filled = fields.filter((f) => !!f).length;
+    if (fields.length === 0) return 0;
+    return Math.round((filled / fields.length) * 100);
+  }, [profile]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -31,8 +53,6 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
     phonePrimary?: string;
     phoneSecondary?: string;
     nationalId?: string;
-    idFront?: string;
-    idBack?: string;
     businessName?: string;
     accountName?: string;
     accountNumber?: string;
@@ -49,8 +69,6 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
         phonePrimary: profile.phone || undefined,
         phoneSecondary: profile.second_number || undefined,
         nationalId: profile.id_number || undefined,
-        idFront: profile.id_front_page || undefined,
-        idBack: profile.id_back_page || undefined,
         businessName: profile.business_name || undefined,
         accountName: profile.account_name || undefined,
         accountNumber: profile.account_number || undefined,
@@ -68,10 +86,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
     "https://placehold.co/100x100?text=Avatar&bg=EFEFEF&fg=666";
   const logoPlaceholder =
     "https://placehold.co/100x100?text=Logo&bg=EFEFEF&fg=666";
-  const frontPlaceholder =
-    "https://placehold.co/500x250?text=Front&bg=EFEFEF&fg=666";
-  const backPlaceholder =
-    "https://placehold.co/500x250?text=Back&bg=EFEFEF&fg=666";
+  // removed ID front/back placeholders — ID pages are no longer collected here
 
   const onImgError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>,
@@ -187,9 +202,6 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                   />
                   <Camera size={16} />
                 </label>
-                {avatarFile && (
-                  <div className="text-[0.7rem] mt-1">Selected</div>
-                )}
               </div>
               <div className="flex flex-col items-center gap-2 relative">
                 <img
@@ -223,7 +235,6 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                   />
                   <Camera size={16} />
                 </label>
-                {logoFile && <div className="text-[0.7rem] mt-1">Selected</div>}
               </div>
             </div>
 
@@ -231,18 +242,16 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center mb-2">
                 <p className="text-sm font-medium">General Details</p>
-                <button 
+                <button
                   className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
                   onClick={() => {
                     setIsReadonly(!isReadonly);
                     setIsReadonlyRight(!isReadonlyRight);
                   }}
-                  className="text-xs text-blue-500 underline"
                 >
                   {isReadonly ? "Edit" : "Preview"}
                 </button>
-                <button 
-                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                <button
                   onClick={() => {
                     setIsReadonly(!isReadonly);
                     setIsReadonlyRight(!isReadonlyRight);
@@ -322,23 +331,8 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                   />
                 </>
               ) : (
-                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                  <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
-                    <p>Front</p>
-                    <img
-                      src={frontPlaceholder}
-                      className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
-                      onError={(e) => onImgError(e, frontPlaceholder)}
-                    />
-                  </div>
-                  <div className="flex flex-col justify-start items-center gap-2 w-full sm:w-1/2">
-                    <p>Back</p>
-                    <img
-                      src={backPlaceholder}
-                      className="w-full max-w-full h-auto rounded-md object-cover bg-gray-100"
-                      onError={(e) => onImgError(e, backPlaceholder)}
-                    />
-                  </div>
+                <div className="py-3 text-sm text-gray-600">
+                  Finish the remaining account details to complete your profile.
                 </div>
               )}
             </div>
@@ -439,7 +433,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                         selectedUser?.phonePrimary ?? "",
                       );
 
-                      await apiClient.patch(endpoints.userProfile.userProfile, form);
+                      await apiClient.put(endpoints.userProfile.userProfile, form);
                     } else {
                       // build JSON payload according to UserProfileUpdatePayload
                       const payload: any = {
