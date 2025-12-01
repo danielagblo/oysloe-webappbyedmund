@@ -229,8 +229,8 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
 
             {/* general details */}
             <div className="w-[95%] bg-white p-4 rounded-md">
-              <div className="flex gap-6 items-center mb-2">
-                <p className="text-sm font-medium">General Details</p>
+              <div className="flex gap-4 items-center mb-2">
+                <p className="text-sm font-medium whitespace-nowrap">General Details</p>
                 <button 
                   className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
                   onClick={() => {
@@ -259,7 +259,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.name ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
 
               <div className="flex items-center">
@@ -274,7 +274,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.email ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
 
               <label className="text-xs text-gray-600">First Number</label>
@@ -283,7 +283,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.phonePrimary ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Second Number</label>
@@ -292,7 +292,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.phoneSecondary ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <div className="flex items-center">
@@ -307,7 +307,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.nationalId ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               {setupProgress === 100 ? (
@@ -318,7 +318,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                     readOnly={isReadonly}
                     value={selectedUser?.businessName ?? ""}
                     onChange={handleInputChange}
-                    className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                    className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
                   />
                 </>
               ) : (
@@ -376,7 +376,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountName ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Account Number</label>
@@ -385,7 +385,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountNumber ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Mobile Network</label>
@@ -394,12 +394,9 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.mobileNetwork ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
-              {saveError && (
-                <div className="mb-2 text-sm text-red-600">{saveError}</div>
-              )}
               <button
                 onClick={async () => {
                   setSaveError(null);
@@ -474,7 +471,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                   }
                 }}
                 disabled={isSaving}
-                className={`w-full py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? "bg-gray-300 text-gray-500" : "bg-gray-200 text-gray-800"}`}
+                className={`w-full hover:scale-95 active:scale-100 cursor-pointer transition py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? "bg-gray-300 text-gray-500" : "bg-gray-200 text-gray-800"}`}
               >
                 {isSaving
                   ? "Saving..."
@@ -482,6 +479,10 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                     ? "Finish"
                     : "Save"}
               </button>
+
+              {saveError && (
+                <div className="mt-2 text-bas text-red-600 w-full text-right">An error occurred.</div>
+              )}
             </div>
           </div>
           <div className="md:w-full md:h-20" />
