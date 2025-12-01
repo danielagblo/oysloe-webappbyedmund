@@ -20,8 +20,8 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   //readonly toggle - make editable by default when opening edit page
-  const isReadonly: boolean = false;
-  const isReadonlyRight: boolean = false;
+  const [isReadonly, setIsReadonly] = useState<boolean>(true);
+  const [isReadonlyRight, setIsReadonlyRight] = useState<boolean>(true);
 
   const [selectedUser, setSelectedUser] = useState<{
     profileImage?: string;
@@ -113,10 +113,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
           <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
             <button
               className="absolute top-4 max-lg:top-7 max-lg:left-20 left-4 flex items-center justify-center bg-white shadow-sm px-2 rounded-lg hover:scale-95 cursor-pointer hover:bg-gray-100 transition"
-              onClick={() => {
-                if (onClose) onClose();
-                else navigate(-1);
-              }}
+              onClick={() => setShowEdit(false)}
             >
               <span className="text-2xl">← </span>
               &nbsp;
@@ -242,6 +239,15 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center mb-2">
                 <p className="text-sm font-medium">General Details</p>
+                <button className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                  onClick={() => {
+                    setIsReadonly(!isReadonly);
+                    setIsReadonlyRight(!isReadonlyRight);
+                  }}
+                  className="text-xs text-blue-500 underline"
+                >
+                  {isReadonly ? "Edit" : "Preview"}
+                </button>
               </div>
               <label className="text-xs text-gray-600">Name</label>
               <input
@@ -455,7 +461,6 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                     // close edit view on success
                     // setShowEdit(false);
                     toast.success('Profile saved');
-                    if (onClose) onClose();
                   } catch (err: any) {
                     const msg = err instanceof Error ? err.message : String(err);
                     setSaveError(msg || 'Failed to save profile');
