@@ -9,11 +9,13 @@ import {
   createProduct,
   deleteProduct,
   getProduct,
+  getProductReportCount,
   getProducts,
   getProductsForOwner,
   getRelatedProducts,
   markProductAsTaken,
   patchProduct,
+  reportProduct,
   setProductStatus,
   updateProduct,
 } from "../../services/productService";
@@ -34,7 +36,8 @@ export const productKeys = {
   details: () => [...productKeys.all, "detail"] as const,
   detail: (id: number | string) => [...productKeys.details(), id] as const,
 
-  related: () => [...productKeys.all, "related"] as const,
+  related: (id?: number) => [...productKeys.all, "related", id] as const,
+  reports: (id?: number) => [...productKeys.all, "reports", id] as const,
 };
 
 // useProducts
@@ -57,13 +60,23 @@ export const useProduct = (id: number | string) =>
   );
 
 // useRelatedProduct
-export const useRelatedProducts = () =>
+export const useRelatedProducts = (productId?: number) =>
   useQuery(
     queryOptions({
-      queryKey: productKeys.related(),
-      queryFn: getRelatedProducts,
+      queryKey: productKeys.related(productId),
+      queryFn: () => getRelatedProducts(productId),
+      enabled: productId != null,
     }),
   );
+
+// useProductReportCount
+export const useProductReportCount = (productId?: number) =>
+  useQuery<number>({
+    queryKey: productKeys.reports(productId),
+    queryFn: () => getProductReportCount(productId as number),
+    enabled: productId != null,
+    staleTime: 1000 * 60, // 1 minute
+  });
 
 // useCreateProduct
 export const useCreateProduct = () => {
@@ -189,5 +202,18 @@ export const useOwnerProducts = (ownerId?: number | null) => {
     enabled: ownerId != null,
     queryFn: () => getProductsForOwner(ownerId as number),
     staleTime: 1000 * 60 * 2,
+  });
+};
+
+// useReportProduct
+export const useReportProduct = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number | string; body?: Record<string, unknown> }) => reportProduct(id, body),
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: productKeys.detail(variables.id) });
+      qc.invalidateQueries({ queryKey: productKeys.all });
+    },
   });
 };

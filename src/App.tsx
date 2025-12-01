@@ -6,6 +6,7 @@ import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import InboxPage from "./pages/InboxPage.tsx";
 import LogInPage from "./pages/LogInPage.tsx";
+import PaystackCallback from "./pages/PaystackCallback";
 import PostAdPage from "./pages/PostAdPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import ReferalVerificationPage from "./pages/ReferalVerificationPage.tsx";
@@ -100,6 +101,7 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route path="/paystack/callback" element={<PaystackCallback />} />
       </Routes>
     </div>
   );

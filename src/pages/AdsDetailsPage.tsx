@@ -4,7 +4,7 @@ import "../App.css";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import useFavourites from "../features/products/useFavourites";
-import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProducts } from "../features/products/useProducts";
+import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { ProductFeature } from "../types/ProductFeature";
@@ -55,8 +55,8 @@ const AdsDetailsPage = () => {
     // assemble a full product payload to match backend schema expectations
     const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
     const payload = {
-      pid: (src as any)?.pid ?? `pid_${pid}`,
-      name: (src as any)?.name ?? "",
+      pid: (src)?.pid ?? `pid_${pid}`,
+      name: (src)?.name ?? "",
       image: (src as any)?.image ?? ((src as any)?.images?.[0]?.image ?? ""),
       type: (src as any)?.type ?? ("SALE" as const),
       status: (src as any)?.status ?? ("ACTIVE" as const),
@@ -71,6 +71,26 @@ const AdsDetailsPage = () => {
     markTaken.mutate({ id: pid, body: payload });
   };
 
+  const handleReportAd = () => {
+    const pid = (currentAdDataFromQuery as any)?.id || (adDataFromState as any)?.id || numericId;
+    if (!pid) return;
+    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+    const payload = {
+      pid: (src as any)?.pid ?? `pid_${pid}`,
+      name: (src as any)?.name ?? "",
+      image: (src as any)?.image ?? ((src as any)?.images?.[0]?.image ?? ""),
+      type: (src as any)?.type ?? ("SALE" as const),
+      status: (src as any)?.status ?? ("ACTIVE" as const),
+      is_taken: Boolean((src as any)?.is_taken),
+      description: (src as any)?.description ?? "",
+      price: (src as any)?.price ?? 0,
+      duration: (src as any)?.duration ?? "",
+      category: (src as any)?.category ?? (src as any)?.category_id ?? 0,
+    } as Record<string, unknown>;
+
+    reportProduct.mutate({ id: pid, body: payload });
+  };
+
   // Determine a candidate owner id early so hooks can be called unconditionally
   const ownerIdCandidate =
     adDataFromState?.owner?.id ?? currentAdDataFromQuery?.owner?.id ??
@@ -79,6 +99,16 @@ const AdsDetailsPage = () => {
   // fetch seller's products from backend via hook (call unconditionally)
   const ownerProductsQuery = useOwnerProducts(ownerIdCandidate as number | undefined);
   const sellerProducts = ownerProductsQuery.data ?? [];
+
+  // fetch related products (for Similar Ads section)
+  const { data: relatedProducts = [] } = useRelatedProducts(numericId ?? undefined);
+  const reportProduct = useReportProduct();
+  const { data: reportCount = 0 } = useProductReportCount(numericId ?? undefined);
+
+  // Caller phone tooltip visibility (hook must be declared before any early returns)
+  const [showCaller1, setShowCaller1] = useState(false);
+  const [showCaller2, setShowCaller2] = useState(false);
+
 
   const productReviews = useMemo(() => {
     if (!reviews || reviews.length === 0) return [];
@@ -135,6 +165,13 @@ const AdsDetailsPage = () => {
   const totalAds = ads.length;
   const currentAdData =
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
+
+  // derive owner contact numbers (prefer canonical fields)
+  const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner) as any;
+  const callerNumber1: string | null = owner?.phone || owner?.phone_number || owner?.primary_phone || null;
+  const callerNumber2: string | null = owner?.phone2 || owner?.secondary_phone || owner?.alt_phone || null;
+  const toggleCaller1 = () => setShowCaller1((s) => !s);
+  const toggleCaller2 = () => setShowCaller2((s) => !s);
 
   const getLikeCount = (p: any) => {
     if (!p) return 0;
@@ -200,7 +237,7 @@ const AdsDetailsPage = () => {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
           <img src="/flag.svg" alt="" className="w-4 h-4" />
-          <span className="text-xs">24</span>
+          <span className="text-xs">{reportCount}</span>
         </div>
         <div className="flex items-center gap-1">
           <img src="/favorited.svg" alt="" className="w-4 h-4" />
@@ -243,7 +280,7 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">30</h2>
+        <h2 className="text-base md:text-[1.125vw]">{reportCount}</h2>
       </div>
       <div className="flex items-center gap-2">
         <img
@@ -431,6 +468,13 @@ const AdsDetailsPage = () => {
     onMakeOffer = () => { },
     onFavorite = () => { },
     isFavourited = false,
+    // new props for caller UI
+    caller1,
+    caller2,
+    showCaller1: showC1,
+    showCaller2: showC2,
+    toggleCaller1,
+    toggleCaller2,
   }: {
     onMarkTaken?: () => void;
     onReportAd?: () => void;
@@ -439,6 +483,12 @@ const AdsDetailsPage = () => {
     onMakeOffer?: () => void;
     onFavorite?: () => void;
     isFavourited?: boolean;
+    caller1?: string | null;
+    caller2?: string | null;
+    showCaller1?: boolean;
+    showCaller2?: boolean;
+    toggleCaller1?: () => void;
+    toggleCaller2?: () => void;
   }) => {
     const isTaken = Boolean((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken);
 
@@ -454,56 +504,107 @@ const AdsDetailsPage = () => {
     return (
       <div>
         <div className="flex flex-wrap gap-2 mb-1">
-          {[
-            ["mark as taken.svg", "Mark as taken"],
-            ["flag.svg", "Report Ad"],
-            ["outgoing call.svg", "Caller 1"],
-            ["outgoing call.svg", "Caller 2"],
-            ["Make an offer.svg", "Make Offer"],
-            ["favorited.svg", "Favorites"],
-          ].map(([icon, label]) => (
-            <button
-              key={label}
-              className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                ${actions[label]
-                  ? "cursor-pointer hover:scale-95 active:scale-105"
-                  : "cursor-not-allowed"
-                }
-              `}
-              onClick={actions[label]}
-            >
-              {/* favourite button shows toggled state */}
-              {label === "Favorites" ? (
-                <>
-                  <img
-                    src={isFavourited ? "/favorited.svg" : "/favorited-outline.svg"}
-                    alt=""
-                    className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
-                  />
-                  <p className="whitespace-nowrap">{isFavourited ? "Liked" : "Like"}</p>
-                </>
-              ) : (
-                <>
-                  {/* show Taken label instead of Mark as taken when product is already taken */}
-                  {label === "Mark as taken" && isTaken ? (
-                    <>
-                      <img src="/check-circle.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
-                      <p className="whitespace-nowrap">Taken</p>
-                    </>
-                  ) : (
+          {(() => {
+            const items: Array<[string, string]> = [
+              ["mark as taken.svg", "Mark as taken"],
+              ["flag.svg", "Report Ad"],
+              ["outgoing call.svg", "Caller 1"],
+              // only include Caller 2 when a second number is available
+              ...(caller2 ? ([["outgoing call.svg", "Caller 2"]] as [string, string][]) : []),
+              ["Make an offer.svg", "Make Offer"],
+              ["favorited.svg", "Favorites"],
+            ];
+            return items.map(([icon, label]) => (
+              <div key={label} className="relative inline-block">
+                <button
+                  key={label}
+                  className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
+                  ${actions[label]
+                      ? "cursor-pointer hover:scale-95 active:scale-105"
+                      : "cursor-not-allowed"
+                    }
+                `}
+                  onClick={(e) => {
+                    // special handling for caller buttons to toggle tooltip
+                    if (label === "Caller 1") {
+                      e.stopPropagation();
+                      (toggleCaller1 || (() => { }))();
+                      return;
+                    }
+                    if (label === "Caller 2") {
+                      e.stopPropagation();
+                      (toggleCaller2 || (() => { }))();
+                      return;
+                    }
+                    // otherwise perform action
+                    actions[label]();
+                  }}
+                >
+                  {/* favourite button shows toggled state */}
+                  {label === "Favorites" ? (
                     <>
                       <img
-                        src={`/${icon}`}
+                        src={isFavourited ? "/favorited.svg" : "/favorited-outline.svg"}
                         alt=""
                         className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
                       />
-                      <p className="whitespace-nowrap">{label}</p>
+                      <p className="whitespace-nowrap">{isFavourited ? "Liked" : "Like"}</p>
+                    </>
+                  ) : (
+                    <>
+                      {/* show Taken label instead of Mark as taken when product is already taken */}
+                      {label === "Mark as taken" && isTaken ? (
+                        <>
+                          <img src="/check-circle.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
+                          <p className="whitespace-nowrap">Taken</p>
+                        </>
+                      ) : (
+                        <>
+                          <img
+                            src={`/${icon}`}
+                            alt=""
+                            className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
+                          />
+                          <p className="whitespace-nowrap">{label}</p>
+                        </>
+                      )}
                     </>
                   )}
-                </>
-              )}
-            </button>
-          ))}
+                </button>
+
+                {/* caller tooltip */}
+                {label === "Caller 1" && (showC1 && caller1) && (
+                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded shadow-md text-sm right-0 w-44">
+                    <div className="flex items-center justify-between">
+                      <div className="truncate">{caller1}</div>
+                      <a
+                        href={`tel:${caller1}`}
+                        onClick={(ev) => ev.stopPropagation()}
+                        className="ml-2 text-blue-600 underline"
+                      >
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {label === "Caller 2" && (showC2 && caller2) && (
+                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded shadow-md text-sm right-0 w-44">
+                    <div className="flex items-center justify-between">
+                      <div className="truncate">{caller2}</div>
+                      <a
+                        href={`tel:${caller2}`}
+                        onClick={(ev) => ev.stopPropagation()}
+                        className="ml-2 text-blue-600 underline"
+                      >
+                        Call
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ));
+          })()}
         </div>
       </div>
     );
@@ -765,7 +866,7 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
-        {ads.map((ad) => (
+        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => (
           <Link
             key={ad.id}
             to={`/ads/${ad.id}`}
@@ -827,7 +928,18 @@ const AdsDetailsPage = () => {
               {/* mobile layout */}
               <div className="sm:hidden flex w-full ad-details-page">
                 <div className="flex flex-col w-fit space-y-6 md:w-1/2  bg-white p-6 rounded-lg mb-5">
-                  <ActionButtons onMarkTaken={handleMarkAsTaken} onFavorite={handleToggleFavourite} isFavourited={isFavourited} />
+                  <ActionButtons
+                    onMarkTaken={handleMarkAsTaken}
+                    onFavorite={handleToggleFavourite}
+                    onReportAd={handleReportAd}
+                    isFavourited={isFavourited}
+                    caller1={callerNumber1}
+                    caller2={callerNumber2}
+                    showCaller1={showCaller1}
+                    showCaller2={showCaller2}
+                    toggleCaller1={toggleCaller1}
+                    toggleCaller2={toggleCaller2}
+                  />
                   <QuickChat />
                 </div>
                 <div className="bg-white p-6 rounded-lg w-full">
@@ -853,7 +965,18 @@ const AdsDetailsPage = () => {
                 </div>
                 <div className="p-6 rounded-lg w-full -mt-17">
                   <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
-                    <ActionButtons onMarkTaken={handleMarkAsTaken} onFavorite={handleToggleFavourite} isFavourited={isFavourited} />
+                    <ActionButtons
+                      onMarkTaken={handleMarkAsTaken}
+                      onFavorite={handleToggleFavourite}
+                      onReportAd={handleReportAd}
+                      isFavourited={isFavourited}
+                      caller1={callerNumber1}
+                      caller2={callerNumber2}
+                      showCaller1={showCaller1}
+                      showCaller2={showCaller2}
+                      toggleCaller1={toggleCaller1}
+                      toggleCaller2={toggleCaller2}
+                    />
                     <QuickChat />
                   </div>
                   <SellerInfo />

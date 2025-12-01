@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Subscription from "../assets/Subscription.png";
 import {
   useCreateUserSubscription,
@@ -5,6 +6,7 @@ import {
   useUpdateUserSubscription,
   useUserSubscriptions,
 } from "../features/subscriptions/useSubscriptions";
+import { initiatePaystackPayment } from "../services/paymentService";
 
 const SubscriptionPage = () => {
   const subsQuery = useSubscriptions();
@@ -18,12 +20,50 @@ const SubscriptionPage = () => {
 
   const activeUserSub = userSubscriptions.length ? userSubscriptions[0] : null;
 
+  // track which subscription is currently being processed to avoid showing
+  // "Processing..." on all package buttons when one is clicked
+  const [subscribingId, setSubscribingId] = useState<number | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+
   const handleSubscribe = (id: number) => {
-    createSub.mutate({ subscription_id: id });
+    (async () => {
+      try {
+        setSubscribingId(id);
+        const callbackUrl = `${window.location.origin}/paystack/callback`;
+        // store pending subscription so callback knows which subscription was bought
+        localStorage.setItem(
+          "pending_subscription",
+          JSON.stringify({ subscription_id: id }),
+        );
+
+        const res = await initiatePaystackPayment({ subscription_id: id, callback_url: callbackUrl });
+
+        // attempt to extract redirect URL from common shapes
+        const redirectUrl =
+          res?.data?.authorization_url || res?.authorization_url || res?.data?.url || res?.url || res?.authorizationUrl;
+
+        if (redirectUrl) {
+          // redirect to Paystack checkout
+          window.location.assign(redirectUrl);
+          return;
+        }
+
+        // fallback: create user subscription record directly if backend doesn't return a redirect URL
+        createSub.mutate({ subscription_id: id });
+      } catch (err) {
+        // if initiation failed, clear state and show fallback
+        console.error("Paystack initiation failed", err);
+      } finally {
+        setSubscribingId(null);
+      }
+    })();
   };
 
   const handleRenew = (userSubId: number, subscriptionId: number) => {
-    updateSub.mutate({ id: userSubId, body: { subscription_id: subscriptionId } });
+    setUpdatingId(userSubId);
+    updateSub.mutate({ id: userSubId, body: { subscription_id: subscriptionId } }, {
+      onSettled: () => setUpdatingId(null),
+    });
   };
 
   return (
@@ -65,9 +105,9 @@ const SubscriptionPage = () => {
                   <button
                     className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
                     onClick={() => handleRenew(activeUserSub.id, activeUserSub.subscription.id)}
-                    disabled={updateSub.isPending}
+                    disabled={updatingId === activeUserSub.id}
                   >
-                    {updateSub.isPending ? "Processing..." : "Renew / Update"}
+                    {updatingId === activeUserSub.id ? "Processing..." : "Renew / Update"}
                   </button>
                 </div>
               )}
@@ -116,9 +156,9 @@ const SubscriptionPage = () => {
                     <button
                       className="bg-[var(--div-active)] w-full py-3 rounded text-center mt-2"
                       onClick={() => handleSubscribe(s.id)}
-                      disabled={createSub.isPending}
+                      disabled={subscribingId === s.id}
                     >
-                      {createSub.isPending ? "Processing..." : "Subscribe / Pay Now"}
+                      {subscribingId === s.id ? "Processing..." : "Subscribe / Pay Now"}
                     </button>
                   </div>
                 </div>

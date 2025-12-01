@@ -60,6 +60,9 @@ export const endpoints = {
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
+    report: (id: number | string) => `/products/${id}/report/`,
+    // Legacy per-product reports endpoint (kept for compatibility)
+    reports: (id: number | string) => `/products/${id}/reports/`,
     favourite: (id: number | string) => `/products/${id}/favourite/`,
     favouritesList: () => `/products/favourites/`,
 
@@ -71,6 +74,11 @@ export const endpoints = {
       patch: (id: number) => `/product-features/${id}/`,
       delete: (id: number) => `/product-features/${id}/`,
     },
+  },
+  // Top-level product reports viewset (list & retrieve)
+  productReports: {
+    list: () => "/product-reports/",
+    detail: (id: number | string) => `/product-reports/${id}/`,
   },
   accountDeleteRequests: {
     list: () => "/account-delete-requests/",
