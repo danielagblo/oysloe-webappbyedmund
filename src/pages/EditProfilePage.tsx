@@ -259,7 +259,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.name ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
 
               <div className="flex items-center">
@@ -274,7 +274,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.email ?? ""}
                 onChange={handleInputChange}
-                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
 
               <label className="text-xs text-gray-600">First Number</label>
@@ -283,7 +283,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.phonePrimary ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Second Number</label>
@@ -292,7 +292,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.phoneSecondary ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <div className="flex items-center">
@@ -307,7 +307,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonly}
                 value={selectedUser?.nationalId ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               {setupProgress === 100 ? (
@@ -318,7 +318,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                     readOnly={isReadonly}
                     value={selectedUser?.businessName ?? ""}
                     onChange={handleInputChange}
-                    className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                    className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
                   />
                 </>
               ) : (
@@ -376,7 +376,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountName ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Account Number</label>
@@ -385,7 +385,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.accountNumber ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <label className="text-xs text-gray-600">Mobile Network</label>
@@ -394,7 +394,7 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
                 readOnly={isReadonlyRight}
                 value={selectedUser?.mobileNetwork ?? ""}
                 onChange={handleInputChange}
-                className="read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
+                className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
               <button
