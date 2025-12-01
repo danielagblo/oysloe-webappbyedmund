@@ -19,7 +19,11 @@ async function request<T>(
   const fullUrl = `${API_BASE_URL}${cleanUrl}`;
   // Build headers and attach Authorization automatically when token is present
   // If body is a FormData, do not set Content-Type so the browser can add the multipart boundary.
-  const isFormData = options.body instanceof FormData;
+  // Use a robust detection for FormData so this works across environments / polyfills.
+  const maybeBody = options.body as any;
+  const isFormData =
+    (typeof FormData !== "undefined" && options.body instanceof FormData) ||
+    (maybeBody && typeof maybeBody.append === "function" && typeof maybeBody.get === "function");
   const headers = { ...(options.headers ?? {}) } as Record<string, string>;
   if (!isFormData) headers["Content-Type"] = "application/json";
 
@@ -42,8 +46,7 @@ async function request<T>(
   // DEV-only: log the final headers so we can verify Authorization is attached
   if (import.meta.env.DEV) {
     try {
-       
-      console.debug("apiClient request:", { fullUrl, headers });
+      console.debug("apiClient request:", { fullUrl, headers, isFormData });
     } catch (e) {
       void e;
     }

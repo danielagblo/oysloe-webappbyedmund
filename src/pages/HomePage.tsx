@@ -12,6 +12,90 @@ import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
 
+type HomePageHeaderProps = {
+  searchValue: string;
+  setSearchValue: (v: string) => void;
+};
+
+export const HomePageHeader = ({ searchValue, setSearchValue }: HomePageHeaderProps) => {
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [isCondensed, setIsCondensed] = useState(false);
+
+  // check screen size
+  useEffect(() => {
+    const checkScreen = () => setIsSmallScreen(window.innerWidth <= 640);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
+  // detect scroll to toggle condensed mode
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsCondensed(scrollTop > 50); // triggers once you scroll down a bit
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div
+      ref={headerRef}
+      className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
+        ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+        : "relative"
+        }`}
+    >
+      <div
+        className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
+          ? "justify-between px-4 py-2 gap-3"
+          : "flex-col items-center justify-center gap-8 mt-40"
+          }`}
+      >
+        <h2
+          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+            } font-medium text-(--dark-def) whitespace-nowrap`}
+        >
+          Oysloe
+        </h2>
+
+        <div className="flex w-full px-200">
+          <div
+            className={`relative flex items-center ${isSmallScreen && isCondensed
+              ? "justify-end flex-1"
+              : "justify-center w-full max-w-[520px]"
+              }`}
+          >
+            <div className="rotating-bg" aria-hidden="true" />
+            <div className="rotating-bg-inner" aria-hidden="true" />
+
+            <div className="relative flex">
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="Search anything up for good"
+                className={`search-input ${isSmallScreen && isCondensed
+                  ? "text-[16px]"
+                  : "text-2xl sm:text-2xl"
+                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+              />
+
+              <img
+                src="/search.svg"
+                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-3 w-5 h-5 z-10"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HomePage = () => {
   const {
     categories,
@@ -33,7 +117,16 @@ const HomePage = () => {
   if (categoriesError)
     console.error("Failed to load categories:", categoriesError);
 
-  const { data: products = [] } = useProducts();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
+  // debounce searchTerm -> debouncedSearch
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  const { data: products = [] } = useProducts({ search: debouncedSearch || undefined });
 
   const categoriesWithCounts = categories.map((cat) => {
     const count = products.filter((p) => p.category === cat.id).length;
@@ -136,82 +229,7 @@ const HomePage = () => {
     }
   }, [isCondensed, isSmallScreen]);
 
-  const HomePageHeader = () => {
-    const headerRef = useRef<HTMLDivElement>(null);
-    const [isSmallScreen, setIsSmallScreen] = useState(false);
-    const [isCondensed, setIsCondensed] = useState(false);
-
-    // check screen size
-    useEffect(() => {
-      const checkScreen = () => setIsSmallScreen(window.innerWidth <= 640);
-      checkScreen();
-      window.addEventListener("resize", checkScreen);
-      return () => window.removeEventListener("resize", checkScreen);
-    }, []);
-
-    // detect scroll to toggle condensed mode
-    useEffect(() => {
-      const handleScroll = () => {
-        const scrollTop = window.scrollY;
-        setIsCondensed(scrollTop > 50); // triggers once you scroll down a bit
-      };
-
-      window.addEventListener("scroll", handleScroll);
-      return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    return (
-      <div
-        ref={headerRef}
-        className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-          : "relative"
-          }`}
-      >
-        <div
-          className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
-            ? "justify-between px-4 py-2 gap-3"
-            : "flex-col items-center justify-center gap-8 mt-40"
-            }`}
-        >
-          <h2
-            className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
-              } font-medium text-(--dark-def) whitespace-nowrap`}
-          >
-            Oysloe
-          </h2>
-
-          <div className="flex w-full px-200">
-            <div
-              className={`relative flex items-center ${isSmallScreen && isCondensed
-                ? "justify-end flex-1"
-                : "justify-center w-full max-w-[520px]"
-                }`}
-            >
-              <div className="rotating-bg" aria-hidden="true" />
-              <div className="rotating-bg-inner" aria-hidden="true" />
-
-              <div className="relative flex">
-                <input
-                  type="text"
-                  placeholder="Search anything up for good"
-                  className={`search-input ${isSmallScreen && isCondensed
-                    ? "text-[16px]"
-                    : "text-2xl sm:text-2xl"
-                    } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
-                />
-
-                <img
-                  src="/search.svg"
-                  className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-3 w-5 h-5 z-10"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  /* HomePageHeader moved to module scope to avoid remounting on each render */
 
   const ShowFilter = () => (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
@@ -540,9 +558,54 @@ const HomePage = () => {
     );
   };
 
+  const SearchResults = () => {
+    const results = products.filter(p => p.status === "ACTIVE");
+
+    if (!results || results.length === 0) {
+      return (
+        <div className="bg-(--div-active) w-full flex justify-center -mb-4">
+          <div style={{ transform: "scale(0.9)" }} className="w-[95vw] pb-8">
+            <p className="text-center text-gray-500">No ads found for your search.</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-(--div-active) w-full flex justify-center -mb-4">
+        <div
+          style={{ transform: "scale(0.9)" }}
+          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
+        >
+          {results.map((ad) => (
+            <div key={ad.id} className="flex flex-col w-full overflow-hidden">
+              <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
+                <img
+                  src={ad.image || "/public/no-image.jpeg"}
+                  alt={ad.name}
+                  className="w-full h-40 sm:h-48 object-cover rounded-2xl"
+                />
+                <div className="flex items-center gap-1 px-2 py-1">
+                  <img src="/location.svg" alt="" className="w-4 h-4" />
+                  <p className="text-xs text-gray-500">
+                    {ad.location?.name ?? ad.location?.region ?? ""}
+                  </p>
+                </div>
+                <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
+                <p className="px-2 text-sm font-light text-gray-500">
+                  {formatMoney(ad.price, "GHS")}
+                </p>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
-      <HomePageHeader />
+      <HomePageHeader searchValue={searchTerm} setSearchValue={setSearchTerm} />
       <div className="flex flex-col items-center justify-center">
         <div className="bg-(--div-active) w-screen">
           {selectedCategory && <CategoryFilters />}
@@ -551,6 +614,8 @@ const HomePage = () => {
 
         {selectedCategory ? (
           <ConditionalAds />
+        ) : debouncedSearch ? (
+          <SearchResults />
         ) : (
           <>
             <div className="transform scale-90 sm:transform-none sm:scale-100">

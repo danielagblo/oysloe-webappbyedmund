@@ -43,6 +43,10 @@ export default function PostAdForm() {
   const [monthlyDuration, setMonthlyDuration] = useState("Duration");
   const [price, setPrice] = useState<number | "">("");
   const [keyFeatures, setKeyFeatures] = useState<string[]>(["", ""]);
+  // attachedFeatures: list of selections where user picks an existing feature and provides a value
+  const [attachedFeatures, setAttachedFeatures] = useState<Array<{ feature?: number; value: string }>>([
+    { feature: undefined, value: "" },
+  ]);
   // creation of catalog features is disabled for regular users; we only fetch existing definitions
   const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
   const [featureValues, setFeatureValues] = useState<Record<number, string>>({});
@@ -98,6 +102,17 @@ export default function PostAdForm() {
       mounted = false;
     };
   }, [subcategoryId]);
+
+  // DEV: log feature definitions when they change so UI debugging is easier
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      try {
+        console.debug("featureDefinitions updated:", featureDefinitions);
+      } catch (e) {
+        void e;
+      }
+    }
+  }, [featureDefinitions]);
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -247,6 +262,21 @@ export default function PostAdForm() {
       pricingObj.daily.value = price as number;
     }
 
+    // merge explicit feature values from both the fetched definitions map
+    // and the user-attached selections into a single array for the API
+    const explicitFeatureValues = [
+      ...(featureValues && Object.keys(featureValues).length > 0
+        ? Object.entries(featureValues)
+          .map(([k, v]) => ({ feature: Number(k), value: v }))
+          .filter((f) => f.value && String(f.value).trim() !== "")
+        : []),
+      ...(attachedFeatures && Array.isArray(attachedFeatures)
+        ? attachedFeatures
+          .filter((a) => a.feature != null && String(a.value).trim() !== "")
+          .map((a) => ({ feature: Number(a.feature), value: String(a.value) }))
+        : []),
+    ];
+
     const metadata: AdMetadata & { price?: number | "" } = {
       title: title.trim(),
       // backend expects category PK (number) but AdMetadata.category is a string type; cast to string
@@ -278,18 +308,20 @@ export default function PostAdForm() {
       ...(keyFeatures && Array.isArray(keyFeatures) && keyFeatures.filter((k) => k.trim() !== "").length > 0
         ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
         : {}),
-      // catalog feature creation disabled; do not include createCatalogFeatures flag
-      // attach explicit feature values from fetched definitions
-      ...(featureValues && Object.keys(featureValues).length > 0
-        ? {
-          featureValues: Object.entries(featureValues)
-            .map(([k, v]) => ({ feature: Number(k), value: v }))
-            .filter((f) => f.value && String(f.value).trim() !== "")
-        }
-        : {}),
+      // include merged explicit feature values (from fetched defs and user attachments)
+      ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
     };
 
     console.log("Ad metadata (JSON):", metadata);
+
+    // Debug: log uploadedImages details to help diagnose missing files
+    if (import.meta.env.DEV) {
+      try {
+        console.debug("Uploaded images summary:", uploadedImages.map((u) => ({ id: u.id, hasFile: !!u.file, fileName: u.file ? (u.file as File).name : null, fileType: u.file ? (u.file as File).type : null, url: u.url })));
+      } catch (e) {
+        void e;
+      }
+    }
 
     // quick guard: ensure at least one actual File is present when there are images
     const hasFile = metadata.images && Array.isArray(metadata.images)
@@ -596,9 +628,7 @@ export default function PostAdForm() {
             </div>
 
             <div>
-              <label className="block gap-2 mb-1 font-medium">
-                Key Features
-              </label>
+              <label className="block gap-2 mb-1 font-medium">Key Features</label>
               <div className="flex flex-col gap-2">
                 {keyFeatures.map((kf, idx) => (
                   <div key={`feature-${idx}`} className="flex gap-2 items-center">
@@ -638,7 +668,6 @@ export default function PostAdForm() {
                     Reset features
                   </button>
                 </div>
-                <div className="mt-2 text-sm text-gray-500">Feature creation is disabled; select an existing subcategory to load feature definitions.</div>
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
                     <label className="block mb-1 font-medium">Features for selected subcategory</label>
@@ -655,6 +684,65 @@ export default function PostAdForm() {
                           />
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+                {/* Attach existing feature entries (user-selectable) */}
+                {featureDefinitions.length > 0 && (
+                  <div className="mt-4">
+                    <label className="block mb-1 font-medium">Attach Features</label>
+                    <div className="flex flex-col gap-2">
+                      {attachedFeatures.map((af, idx) => (
+                        <div key={`attached-${idx}`} className="flex items-center gap-2">
+                          <select
+                            value={af.feature ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value === "" ? undefined : Number(e.target.value);
+                              setAttachedFeatures((prev) => prev.map((p, i) => (i === idx ? { ...p, feature: v } : p)));
+                            }}
+                            className="w-1/3 p-3 border rounded-xl border-[var(--div-border)] bg-white"
+                          >
+                            <option value="">Select feature</option>
+                            {featureDefinitions.map((fd) => (
+                              <option key={fd.id} value={fd.id}>{fd.name}</option>
+                            ))}
+                          </select>
+
+                          <input
+                            type="text"
+                            placeholder="Value"
+                            value={af.value}
+                            onChange={(e) => setAttachedFeatures((prev) => prev.map((p, i) => (i === idx ? { ...p, value: e.target.value } : p)))}
+                            className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => setAttachedFeatures((prev) => prev.filter((_, i) => i !== idx))}
+                            className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs"
+                            aria-label={`Remove attached feature ${idx + 1}`}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setAttachedFeatures((prev) => [...prev, { feature: undefined, value: "" }])}
+                          className="px-4 py-2 bg-[var(--div-active)] rounded-xl text-sm"
+                        >
+                          + Attach feature
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setAttachedFeatures([{ feature: undefined, value: "" }])}
+                          className="px-4 py-2 bg-gray-100 rounded-xl text-sm"
+                        >
+                          Reset attachments
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}

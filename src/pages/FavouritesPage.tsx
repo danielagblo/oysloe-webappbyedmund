@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ads } from "../data/ads";
 import MenuButton from "../components/MenuButton";
+import useFavourites from "../features/products/useFavourites";
+import type { Product } from "../types/Product";
 
 const FavouritesPage = () => {
-  const [selectedAd, setSelectedAd] = useState<null | (typeof ads)[0]>(null);
+  const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
-  const favourites = ads.filter((ad) => ad.isFavourited);
+  const { data: favourites = [], isLoading, isError } = useFavourites();
 
   return (
     <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent">
@@ -38,30 +39,38 @@ const FavouritesPage = () => {
         </div>
 
         <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-center md:justify-evenly">
-          {favourites.map((ad, index) => (
-            <div
-              key={index}
-              className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
-            >
-              <div className="flex flex-row justify-between items-center mb-2">
-                <img
-                  className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
-                  src={ad.img}
-                  alt={ad.name}
-                />
-                <p
-                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2"
-                  onClick={() => setSelectedAd(ad)}
-                >
-                  ...
-                </p>
+          {isLoading ? (
+            <p className="text-center col-span-full">Loading favourites...</p>
+          ) : isError ? (
+            <p className="text-center col-span-full">Failed to load favourites.</p>
+          ) : favourites.length === 0 ? (
+            <p className="text-center col-span-full">You have no favourited ads.</p>
+          ) : (
+            favourites.map((ad, index) => (
+              <div
+                key={(ad as any).id ?? index}
+                className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
+              >
+                <div className="flex flex-row justify-between items-center mb-2">
+                  <img
+                    className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
+                    src={(ad as any).image ?? (ad as any).img ?? "/public/no-image.jpeg"}
+                    alt={(ad as any).name ?? "Favourite"}
+                  />
+                  <p
+                    className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2"
+                    onClick={() => setSelectedAd(ad)}
+                  >
+                    ...
+                  </p>
+                </div>
+                <div className="mt-2">
+                  <p className="font-medium">{(ad as any).name}</p>
+                  <p className="text-xs text-gray-600">{(ad as any).price}</p>
+                </div>
               </div>
-              <div className="mt-2">
-                <p className="font-medium">{ad.name}</p>
-                <p className="text-xs text-gray-600">{ad.price}</p>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
           <div className="h-20 w-full" />
         </div>
 

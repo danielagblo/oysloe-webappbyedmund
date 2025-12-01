@@ -35,7 +35,7 @@ export interface Product {
 export type ProductPayload = {
   pid: string;
   name: string;
-  image: string;
+  image?: string;
   type: ProductType;
   status: ProductStatus;
   is_taken?: boolean;

@@ -60,6 +60,11 @@ export const endpoints = {
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
+    report: (id: number | string) => `/products/${id}/report/`,
+    // Legacy per-product reports endpoint (kept for compatibility)
+    reports: (id: number | string) => `/products/${id}/reports/`,
+    favourite: (id: number | string) => `/products/${id}/favourite/`,
+    favouritesList: () => `/products/favourites/`,
 
     features: {
       list: "/product-features/",
@@ -69,6 +74,11 @@ export const endpoints = {
       patch: (id: number) => `/product-features/${id}/`,
       delete: (id: number) => `/product-features/${id}/`,
     },
+  },
+  // Top-level product reports viewset (list & retrieve)
+  productReports: {
+    list: () => "/product-reports/",
+    detail: (id: number | string) => `/product-reports/${id}/`,
   },
   accountDeleteRequests: {
     list: () => "/account-delete-requests/",
@@ -115,6 +125,18 @@ export const endpoints = {
     update: (id: number) => `/product-images/${id}/`,
     patch: (id: number) => `/product-images/${id}/`,
     delete: (id: number) => `/product-images/${id}/`,
+  },
+  // Chat / Messaging
+  chat: {
+    // Resolve a chatroom id (by participants or context) if supported
+    resolveChatroomId: () => "/chatroomid/",
+    chatrooms: () => "/chatrooms/",
+    chatroomDetail: (id: number | string) => `/chatrooms/${id}/`,
+    chatroomMarkRead: (id: number | string) => `/chatrooms/${id}/mark-read/`,
+    chatroomMessages: (id: number | string) => `/chatrooms/${id}/messages/`,
+    chatroomSend: (id: number | string) => `/chatrooms/${id}/send/`,
+    messages: () => "/messages/",
+    messageDetail: (id: number | string) => `/messages/${id}/`,
   },
   subcategories: {
     list: () => "/subcategories/",

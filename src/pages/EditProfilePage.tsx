@@ -8,12 +8,7 @@ import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
 
-// const EditProfilePage = ({
-//   setShowEdit,
-// }: {
-//   setShowEdit: (value: boolean) => void;
-// }) => {
-const EditProfilePage = () => {
+const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
@@ -24,9 +19,9 @@ const EditProfilePage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  //readonly toggle
-  const [isReadonly, setIsReadonly] = useState<boolean>(true);
-  const [isReadonlyRight, setIsReadonlyRight] = useState<boolean>(true);
+  //readonly toggle - make editable by default when opening edit page
+  const isReadonly: boolean = false;
+  const isReadonlyRight: boolean = false;
 
   const [selectedUser, setSelectedUser] = useState<{
     profileImage?: string;
@@ -116,14 +111,17 @@ const EditProfilePage = () => {
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
-            {/* <button
+            <button
               className="absolute top-4 max-lg:top-7 max-lg:left-20 left-4 flex items-center justify-center bg-white shadow-sm px-2 rounded-lg hover:scale-95 cursor-pointer hover:bg-gray-100 transition"
-              onClick={() => setShowEdit(false)}
+              onClick={() => {
+                if (onClose) onClose();
+                else navigate(-1);
+              }}
             >
               <span className="text-2xl">← </span>
               &nbsp;
               <span className="text-sm">Back</span>
-            </button> */}
+            </button>
             {closeProgress && (
               <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
                 {setupProgress === 100 && (
@@ -244,11 +242,7 @@ const EditProfilePage = () => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center mb-2">
                 <p className="text-sm font-medium">General Details</p>
-                <button
-                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
-                  onClick={() => setIsReadonly(!isReadonly)}
-                >{isReadonly ? "Edit" : "Preview"}</button>
-              </div>  
+              </div>
               <label className="text-xs text-gray-600">Name</label>
               <input
                 name="name"
@@ -365,10 +359,6 @@ const EditProfilePage = () => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center my-2">
                 <p className="text-sm font-medium">Payment Account</p>
-                <button
-                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
-                  onClick={() => setIsReadonlyRight(!isReadonlyRight)}
-                >{isReadonlyRight ? "Edit" : "Preview"}</button>
               </div>
               <label className="text-xs text-gray-600">Account Name</label>
               <input
@@ -465,6 +455,7 @@ const EditProfilePage = () => {
                     // close edit view on success
                     // setShowEdit(false);
                     toast.success('Profile saved');
+                    if (onClose) onClose();
                   } catch (err: any) {
                     const msg = err instanceof Error ? err.message : String(err);
                     setSaveError(msg || 'Failed to save profile');

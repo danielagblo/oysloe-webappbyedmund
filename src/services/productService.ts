@@ -45,34 +45,6 @@ export const getProduct = async (id: number | string): Promise<Product> => {
 
 // CREATE
 export const createProduct = async (body: ProductPayload): Promise<Product> => {
-  if (useMocks) {
-    const newProduct: Product = {
-      ...body,
-      id: mockProducts.length + 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      images: [],
-      product_features: [],
-      location: {
-        id: 0,
-        region: "Greater Accra",
-        name: "Mock City",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      owner: {
-        id: 0,
-        email: "",
-      },
-      status: "ACTIVE",
-      is_taken: false,
-      pid: body.pid || String(mockProducts.length + 1),
-    };
-    mockProducts.push(newProduct);
-    console.log("Mock createProduct:", newProduct);
-    return newProduct;
-  }
-
   return apiClient.post<Product>(products.create, body);
 };
 
@@ -150,7 +122,71 @@ export const markProductAsTaken = async (
     return mockProducts[idx];
   }
 
-  return apiClient.post<Product>(products.markAsTaken(id), body);
+  // Ensure payload includes `product` field if backend requires it
+  const payload = { ...(body || {}) } as Record<string, unknown>;
+  if (payload.product == null) payload.product = Number(id);
+
+  return apiClient.post<Product>(products.markAsTaken(id), payload);
+};
+
+// ---------------------
+// REPORT PRODUCT
+// ---------------------
+export const reportProduct = async (
+  id: number | string,
+  body: ProductPayload | Record<string, unknown> = {},
+): Promise<Product> => {
+  if (useMocks) {
+    const product = mockProducts.find((p) => p.id === +id);
+    if (!product) throw new Error("Mock product not found");
+    // In mocks just return the product unchanged (report metadata not stored)
+    console.log("Mock reportProduct for:", id, body);
+    return product;
+  }
+
+  return apiClient.post<Product>(products.report(id), body);
+};
+
+// ---------------------
+// GET PRODUCT REPORTS / COUNT
+// ---------------------
+export const getProductReports = async (id: number | string): Promise<unknown> => {
+  if (useMocks) {
+    // No stored reports in mock; return empty array
+    return [];
+  }
+
+  // Some backends may not accept filtering via query params on the viewset
+  // and could return server errors for unknown filters. To be robust we
+  // fetch the top-level list and perform client-side filtering for the
+  // requested product id.
+  const url = `${endpoints.productReports.list()}`;
+  const resp = await apiClient.get<unknown>(url);
+
+  // Normalize to an array of items
+  let items: unknown[] = [];
+  if (Array.isArray(resp)) items = resp as unknown[];
+  else if (resp && typeof resp === "object" && Array.isArray((resp as any).results)) items = (resp as any).results;
+
+  // Filter items whose `product` field matches the requested id. The
+  // `product` property may be a number, or an object with an `id` field.
+  const pid = Number(id);
+  const filtered = items.filter((it) => {
+    if (!it || typeof it !== "object") return false;
+    const prod = (it as any).product;
+    if (prod == null) return false;
+    if (typeof prod === "number") return prod === pid;
+    if (typeof prod === "object" && typeof prod.id === "number") return prod.id === pid;
+    return false;
+  });
+
+  return filtered;
+};
+
+export const getProductReportCount = async (id: number | string): Promise<number> => {
+  const resp = await getProductReports(id);
+  if (Array.isArray(resp)) return resp.length;
+  return 0;
 };
 
 // ---------------------
@@ -174,23 +210,78 @@ export const setProductStatus = async (
 // ---------------------
 // RELATED PRODUCTS
 // ---------------------
-export const getRelatedProducts = async (): Promise<Product[]> => {
+export const getRelatedProducts = async (productId?: number): Promise<Product[]> => {
   if (useMocks) return [...mockProducts];
 
-  return apiClient.get<Product[]>(products.related);
+  const qs = new URLSearchParams();
+  if (productId != null) qs.append("product_id", String(productId));
+  const query = qs.toString() ? `?${qs.toString()}` : "";
+
+  return apiClient.get<Product[]>(`${products.related}${query}`);
+};
+
+// ---------------------
+// FAVOURITES
+// ---------------------
+export const getFavourites = async (): Promise<Product[]> => {
+  if (useMocks) {
+    return mockProducts.filter(p => Boolean((p as any).favourited_by_user));
+  }
+
+  return apiClient.get<Product[]>(endpoints.products.favouritesList());
+};
+
+export const toggleFavourite = async (id: number | string): Promise<Product> => {
+  if (useMocks) {
+    const idx = mockProducts.findIndex(p => p.id === +id);
+    if (idx === -1) throw new Error("Mock product not found");
+    // toggle favourited flag
+    const curr = (mockProducts[idx] as any).favourited_by_user;
+    (mockProducts[idx] as any).favourited_by_user = !curr;
+    return mockProducts[idx];
+  }
+  return apiClient.post<Product>(endpoints.products.favourite(id), {});
 };
 
 // LIST PRODUCTS FOR OWNER
 export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> => {
   // allow ownerId === 0 in case that's a valid id; only bail on null/undefined
   if (ownerId == null) return [];
+  // First try server-side filtering via query param: /products/?owner=<id>
+  try {
+    const resp = await apiClient.get<unknown>(`${endpoints.products.list}?owner=${ownerId}`);
+    const list = Array.isArray(resp)
+      ? (resp as unknown[])
+      : resp && typeof resp === "object" && Array.isArray((resp as any).results)
+      ? (resp as any).results
+      : [];
+    if (list.length > 0) {
+      // Defensive: ensure returned items are actually owned by ownerId (server may return mixed shapes)
+      const owned = list.filter((p: unknown) => {
+        if (!p || typeof p !== "object") return false;
+        const pi = p as { owner?: unknown };
+        const o = pi.owner;
+        if (o == null) return false;
+        if (typeof o === "number") return o === ownerId;
+        if (typeof o === "object" && typeof (o as any).id === "number") return (o as any).id === ownerId;
+        return false;
+      });
+      if (owned.length > 0) return owned as Product[];
+      // if server returned items but none match defensively, fall through to client-side filtering
+    }
+  } catch (e) {
+    // ignore and fall back to fetching all and filtering client-side
+    void e;
+  }
+
+  // Fallback: fetch all products and filter client-side (keeps existing behavior for servers without owner query)
   const all = await getProducts();
 
   const filtered = all.filter((p) => {
-     const o = p.owner as unknown;
-    if (typeof o === 'number') return o === ownerId;
+    const o = p.owner as unknown;
+    if (typeof o === "number") return o === ownerId;
     const obj = o as { id?: unknown };
-    if (obj && typeof obj.id === 'number') return obj.id === ownerId;
+    if (obj && typeof obj.id === "number") return obj.id === ownerId;
     return false;
   });
 
@@ -214,7 +305,6 @@ export const createProductFromAd = async (metadata: any) => {
   const payload: ProductPayload = {
     pid: `ad_${Date.now()}`,
     name: metadata.title,
-    image: "",
     type: mapType(metadata.purpose),
     status: "ACTIVE",
     is_taken: false,
@@ -300,15 +390,32 @@ export const createProductFromAd = async (metadata: any) => {
         // proceed to upload the file
 
         try {
+          // Debug: log file details before upload (DEV only)
+          if (import.meta.env.DEV) {
+            try {
+              console.debug("Uploading product image", {
+                product: created.id,
+                name: fileObj.name,
+                size: fileObj.size,
+                type: fileObj.type,
+              });
+            } catch (e) {
+              void e;
+            }
+          }
+
           await apiClient.post(endpoints.productImages.create(), fd);
         } catch (err) {
           // Log the error with some context so we can inspect server details
            
           console.error("productImages upload failed for", { product: created.id, file: fileObj.name }, err);
+          // Surface the error so caller knows uploads failed.
           throw err;
         }
       } catch (e) {
         console.error("Failed to upload product image:", e);
+        // Abort entire create flow so caller sees the failure (do not silently continue)
+        throw e;
       }
     }
   }
@@ -343,24 +450,11 @@ export const createProductFromAd = async (metadata: any) => {
   }
   // No catalog feature creation here — features must exist on the server and are attached below.
 
-  // Attach product features if provided as free-text keyFeatures (metadata.keyFeatures should be an array of strings)
+  // Free-text `keyFeatures` are skipped because the backend requires an explicit
+  // `feature` id for product-feature attachments. Use the UI to attach
+  // existing features (feature id + value) — those are handled above.
   if (Array.isArray((metadata as any).keyFeatures) && (metadata as any).keyFeatures.length > 0) {
-    for (const feat of (metadata as any).keyFeatures) {
-      try {
-        // backend expects `value` for product-features
-        const payloadFeatureValue = {
-          product: (created as any).id,
-          value: String(feat ?? ""),
-        };
-        try {
-          await apiClient.post(endpoints.productFeatures.create(), payloadFeatureValue);
-        } catch (err) {
-          console.error("product-features (value) failed", payloadFeatureValue, err);
-        }
-      } catch (e) {
-        console.error("Failed to attach product feature (value):", e);
-      }
-    }
+    console.warn("Skipping free-text keyFeatures upload: backend requires feature id. Convert UI to select existing features instead.");
   }
 
   return created;

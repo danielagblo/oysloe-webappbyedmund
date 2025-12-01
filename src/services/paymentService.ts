@@ -31,12 +31,25 @@ export const getPayment = async (id: number): Promise<Payment> => {
 
 export const initiatePaystackPayment = async (
   body: PaystackInitiateRequest,
-): Promise<void> => {
-  await apiClient.post<void>(endpoints.paystack.initiate(), body);
+): Promise<any> => {
+  // return whatever the backend returns (usually an authorization URL or data)
+  return apiClient.post<any>(endpoints.paystack.initiate(), body);
 };
 
 export const paystackWebhook = async (body: unknown): Promise<void> => {
   await apiClient.post<void>(endpoints.paystack.webhook(), body);
+};
+
+/**
+ * Trigger server-side Paystack verification flow.
+ * For debugging you can POST { reference } to the webhook endpoint
+ * so the server performs the verify/update logic immediately.
+ */
+export const verifyPaystackTransaction = async (reference: string): Promise<any> => {
+  // Some backends expect the Paystack webhook payload shape (data.reference)
+  // Send both to maximize compatibility: { reference, data: { reference } }
+  const payload = { reference, data: { reference } };
+  return apiClient.post<any>(endpoints.paystack.webhook(), payload);
 };
 
 export default {
@@ -44,4 +57,5 @@ export default {
   getPayment,
   initiatePaystackPayment,
   paystackWebhook,
+  verifyPaystackTransaction,
 };

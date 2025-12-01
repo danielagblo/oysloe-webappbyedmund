@@ -4,16 +4,18 @@ import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
 // import AccountPage from "./AccountPage";
 import AdsPage from "./AdsPage";
+import EditProfilePage from "./EditProfilePage";
 import FavouritesPage from "./FavouritesPage";
 import FeedbackPage from "./FeedbackPage";
 import PrivacyPage from "./PrivacyPage";
+import ProfileView from "./ProfileView";
 import ReferPage from "./ReferPage";
 import SubscriptionPage from "./SubscriptionPage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
-import EditProfilePage from "./EditProfilePage";
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const [isEditing, setIsEditing] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -39,13 +41,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">
+    <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-start sm:items-center bg-[#ededed]">
       <div className="h-full">
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex no-scrollbar h-full items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 overflow-y-auto no-scrollbar">
-        <div className="flex gap-2 sm:h-full sm:w-full">{renderContent()}</div>
+      <div className="flex no-scrollbar h-full items-start sm:items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 overflow-y-auto no-scrollbar">
+        <div className="flex gap-2 sm:h-full sm:w-full items-center">
+          {activeTab === "profile" ? (
+            isEditing ? (
+              <EditProfilePage onClose={() => setIsEditing(false)} />
+            ) : (
+              <ProfileView onEdit={() => setIsEditing(true)} />
+            )
+          ) : (
+            renderContent()
+          )}
+        </div>
       </div>
 
       <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-[2.125vw]">

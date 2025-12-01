@@ -32,7 +32,7 @@ const AccountPage = () => {
   };
 
   if (showEdit) {
-    return <EditProfilePage setShowEdit={setShowEdit} />;
+    return <EditProfilePage {...({ setShowEdit } as any)} />;
   }
 
   return (
