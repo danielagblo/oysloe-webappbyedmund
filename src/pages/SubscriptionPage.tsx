@@ -146,9 +146,9 @@ const SubscriptionPage = () => {
                   )}
 
                   <div className="flex justify-start items-start gap-4 w-full">
-                    <p className="font-bold text-sm">₵ {s.effective_price ?? s.price}</p>
+                    <p className="font-bold text-sm">₵ {Number(s.effective_price ?? s.price).toFixed(2)}</p>
                     {s.original_price && (
-                      <p className="text-gray-500">₵ <span className="line-through">{s.original_price}</span></p>
+                      <p className="text-gray-500">₵ <span className="line-through">{Number(s.original_price).toFixed(2)}</span></p>
                     )}
                   </div>
 
