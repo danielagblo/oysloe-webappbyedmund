@@ -94,6 +94,10 @@ export const endpoints = {
     patch: (id: number) => `/features/${id}/`,
     delete: (id: number) => `/features/${id}/`,
   },
+  // Possible feature values (suggested choices for a feature or subcategory)
+  possibleFeatureValues: {
+    list: () => "/possible-feature-values/",
+  },
   locations: {
     list: () => "/locations/",
     detail: (id: number) => `/locations/${id}/`,

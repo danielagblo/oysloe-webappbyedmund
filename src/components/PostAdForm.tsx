@@ -6,7 +6,7 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
-import { getFeatures } from "../services/featureService";
+import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
 import DropdownPopup from "./DropDownPopup";
@@ -50,6 +50,7 @@ export default function PostAdForm() {
   // creation of catalog features is disabled for regular users; we only fetch existing definitions
   const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
   const [featureValues, setFeatureValues] = useState<Record<number, string>>({});
+  const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
 
   // Fetch subcategories whenever categoryId changes
   useEffect(() => {
@@ -88,6 +89,16 @@ export default function PostAdForm() {
             map[f.id] = "";
           });
           setFeatureValues(map);
+            // fetch possible values for features in this subcategory when available
+            try {
+              const pv = await getPossibleFeatureValues({ subcategory: Number(subcategoryId) });
+              if (!mounted) return;
+              // pv is expected to be a mapping of feature id -> array of possible string values
+              setPossibleFeatureValues(pv || {});
+            } catch (e) {
+              console.warn("Failed to fetch possible feature values", e);
+              setPossibleFeatureValues({});
+            }
         } else {
           setFeatureDefinitions([]);
           setFeatureValues({});
@@ -675,13 +686,49 @@ export default function PostAdForm() {
                       {featureDefinitions.map((fd) => (
                         <div key={`def-${fd.id}`} className="flex items-center gap-2">
                           <div className="w-1/3 text-sm">{fd.name}</div>
-                          <input
-                            type="text"
-                            placeholder={`Value for ${fd.name}`}
-                            value={featureValues[fd.id] ?? ""}
-                            onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                            className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
-                          />
+                            {possibleFeatureValues[fd.id] && possibleFeatureValues[fd.id].length > 0 ? (
+                              <div className="flex-1 flex gap-2 items-center">
+                                <select
+                                  value={
+                                    possibleFeatureValues[fd.id].includes(featureValues[fd.id] ?? "")
+                                      ? (featureValues[fd.id] ?? "")
+                                      : (featureValues[fd.id] ? "__custom__" : "")
+                                  }
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (v === "__custom__") {
+                                      // clear to show custom input
+                                      setFeatureValues((prev) => ({ ...prev, [fd.id]: "" }));
+                                    } else {
+                                      setFeatureValues((prev) => ({ ...prev, [fd.id]: v }));
+                                    }
+                                  }}
+                                  className="w-1/3 p-3 border rounded-xl border-[var(--div-border)] bg-white"
+                                >
+                                  <option value="">Select</option>
+                                  {possibleFeatureValues[fd.id].map((v) => (
+                                    <option key={v} value={v}>{v}</option>
+                                  ))}
+                                  <option value="__custom__">Other...</option>
+                                </select>
+
+                                <input
+                                  type="text"
+                                  placeholder={`Value for ${fd.name}`}
+                                  value={featureValues[fd.id] ?? ""}
+                                  onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                  className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                                />
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                placeholder={`Value for ${fd.name}`}
+                                value={featureValues[fd.id] ?? ""}
+                                onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                              />
+                            )}
                         </div>
                       ))}
                     </div>

@@ -239,12 +239,12 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center mb-2">
                 <p className="text-sm font-medium">General Details</p>
-                <button className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                <button
                   onClick={() => {
                     setIsReadonly(!isReadonly);
                     setIsReadonlyRight(!isReadonlyRight);
                   }}
-                  className="text-xs text-blue-500 underline"
+                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200 transition text-xs text-blue-500 underline"
                 >
                   {isReadonly ? "Edit" : "Preview"}
                 </button>
