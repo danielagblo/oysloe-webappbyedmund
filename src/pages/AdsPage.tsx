@@ -86,7 +86,7 @@ const AdsPage = () => {
 
         <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-evenly">
           {filteredAds.length < 1 
-            ? <div className="text-center col-span-full h-full min-h-[67vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
+            ? <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
                 <img 
                   src="/public/nothing-to-show.png" 
                   alt="Nothing to show here" 

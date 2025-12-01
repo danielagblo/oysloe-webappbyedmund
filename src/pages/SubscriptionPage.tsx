@@ -126,8 +126,8 @@ const SubscriptionPage = () => {
               {subscriptions.map((s) => (
                 <div key={s.id} className="relative bg-(--div-active) rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full">
                   {s.discount_percentage && (
-                    <div className="absolute top-[-10%] right-10 z-10 py-1 px-2 rounded-2xl bg-gray-900 text-white text-center text-xs">
-                      {s.discount_percentage}% off
+                    <div className="absolute -top-2 right-4 z-10 py-1 px-2 rounded-2xl bg-gray-900 text-white text-center text-xs">
+                      {Number(s.discount_percentage).toString()}% off
                     </div>
                   )}
 
@@ -152,7 +152,7 @@ const SubscriptionPage = () => {
                     )}
                   </div>
 
-                  <div className="w-full">
+                  <div className="w-full flex items-center justify-center">
                     <button
                       className="bg-gray-200 hover:scale-95 active:scale-105 hover:bg-gray-100 cursor-pointer lg:w-4/5 transition w-full py-3 rounded text-center mt-2"
                       title="clicking this will open Paystack in a new tab"
