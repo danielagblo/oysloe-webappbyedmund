@@ -43,8 +43,8 @@ const SubscriptionPage = () => {
           res?.data?.authorization_url || res?.authorization_url || res?.data?.url || res?.url || res?.authorizationUrl;
 
         if (redirectUrl) {
-          // redirect to Paystack checkout
-          window.location.assign(redirectUrl);
+          // redirect to Paystack checkout in a new tab
+          window.open(redirectUrl, "_blank", "noopener,noreferrer");
           return;
         }
 
