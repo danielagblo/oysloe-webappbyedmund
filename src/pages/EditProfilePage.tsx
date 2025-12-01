@@ -20,8 +20,8 @@ const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   //readonly toggle - make editable by default when opening edit page
-  const [isReadonly, setIsReadonly] = useState<boolean>(false);
-  const [isReadonlyRight, setIsReadonlyRight] = useState<boolean>(false);
+  const isReadonly: boolean = false;
+  const isReadonlyRight: boolean = false;
 
   const [selectedUser, setSelectedUser] = useState<{
     profileImage?: string;

@@ -45,34 +45,6 @@ export const getProduct = async (id: number | string): Promise<Product> => {
 
 // CREATE
 export const createProduct = async (body: ProductPayload): Promise<Product> => {
-  if (useMocks) {
-    const newProduct: Product = {
-      ...body,
-      id: mockProducts.length + 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      images: [],
-      product_features: [],
-      location: {
-        id: 0,
-        region: "Greater Accra",
-        name: "Mock City",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      owner: {
-        id: 0,
-        email: "",
-      },
-      status: "ACTIVE",
-      is_taken: false,
-      pid: body.pid || String(mockProducts.length + 1),
-    };
-    mockProducts.push(newProduct);
-    console.log("Mock createProduct:", newProduct);
-    return newProduct;
-  }
-
   return apiClient.post<Product>(products.create, body);
 };
 
