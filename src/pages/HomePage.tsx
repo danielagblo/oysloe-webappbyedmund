@@ -1,23 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+
 import MenuButton from "../components/MenuButton";
 
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 import "../App.css";
+
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
+
 import { formatMoney } from "../utils/formatMoney";
+import { formatCount } from "../utils/formatCount";
+import Lottie from "lottie-react";
+import LoadingSkeleton from "../components/LoadingDots";
+import Loader from "../components/LoadingDots";
+import Toaster from "../components/Toaster";
+import { toast } from "sonner";
 
 type HomePageHeaderProps = {
   searchValue: string;
   setSearchValue: (v: string) => void;
 };
 
-export const HomePageHeader = ({ searchValue, setSearchValue }: HomePageHeaderProps) => {
+export const HomePageHeader = ({
+  searchValue,
+  setSearchValue,
+}: HomePageHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [isCondensed, setIsCondensed] = useState(false);
@@ -44,30 +56,34 @@ export const HomePageHeader = ({ searchValue, setSearchValue }: HomePageHeaderPr
   return (
     <div
       ref={headerRef}
-      className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-        ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-        : "relative"
-        }`}
+      className={`w-full left-0 z-40 transition-all duration-300 ${
+        isSmallScreen && isCondensed
+          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+          : "relative"
+      }`}
     >
       <div
-        className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
-          ? "justify-between px-4 py-2 gap-3"
-          : "flex-col items-center justify-center gap-8 mt-40"
-          }`}
+        className={`flex items-center transition-all duration-300 ${
+          isSmallScreen && isCondensed
+            ? "justify-between px-4 py-2 gap-3"
+            : "flex-col items-center justify-center gap-8 mt-40"
+        }`}
       >
         <h2
-          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
-            } font-medium text-(--dark-def) whitespace-nowrap`}
+          className={`${
+            isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+          } font-medium text-(--dark-def) whitespace-nowrap`}
         >
           Oysloe
         </h2>
 
         <div className="flex w-full px-200">
           <div
-            className={`relative flex items-center ${isSmallScreen && isCondensed
-              ? "justify-end flex-1"
-              : "justify-center w-full max-w-[520px]"
-              }`}
+            className={`relative flex items-center ${
+              isSmallScreen && isCondensed
+                ? "justify-end flex-1"
+                : "justify-center w-full max-w-[520px]"
+            }`}
           >
             <div className="rotating-bg" aria-hidden="true" />
             <div className="rotating-bg-inner" aria-hidden="true" />
@@ -78,10 +94,11 @@ export const HomePageHeader = ({ searchValue, setSearchValue }: HomePageHeaderPr
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
-                className={`search-input ${isSmallScreen && isCondensed
-                  ? "text-[16px]"
-                  : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                className={`search-input ${
+                  isSmallScreen && isCondensed
+                    ? "text-[16px]"
+                    : "text-2xl sm:text-2xl"
+                } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
               />
 
               <img
@@ -126,7 +143,9 @@ const HomePage = () => {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const { data: products = [] } = useProducts({ search: debouncedSearch || undefined });
+  const { data: products = [], isLoading: productsLoading } = useProducts({
+    search: debouncedSearch || undefined,
+  });
 
   const categoriesWithCounts = categories.map((cat) => {
     const count = products.filter((p) => p.category === cat.id).length;
@@ -138,18 +157,20 @@ const HomePage = () => {
 
   const totalProducts = products.length;
 
-  const productsByCategory = categories.reduce((acc, category) => {
-    const categoryProducts = products?.filter(p => p.category === category.id) || [];
+  const productsByCategory = categories.reduce(
+    (acc, category) => {
+      const categoryProducts =
+        products?.filter((p) => p.category === category.id) || [];
 
-    if (categoryProducts.length > 0) {
-      acc[category.id] = categoryProducts;
-    } else {
-      acc[category.id] = [];
-    }
-    return acc;
-  }, {} as Record<number, Product[]>);
-
-
+      if (categoryProducts.length > 0) {
+        acc[category.id] = categoryProducts;
+      } else {
+        acc[category.id] = [];
+      }
+      return acc;
+    },
+    {} as Record<number, Product[]>,
+  );
 
   /* API BIT ENDS HERE */
   if (categoriesLoading) console.log("Loading up categories...");
@@ -301,16 +322,105 @@ const HomePage = () => {
       </div>
     </div>
   );
+
   const SelectACategory = ({
     categories,
     onCategoryClick,
   }: {
     categories: Category[];
     onCategoryClick: (name: string) => void;
-  }) => (
-    <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
-      <div
-        className="
+  }) => {
+    if (categoriesLoading) {
+      
+      return (
+        <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+          <div
+            className="grid grid-cols-5 gap-2 sm:gap-4 place-items-center justify-items-center max-w-full"
+            style={{ gridAutoRows: "1fr" }}
+          >
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div 
+                key={i}
+                className="
+                  flex flex-col items-center justify-center
+                  min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                  bg-gray-200 rounded-lg 
+                  p-2 sm:p-3 cursor-progress animate-pulse
+                "
+              >
+                <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                  <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 rounded-full bg-white" />
+                    
+                </div>
+                <h3 className="mt-2 truncate bg-gray-300 rounded-full w-3/5 text-left h-2.5"/>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    if (categoriesError || !categories || categories.length === 0) {
+      if (categoriesError) console.log("Failed to load categories.", categoriesError);
+      if (!categories || categories.length === 0) console.log("No categories were found.");
+
+      return (
+        <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+          <div
+            className="
+              grid 
+              grid-cols-5 
+              gap-2 sm:gap-4 
+              place-items-center
+              justify-items-center
+              max-w-full
+          "
+            style={{
+              gridAutoRows: "1fr",
+            }}
+          >
+            {[
+              "Cosmetics",
+              "Electronics",
+              "Fashion",
+              "Furniture",
+              "Games",
+              "Grocery",
+              "Industry",
+              "Property",
+              "Services",
+              "Vehicle",
+            ].slice(0, 10).map((category, ix) => (
+              <div
+                key={ix}
+                onClick={() => toast("Data is currently unavailable for " + category)}
+                className="
+                      flex flex-col items-center justify-center
+                      min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                      bg-(--div-active) rounded-lg 
+                      p-2 sm:p-3 cursor-pointer 
+                      hover:bg-gray-300
+                  "
+              >
+                <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                  <img
+                    src={`/${category.toLowerCase()}.png`}
+                    alt={category}
+                    className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
+                  />
+                </div>
+                <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
+                  {category}
+                </h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+        <div
+          className="
             grid 
             grid-cols-5 
             gap-2 sm:gap-4 
@@ -318,37 +428,39 @@ const HomePage = () => {
             justify-items-center
             max-w-full
         "
-        style={{
-          gridAutoRows: "1fr",
-        }}
-      >
-        {categories.slice(0, 10).map((category) => (
-          <div
-            key={category.id}
-            onClick={() => onCategoryClick(category.name)}
-            className="
+          style={{
+            gridAutoRows: "1fr",
+          }}
+        >
+          {categories.slice(0, 10).map((category) => (
+            <div
+              key={category.id}
+              onClick={() => onCategoryClick(category.name)}
+              className="
                     flex flex-col items-center justify-center
                     min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
                     bg-(--div-active) rounded-lg 
                     p-2 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
                 "
-          >
-            <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
-              <img
-                src={`/${category.name.toLowerCase()}.png`}
-                alt={category.name}
-                className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
-              />
+            >
+              <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                <img
+                  src={`/${category.name.toLowerCase()}.png`}
+                  alt={category.name}
+                  className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
+                />
+              </div>
+              <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
+                {category.name}
+              </h3>
             </div>
-            <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
-              {category.name}
-            </h3>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
   const CategoryFilters = () => (
     <div className="flex flex-wrap justify-center sm:justify-center gap-2 sm:gap-4 mt-4 mb-6 px-3 sm:px-0">
       <button
@@ -387,20 +499,35 @@ const HomePage = () => {
   }: {
     categories: (Category & { adsCount: number })[];
     total: number;
-  }) => (
+  }) => {
+
+    if (categoriesLoading) {
+      return (
+        <div className="flex flex-col items-center mt-12">
+          <p className="loading-dots">Loading ad counts</p>
+          <Loader className={"h-40 -mt-12"}/>
+        </div>
+      );
+    }
+    if (categoriesError || !categories || categories.length === 0) {
+      console.log("No categories available to be summarised."); 
+      return <p className="text-xl py-17 text-center">Ad count summaries are currently unavailiable.</p> 
+    }
+
+    return (
     <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 h-50">
       <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2">
+
+        
         {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
         {categories
           .sort((a, b) => b.adsCount - a.adsCount)
-          .filter(cat => cat.adsCount > 0)
+          .filter((cat) => cat.adsCount > 0)
           .slice(0, 5)
-          .concat(
-            categories.filter(cat => cat.adsCount === 0)
-          )
+          .concat(categories.filter((cat) => cat.adsCount === 0))
           .slice(0, 5)
           .map((category) => {
-            const percentage = (category.adsCount || 0) / total * 100;
+            const percentage = ((category.adsCount || 0) / total) * 100;
             return (
               <div
                 key={category.id}
@@ -420,7 +547,7 @@ const HomePage = () => {
                     {category.name}
                   </span>
                   <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
-                    {category.adsCount}{category.adsCount > 0 && "+"}
+                    {formatCount(category.adsCount)}
                   </span>
                 </div>
               </div>
@@ -428,12 +555,16 @@ const HomePage = () => {
           })}
       </div>
     </div>
-  );
+  )};
 
   const ScrollableAds = () => {
+    if (!categories || categories.length === 0) {
+      return <p className="text-xl mt-5 w-full text-center">No ad categories available at this time.</p>;
+    }
+    
     return categories.map((category) => {
       const categoryProducts = productsByCategory[category.id] || [];
-      if (!categoryProducts || categoryProducts.length === 0) return;
+      if (!categoryProducts || categoryProducts.length === 0) return <p>No ads to show here...</p>
 
       return (
         <div
@@ -469,37 +600,42 @@ const HomePage = () => {
           >
             {categoryProducts.length > 0 ? (
               <div className="flex gap-2 sm:gap-3 w-max">
-                {categoryProducts.map((ad) => (
-                  ad.status === "ACTIVE" &&
-                  <Link
-                    key={ad.id}
-                    to={`/ads/${ad.id}`}
-                    state={{ adData: ad }}
-                    className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-                  >
-                    <img
-                      src={ad.image || "/public/no-image.jpeg"}
-                      alt={ad.name}
-                      className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
-                    />
-                    <div className="flex items-center gap-1 px-2 py-1">
-                      <img
-                        src="/location.svg"
-                        alt=""
-                        className="w-3 sm:w-5 h-3 sm:h-5"
-                      />
-                      <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                        {ad.location?.name ?? ad.location?.region ?? ""}
-                      </p>
-                    </div>
-                    <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
-                      {ad.name}
-                    </p>
-                    <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
-                      {formatMoney(ad.price, "GHS")}
-                    </p>
-                  </Link>
-                ))}
+          
+                {productsLoading 
+                  ? <Loader className={"h-40 my-0"}/>
+                  : categoryProducts.map(
+                  (ad) =>
+                    ad.status === "ACTIVE" && (
+                      <Link
+                        key={ad.id}
+                        to={`/ads/${ad.id}`}
+                        state={{ adData: ad }}
+                        className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                      >
+                        <img
+                          src={ad.image || "/public/no-image.jpeg"}
+                          alt={ad.name}
+                          className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+                        />
+                        <div className="flex items-center gap-1 px-2 py-1">
+                          <img
+                            src="/location.svg"
+                            alt=""
+                            className="w-3 sm:w-5 h-3 sm:h-5"
+                          />
+                          <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                            {ad.location?.name ?? ad.location?.region ?? ""}
+                          </p>
+                        </div>
+                        <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                          {ad.name}
+                        </p>
+                        <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                          {formatMoney(ad.price, "GHS")}
+                        </p>
+                      </Link>
+                    ),
+                )}
               </div>
             ) : (
               <p className="px-2 text-sm text-gray-500">
@@ -559,13 +695,15 @@ const HomePage = () => {
   };
 
   const SearchResults = () => {
-    const results = products.filter(p => p.status === "ACTIVE");
+    const results = products.filter((p) => p.status === "ACTIVE");
 
     if (!results || results.length === 0) {
       return (
         <div className="bg-(--div-active) w-full flex justify-center -mb-4">
           <div style={{ transform: "scale(0.9)" }} className="w-[95vw] pb-8">
-            <p className="text-center text-gray-500">No ads found for your search.</p>
+            <p className="text-center text-gray-500">
+              No ads found for your search.
+            </p>
           </div>
         </div>
       );

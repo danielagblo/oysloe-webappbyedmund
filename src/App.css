@@ -232,6 +232,18 @@ body {
   animation: fadeIn 0.25s ease-out;
 }
 
-input[read-only] {
-  cursor: not-allowed;
+.loading-dots::after {
+  content: '';
+  display: inline-block;
+  width: 1ch;
+  animation: dots 1s steps(3, end) infinite;
+  margin-left: 0.25ch;
+  white-space: nowrap;
+}
+
+@keyframes dots {
+  0%   { content: ' '; }
+  33%  { content: '. '; }
+  66%  { content: '. . '; }
+  100% { content: '. . .'; }
 }

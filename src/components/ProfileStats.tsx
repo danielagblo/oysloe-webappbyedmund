@@ -13,7 +13,7 @@ export default function ProfileStats() {
 
   // mini components
   const Profile = () => (
-    <div className="flex flex-col items-center pb-6 md:pb-4 border-b border-gray-100 ">
+    <div className="flex flex-col items-center pb-6 md:pb-4">
       <img
         src={buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"}
         alt="pfp"
