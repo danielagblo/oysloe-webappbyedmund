@@ -242,7 +242,7 @@ const EditProfilePage = () => {
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-4 items-center mb-2">
                 <p className="text-sm font-medium whitespace-nowrap">General Details</p>
-                <button 
+                <button
                   className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
                   onClick={() => {
                     setIsReadonly(!isReadonly);
