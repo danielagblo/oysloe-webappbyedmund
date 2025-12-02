@@ -279,13 +279,13 @@ const EditProfilePage = () => {
 
             {/* general details */}
             <div className="w-[95%] bg-white p-4 rounded-md">
-              <div className="grid grid-cols-3 gap-4 justify-between items-center mb-2 max-w-[650px]">
+              <div className="grid grid-cols-3 justify-between items-center mb-2 max-w-[650px]">
                 <p className="text-sm font-medium whitespace-nowrap">
                   General Details
                 </p>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-end">
                   <button
-                    className="bg-gray-100 py-1 px-3 w-fit rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                    className="bg-gray-100 py-1 px-3 w-fit rounded-full text-xs cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
                     onClick={() => {
                       setIsReadonly(!isReadonly);
                       setIsReadonlyRight(!isReadonlyRight);
@@ -296,10 +296,10 @@ const EditProfilePage = () => {
                 </div>
                 <button
                   onClick={() => setAccountDeletionRequested(true)}
-                  className="text-xs cursor-pointer hover:text-red-700 underline text-red-500 transition"
+                  className="text-xs cursor-pointer hover:text-red-700 underline text-red-500 transition text-right"
                   title="This is IRREVERSIBLE"
                 >
-                  Request Account Deletion
+                  Deactivate
                 </button>
               </div>
               <label className="text-xs text-gray-600">Name</label>

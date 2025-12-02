@@ -845,11 +845,11 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={currentAdData?.owner?.avatar || "/userPfp2.jpg"}
-            alt={currentAdData?.owner?.name || "Seller"}
+            src={currentUserProfile?.avatar || "/userPfp2.jpg"}
+            alt={currentUserProfile?.name || "Seller"}
             className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
           />
-          {(currentAdData?.owner?.is_verified || currentAdData?.owner?.verified || currentAdData?.owner?.verified_at) && (
+          {currentUserProfile?.admin_verified && (
             <img
               src="/verified.svg"
               alt="Verified"

@@ -206,13 +206,13 @@ const ReviewPage = () => {
           </h2>
 
           {/* Star Selection */}
-          <div className="flex w-full justify-around mb-4">
+          <div className="flex justify-around mb-4 w-4/5">
             {[1, 2, 3, 4, 5].map((star) => (
               <img
                 key={star}
                 src="/star.svg"
                 alt=""
-                className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
+                className={`w-10 h-10 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
                   }`}
                 onClick={() => setSelectedStars(star)}
               />
@@ -254,19 +254,21 @@ const ReviewPage = () => {
               }
               createMutation.mutate({ product: productId, rating: selectedStars, comment });
             }}
-            className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+            className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition"
           >
             Send Review
           </button>
 
           {/* Success Modal */}
           {sendSuccess && (
-            <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50">
-              <div className="bg-white rounded-4xl w-80 max-h-96 flex flex-col justify-center items-center p-6 text-center">
-                <LottieSuccess />
-                <h2 className="text-lg font-medium mt-2 mb-6">Submitted!</h2>
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl max-w-2/5 max-h-2/3 h-fit flex flex-col justify-center items-center p-6 text-center">
+                <div className="h-auto w-100">
+                  <LottieSuccess />
+                </div>
+                <h2 className="text-lg font-medium mb-6">Submitted!</h2>
                 <button
-                  className="bg-[var(--div-active)] text-white rounded-full px-6 py-2"
+                  className="bg-gray-200 rounded-lg px-8 py-3 cursor-pointer hover:bg-gray-300 transition"
                   onClick={() => setSendSuccess(false)}
                 >
                   Close

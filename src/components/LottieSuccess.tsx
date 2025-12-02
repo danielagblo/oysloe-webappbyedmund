@@ -7,7 +7,7 @@ const LottieSuccess = () => {
       animationData={Success}
       loop={false}
       autoplay={true}
-      className="h-1/2"
+      className="h-60 w-auto"
     />
   );
 };
