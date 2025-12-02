@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
+import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import useFavourites from "../features/products/useFavourites";
@@ -11,7 +12,6 @@ import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import Loader from "../components/LoadingDots";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,19 +38,19 @@ const AdsDetailsPage = () => {
 
   useEffect(() => {
     const favFromProduct = Boolean((currentAdDataFromQuery as any)?.favourited_by_user);
-    const favFromList = favourites.some((p) => p.id === (currentAdDataFromQuery as any)?.id);
+    const favFromList = favourites.some((p) => p.id === (currentAdDataFromQuery)?.id);
     setIsFavourited(Boolean(favFromProduct || favFromList));
   }, [currentAdDataFromQuery, favourites]);
 
   const handleToggleFavourite = () => {
-    const pid = (currentAdDataFromQuery as any)?.id || (adDataFromState as any)?.id || null;
+    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || null;
     if (!pid) return;
     setIsFavourited((s) => !s);
     toggleFavourite.mutate(pid);
   };
 
   const handleMarkAsTaken = () => {
-    const pid = (currentAdDataFromQuery as any)?.id || (adDataFromState as any)?.id || numericId;
+    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
 
     // assemble a full product payload to match backend schema expectations
@@ -58,14 +58,14 @@ const AdsDetailsPage = () => {
     const payload = {
       pid: (src)?.pid ?? `pid_${pid}`,
       name: (src)?.name ?? "",
-      image: (src as any)?.image ?? ((src as any)?.images?.[0]?.image ?? ""),
-      type: (src as any)?.type ?? ("SALE" as const),
-      status: (src as any)?.status ?? ("ACTIVE" as const),
+      image: src?.image ?? (src?.images?.[0]?.image ?? ""),
+      type: (src)?.type ?? ("SALE" as const),
+      status: (src)?.status ?? ("ACTIVE" as const),
       is_taken: true,
-      description: (src as any)?.description ?? "",
-      price: (src as any)?.price ?? 0,
-      duration: (src as any)?.duration ?? "",
-      category: (src as any)?.category ?? (src as any)?.category_id ?? 0,
+      description: (src)?.description ?? "",
+      price: (src)?.price ?? 0,
+      duration: (src)?.duration ?? "",
+      category: (src)?.category ?? (src)?.category_id ?? 0,
     } as Record<string, unknown>;
 
     // call mutation with full payload so server receives the expected schema
@@ -73,20 +73,20 @@ const AdsDetailsPage = () => {
   };
 
   const handleReportAd = () => {
-    const pid = (currentAdDataFromQuery as any)?.id || (adDataFromState as any)?.id || numericId;
+    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
     const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
     const payload = {
-      pid: (src as any)?.pid ?? `pid_${pid}`,
-      name: (src as any)?.name ?? "",
-      image: (src as any)?.image ?? ((src as any)?.images?.[0]?.image ?? ""),
-      type: (src as any)?.type ?? ("SALE" as const),
-      status: (src as any)?.status ?? ("ACTIVE" as const),
-      is_taken: Boolean((src as any)?.is_taken),
-      description: (src as any)?.description ?? "",
-      price: (src as any)?.price ?? 0,
-      duration: (src as any)?.duration ?? "",
-      category: (src as any)?.category ?? (src as any)?.category_id ?? 0,
+      pid: (src)?.pid ?? `pid_${pid}`,
+      name: (src)?.name ?? "",
+      image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
+      type: (src)?.type ?? ("SALE" as const),
+      status: (src)?.status ?? ("ACTIVE" as const),
+      is_taken: Boolean((src)?.is_taken),
+      description: (src)?.description ?? "",
+      price: (src)?.price ?? 0,
+      duration: (src)?.duration ?? "",
+      category: (src)?.category ?? (src)?.category_id ?? 0,
     } as Record<string, unknown>;
 
     reportProduct.mutate({ id: pid, body: payload });
@@ -169,7 +169,7 @@ const AdsDetailsPage = () => {
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
 
   // derive owner contact numbers (prefer canonical fields)
-  const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner) as any;
+  const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner);
   const callerNumber1: string | null = owner?.phone || owner?.phone_number || owner?.primary_phone || null;
   const callerNumber2: string | null = owner?.phone2 || owner?.secondary_phone || owner?.alt_phone || null;
   const toggleCaller1 = () => setShowCaller1((s) => !s);
@@ -493,7 +493,8 @@ const AdsDetailsPage = () => {
     toggleCaller2?: () => void;
   }) => {
     const isTaken = Boolean((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken);
-
+    const [showOffer, setShowOffer] = useState(false);
+    const [offerInput, setOfferInput] = useState<string>("");
     const actions: Record<string, () => void> = {
       "Mark as taken": isTaken ? () => { } : (onMarkTaken || (() => { })),
       "Report Ad": onReportAd,
@@ -537,6 +538,10 @@ const AdsDetailsPage = () => {
                       (toggleCaller2 || (() => { }))();
                       return;
                     }
+                    if (label === "Make Offer") {
+                      setShowOffer((s) => !s);
+                      return;
+                    }
                     // otherwise perform action
                     actions[label]();
                   }}
@@ -575,30 +580,84 @@ const AdsDetailsPage = () => {
 
                 {/* caller tooltip */}
                 {label === "Caller 1" && (showC1 && caller1) && (
-                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded shadow-md text-sm right-0 w-44">
-                    <div className="flex items-center justify-between">
-                      <div className="truncate">{caller1}</div>
+                  <div className="absolute z-50 mt-2 p-2 bg-white rounded-2xl shadow-md text-sm w-48 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                    <div className="flex flex-col items-center gap-8">
+                      <div className="text-xs font-semibold flex items-center gap-2">
+                        <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                        <span className="text-[9px]">Caller 1</span>
+                      </div>
                       <a
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
-                        className="ml-2 text-blue-600 underline"
+                        className="font-normal flex items-center gap-2"
+                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
                       >
-                        Call
+                        <span className="border border-gray-200 px-2 py-1">Call</span><span className="border border-gray-200 px-2 py-1"> {caller1}</span>
                       </a>
                     </div>
                   </div>
                 )}
 
+                {/* Make Offer modal */}
+                {label === "Make Offer" && showOffer && (
+                  <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-68 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold">
+                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto" />
+                        <span className="text-[9px]">Make Offer</span>
+                      </div>
+                      <div className="w-full flex flex-col gap-2">
+                        {/* offer option buttons: no border */}
+                        <div className="flex gap-2">
+                          {['~5% cut', '~10% cut', '~15% cut', '~20% cut'].map((opt) => (
+                            <button
+                              key={opt}
+                              type="button"
+                              className="w-full text-center py-2 rounded bg-(--div-active) text-[10px] text-(--dark-def) font-medium focus:outline-none"
+                              onClick={(ev) => {
+                                ev.stopPropagation();
+                                // set the input value when an option is clicked
+                                setOfferInput(`${opt} off on overall price`);
+                              }}
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                        {/* input + send button */}
+                        <div className="flex gap-2 mt-1">
+                          <input
+                            type="text"
+                            value={offerInput}
+                            onChange={(e) => setOfferInput(e.target.value)}
+                            className="flex-1 px-3 py-2 rounded bg-white border border-gray-200 text-sm"
+                            onClick={(ev) => ev.stopPropagation()}
+                          />
+                          <button
+                            type="button"
+                            className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
+                            onClick={(ev) => ev.stopPropagation()}
+                          >
+                            <img src="/send.svg" alt="Send" className="w-8 h-8" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {label === "Caller 2" && (showC2 && caller2) && (
-                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded shadow-md text-sm right-0 w-44">
-                    <div className="flex items-center justify-between">
-                      <div className="truncate">{caller2}</div>
+                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded-2xl shadow-md text-sm w-48 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                    <div className="flex flex-col items-center gap-3">
+                      <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                      <span className="text-[9px]">Caller 2</span>
                       <a
                         href={`tel:${caller2}`}
                         onClick={(ev) => ev.stopPropagation()}
-                        className="ml-2 text-blue-600 underline"
+                        className="font-normal flex items-center gap-2"
+                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
                       >
-                        Call
+                        <span className="border border-gray-200 px-2 py-1">Call</span><span className="border border-gray-200 px-2 py-1"> {caller2}</span>
                       </a>
                     </div>
                   </div>
@@ -627,7 +686,7 @@ const AdsDetailsPage = () => {
               <span className="sm:hidden">reviews</span> to show. Leave one?
             </p>
           )}
-          {productReviews.map((review: Review) => (
+          {productReviews.slice(0, 3).map((review: Review) => (
             <div
               key={review.id}
               className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
@@ -644,7 +703,7 @@ const AdsDetailsPage = () => {
                       {formatReviewDate(review.created_at)}
                     </p>
                     <h3 className="font-semibold md:text-[1.2vw]">
-                      {review.user.account_name || "User"}
+                      {review.user.name || "User"}
                     </h3>
                     <div className="flex mb-2">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -679,13 +738,13 @@ const AdsDetailsPage = () => {
         </div>
         <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
           <button
-            onClick={() => navigate("/reviews")}
+            onClick={() => navigate("/reviews", { state: { productId: currentAdData?.id ?? numericId } })}
             className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Make Review
           </button>
           <button
-            onClick={() => navigate("/reviews")}
+            onClick={() => navigate("/reviews", { state: { productId: currentAdData?.id ?? numericId } })}
             className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Show reviews

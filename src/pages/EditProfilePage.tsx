@@ -8,7 +8,7 @@ import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
 
-const EditProfilePage = ({ onClose }: { onClose?: () => void }) => {
+const EditProfilePage = () => {
   const [closeProgress, setCloseProgress] = useState(true);
   const [openVerificationModal, setOpenVerificationModal] = useState(false);
   const [linkSent, setLinkSent] = useState(false);

@@ -94,7 +94,7 @@ const AlertsPanel = () => {
                 className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
               >
                 <img
-                  src="/building.svg"
+                  src="/favicon.png"
                   alt="alert source"
                   className="w-8 h-8 object-cover rounded-full flex-shrink-0"
                 />

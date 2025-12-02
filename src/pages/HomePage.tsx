@@ -15,10 +15,7 @@ import type { Product } from "../types/Product";
 
 import { formatMoney } from "../utils/formatMoney";
 import { formatCount } from "../utils/formatCount";
-import Lottie from "lottie-react";
-import LoadingSkeleton from "../components/LoadingDots";
 import Loader from "../components/LoadingDots";
-import Toaster from "../components/Toaster";
 import { toast } from "sonner";
 
 type HomePageHeaderProps = {

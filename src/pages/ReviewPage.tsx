@@ -1,14 +1,115 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import "../App.css";
 import LottieSuccess from "../components/LottieSuccess";
 import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
+import useReviews from "../features/reviews/useReviews";
+import useUserProfile from "../features/userProfile/useUserProfile";
+import { createReview, patchReview } from "../services/reviewService";
+import type { ReviewPayload } from "../types/Review";
 
 const ReviewPage = () => {
   const [sendSuccess, setSendSuccess] = useState(false);
   const [selectedStars, setSelectedStars] = useState(0);
   const [showMobileForm, setShowMobileForm] = useState(false);
+  const [comment, setComment] = useState("");
+  const location = useLocation();
+
+  // Try to determine a product id from either location state or query string.
+  // Supports: navigate('/reviews', { state: { productId: 123 } })
+  // or /reviews?product=123
+  type LocationState = { productId?: number; adData?: { id?: number } };
+  const stateVal = (location.state || {}) as LocationState;
+  const stateProductId = typeof stateVal.productId === "number" ? stateVal.productId : typeof stateVal?.adData?.id === "number" ? stateVal.adData!.id : undefined;
+  const queryProductRaw = new URLSearchParams(location.search).get("product");
+  const queryProductId = queryProductRaw ? Number(queryProductRaw) : undefined;
+  const productId = typeof stateProductId === "number" ? stateProductId : typeof queryProductId === "number" && !Number.isNaN(queryProductId) ? queryProductId : undefined;
+
+  const { reviews, isLoading, refetch } = useReviews(productId ? { product: productId } : undefined);
+  const queryClient = useQueryClient();
+  const { profile: currentUserProfile } = useUserProfile();
+
+  const createMutation = useMutation<any, unknown, Partial<ReviewPayload>>({
+    mutationFn: (body: Partial<ReviewPayload>) => createReview(body as ReviewPayload),
+    onSuccess: () => {
+      setSendSuccess(true);
+      setSelectedStars(0);
+      setComment("");
+      // refresh reviews list for this product (or all reviews if no product)
+      const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+      queryClient.invalidateQueries({ queryKey: key });
+      refetch();
+    },
+    onError: (err: unknown, vars?: Partial<ReviewPayload>) => {
+      // apiClient throws an Error with the response body appended to the message.
+      // Try to parse JSON from the error message to extract backend validation messages.
+      const message = err instanceof Error ? err.message : String(err);
+      const jsonStart = message.indexOf("{");
+      if (jsonStart !== -1) {
+        try {
+          const jsonPart = message.slice(jsonStart);
+          const parsed = JSON.parse(jsonPart);
+          if (parsed && typeof parsed === "object") {
+            const nf = parsed.non_field_errors || [];
+            const already = Array.isArray(nf) && nf.find((s: string) => /already reviewed/i.test(String(s)));
+            if (already && productId) {
+              if (!currentUserProfile || !currentUserProfile.id) {
+                toast.error("You must be logged in to update your review.");
+                return;
+              }
+              const existing = reviews.find(
+                (r) => r.product && (r.product as any).id === productId && r.user && r.user.id === currentUserProfile.id,
+              );
+              if (existing) {
+                (async () => {
+                  try {
+                    await patchReview(existing.id, vars || { rating: selectedStars, comment });
+                    toast.success("Review updated");
+                    const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+                    queryClient.invalidateQueries({ queryKey: key });
+                    refetch();
+                  } catch (e) {
+                    const fallback = e instanceof Error ? e.message : String(e);
+                    toast.error(fallback);
+                  }
+                })();
+                return;
+              }
+            }
+
+            if (Array.isArray(nf) && nf.length > 0) {
+              toast.error(nf.join(" "));
+              return;
+            }
+
+            const firstKey = Object.keys(parsed)[0];
+            if (firstKey && parsed[firstKey]) {
+              const v = parsed[firstKey];
+              if (Array.isArray(v)) toast.error(String(v[0]));
+              else toast.error(String(v));
+              return;
+            }
+          }
+        } catch {
+          // fall through to raw message
+        }
+      }
+      toast.error(message);
+    },
+  });
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const displayedReviews = ratingFilter ? reviews.filter((r) => Math.round(r.rating) === ratingFilter) : reviews;
+
+  // Auto-dismiss the success modal after a short timeout so it doesn't block the UI.
+  useEffect(() => {
+    if (!sendSuccess) return;
+    const t = setTimeout(() => setSendSuccess(false), 3000);
+    return () => clearTimeout(t);
+  }, [sendSuccess]);
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-(--div-active) text-(--dark-def) relative">
@@ -33,13 +134,17 @@ const ReviewPage = () => {
 
             {/* Star Filter Bar */}
             <div className="bg-white/95 backdrop-blur-md px-2 py-3 border-b min-h-fit border-gray-100 flex flex-nowrap gap-1 justify-around overflow-x-auto no-scrollbar text-sm">
-              <button className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
+              <button
+                onClick={() => setRatingFilter(null)}
+                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
+              >
                 <img src="/star.svg" alt="" className="w-4 h-4" /> All
               </button>
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
-                  className="flex justify-center items-center gap-1 bg-gray-100 rounded-full px-3 py-2 h-auto"
+                  onClick={() => setRatingFilter(star)}
+                  className={`flex justify-center items-center gap-1 rounded-full px-3 py-2 h-auto ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
                 >
                   <img src="/star.svg" alt="" className="w-4 h-4" />
                   {star}
@@ -50,28 +155,32 @@ const ReviewPage = () => {
 
           {/* Comments */}
           <div className="space-y-4 mt-4">
-            {Array.from({ length: 10 }).map((_, i) => (
+            {isLoading && <p className="text-center text-gray-500">Loading reviews...</p>}
+            {!isLoading && reviews.length === 0 && (
+              <p className="text-center text-gray-500">No reviews yet.</p>
+            )}
+            {!isLoading && displayedReviews.map((rev) => (
               <div
-                key={i}
+                key={rev.id}
                 className="pb-4 border-b border-gray-100 last:border-b-0"
               >
                 <div className="flex items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
                     <img
-                      src="/face.svg"
+                      src={rev.user?.avatar || "/face.svg"}
                       alt=""
                       className="w-10 h-10 rounded-lg"
                     />
                     <div className="flex flex-col">
-                      <p className="text-[10px] text-gray-400">April 1</p>
-                      <h3 className="font-semibold">Sandra</h3>
+                      <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
+                      <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
                       <div className="flex">
-                        {[...Array(5)].map((_, j) => (
+                        {Array.from({ length: 5 }).map((_, j) => (
                           <img
                             key={j}
                             src="/star.svg"
                             alt=""
-                            className="w-3 h-3"
+                            className={`w-3 h-3 ${j < rev.rating ? "opacity-100" : "opacity-30"}`}
                           />
                         ))}
                       </div>
@@ -79,13 +188,10 @@ const ReviewPage = () => {
                   </div>
                   <div className="flex items-center gap-1 text-gray-500">
                     <img src="/like.svg" alt="" className="w-4 h-4" />
-                    <span className="text-xs">20</span>
+                    <span className="text-xs">0</span>
                   </div>
                 </div>
-                <p className="text-gray-700 text-sm mt-1">
-                  This is a great car with excellent features. I had a wonderful
-                  experience driving it around the city.
-                </p>
+                <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
               </div>
             ))}
             <div className="h-8 bg-white" />
@@ -105,9 +211,8 @@ const ReviewPage = () => {
                 key={star}
                 src="/star.svg"
                 alt=""
-                className={`w-7 h-7 cursor-pointer transition ${
-                  star <= selectedStars ? "opacity-100" : "opacity-40"
-                }`}
+                className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
+                  }`}
                 onClick={() => setSelectedStars(star)}
               />
             ))}
@@ -130,12 +235,24 @@ const ReviewPage = () => {
           {/* Comment Input */}
           <textarea
             placeholder="Comment"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
             className="border border-gray-300 rounded-lg p-3 w-11/12 h-28 resize-none mb-6 focus:outline-none focus:ring-2 focus:ring-[var(--dark-def)]"
           />
 
           {/* Send Button */}
           <button
-            onClick={() => setSendSuccess(true)}
+            onClick={() => {
+              if (selectedStars <= 0) return;
+              if (!productId) {
+                // product is required by the API for product reviews
+                // guide the user to open reviews from a product page
+                // (AdsDetailsPage already navigates with productId)
+                alert("Product id missing. Open this page from a product to leave a review.");
+                return;
+              }
+              createMutation.mutate({ product: productId, rating: selectedStars, comment });
+            }}
             className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
           >
             Send Review
@@ -165,13 +282,17 @@ const ReviewPage = () => {
         <div className="p-4 bg-white h-[90vh] -mt-12">
           <h2 className="text-xl font-semibold mb-3">User Reviews</h2>
           <div className="flex gap-2 flex-wrap mb-4">
-            <button className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 rounded-full whitespace-nowrap">
+            <button
+              onClick={() => setRatingFilter(null)}
+              className={`flex items-center justify-center gap-1 px-3 py-2 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
+            >
               <img src="/star.svg" alt="" className="w-4 h-4" /> All
             </button>
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
-                className="flex justify-center items-center gap-1 bg-gray-100 rounded-full px-3 py-2 text-sm"
+                onClick={() => setRatingFilter(star)}
+                className={`flex justify-center items-center gap-1 rounded-full px-3 py-2 text-sm ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
               >
                 <img src="/star.svg" alt="" className="w-4 h-4" />
                 {star}
@@ -179,20 +300,18 @@ const ReviewPage = () => {
             ))}
           </div>
 
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="pb-4 border-b border-gray-100">
+          {!isLoading && displayedReviews.slice(0, 5).map((rev) => (
+            <div key={rev.id} className="pb-4 border-b border-gray-100">
               <div className="flex items-center gap-3 justify-between">
                 <div className="flex items-center gap-3">
-                  <img src="/face.svg" alt="" className="w-8 h-8 rounded-lg" />
+                  <img src={rev.user?.avatar || "/face.svg"} alt="" className="w-8 h-8 rounded-lg" />
                   <div className="flex flex-col">
-                    <p className="text-[10px] text-gray-400">April 1</p>
-                    <h3 className="font-semibold">Sandra</h3>
+                    <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
+                    <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
                   </div>
                 </div>
               </div>
-              <p className="text-gray-700 text-sm mt-1">
-                This is a great car with excellent features.
-              </p>
+              <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
             </div>
           ))}
         </div>
@@ -200,7 +319,7 @@ const ReviewPage = () => {
         {/* Floating Add Review Button */}
         <button
           onClick={() => setShowMobileForm(true)}
-          className="fixed bottom-20 right-3 bg-[var(--dark-def)] text-white rounded-full w-14 h-14 flex items-center justify-center text-3xl shadow-lg z-30"
+          className="fixed bottom-20 right-3 bg-(--dark-def) text-white rounded-full w-14 h-14 flex items-center justify-center text-3xl shadow-lg z-30"
         >
           +
         </button>
@@ -225,9 +344,8 @@ const ReviewPage = () => {
                     key={star}
                     src="/star.svg"
                     alt=""
-                    className={`w-7 h-7 cursor-pointer transition ${
-                      star <= selectedStars ? "opacity-100" : "opacity-40"
-                    }`}
+                    className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
+                      }`}
                     onClick={() => setSelectedStars(star)}
                   />
                 ))}
@@ -235,11 +353,18 @@ const ReviewPage = () => {
 
               <textarea
                 placeholder="Comment"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
                 className="border border-gray-300 rounded-lg p-3 w-full h-24 resize-none mb-4 focus:outline-none"
               />
               <button
                 onClick={() => {
-                  setSendSuccess(true);
+                  if (selectedStars <= 0) return;
+                  if (!productId) {
+                    alert("Product id missing. Open this page from a product to leave a review.");
+                    return;
+                  }
+                  createMutation.mutate({ product: productId, rating: selectedStars, comment });
                   setShowMobileForm(false);
                 }}
                 className="w-full p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
