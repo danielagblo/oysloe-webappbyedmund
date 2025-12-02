@@ -183,11 +183,10 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
   return filtered;
 };
 
-export const getProductReportCount = async (id: number | string): Promise<number> => {
-  const resp = await getProductReports(id);
-  if (Array.isArray(resp)) return resp.length;
-  return 0;
+export const getProductReportCount = async (productId: number | string) => {
+  return apiClient.get(endpoints.products.report(productId));
 };
+
 
 // ---------------------
 // SET STATUS
