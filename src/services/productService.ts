@@ -306,7 +306,7 @@ export const createProductFromAd = async (metadata: any) => {
     pid: `ad_${Date.now()}`,
     name: metadata.title,
     type: mapType(metadata.purpose),
-    status: "ACTIVE",
+    status: "PENDING",
     is_taken: false,
     description: `Posted via app on ${new Date(metadata.createdAt).toLocaleString()}`,
     price: price as unknown as string | number,
@@ -353,8 +353,80 @@ export const createProductFromAd = async (metadata: any) => {
 
   
 
-  // Always create the product first via JSON, then upload images individually
-  const created: Product = await createProduct(payload);
+  // If there is at least one image, send the first image as part of
+  // the product creation request (so it populates the product "image"
+  // column). Remaining images are uploaded to the productImages
+  // endpoint afterwards. For servers that do not accept multipart on
+  // product create, the code falls back to a JSON create and will
+  // upload all images afterwards.
+
+  const created: Product = await (async () => {
+    // determine first image file (if any)
+    let firstFile: File | null = null;
+    if (imgs.length > 0) {
+      try {
+        const img0 = imgs[0];
+        if (img0 && img0.file instanceof File) {
+          firstFile = img0.file;
+        } else if (img0 && typeof img0.url === "string") {
+          firstFile = await blobUrlToFile(img0.url, `image-0`);
+        }
+      } catch {
+        firstFile = null;
+      }
+    }
+
+    // If using mocks, keep existing mock flow but set mock image for
+    // the created product when we have a first file.
+    if (useMocks) {
+      const createdMock = await createProduct(payload);
+      // set a convenience `image` field on the mock product so UI can
+      // read from it (use a blob URL when we have a File)
+      if (firstFile) {
+        try {
+          // createObjectURL is available in browser runtime
+          (createdMock as any).image = URL.createObjectURL(firstFile as Blob);
+        } catch {
+          (createdMock as any).image = (firstFile as any).name ?? null;
+        }
+      }
+      return createdMock;
+    }
+
+    // For real server: when there's a first file, send multipart/form-data
+    // so the server can save it to the product.image column.
+    if (firstFile) {
+      const fd = new FormData();
+      // append JSON fields from payload (simple scalar fields)
+      Object.entries(payload).forEach(([k, v]) => {
+        if (v === undefined || v === null) return;
+        // For objects/arrays, stringify (server should handle accordingly)
+        if (typeof v === "object") {
+          try {
+            fd.append(k, JSON.stringify(v as unknown));
+          } catch {
+            // fallback
+            fd.append(k, String(v));
+          }
+        } else {
+          fd.append(k, String(v));
+        }
+      });
+      fd.append("image", firstFile, (firstFile as File).name);
+
+      try {
+        return await apiClient.post<Product>(products.create, fd);
+      } catch (e) {
+        // If multipart create fails, fall back to JSON create so we at
+        // least create the product and can upload images afterwards.
+        console.warn("Multipart product create failed, falling back to JSON create:", e);
+        return await createProduct(payload);
+      }
+    }
+
+    // No first file: create product as JSON
+    return await createProduct(payload);
+  })();
 
   // created product returned from API (owner should be set)
 
@@ -371,7 +443,17 @@ export const createProductFromAd = async (metadata: any) => {
   }
 
   if (imgs.length > 0) {
-    for (let i = 0; i < imgs.length; i++) {
+    // Start uploading from index 0 except when the first image was
+    // already attached to the product create request. We detect that
+    // by checking whether the server returned an `image` field or if
+    // we used a firstFile above during non-mock flow.
+    let startIndex = 0;
+    // If server returned an `image` property or we had imgs[0].file in mocks,
+    // skip uploading index 0
+    const createdHasImage = (created as any)?.image != null;
+    if (createdHasImage) startIndex = 1;
+
+    for (let i = startIndex; i < imgs.length; i++) {
       const img = imgs[i];
       try {
         let fileObj: File | null = null;
@@ -384,13 +466,9 @@ export const createProductFromAd = async (metadata: any) => {
 
         const fd = new FormData();
         fd.append("product", String(created.id));
-        // include filename explicitly
         fd.append("image", fileObj, fileObj.name);
 
-        // proceed to upload the file
-
         try {
-          // Debug: log file details before upload (DEV only)
           if (import.meta.env.DEV) {
             try {
               console.debug("Uploading product image", {
@@ -406,15 +484,11 @@ export const createProductFromAd = async (metadata: any) => {
 
           await apiClient.post(endpoints.productImages.create(), fd);
         } catch (err) {
-          // Log the error with some context so we can inspect server details
-           
           console.error("productImages upload failed for", { product: created.id, file: fileObj.name }, err);
-          // Surface the error so caller knows uploads failed.
           throw err;
         }
       } catch (e) {
         console.error("Failed to upload product image:", e);
-        // Abort entire create flow so caller sees the failure (do not silently continue)
         throw e;
       }
     }

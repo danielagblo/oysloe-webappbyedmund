@@ -7,15 +7,46 @@ type LiveChatProps = {
 };
 
 export default function LiveChat({ caseId, onClose }: LiveChatProps) {
-  const { messages, sendMessage, addLocalMessage } = useChat(caseId);
+  // validatedRoomId will be set to `caseId` only after we confirm the room exists on the backend
+  const [validatedRoomId, setValidatedRoomId] = useState<string | null>(null);
+  const [isValidRoom, setIsValidRoom] = useState<boolean | null>(null); // null = unknown/loading
+
+  // pass validatedRoomId to the hook so we only connect when the room is confirmed
+  const { messages, sendMessage, addLocalMessage, connected } = useChat(validatedRoomId);
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Debug: show incoming caseId changes
   useEffect(() => {
+    console.log("LiveChat caseId:", caseId);
+
+    // reset validation state and validated id whenever the incoming caseId changes
+    setIsValidRoom(null);
+    setValidatedRoomId(null);
+
     if (!caseId) return;
 
-    // hook handles loading and websocket lifecycle
-    // nothing to do here anymore
+    let mounted = true;
+    (async () => {
+      try {
+        console.log("LiveChat: validating room id on backend", caseId);
+        // chatService.getChatRoom will throw if the room does not exist
+        await (await import("../services/chatService")).getChatRoom(caseId);
+        if (!mounted) return;
+        console.log("LiveChat: room validated", caseId);
+        setIsValidRoom(true);
+        setValidatedRoomId(caseId);
+      } catch (err) {
+        console.warn("LiveChat: room validation failed", caseId, err);
+        if (!mounted) return;
+        setIsValidRoom(false);
+        setValidatedRoomId(null);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
   }, [caseId]);
 
   useEffect(() => {
@@ -26,9 +57,35 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   }, [messages]);
 
+  // Debug: show websocket connection status
+  useEffect(() => {
+    console.log("WebSocket connected:", connected, "validatedRoomId:", validatedRoomId, "isValidRoom:", isValidRoom);
+  }, [connected, validatedRoomId, isValidRoom]);
+
   if (!caseId) return null;
 
+  if (isValidRoom === false) {
+    return (
+      <div className="p-4">
+        <p className="text-sm text-red-600">Chat room not found. Please use an existing chatroom ID.</p>
+        <div className="mt-2">
+          <button onClick={onClose} className="px-3 py-1 border rounded">Close</button>
+        </div>
+      </div>
+    );
+  }
+
   const handleSend = async () => {
+    // Only allow sending to validated, existing rooms and when WS is connected
+    if (isValidRoom !== true) {
+      console.warn("Refusing to send: room is not validated or unknown", { isValidRoom, caseId });
+      return;
+    }
+    if (!connected) {
+      console.warn("Refusing to send: websocket not connected");
+      return;
+    }
+
     const text = input.trim();
     if (!text) return;
     setInput("");
@@ -36,7 +93,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     // optimistic UI
     const optimistic: ChatMessage = {
       id: Date.now(),
-      room: Number(caseId as any),
+      room: Number(caseId),
       sender: { id: 0, name: "Me" },
       content: text,
       created_at: new Date().toISOString(),
