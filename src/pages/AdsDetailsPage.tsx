@@ -257,7 +257,7 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base md:text-[1.125vw]">
-          {currentAdData?.location?.name || "No location set"}
+          {currentAdData?.location?.name || "Unknown"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
@@ -404,7 +404,7 @@ const AdsDetailsPage = () => {
         <h2 className="text-sm md:text-[1.1vw]">
           {currentAdData?.location?.name && currentAdData?.location?.region
             ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region`
-            : "No location has been set for this user"}
+            : "Unknown"}
         </h2>
       </div>
       <div className="flex items-center gap-3">
@@ -561,7 +561,7 @@ const AdsDetailsPage = () => {
                       {/* show Taken label instead of Mark as taken when product is already taken */}
                       {label === "Mark as taken" && isTaken ? (
                         <>
-                          <img src="/check-circle.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
+                          <img src="/check.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
                           <p className="whitespace-nowrap">Taken</p>
                         </>
                       ) : (
