@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Lottie from "lottie-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logoutAnim from "../assets/logout.json";
-import { XMarkIcon, Bars3Icon } from "@heroicons/react/24/outline";
+import { useLogout } from "../features/Auth/useAuth";
 
 export type MenuItem = {
   key: string;
@@ -35,10 +37,23 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
     setIsOpen(false);
   };
 
-  const handleLogout = () => {
-    console.log("User logged out");
-    window.location.href = "/login";
-    setLogout(false);
+  const navigate = useNavigate();
+  const logoutMutation = useLogout();
+
+  const handleLogout = async () => {
+    if (logoutMutation.status === "pending") return;
+    console.log("ProfileSidebar: starting logout mutation");
+    try {
+      await logoutMutation.mutateAsync();
+      console.log("ProfileSidebar: logout mutation resolved");
+      setLogout(false);
+      navigate("/login");
+    } catch (err) {
+      console.error("ProfileSidebar: logout mutation failed", err);
+      // close dialog and navigate to login to force unauthenticated state
+      setLogout(false);
+      navigate("/login");
+    }
   };
 
   return (
@@ -53,11 +68,10 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 key={item.key}
                 type="button"
                 onClick={() => handleSelect(item.key)}
-                className={`text-left py-1 px-4 flex items-center gap-2 flex-col w-full transition-all ${
-                  isActive
+                className={`text-left py-1 px-4 flex items-center gap-2 flex-col w-full transition-all ${isActive
                     ? "border-r-4 border-[var(--dark-def)]"
                     : "hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 {item.icon && (
                   <img
@@ -117,11 +131,10 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                     <button
                       key={item.key}
                       onClick={() => handleSelect(item.key)}
-                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${
-                        isActive
+                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${isActive
                           ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
                           : "hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       {item.icon && (
                         <img
@@ -167,13 +180,17 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
               <button
                 onClick={handleLogout}
-                className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40 w-full"
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending" ? "opacity-60 pointer-events-none" : "hover:bg-red-200/40"
+                  }`}
+                disabled={logoutMutation.status === "pending"}
               >
-                Logout
+                {logoutMutation.status === "pending" ? "Logging out..." : "Logout"}
               </button>
               <button
                 onClick={() => setLogout(false)}
-                className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 w-full"
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending" ? "opacity-60 pointer-events-none" : "hover:bg-green-200/40"
+                  }`}
+                disabled={logoutMutation.status === "pending"}
               >
                 Cancel
               </button>

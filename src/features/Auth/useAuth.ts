@@ -1,15 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  login,
-  logout as logoutService,
-  otpLogin,
-  register,
+    login,
+    logout as logoutService,
+    otpLogin,
+    register,
 } from "../../services/authService";
 import userProfileService from "../../services/userProfileService";
 import type {
-  LoginRequest,
-  OTPLoginRequest,
-  RegisterRequest,
+    LoginRequest,
+    OTPLoginRequest,
+    RegisterRequest,
 } from "../../types/Auth";
 
 const STORAGE_TOKEN_KEY = "oysloe_token";
@@ -62,7 +62,8 @@ export function useLogout() {
   const qc = useQueryClient();
   return useMutation<Awaited<ReturnType<typeof logoutService>>, Error, void>({
     mutationFn: () => logoutService(),
-    onSuccess: () => {
+    // Always clear client-side auth state regardless of server response.
+    onSettled: () => {
       localStorage.removeItem(STORAGE_TOKEN_KEY);
       localStorage.removeItem(STORAGE_USER_KEY);
       qc.removeQueries({ queryKey: ["currentUser"] });
