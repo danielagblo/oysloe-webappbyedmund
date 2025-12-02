@@ -45,7 +45,7 @@ export default function PostAdForm() {
   const [price, setPrice] = useState<number | "">("");
   const [keyFeatures, setKeyFeatures] = useState<string[]>(["", ""]);
   // attachedFeatures: list of selections where user picks an existing feature and provides a value
-  const [attachedFeatures, setAttachedFeatures] = useState<Array<{ feature?: number; value: string }>>([
+  const [attachedFeatures] = useState<Array<{ feature?: number; value: string }>>([
     { feature: undefined, value: "" },
   ]);
   // creation of catalog features is disabled for regular users; we only fetch existing definitions
