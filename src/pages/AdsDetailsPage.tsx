@@ -11,6 +11,7 @@ import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import Loader from "../components/LoadingDots";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -150,9 +151,10 @@ const AdsDetailsPage = () => {
     );
   if (adLoading || adsLoading)
     return (
-      <p className="h-screen w-screen m-0 flex items-center justify-center">
-        Loading...
-      </p>
+      <div className="relative h-screen max-h-[97vh] w-screen m-0 flex flex-col items-center justify-center">
+        <Loader />
+        <p className="loading absolute bottom-0 loading-dots">Loading</p>
+      </div>
     );
   if (adError)
     return (
@@ -525,14 +527,13 @@ const AdsDetailsPage = () => {
                     }
                 `}
                   onClick={(e) => {
+                    e.stopPropagation();
                     // special handling for caller buttons to toggle tooltip
                     if (label === "Caller 1") {
-                      e.stopPropagation();
                       (toggleCaller1 || (() => { }))();
                       return;
                     }
                     if (label === "Caller 2") {
-                      e.stopPropagation();
                       (toggleCaller2 || (() => { }))();
                       return;
                     }
@@ -544,7 +545,7 @@ const AdsDetailsPage = () => {
                   {label === "Favorites" ? (
                     <>
                       <img
-                        src={isFavourited ? "/favorited.svg" : "/favorited-outline.svg"}
+                        src={isFavourited ? "/favorited.svg" : "/heart-outline.svg"}
                         alt=""
                         className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
                       />
