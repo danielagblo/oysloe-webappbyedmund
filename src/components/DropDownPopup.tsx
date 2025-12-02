@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -64,7 +64,7 @@ export default function DropdownPopup({
         }}
         className="relative w-full p-3 border rounded-xl border-[var(--div-border)] text-gray-600 text-left"
       >
-        <p className="max-w-[80%] truncate">
+        <p className="block truncate pr-10">
           {truncate ? finalLabel.split(" - ")[0] : finalLabel}
         </p>
         <div className="absolute right-3 top-3 py-1.5 px-1 bg-[var(--div-active)] rounded-full flex justify-center items-center">
@@ -114,31 +114,29 @@ export default function DropdownPopup({
               <div className="flex flex-col max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                 {Array.isArray(options)
                   ? options.map((opt, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleMainSelect(opt)}
-                        className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
-                          i !== options.length - 1
-                            ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                            : ""
+                    <button
+                      key={i}
+                      onClick={() => handleMainSelect(opt)}
+                      className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== options.length - 1
+                          ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                          : ""
                         }`}
-                      >
-                        {opt}
-                      </button>
-                    ))
+                    >
+                      {opt}
+                    </button>
+                  ))
                   : Object.keys(options).map((main, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleMainSelect(main)}
-                        className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
-                          i !== Object.keys(options).length - 1
-                            ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                            : ""
+                    <button
+                      key={i}
+                      onClick={() => handleMainSelect(main)}
+                      className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== Object.keys(options).length - 1
+                          ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                          : ""
                         }`}
-                      >
-                        {main}
-                      </button>
-                    ))}
+                    >
+                      {main}
+                    </button>
+                  ))}
               </div>
             </div>
           )}
@@ -190,11 +188,10 @@ export default function DropdownPopup({
                   <button
                     key={i}
                     onClick={() => handleSubSelect(opt)}
-                    className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
-                      i !== submenuOptions.length - 1
+                    className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== submenuOptions.length - 1
                         ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
                         : ""
-                    }`}
+                      }`}
                   >
                     {opt}
                   </button>
