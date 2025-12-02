@@ -606,7 +606,7 @@ const HomePage = () => {
                           className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
                         >
                           <img
-                            src={ad.image || "/public/no-image.jpeg"}
+                            src={ad.image || "/no-image.jpeg"}
                             alt={ad.name}
                             className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                           />
@@ -658,7 +658,7 @@ const HomePage = () => {
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
                 <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
                   <img
-                    src={ad.image || "/public/no-image.jpeg"}
+                    src={ad.image || "/no-image.jpeg"}
                     alt={ad.name}
                     className="w-full h-40 sm:h-48 object-cover rounded-2xl"
                   />
@@ -712,7 +712,7 @@ const HomePage = () => {
             <div key={ad.id} className="flex flex-col w-full overflow-hidden">
               <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
                 <img
-                  src={ad.image || "/public/no-image.jpeg"}
+                  src={ad.image || "/no-image.jpeg"}
                   alt={ad.name}
                   className="w-full h-40 sm:h-48 object-cover rounded-2xl"
                 />

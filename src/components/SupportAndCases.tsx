@@ -67,24 +67,6 @@ export default function SupportAndCases({
         Continue conversations with support or other users. Tap a chat to open
         it.
       </p>
-      <div className="w-[100%] flex items-center justify-center mb-8">
-        <button
-          className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-2xl hover:bg-gray-200"
-          onClick={() => onSelectChat?.("new")}
-        >
-          <p>Start new chat</p>
-          <span
-            className="w-5 h-5 ml-2 text-green-500 bg-green-200 flex justify-center items-center"
-            style={{
-              borderRadius: "2rem",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            <p>+</p>
-          </span>
-        </button>
-      </div>
       <ChatsList />
     </div>
   );
@@ -113,28 +95,35 @@ export default function SupportAndCases({
 
     return (
       <div className="flex flex-col gap-2 mb-3">
-        {rooms.map((r) => (
-          <button
-            key={r.id}
-            onClick={() => onSelectChat?.(String(r.id))}
-            className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
-          >
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
-              {r.name
-                .split(" ")
-                .map((s) => s[0])
-                .slice(0, 2)
-                .join("")}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{r.name}</p>
-                <span className="text-xs text-gray-400">{r.messages?.length ? `${Math.max(0, r.messages!.length - 1)}m` : ""}</span>
+        {rooms.map((r) => {
+          const lastMessage = r.messages && r.messages.length ? r.messages[r.messages.length - 1] : null;
+          const lastContent = lastMessage && typeof (lastMessage as any).content === "string" ? String((lastMessage as any).content) : "";
+          // If the last message content is a data URL (base64 image), show a friendly label instead
+          const previewText = lastContent.startsWith("data:") ? "picture" : lastContent;
+
+          return (
+            <button
+              key={r.id}
+              onClick={() => onSelectChat?.(String(r.id))}
+              className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
+            >
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
+                {r.name
+                  .split(" ")
+                  .map((s) => s[0])
+                  .slice(0, 2)
+                  .join("")}
               </div>
-              <p className="text-xs text-gray-500 truncate">{r.messages && r.messages.length ? r.messages[r.messages.length - 1].content : ""}</p>
-            </div>
-          </button>
-        ))}
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">{r.name}</p>
+                  <span className="text-xs text-gray-400">{r.messages?.length ? `${Math.max(0, r.messages!.length - 1)}m` : ""}</span>
+                </div>
+                <p className="text-xs text-gray-500 truncate">{previewText}</p>
+              </div>
+            </button>
+          );
+        })}
       </div>
     );
   }

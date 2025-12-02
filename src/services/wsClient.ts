@@ -24,12 +24,20 @@ export class WebSocketClient {
     const sep = this.url.includes("?") ? "&" : "?";
     const urlWithToken = this.token ? `${this.url}${sep}token=${encodeURIComponent(this.token)}` : this.url;
 
-    this.ws = new WebSocket(urlWithToken);
+    console.log("WebSocketClient.connect: opening", { urlWithToken });
+    try {
+      this.ws = new WebSocket(urlWithToken);
+    } catch (err) {
+      console.warn("WebSocketClient.connect: constructor threw", err, { urlWithToken });
+      throw err;
+    }
 
     this.ws.onopen = (ev) => {
+      console.log("WebSocketClient.onopen", { urlWithToken });
       this.handlers.onOpen?.(ev);
     };
     this.ws.onclose = (ev) => {
+      console.log("WebSocketClient.onclose", { code: ev?.code, reason: ev?.reason, urlWithToken });
       this.handlers.onClose?.(ev);
       if (this.shouldReconnect) {
         setTimeout(() => this.connect(), this.reconnectInterval);

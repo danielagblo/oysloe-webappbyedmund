@@ -4,10 +4,13 @@ import "../App.css";
 import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
+import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
+import type { Message as ChatMessage } from "../services/chatService";
+import { resolveChatroomId } from "../services/chatService";
 import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
@@ -28,6 +31,9 @@ const AdsDetailsPage = () => {
   const { data: ads = [], isLoading: adsLoading } = useProducts();
   const { profile: currentUserProfile } = useUserProfile();
   const { reviews: reviews = [] } = useReviews();
+
+  // chat hook (declare early before any conditional returns)
+  const { sendMessage, addLocalMessage } = useWsChat();
 
   // Favourites hook and local state (declare early to obey hook rules)
   const { data: favourites = [], toggleFavourite } = useFavourites();
@@ -109,6 +115,7 @@ const AdsDetailsPage = () => {
   // Caller phone tooltip visibility (hook must be declared before any early returns)
   const [showCaller1, setShowCaller1] = useState(false);
   const [showCaller2, setShowCaller2] = useState(false);
+  const [quickChatInput, setQuickChatInput] = useState("");
 
 
   const productReviews = useMemo(() => {
@@ -191,6 +198,62 @@ const AdsDetailsPage = () => {
   const favouriteCount = getLikeCount(currentAdData) || getLikeCount(currentAdDataFromQuery) || favourites.length || 0;
 
   const ownerId = currentAdData?.owner?.id ?? null;
+
+  const openChatWithOwnerAndSend = async (text: string) => {
+    if (!owner || !owner.id) {
+      // fallback: just go to inbox
+      navigate("/inbox");
+      return;
+    }
+
+    try {
+      // resolve a chatroom id for this owner/product (use GET endpoint to avoid POST 405)
+      const params: Record<string, unknown> = {
+        user_id: owner.id,
+        product_id: currentAdData?.id ?? numericId,
+      };
+      const res = await resolveChatroomId(params as any);
+      // resolveChatroomId returns { room_id: string } or similar
+      const roomKey = (res as any)?.room_id || String((res as any)?.room || (res as any)?.id);
+
+      // optimistic local message
+      const tempId = `tmp_${Date.now()}`;
+      const tempMsg: Partial<ChatMessage> = {
+        id: -Date.now(),
+        room: roomKey as any,
+        sender: {
+          id: currentUserProfile?.id ?? 0,
+          name: currentUserProfile?.name ?? "You",
+          avatar: (currentUserProfile as any)?.avatar ?? null,
+        } as any,
+        content: text,
+        created_at: new Date().toISOString(),
+        is_read: false,
+        // keep temp ids for reconciliation
+        __temp_id: tempId,
+        __optimistic: true,
+      };
+
+      try {
+        addLocalMessage(String(roomKey), tempMsg as ChatMessage);
+      } catch (err) {
+        console.warn("AdsDetailsPage: addLocalMessage failed", err);
+      }
+
+      // attempt to send
+      try {
+        await sendMessage(String(roomKey), text, tempId);
+      } catch (err) {
+        console.warn("AdsDetailsPage: sendMessage failed", err);
+      }
+
+      // navigate to inbox and open the room
+      navigate("/inbox", { state: { openRoom: String(roomKey) } });
+    } catch (err) {
+      console.warn("AdsDetailsPage: createChatRoom/send failed", err);
+      navigate("/inbox");
+    }
+  };
 
 
 
@@ -330,7 +393,7 @@ const AdsDetailsPage = () => {
         currentAdDataFromQuery?.images.length === 0 &&
         !currentAdDataFromQuery?.image
       )
-        return "/public/no-image.jpeg"; //if there are no images, and there is no image (cover), use this placeholder
+        return "/no-image.jpeg"; //if there are no images, and there is no image (cover), use this placeholder
 
       const id = imageID;
       imageID = (imageID + 1) % max;
@@ -636,7 +699,13 @@ const AdsDetailsPage = () => {
                           <button
                             type="button"
                             className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
-                            onClick={(ev) => ev.stopPropagation()}
+                            onClick={async (ev) => {
+                              ev.stopPropagation();
+                              if (!offerInput || offerInput.trim().length === 0) return;
+                              // send offer as chat message and open inbox
+                              await openChatWithOwnerAndSend(offerInput.trim());
+                              setShowOffer(false);
+                            }}
                           >
                             <img src="/send.svg" alt="Send" className="w-8 h-8" />
                           </button>
@@ -780,17 +849,24 @@ const AdsDetailsPage = () => {
           <input
             type="text"
             placeholder="Start a chat"
+            value={quickChatInput}
+            onChange={(e) => setQuickChatInput(e.target.value)}
             style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 py-3 bg-[url('/send.svg')] bg-size-[20px_20px] bg-position-[center_right_12px] bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
+            className="rounded-2xl px-3 py-3 bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
           />
           <button
             style={{ border: "1px solid var(--div-border)" }}
             className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white"
+            onClick={async () => {
+              if (!quickChatInput || quickChatInput.trim().length === 0) return;
+              await openChatWithOwnerAndSend(quickChatInput.trim());
+              setQuickChatInput("");
+            }}
           >
             <img
-              src="/audio.svg"
-              alt=""
-              className="w-7 h-5 md:h-[1.5vw] md:w-[1.5vw]"
+              src="/send.svg"
+              alt="Send"
+              className="w-6 h-6"
             />
           </button>
         </div>
@@ -877,7 +953,7 @@ const AdsDetailsPage = () => {
                 sellerProducts.slice(0, 6).map((p) => (
                   <img
                     key={p.id}
-                    src={p.image || "/public/no-image.jpeg"}
+                    src={p.image || "/no-image.jpeg"}
                     alt={p.name || "Seller product"}
                     role="button"
                     tabIndex={0}
@@ -934,7 +1010,7 @@ const AdsDetailsPage = () => {
             className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
           >
             <img
-              src={ad.image || "/public/no-image.jpeg"}
+              src={ad.image || "/no-image.jpeg"}
               alt={ad.name.slice(0, 10)}
               className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
             />

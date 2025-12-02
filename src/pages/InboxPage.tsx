@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
@@ -6,7 +7,9 @@ import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 
 export default function InboxPage() {
-  const [selectedCase, setSelectedCase] = useState<string | null>(null);
+  const location = useLocation();
+  const initialOpen = (location.state as any)?.openRoom ?? null;
+  const [selectedCase, setSelectedCase] = useState<string | null>(initialOpen);
 
   return (
     <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">

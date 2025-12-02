@@ -307,7 +307,7 @@ export default function PostAdForm() {
     const errors: string[] = [];
     if (!title.trim()) errors.push("Title is required.");
     if (!categoryId) errors.push("Category is required.");
-    if (!mapSelection && !regionLocation)
+    if ((mapSelection || regionLocation) == null)
       errors.push("Please choose a location (map or region).");
 
     if (errors.length > 0) {

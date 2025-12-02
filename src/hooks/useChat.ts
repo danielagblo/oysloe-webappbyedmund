@@ -46,13 +46,16 @@ export function useChat(roomId: string | null): UseChatReturn {
         console.error("useChat failed to load messages", e);
       }
 
-      // build websocket url
+      // build websocket url (append token as query param per backend spec)
       const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
       const wsBaseRaw = (import.meta.env.VITE_WS_URL as string) || apiBase;
       const wsBase = wsBaseRaw.replace(/^http/, "ws").replace(/\/$/, "");
-      const wsUrl = `${wsBase}/chatrooms/${rid}/`;
-
       const token = typeof window !== "undefined" ? localStorage.getItem("oysloe_token") : null;
+      const encodedRid = encodeURIComponent(String(rid));
+      const wsUrl = token
+        ? `${wsBase}/chat/${encodedRid}/?token=${encodeURIComponent(token)}`
+        : `${wsBase}/chat/${encodedRid}/`;
+
       console.log("useChat: creating WebSocketClient", { wsUrl, tokenPresent: !!token });
       const client = new WebSocketClient(wsUrl, token, {
         onOpen: () => {
@@ -128,8 +131,11 @@ export function useChat(roomId: string | null): UseChatReturn {
       const apiBase = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
       const wsBaseRaw = (import.meta.env.VITE_WS_URL as string) || apiBase;
       const wsBase = wsBaseRaw.replace(/^http/, "ws").replace(/\/$/, "");
-      const wsUrl = `${wsBase}/chatrooms/${newRid}/`;
       const token = typeof window !== "undefined" ? localStorage.getItem("oysloe_token") : null;
+      const encodedNewRid = encodeURIComponent(String(newRid));
+      const wsUrl = token
+        ? `${wsBase}/chat/${encodedNewRid}/?token=${encodeURIComponent(token)}`
+        : `${wsBase}/chat/${encodedNewRid}/`;
       const client = new WebSocketClient(wsUrl, token, {
         onOpen: () => {
           console.log("useChat.sendMessage.ws onOpen", { room: newRid });

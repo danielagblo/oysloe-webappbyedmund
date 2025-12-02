@@ -61,7 +61,7 @@ const FavouritesPage = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <img
                     className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
-                    src={(ad as any).image ?? (ad as any).img ?? "/public/no-image.jpeg"}
+                    src={(ad as any).image ?? (ad as any).img ?? "/no-image.jpeg"}
                     alt={(ad as any).name ?? "Favourite"}
                   />
                   <p
