@@ -320,7 +320,7 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base md:text-[1.125vw]">
-          {currentAdData?.location?.name || "No location set"}
+          {currentAdData?.location?.name || "Unknown"}
         </h2>
       </div>
       <div className="flex items-center gap-2">
@@ -379,16 +379,40 @@ const AdsDetailsPage = () => {
       </div>
     </div>
   );
-  const ImageGallery = () => {
-    let imageID = 0;
-    const max = currentAdDataFromQuery?.images.length || 0;
 
+  const ImageGallery = () => {
+    const images = currentAdDataFromQuery?.images ?? [];
+    const coverImage = currentAdDataFromQuery?.image ?? null;
+
+    const galleryImages =
+      images.length > 0 ? images.map((i) => i.image) : coverImage ? [coverImage] : ["/public/no-image.jpeg"];
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const max = galleryImages.length;
+
+    const prevImage = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (currentIndex === 0) return;
+      setCurrentIndex((i) => i - 1);
+    };
+
+    const nextImage = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (currentIndex === max - 1) return;
+      setCurrentIndex((i) => i + 1);
+    };
+
+    const getMainImage = () => galleryImages[currentIndex];
+
+    let imageID = 0;
     const getImageSrc = () => {
       if (
         currentAdDataFromQuery?.images.length === 0 &&
         currentAdDataFromQuery?.image
       )
-        return currentAdDataFromQuery?.image; //if there are no images, but there is an image (the cover), use the cover
+        return currentAdDataFromQuery?.image; 
+        //if there are no images, but there is an image (the cover), use the cover
       if (
         currentAdDataFromQuery?.images.length === 0 &&
         !currentAdDataFromQuery?.image
@@ -399,67 +423,64 @@ const AdsDetailsPage = () => {
       imageID = (imageID + 1) % max;
       return currentAdDataFromQuery?.images[id].image;
     };
+    
 
     return (
       <div className="w-full flex justify-center my-4 sm:mb-8">
-        {/* Desktop */}
+
+        {/* DESKTOP */}
         <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
-          <div className="flex w-full">
+          <div className="flex w-full relative">
+            {max > 1 && currentIndex > 0 && (
+              <button
+                onClick={prevImage}
+                className="absolute left-1 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2"
+              >
+                <img src="/arrowleft.svg" alt="&#9664;" />
+              </button>
+            )}
+
             <img
-              src={getImageSrc()}
+              src={getMainImage()}
               alt=""
               className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg"
             />
+            {max > 1 && currentIndex < max - 1 && (
+              <button
+                onClick={nextImage}
+                className="absolute right-1 bg-white rounded-full top-1/2 -translate-y-1/2 z-20 px-2 py-2"
+              >
+                <img src="/arrowright.svg" alt="&#9654;" />
+              </button>
+            )}
           </div>
+
           <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
-            <img
-              src={getImageSrc()}
-              alt=""
-              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-            />
-            <img
-              src={getImageSrc()}
-              alt=""
-              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-            />
+            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
           </div>
+
           <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
-            <img
-              src={getImageSrc()}
-              alt=""
-              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-            />
-            <img
-              src={getImageSrc()}
-              alt=""
-              className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg"
-            />
+            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
           </div>
         </div>
 
-        {/* Mobile */}
+        {/* MOBILE */}
         <div
           className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <img
-            src={getImageSrc()}
-            alt="Ad main"
-            className="object-cover w-full h-full"
-          />
-          <div
-            onClick={handlePrevious}
-            className="absolute top-0 left-0 w-[30%] h-full z-20"
-          />
-          <div
-            onClick={handleNext}
-            className="absolute top-0 right-0 w-[30%] h-full z-20"
-          />
+          <img src={getMainImage()} alt="Ad main" className="object-cover w-full h-full" />
+          <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
+          <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
         </div>
       </div>
     );
   };
+
+
   const TitleAndPrice = () => (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
@@ -467,7 +488,7 @@ const AdsDetailsPage = () => {
         <h2 className="text-sm md:text-[1.1vw]">
           {currentAdData?.location?.name && currentAdData?.location?.region
             ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region`
-            : "No location has been set for this user"}
+            : "Unknown"}
         </h2>
       </div>
       <div className="flex items-center gap-3">
@@ -624,7 +645,7 @@ const AdsDetailsPage = () => {
                       {/* show Taken label instead of Mark as taken when product is already taken */}
                       {label === "Mark as taken" && isTaken ? (
                         <>
-                          <img src="/check-circle.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
+                          <img src="/check.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
                           <p className="whitespace-nowrap">Taken</p>
                         </>
                       ) : (

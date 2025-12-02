@@ -8,6 +8,7 @@ import {
   useSetProductStatus,
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
+import { formatMoney } from "../utils/formatMoney";
 
 const AdsPage = () => {
   const [activeTab, setActiveTab] = useState("Active");
@@ -114,7 +115,7 @@ const AdsPage = () => {
               </div>
               <div className="mt-2">
                 <p className="font-medium">{ad.name}</p>
-                <p className="text-xs text-gray-600">{ad.price}</p>
+                <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
               </div>
             </div>
           ))}

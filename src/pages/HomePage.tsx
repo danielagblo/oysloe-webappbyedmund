@@ -617,7 +617,7 @@ const HomePage = () => {
                               className="w-3 sm:w-5 h-3 sm:h-5"
                             />
                             <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                              {ad.location?.name ?? ad.location?.region ?? ""}
+                              {ad.location?.name ?? ad.location?.region ?? "Unknown"}
                             </p>
                           </div>
                           <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
@@ -665,7 +665,7 @@ const HomePage = () => {
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
                     <p className="text-xs text-gray-500">
-                      {ad.location?.name ?? ad.location?.region ?? ""}
+                      {ad.location?.name ?? ad.location?.region ?? "Unknown"}
                     </p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">

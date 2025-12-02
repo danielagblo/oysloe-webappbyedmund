@@ -1,12 +1,13 @@
 import { Camera, PlusIcon, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import mailGif from "../assets/mail.gif";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
+import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 
 const EditProfilePage = () => {
   const [closeProgress, setCloseProgress] = useState(true);
@@ -44,6 +45,9 @@ const EditProfilePage = () => {
   //readonly toggle - make editable by default when opening edit page
   const [isReadonly, setIsReadonly] = useState<boolean>(true);
   const [isReadonlyRight, setIsReadonlyRight] = useState<boolean>(true);
+
+  const [accountDeletionRequested, setAccountDeletionRequested] =
+    useState(false);
 
   const [selectedUser, setSelectedUser] = useState<{
     profileImage?: string;
@@ -100,7 +104,7 @@ const EditProfilePage = () => {
     if (!val) return val;
     try {
       // If the value is an assets path, return just the filename
-      if (val.includes('/assets/')) return val.split('/').pop();
+      if (val.includes("/assets/")) return val.split("/").pop();
     } catch {
       // ignore
     }
@@ -108,6 +112,41 @@ const EditProfilePage = () => {
   };
 
   const navigate = useNavigate();
+
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+  const { create, data } = useAccountDeleteRequest();
+
+  const handleDelete = async () => {
+    if (!deleteReason) {
+      toast.warning("Delete reason required");
+      return;
+    }
+
+    if (typeof create !== "function") {
+      toast.error("Account delete action is not available");
+      return;
+    }
+
+    if (data && (data.status === "PENDING" || data.status === "APPROVED")) {
+      toast.warning(
+        `You already have a${data.status === "APPROVED" ? "n " : " "}${data.status.toLowerCase()} delete request.`
+      );
+      return;
+    }
+
+    //check if user has a rejected request/no pending or approved b4 allowing them to proceed
+
+    try {
+      await create({ reason: deleteReason });
+      setAccountDeletionRequested(false);
+      setDeleteReason("");
+      toast.success("Account delete request submitted successfully");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Failed to submit delete request: ${msg}`);
+    }
+  };
 
   // hold chosen files to submit to backend directly
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -240,23 +279,24 @@ const EditProfilePage = () => {
 
             {/* general details */}
             <div className="w-[95%] bg-white p-4 rounded-md">
-              <div className="flex gap-4 items-center mb-2">
-                <p className="text-sm font-medium whitespace-nowrap">General Details</p>
+              <div className="grid grid-cols-3 gap-4 justify-between items-center mb-2 max-w-[650px]">
+                <p className="text-sm font-medium whitespace-nowrap">
+                  General Details
+                </p>
+                <div className="flex items-center justify-center">
+                  <button
+                    className="bg-gray-100 py-1 px-3 w-fit rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                    onClick={() => {
+                      setIsReadonly(!isReadonly);
+                      setIsReadonlyRight(!isReadonlyRight);
+                    }}
+                  >
+                    {isReadonly ? "Edit" : "Preview"}
+                  </button>
+                </div>
                 <button
-                  className="bg-gray-100 py-1 px-3 rounded-full text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
-                  onClick={() => {
-                    setIsReadonly(!isReadonly);
-                    setIsReadonlyRight(!isReadonlyRight);
-                  }}
-                >
-                  {isReadonly ? "Edit" : "Preview"}
-                </button>
-                <button
-                  onClick={() => {
-                    setIsReadonly(!isReadonly);
-                    setIsReadonlyRight(!isReadonlyRight);
-                  }}
-                  className="text-xs hover:text-red-700 underline text-red-500 transition"
+                  onClick={() => setAccountDeletionRequested(true)}
+                  className="text-xs cursor-pointer hover:text-red-700 underline text-red-500 transition"
                   title="This is IRREVERSIBLE"
                 >
                   Request Account Deletion
@@ -436,7 +476,10 @@ const EditProfilePage = () => {
                         selectedUser?.phonePrimary ?? "",
                       );
 
-                      await apiClient.put(endpoints.userProfile.userProfile, form);
+                      await apiClient.put(
+                        endpoints.userProfile.userProfile,
+                        form,
+                      );
                     } else {
                       // build JSON payload according to UserProfileUpdatePayload
                       const payload: any = {
@@ -446,7 +489,9 @@ const EditProfilePage = () => {
                         address: (selectedUser as any)?.address,
                         // strip local asset paths so backend doesn't try to process them
                         avatar: stripAssetPath(selectedUser?.profileImage),
-                        business_logo: stripAssetPath(selectedUser?.businessLogo),
+                        business_logo: stripAssetPath(
+                          selectedUser?.businessLogo,
+                        ),
                         business_name: selectedUser?.businessName,
                         account_name: selectedUser?.accountName,
                         account_number: selectedUser?.accountNumber,
@@ -461,11 +506,12 @@ const EditProfilePage = () => {
                     }
                     // close edit view on success
                     // setShowEdit(false);
-                    toast.success('Profile saved');
+                    toast.success("Profile saved");
                   } catch (err: any) {
-                    const msg = err instanceof Error ? err.message : String(err);
-                    setSaveError(msg || 'Failed to save profile');
-                    toast.error(msg || 'Failed to save profile');
+                    const msg =
+                      err instanceof Error ? err.message : String(err);
+                    setSaveError(msg || "Failed to save profile");
+                    toast.error(msg || "Failed to save profile");
                   } finally {
                     setIsSaving(false);
                   }
@@ -481,7 +527,9 @@ const EditProfilePage = () => {
               </button>
 
               {saveError && (
-                <div className="mt-2 text-bas text-red-600 w-full text-right">An error occurred.</div>
+                <div className="mt-2 text-bas text-red-600 w-full text-right">
+                  An error occurred.
+                </div>
               )}
             </div>
           </div>
@@ -507,6 +555,75 @@ const EditProfilePage = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {accountDeletionRequested && (
+        <div className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center ">
+
+          {!deleteConfirmation ? (
+              <div className="bg-white flex justify-center items-center flex-col p-10 px-6 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
+                <h2 className="text-lg w-[80%] text-center">
+                  <span>Are you sure you want to delete your account?</span>
+                  <br />
+                  <span className="text-red-600 text-xl font-bold">
+                    ⚠️ This action is irreversible.
+                  </span>
+                </h2>
+                <div className="grid grid-cols-2 gap-4 lg:gap-6 w-4/5">
+                  <button
+                    onClick={() => setDeleteConfirmation(true) }               
+                    className="text-base bg-red-600 text-white  hover:bg-red-700 cursor-pointer rounded-lg py-2 px-4 transition"
+                  >
+                    Yes, Delete My Account
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAccountDeletionRequested(false);
+                    }}
+                    className="text-base cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-2 px-4 transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+          ) : (
+            <div className="bg-white flex justify-center items-center flex-col p-10 px-20 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
+
+              <h3 className="text-xl font-semibold">
+                  Why do you want to delete your account?
+                </h3>
+                <textarea
+                  placeholder="Please provide your reason for deleting your account here."
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded resize-none"
+                  rows={4}
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer transition"
+                    onClick={() => {
+                      setAccountDeletionRequested(false);
+                      setDeleteConfirmation(false);
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer transition"
+                    onClick={() => {
+                      handleDelete();
+                      setDeleteConfirmation(false);
+                      setAccountDeletionRequested(false);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+            </div>
+          )
+        }
+      </div>
       )}
     </div>
   );

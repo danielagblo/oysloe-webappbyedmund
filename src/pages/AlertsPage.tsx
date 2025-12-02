@@ -35,7 +35,11 @@ const AlertsPanel = () => {
                   </div>
                 </div>
               ))
-            ) : alerts.length === 0 ? (
+            ) : error ? (
+              <p className="w-full text-center max-lg:hidden">
+                There was an error retrieving your alerts.
+              </p>
+            ) :alerts.length === 0 ? (
               <p className="w-full text-center">You have no alerts</p>
             ) : (
               alerts.map((alert) => (
@@ -64,29 +68,25 @@ const AlertsPanel = () => {
         </div>
 
         {/* Mobile alerts */}
-        <div className="flex lg:hidden flex-col w-full p-4 bg-white h-[87vh] overflow-y-auto no-scrollbar">
+        <div className="flex lg:hidden flex-col w-full md:w-screen p-4 bg-white h-[87vh] overflow-y-auto no-scrollbar">
           {loading ? (
-            Array.from({ length: 5 }).map((_, i) => (
+            <div className="flex flex-col gap-2 p-2 w-screen justify-center items-center">
+              {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 animate-pulse"
+                className="flex items-center gap-3 p-2 h-15 rounded-lg bg-gray-100 w-9/10 animate-pulse"
               >
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex-shrink-0" />
-                <div className="flex flex-col w-full">
-                  <span className="text-xs text-gray-400">...</span>
-                  <div className="text-sm">
-                    <span className="font-semibold">Loading...</span>
-                    <span className="ml-1 text-gray-400">Please wait</span>
-                  </div>
-                </div>
+                <div className="w-8 h-8 rounded-full bg-gray-300 shrink-0" />
+                <span className="font-semibold text-gray-600 text-sm h-full mt-7">Loading...</span>
               </div>
-            ))
+            ))}
+            </div>
           ) : error ? (
-            <p className="w-full text-center">
-              There was an error retrieving your alerts
+            <p className="w-full text-center lg:hidden ">
+              There was an error retrieving your alerts.
             </p>
           ) : alerts.length === 0 ? (
-            <p className="w-full text-center">You have no alerts</p>
+            <p className="w-full text-center">You have no alerts.</p>
           ) : (
             alerts.map((alert) => (
               <div

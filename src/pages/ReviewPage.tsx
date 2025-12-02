@@ -11,6 +11,7 @@ import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { createReview, patchReview } from "../services/reviewService";
 import type { ReviewPayload } from "../types/Review";
+import { formatReviewDate } from "../utils/formatReviewDate";
 
 const ReviewPage = () => {
   const [sendSuccess, setSendSuccess] = useState(false);
@@ -172,7 +173,7 @@ const ReviewPage = () => {
                       className="w-10 h-10 rounded-lg"
                     />
                     <div className="flex flex-col">
-                      <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-gray-400">{formatReviewDate(rev.created_at)}</p>
                       <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
                       <div className="flex">
                         {Array.from({ length: 5 }).map((_, j) => (
