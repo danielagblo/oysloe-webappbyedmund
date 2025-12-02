@@ -665,7 +665,7 @@ const HomePage = () => {
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-4 h-4" />
                     <p className="text-xs text-gray-500">
-                      {ad.location?.name ?? ad.location?.region ?? ""}
+                      {ad.location?.name ?? ad.location?.region ?? "Unknown"}
                     </p>
                   </div>
                   <p className="px-2 text-sm truncate text-gray-500">

@@ -2,11 +2,14 @@ import { useState } from "react";
 import MenuButton from "../components/MenuButton";
 import useFavourites from "../features/products/useFavourites";
 import type { Product } from "../types/Product";
+import { formatMoney } from "../utils/formatMoney";
+import { useNavigate } from "react-router-dom";
 
 const FavouritesPage = () => {
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
-  const { data: favourites = [], isLoading, isError } = useFavourites();
+  const { data: favourites = [], isLoading, isError, toggleFavourite } = useFavourites();
+  const navigate = useNavigate(); 
 
   return (
     <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent">
@@ -73,7 +76,7 @@ const FavouritesPage = () => {
                 </div>
                 <div className="mt-2">
                   <p className="font-medium">{(ad as any).name}</p>
-                  <p className="text-xs text-gray-600">{(ad as any).price}</p>
+                  <p className="text-xs text-gray-600">{formatMoney((ad as any).price)}</p>
                 </div>
               </div>
             ))
@@ -91,10 +94,19 @@ const FavouritesPage = () => {
                 +
               </button>
               <div className="mt-6 text-center text-gray-600 flex flex-col gap-1.5 sm:flex-row sm:justify-center items-center">
-                <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 max-sm:w-4/5">
+                <button 
+                  className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 max-sm:w-4/5"
+                  onClick={() => navigate("/ads/" + (selectedAd as any).id)}
+                >
                   Open
                 </button>
-                <button className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40   max-sm:w-4/5">
+                <button 
+                  className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40   max-sm:w-4/5"
+                  onClick={()=> {
+                    toggleFavourite.mutate((selectedAd as any).id);
+                    setSelectedAd(null);
+                  }}
+                >
                   Remove From Favourites
                 </button>
               </div>
