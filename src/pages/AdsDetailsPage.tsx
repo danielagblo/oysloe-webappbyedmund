@@ -218,7 +218,7 @@ const AdsDetailsPage = () => {
 
       // optimistic local message
       const tempId = `tmp_${Date.now()}`;
-      const tempMsg: Partial<ChatMessage> = {
+      const tempMsg = {
         id: -Date.now(),
         room: roomKey as any,
         sender: {
@@ -232,7 +232,7 @@ const AdsDetailsPage = () => {
         // keep temp ids for reconciliation
         __temp_id: tempId,
         __optimistic: true,
-      };
+      } as unknown as ChatMessage;
 
       try {
         addLocalMessage(String(roomKey), tempMsg as ChatMessage);
@@ -302,7 +302,7 @@ const AdsDetailsPage = () => {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
           <img src="/flag.svg" alt="" className="w-4 h-4" />
-          <span className="text-xs">{reportCount}</span>
+          <span className="text-xs">{String(reportCount)}</span>
         </div>
         <div className="flex items-center gap-1">
           <img src="/favorited.svg" alt="" className="w-4 h-4" />
@@ -345,7 +345,7 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">{reportCount}</h2>
+        <h2 className="text-base md:text-[1.125vw]">{String(reportCount)}</h2>
       </div>
       <div className="flex items-center gap-2">
         <img
@@ -411,8 +411,8 @@ const AdsDetailsPage = () => {
         currentAdDataFromQuery?.images.length === 0 &&
         currentAdDataFromQuery?.image
       )
-        return currentAdDataFromQuery?.image; 
-        //if there are no images, but there is an image (the cover), use the cover
+        return currentAdDataFromQuery?.image;
+      //if there are no images, but there is an image (the cover), use the cover
       if (
         currentAdDataFromQuery?.images.length === 0 &&
         !currentAdDataFromQuery?.image
@@ -423,7 +423,7 @@ const AdsDetailsPage = () => {
       imageID = (imageID + 1) % max;
       return currentAdDataFromQuery?.images[id].image;
     };
-    
+
 
     return (
       <div className="w-full flex justify-center my-4 sm:mb-8">
