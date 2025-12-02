@@ -11,7 +11,7 @@ function PostAdPage() {
         <MobileBanner page="Post An Ad" />
       </div>
 
-      <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
+      <div className="hidden lg:flex w-[25vw] h-screen items-center justify-center pl-2">
         <ProfileStats />
       </div>
 
