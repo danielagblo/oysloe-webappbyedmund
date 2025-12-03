@@ -25,7 +25,7 @@ export function formatMoney(
       symbol = currency + " ";
   }
 
-  const formatted = amount.toLocaleString(undefined, {
+  const formatted = Math.abs(amount).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
