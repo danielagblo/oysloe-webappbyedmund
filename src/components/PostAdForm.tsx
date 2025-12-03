@@ -6,6 +6,7 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
+import useLocationSelection from "../hooks/useLocationSelection";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
@@ -237,54 +238,27 @@ export default function PostAdForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<Region | null>(null);
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
+
+  // use our centralised hook to manage location selection and saved locations
+  const {
+    regionLabel,
+    locationDetails,
+    savedLocations,
+    showSaveLocationModal: showSaveModal,
+    newLocationName,
+    grouped,
+    setNewLocationName,
+    selectPlace,
+    applySavedLocation,
+    saveCurrentLocation,
+    removeSavedLocation,
+    setShowSaveLocationModal,
+    reset: resetLocationSelection,
+  } = useLocationSelection(groupedLocations);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const [showSaveLocationModal, setShowSaveLocationModal] = useState(false);
-  const [newLocationName, setNewLocationName] = useState("");
-  const STORAGE_KEY = "oysloe.savedLocations";
-
-  type SavedLocation = {
-    label: string;
-    region: string;
-    place: string;
-  };
-
-  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : null;
-      if (!Array.isArray(parsed)) return [];
-
-      // Support legacy string-array entries by converting them to objects
-      if (parsed.length > 0 && typeof parsed[0] === "string") {
-        return parsed.map((s: string) => ({ label: s, region: "", place: s }));
-      }
-
-      // Already in object shape?
-      return parsed.map((p: any) => ({
-        label: typeof p.label === "string" ? p.label : String(p),
-        region: typeof p.region === "string" ? p.region : "",
-        place: typeof p.place === "string" ? p.place : (p.label ?? ""),
-      }));
-    } catch {
-      return [];
-    }
-  });
-
-  // persist saved locations to localStorage whenever they change
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedLocations));
-    } catch {
-      // ignore storage errors
-    }
-  }, [savedLocations]);
-  const [tempSelectedLocation, setTempSelectedLocation] = useState<
-    string | null
-  >(null);
 
   // Mutation hook for posting ads
   const postAdMutation = usePostAd();
@@ -343,33 +317,9 @@ export default function PostAdForm() {
     setSelectedImage(null);
   }
 
-  function handleRegionSelect(opt: string) {
-    // When a place is chosen, immediately set the form's regionLocation
-    // by resolving its parent region from groupedLocations so validation
-    // won't fail if the user proceeds without explicitly saving the location.
-    let regionFound = "";
-    try {
-      for (const r of Object.keys(groupedLocations)) {
-        const places = (groupedLocations as Record<string, string[]>)[r] ?? [];
-        if (Array.isArray(places) && places.includes(opt)) {
-          regionFound = r;
-          break;
-        }
-      }
-    } catch {
-      regionFound = "";
-    }
+  // location selection handled by `useLocationSelection` (selectPlace / applySavedLocation)
 
-    const display = regionFound ? `${opt}, ${regionFound}` : opt;
-    const regionValue: Region = display.split(" - ")[0].trim() as Region;
-    const cityValue = display.split(" - ")[1].trim();
-    setLocationDetails({ region: regionValue, place: cityValue });
-    setRegionLocation(regionValue || null);
-    setTempSelectedLocation(opt);
-    setShowSaveLocationModal(true);
-  }
-
-  const [LocationDetails, setLocationDetails] = useState<{ region: string; place: string } | null>(null);
+  // The canonical `locationDetails` is provided by the `useLocationSelection` hook
 
 
   async function handleSave(e?: React.FormEvent) {
@@ -380,7 +330,7 @@ export default function PostAdForm() {
     const errors: string[] = [];
     if (!title.trim()) errors.push("Title is required.");
     if (!categoryId) errors.push("Category is required.");
-    if (regionLocation == null)
+    if (!locationDetails || !locationDetails.place)
       errors.push("Please choose a location.");
     // If duration is not chosen, we'll send a backend-friendly default later.
 
@@ -434,10 +384,7 @@ export default function PostAdForm() {
           value: price !== "" ? Number(price) : 0,
         },
       },
-      location: {
-        region: LocationDetails?.region as Region || null,
-        name: LocationDetails?.place || "",
-      } as LocationPayload,
+      location: locationDetails ? { region: (locationDetails.region as Region) || null, name: locationDetails.place } as LocationPayload : null,
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
@@ -477,7 +424,7 @@ export default function PostAdForm() {
       return;
     }
 
-    console.log("Location Details:", LocationDetails);
+    console.log("Location Details:", locationDetails);
     console.log("Ad Metadata to submit:", metadata);
 
     try {
@@ -556,7 +503,7 @@ export default function PostAdForm() {
     setSubcategoryId("");
     setPurpose("Sale");
     setPrice("");
-    setRegionLocation("Ad Area Location");
+    resetLocationSelection();
     setUploadedImages([]);
     setKeyFeatures(["", ""]);
     setShowSuccess(false);
@@ -663,12 +610,11 @@ export default function PostAdForm() {
             <div>
               <div>
                 <DropdownPopup
-                  triggerLabel={regionLocation || "Ad Area Location"}
+                  triggerLabel={regionLabel ?? "Ad Area Location"}
                   options={groupedLocations}
-                  onSelect={(opt) => handleRegionSelect(opt)}
+                  onSelect={(opt) => selectPlace(opt)}
                   supportsSubmenu
                   title={locationsLoading ? "Loading locations..." : "Select Region / Place"}
-                  setLocation={setRegionLocation}
                 />
               </div>
 
@@ -678,10 +624,7 @@ export default function PostAdForm() {
                     key={`${loc.label}|${loc.place}`}
                     type="button"
                     className="p-1 bg-gray-100 rounded-xs text-[8px] hover:bg-gray-200"
-                    onClick={() => {
-                      const display = loc.place + (loc.region ? `, ${loc.region}` : "");
-                      setRegionLocation(display);
-                    }}
+                    onClick={() => applySavedLocation(loc)}
                   >
                     {loc.label}
                   </button>
@@ -937,7 +880,7 @@ export default function PostAdForm() {
                 </div>
               </div>
             )}
-            {showSaveLocationModal && (
+            {showSaveModal && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                 <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
                   <h2 className="text-lg font-semibold text-[var(--dark-def)] mb-2">
@@ -959,7 +902,7 @@ export default function PostAdForm() {
                       />
                     </svg>
                     &#160;
-                    <span>{tempSelectedLocation}</span>
+                    <span>{regionLabel}</span>
                   </p>
 
                   <input
@@ -973,39 +916,12 @@ export default function PostAdForm() {
                   <div className="flex gap-3 w-full">
                     <button
                       onClick={() => {
-                        if (tempSelectedLocation) {
-                          // find region for the chosen place (if available)
-                          let regionFound = "";
-                          try {
-                            for (const r of Object.keys(groupedLocations)) {
-                              const places = groupedLocations[r] ?? [];
-                              if (places.includes(tempSelectedLocation)) {
-                                regionFound = r;
-                                break;
-                              }
-                            }
-                          } catch {
-                            regionFound = "";
-                          }
-
-                          setRegionLocation(LocationDetails?.region);
-
-                          // determine label to save: prefer a provided name, otherwise the chosen place
-                          const label = newLocationName.trim() !== "" ? newLocationName.trim() : tempSelectedLocation;
-
-                          // only add if not already present (same place + region)
-                          setSavedLocations((prev) => {
-                            if (prev.some((p) => p.place === tempSelectedLocation && p.region === regionFound)) return prev;
-                            const next = [...prev, { label, region: LocationDetails?.region , place: LocationDetails?.place || tempSelectedLocation }];
-                            return next;
-                          });
-
+                        const ok = saveCurrentLocation();
+                        if (ok) {
                           toast.success("Saved location locally");
+                        } else {
+                          toast.error("Could not save location");
                         }
-
-                        setNewLocationName("");
-                        setTempSelectedLocation(null);
-                        setShowSaveLocationModal(false);
                       }}
                       className="w-full py-3 rounded-xl bg-[var(--dark-def)] text-white hover:bg-[var(--div-active)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] active:scale-98 transition"
                       type="button"
@@ -1016,7 +932,6 @@ export default function PostAdForm() {
                     <button
                       onClick={() => {
                         setNewLocationName("");
-                        setTempSelectedLocation(null);
                         setShowSaveLocationModal(false);
                       }}
                       className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
