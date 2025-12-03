@@ -67,7 +67,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
       <p
         className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}
       >
-        {isLoading ? "..." : `${(rd?.count || rd?.count === 0) ? rd?.count : count} Review ${(rd?.count && rd?.count > 1) || count > 1 ? "s" : ""}`}
+        {isLoading ? "..." : `${(rd?.count || rd?.count === 0) ? rd?.count : count} Review${(rd?.count && rd?.count > 1) || count > 1 ? "s" : ""}`}
       </p>
     </div>
   );

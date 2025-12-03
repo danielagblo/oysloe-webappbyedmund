@@ -262,7 +262,7 @@ export default function PostAdForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<string>("");
+  const [regionLocation, setRegionLocation] = useState<string | null>("");
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
 
   const [isSubmitting, setIsSubmitting] = useState(false);

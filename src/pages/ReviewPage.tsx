@@ -168,7 +168,7 @@ const ReviewPage = () => {
                 <div className="flex items-center gap-3 justify-between">
                   <div className="flex items-center gap-3">
                     <img
-                      src={rev.user?.avatar || "/face.svg"}
+                      src={rev.user?.avatar || "/userPfp2.jpg"}
                       alt=""
                       className="w-10 h-10 rounded-lg"
                     />
@@ -307,7 +307,7 @@ const ReviewPage = () => {
             <div key={rev.id} className="pb-4 border-b border-gray-100">
               <div className="flex items-center gap-3 justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={rev.user?.avatar || "/face.svg"} alt="" className="w-8 h-8 rounded-lg" />
+                  <img src={rev.user?.avatar || "/userPfp2.jpg"} alt="" className="w-8 h-8 rounded-lg" />
                   <div className="flex flex-col">
                     <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
                     <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
