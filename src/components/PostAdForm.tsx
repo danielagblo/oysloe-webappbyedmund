@@ -11,7 +11,6 @@ import { getProductFeatures } from "../services/productFeatureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
 import DropdownPopup from "./DropDownPopup";
-import LocationSelector from "./LocationSelector";
 
 // (mock toggle not used here; kept in file earlier) 
 
@@ -33,15 +32,9 @@ export default function PostAdForm() {
   const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
-
+  const [duration, setDuration] = useState<string | null>("Duration (days)");
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const [dailyValue, setDailyValue] = useState<number | "">("");
-  const [dailyDuration, setDailyDuration] = useState("Duration");
-  const [weeklyValue, setWeeklyValue] = useState<number | "">("");
-  const [weeklyDuration, setWeeklyDuration] = useState("Duration");
-  const [monthlyValue, setMonthlyValue] = useState<number | "">("");
-  const [monthlyDuration, setMonthlyDuration] = useState("Duration");
   const [price, setPrice] = useState<number | "">("");
   const [keyFeatures, setKeyFeatures] = useState<string[]>(["", ""]);
   // attachedFeatures: list of selections where user picks an existing feature and provides a value
@@ -188,12 +181,8 @@ export default function PostAdForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<string | null>(null);
+  const [regionLocation, setRegionLocation] = useState<string>("");
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
-  const [mapSelection, setMapSelection] = useState<{
-    coords: { lat: number; lng: number };
-    placeName: string;
-  } | null>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const gridRef = useRef<HTMLDivElement | null>(null);
@@ -283,21 +272,28 @@ export default function PostAdForm() {
   }
 
   function handleRegionSelect(opt: string) {
+    // When a place is chosen, immediately set the form's regionLocation
+    // by resolving its parent region from groupedLocations so validation
+    // won't fail if the user proceeds without explicitly saving the location.
+    let regionFound = "";
+    try {
+      for (const r of Object.keys(groupedLocations)) {
+        const places = (groupedLocations as Record<string, string[]>)[r] ?? [];
+        if (Array.isArray(places) && places.includes(opt)) {
+          regionFound = r;
+          break;
+        }
+      }
+    } catch {
+      regionFound = "";
+    }
+
+    const display = regionFound ? `${opt}, ${regionFound}` : opt;
+    setRegionLocation(display);
     setTempSelectedLocation(opt);
     setShowSaveLocationModal(true);
   }
 
-  function handleMapConfirm(
-    selection: {
-      coords: { lat: number; lng: number };
-      placeName: string;
-    } | null,
-  ) {
-    setMapSelection(selection);
-    if (selection) {
-      setRegionLocation(null);
-    }
-  }
 
   async function handleSave(e?: React.FormEvent) {
     if (e) e.preventDefault();
@@ -307,8 +303,8 @@ export default function PostAdForm() {
     const errors: string[] = [];
     if (!title.trim()) errors.push("Title is required.");
     if (!categoryId) errors.push("Category is required.");
-    if ((mapSelection || regionLocation) == null)
-      errors.push("Please choose a location (map or region).");
+    if (regionLocation == null)
+      errors.push("Please choose a location.");
 
     if (errors.length > 0) {
       console.warn("Validation errors:", errors);
@@ -317,21 +313,6 @@ export default function PostAdForm() {
       return;
     }
 
-    // Build pricing object and apply `price` as a fallback if no specific
-    // daily/weekly/monthly values were provided by the user.
-    const pricingObj = {
-      daily: { value: dailyValue || null, duration: dailyDuration },
-      weekly: { value: weeklyValue || null, duration: weeklyDuration },
-      monthly: { value: monthlyValue || null, duration: monthlyDuration },
-    } as {
-      daily: { value: number | null; duration: string };
-      weekly: { value: number | null; duration: string };
-      monthly: { value: number | null; duration: string };
-    };
-
-    if (!pricingObj.daily.value && !pricingObj.weekly.value && !pricingObj.monthly.value && price !== "") {
-      pricingObj.daily.value = price as number;
-    }
 
     // merge explicit feature values from both the fetched definitions map
     // and the user-attached selections into a single array for the API
@@ -353,18 +334,8 @@ export default function PostAdForm() {
       // backend expects category PK (number) but AdMetadata.category is a string type; cast to string
       category: String(categoryId ?? ""),
       purpose,
-      pricing: {
-        daily: { value: pricingObj.daily.value ?? null, duration: pricingObj.daily.duration },
-        weekly: { value: pricingObj.weekly.value ?? null, duration: pricingObj.weekly.duration },
-        monthly: { value: pricingObj.monthly.value ?? null, duration: pricingObj.monthly.duration },
-      },
-      location: mapSelection
-        ? {
-          type: "map",
-          placeName: mapSelection.placeName,
-          coords: mapSelection.coords,
-        }
-        : { type: "region", value: regionLocation },
+      duration,
+      location: regionLocation,
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
@@ -420,11 +391,6 @@ export default function PostAdForm() {
     }
   }
 
-  function handleSelect(trigger: string, value: string) {
-    if (trigger === "daily") setDailyDuration(value);
-    if (trigger === "weekly") setWeeklyDuration(value);
-    if (trigger === "monthly") setMonthlyDuration(value);
-  }
 
   const reorder = (
     list: UploadedImage[],
@@ -444,13 +410,6 @@ export default function PostAdForm() {
     setSubcategoryId("");
     setPurpose("Sale");
     setPrice("");
-    setDailyValue("");
-    setWeeklyValue("");
-    setMonthlyValue("");
-    setDailyDuration("Duration");
-    setWeeklyDuration("Duration");
-    setMonthlyDuration("Duration");
-    setMapSelection(null);
     setRegionLocation("Ad Area Location");
     setUploadedImages([]);
     setKeyFeatures(["", ""]);
@@ -555,83 +514,6 @@ export default function PostAdForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
-              {[
-                {
-                  name: "Daily",
-                  trigger: "daily",
-                  value: dailyValue,
-                  setValue: setDailyValue,
-                  duration: dailyDuration,
-                },
-                {
-                  name: "Weekly",
-                  trigger: "weekly",
-                  value: weeklyValue,
-                  setValue: setWeeklyValue,
-                  duration: weeklyDuration,
-                },
-                {
-                  name: "Monthly",
-                  trigger: "monthly",
-                  value: monthlyValue,
-                  setValue: setMonthlyValue,
-                  duration: monthlyDuration,
-                },
-              ].map((label) => (
-                <div key={label.trigger}>
-                  <p className="mb-1 font-medium">{label.name}</p>
-                  <div
-                    className="relative grid gap-2"
-                    style={{ gridTemplateColumns: "2fr 1fr" }}
-                  >
-                    <input
-                      value={label.value}
-                      onChange={(e) =>
-                        label.setValue(
-                          e.target.value === "" ? "" : Number(e.target.value),
-                        )
-                      }
-                      type="number"
-                      placeholder="0"
-                      className="w-full border rounded-xl border-[var(--div-border)] p-3 pl-7"
-                    />
-                    <p className="absolute inline top-3.25 left-3">₵</p>
-                    <DropdownPopup
-                      truncate
-                      triggerLabel={label.duration}
-                      options={
-                        label.trigger === "daily"
-                          ? [
-                            "30 days - 1 month",
-                            "60 days - 2 months",
-                            "90 days - 3 months",
-                          ]
-                          : label.trigger === "weekly"
-                            ? [
-                              "8 weeks - 2 months",
-                              "12 weeks - 3 months",
-                              "16 weeks - 4 months",
-                              "20 weeks - 5 months",
-                            ]
-                            : [
-                              "4 months",
-                              "5 months",
-                              "6 months",
-                              "7 months",
-                              "8 months",
-                              "9 months",
-                              "10 months",
-                              "12 months",
-                            ]
-                      }
-                      onSelect={(opt) => handleSelect(label.trigger, opt)}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <div>
               <div>
                 <DropdownPopup
@@ -640,6 +522,7 @@ export default function PostAdForm() {
                   onSelect={(opt) => handleRegionSelect(opt)}
                   supportsSubmenu
                   title={locationsLoading ? "Loading locations..." : "Select Region / Place"}
+                  setLocation={setRegionLocation}
                 />
               </div>
 
@@ -687,15 +570,6 @@ export default function PostAdForm() {
                 </svg>
                 &nbsp; This is required only for verification and safety purpose
               </p>
-            </div>
-
-            <div>
-              <LocationSelector
-                onConfirm={handleMapConfirm}
-                selectedLocation={mapSelection}
-              />
-              <div className="flex flex-wrap gap-2 lg:gap-1 my-1 font-bold">
-              </div>
             </div>
 
             <div>

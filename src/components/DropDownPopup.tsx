@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -7,6 +7,7 @@ interface DropdownPopupProps {
   supportsSubmenu?: boolean;
   title?: string;
   truncate?: boolean;
+  setLocation?: Dispatch<SetStateAction<string | null>>;
 }
 
 export default function DropdownPopup({
@@ -38,11 +39,21 @@ export default function DropdownPopup({
         onSelect(mainOption);
         setFinalLabel(mainOption);
         setOpen(false);
+        try {
+          setLocation?.(mainOption);
+        } catch {
+          // ignore
+        }
       }
     } else {
       onSelect(mainOption);
       setFinalLabel(mainOption);
       setOpen(false);
+      try {
+        setLocation?.(mainOption);
+      } catch {
+        // ignore
+      }
     }
   };
 
@@ -52,6 +63,11 @@ export default function DropdownPopup({
     setFinalLabel(combined);
     setSubmenuOpen(false);
     setOpen(false);
+    try {
+      setLocation?.(combined);
+    } catch {
+      // ignore
+    }
   };
 
   return (
@@ -118,8 +134,8 @@ export default function DropdownPopup({
                       key={i}
                       onClick={() => handleMainSelect(opt)}
                       className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== options.length - 1
-                          ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                          : ""
+                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                        : ""
                         }`}
                     >
                       {opt}
@@ -130,8 +146,8 @@ export default function DropdownPopup({
                       key={i}
                       onClick={() => handleMainSelect(main)}
                       className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== Object.keys(options).length - 1
-                          ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                          : ""
+                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                        : ""
                         }`}
                     >
                       {main}
@@ -189,8 +205,8 @@ export default function DropdownPopup({
                     key={i}
                     onClick={() => handleSubSelect(opt)}
                     className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== submenuOptions.length - 1
-                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                        : ""
+                      ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                      : ""
                       }`}
                   >
                     {opt}

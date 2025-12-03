@@ -51,6 +51,12 @@ const AdsDetailsPage = () => {
   const handleToggleFavourite = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || null;
     if (!pid) return;
+    // prevent duplicate rapid clicks while a mutation is in-flight
+    if (toggleFavourite.status === "pending") {
+      console.debug("handleToggleFavourite: mutation already in-flight", { pid });
+      return;
+    }
+    console.debug("handleToggleFavourite: toggling", { pid, at: Date.now() });
     setIsFavourited((s) => !s);
     toggleFavourite.mutate(pid);
   };
@@ -150,6 +156,40 @@ const AdsDetailsPage = () => {
 
   const touchStartX = useRef<number | null>(null);
 
+  // Gallery state: keep hooks above any early returns so they're
+  // invoked unconditionally on every render.
+  const [galleryIndex, setGalleryIndex] = useState<number>(0);
+  useEffect(() => {
+    // reset index when route/ad (id) changes
+    setGalleryIndex(0);
+  }, [id]);
+
+  // Modal state for picture viewer
+  const [isPictureModalOpen, setIsPictureModalOpen] = useState<boolean>(false);
+  const [pictureModalIndex, setPictureModalIndex] = useState<number>(0);
+  // when modal closes, sync page gallery index
+  useEffect(() => {
+    if (!isPictureModalOpen) {
+      setGalleryIndex(pictureModalIndex);
+    }
+  }, [isPictureModalOpen, pictureModalIndex]);
+
+  // Keyboard handling for modal (registered unconditionally; only active when open)
+  useEffect(() => {
+    if (!isPictureModalOpen) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") setIsPictureModalOpen(false);
+      if (ev.key === "ArrowLeft") setPictureModalIndex((i) => Math.max(0, i - 1));
+      if (ev.key === "ArrowRight") setPictureModalIndex((i) => i + 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isPictureModalOpen]);
+
+  // derived image list and count (safe, uses currentAdData later)
+  // we'll compute the concrete array after currentAdData is available
+
+
   if (!id || numericId === null)
     return (
       <p className="h-screen w-screen m-0 flex items-center justify-center">
@@ -174,6 +214,20 @@ const AdsDetailsPage = () => {
   const totalAds = ads.length;
   const currentAdData =
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
+
+  // derive a simple list of image URLs for the gallery. Backend may
+  // provide `images` as array of objects or a single `image` string.
+  const pageImages: string[] = (() => {
+    const imgs = (currentAdData as any)?.images;
+    if (Array.isArray(imgs) && imgs.length > 0) {
+      return imgs.map((it: any) => (typeof it === "string" ? it : it?.image || it?.url || "/no-image.jpeg"));
+    }
+    if ((currentAdData as any)?.image) return [(currentAdData as any).image];
+    return [];
+  })();
+
+  const imageCount = pageImages.length;
+
 
   // derive owner contact numbers (prefer canonical fields)
   const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner);
@@ -297,7 +351,7 @@ const AdsDetailsPage = () => {
         <span className="text-sm">Back</span>
       </button>
       <h2 className="text-sm font-medium some-gray] rounded-2xl py-1 px-2">
-        {currentId}/{totalAds}
+        {imageCount > 0 ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}` : `0/0`}
       </h2>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
@@ -323,6 +377,7 @@ const AdsDetailsPage = () => {
           {currentAdData?.location?.name || "Unknown"}
         </h2>
       </div>
+
       <div className="flex items-center gap-2">
         <img
           src="/star.svg"
@@ -355,6 +410,12 @@ const AdsDetailsPage = () => {
         />
         <h2 className="text-base md:text-[1.125vw]">{favouriteCount}</h2>
       </div>
+      {/* Image count (desktop) - mirrors mobile header */}
+      <div className="flex items-center gap-2">
+        <h2 className="text-sm font-medium">
+          {imageCount > 0 ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}` : `0/0`}
+        </h2>
+      </div>
       <div className="flex gap-2 ml-auto">
         <button
           onClick={handlePrevious}
@@ -380,99 +441,91 @@ const AdsDetailsPage = () => {
     </div>
   );
 
-  const ImageGallery = () => {
-    const images = currentAdDataFromQuery?.images ?? [];
-    const coverImage = currentAdDataFromQuery?.image ?? null;
-
-    const galleryImages =
-      images.length > 0 ? images.map((i) => i.image) : coverImage ? [coverImage] : ["/public/no-image.jpeg"];
-
-    const [currentIndex, setCurrentIndex] = useState(0);
-
+  const ImageGallery = ({
+    images,
+    currentIndex,
+    setCurrentIndex,
+  }: {
+    images: string[];
+    currentIndex: number;
+    setCurrentIndex: (n: number) => void;
+  }) => {
+    const galleryImages = images.length > 0 ? images : ["/no-image.jpeg"];
     const max = galleryImages.length;
 
     const prevImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
       if (currentIndex === 0) return;
-      setCurrentIndex((i) => i - 1);
+      setCurrentIndex(Math.max(0, currentIndex - 1));
     };
 
     const nextImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex === max - 1) return;
-      setCurrentIndex((i) => i + 1);
+      if (currentIndex >= max - 1) return;
+      setCurrentIndex(Math.min(max - 1, currentIndex + 1));
     };
 
-    const getMainImage = () => galleryImages[currentIndex];
-
-    let imageID = 0;
-    const getImageSrc = () => {
-      if (
-        currentAdDataFromQuery?.images.length === 0 &&
-        currentAdDataFromQuery?.image
-      )
-        return currentAdDataFromQuery?.image;
-      //if there are no images, but there is an image (the cover), use the cover
-      if (
-        currentAdDataFromQuery?.images.length === 0 &&
-        !currentAdDataFromQuery?.image
-      )
-        return "/no-image.jpeg"; //if there are no images, and there is no image (cover), use this placeholder
-
-      const id = imageID;
-      imageID = (imageID + 1) % max;
-      return currentAdDataFromQuery?.images[id].image;
-    };
+    const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
 
 
     return (
       <div className="w-full flex justify-center my-4 sm:mb-8">
 
-        {/* DESKTOP */}
-        <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 lg:h-80 gap-1">
-          <div className="flex w-full relative">
+        {/* DESKTOP: main image left, thumbnails right */}
+        <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 md:h-80 lg:h-100 gap-4 items-stretch">
+          <div className="flex-1 relative bg-white rounded-lg overflow-hidden flex items-center justify-center">
             {max > 1 && currentIndex > 0 && (
               <button
                 onClick={prevImage}
-                className="absolute left-1 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2"
+                className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+                aria-label="Previous image"
               >
-                <img src="/arrowleft.svg" alt="&#9664;" />
+                <img src="/arrowleft.svg" alt="Previous" />
               </button>
             )}
-
             <img
               src={getMainImage()}
-              alt=""
-              className="object-cover h-auto w-full sm:h-full sm:w-full rounded-lg"
+              alt={`Ad image ${currentIndex + 1}`}
+              className="object-cover h-full w-full cursor-zoom-in"
+              onClick={() => {
+                setPictureModalIndex(currentIndex);
+                setIsPictureModalOpen(true);
+              }}
+
             />
+
             {max > 1 && currentIndex < max - 1 && (
               <button
                 onClick={nextImage}
-                className="absolute right-1 bg-white rounded-full top-1/2 -translate-y-1/2 z-20 px-2 py-2"
+                className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+                aria-label="Next image"
               >
-                <img src="/arrowright.svg" alt="&#9654;" />
+                <img src="/arrowright.svg" alt="Next" />
               </button>
             )}
           </div>
 
-          <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] w-0 h-0 sm:w-8/10">
-            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-          </div>
-
-          <div className="flex flex-row flex-wrap gap-1 sm:h-[49.3%] sm:w-8/10">
-            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
-            <img src={getImageSrc()} alt="" className="object-cover sm:h-full sm:w-full sm:block hidden rounded-lg" />
+          <div className="w-20 flex flex-col gap-2 overflow-y-auto">
+            {galleryImages.map((src, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-full h-20 rounded overflow-hidden border ${idx === currentIndex ? "border-(--dark-def)" : "border-gray-200"}`}
+                aria-label={`Show image ${idx + 1}`}
+              >
+                <img src={src} alt={`Thumbnail ${idx + 1}`} className="object-cover w-full h-full" />
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* MOBILE */}
+        {/* MOBILE: full-width swipeable image */}
         <div
           className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <img src={getMainImage()} alt="Ad main" className="object-cover w-full h-full" />
+          <img src={getMainImage()} alt="Ad main" className="object-cover w-full h-full cursor-zoom-in" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
           <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
           <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
         </div>
@@ -480,6 +533,85 @@ const AdsDetailsPage = () => {
     );
   };
 
+
+  const PictureModal = () => {
+    if (!isPictureModalOpen) return null;
+    const imgs = pageImages.length > 0 ? pageImages : ["/no-image.jpeg"];
+    const max = imgs.length;
+
+    const prev = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setPictureModalIndex((i) => Math.max(0, i - 1));
+    };
+    const next = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setPictureModalIndex((i) => Math.min(max - 1, i + 1));
+    };
+
+    const close = () => {
+      setIsPictureModalOpen(false);
+      setGalleryIndex(pictureModalIndex);
+    };
+
+    // keyboard handling is registered at top-level useEffect when modal is open
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={close}>
+        <div
+          className="relative max-w-4xl w-[95%] sm:w-[80%] bg-transparent p-4 max-h-[90vh] overflow-auto flex flex-col items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1"
+            onClick={close}
+            aria-label="Close"
+          >
+            ✕
+          </button>
+
+          {max > 1 && (
+            <button
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
+              onClick={prev}
+              aria-label="Previous"
+            >
+              <img src="/arrowleft.svg" alt="Prev" />
+            </button>
+          )}
+
+          <div className="flex items-center justify-center w-full">
+            <img
+              src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
+              alt={`Modal image ${pictureModalIndex + 1}`}
+              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded"
+            />
+          </div>
+
+          {max > 1 && (
+            <button
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
+              onClick={next}
+              aria-label="Next"
+            >
+              <img src="/arrowright.svg" alt="Next" />
+            </button>
+          )}
+
+          <div className="mt-4 flex gap-2 overflow-x-auto py-2 rounded justify-center items-center">
+            {imgs.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => setPictureModalIndex(i)}
+                className={`shrink-0 w-20 h-20 overflow-hidden rounded ${i === pictureModalIndex ? "ring-2 ring-white" : ""}`}
+              >
+                <img src={s} alt={`thumb ${i + 1}`} className="object-cover w-full h-full" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const TitleAndPrice = () => (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
@@ -561,6 +693,7 @@ const AdsDetailsPage = () => {
     showCaller2: showC2,
     toggleCaller1,
     toggleCaller2,
+    favouritePending = false,
   }: {
     onMarkTaken?: () => void;
     onReportAd?: () => void;
@@ -575,6 +708,7 @@ const AdsDetailsPage = () => {
     showCaller2?: boolean;
     toggleCaller1?: () => void;
     toggleCaller2?: () => void;
+    favouritePending?: boolean;
   }) => {
     const isTaken = Boolean((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken);
     const [showOffer, setShowOffer] = useState(false);
@@ -627,8 +761,11 @@ const AdsDetailsPage = () => {
                       return;
                     }
                     // otherwise perform action
+                    // disable Favorites button when mutation is pending
+                    if (label === "Favorites" && favouritePending) return;
                     actions[label]();
                   }}
+                  disabled={label === "Favorites" && favouritePending}
                 >
                   {/* favourite button shows toggled state */}
                   {label === "Favorites" ? (
@@ -664,7 +801,7 @@ const AdsDetailsPage = () => {
 
                 {/* caller tooltip */}
                 {label === "Caller 1" && (showC1 && caller1) && (
-                  <div className="absolute z-50 mt-2 p-2 bg-white rounded-2xl shadow-md text-sm w-48 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                  <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-8">
                       <div className="text-xs font-semibold flex items-center gap-2">
                         <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
@@ -684,7 +821,7 @@ const AdsDetailsPage = () => {
 
                 {/* Make Offer modal */}
                 {label === "Make Offer" && showOffer && (
-                  <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-68 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                  <div className="absolute z-50 mt-2 p-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-54 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-96">
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-xs font-semibold">
                         <img src="/Make an offer.svg" alt="" className="w-4 h-auto" />
@@ -737,7 +874,7 @@ const AdsDetailsPage = () => {
                 )}
 
                 {label === "Caller 2" && (showC2 && caller2) && (
-                  <div className="absolute z-50 mt-2 p-2 bg-white border rounded-2xl shadow-md text-sm w-48 left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0">
+                  <div className="absolute z-50 mt-2 p-3 bg-white border rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-3">
                       <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
                       <span className="text-[9px]">Caller 2</span>
@@ -1067,7 +1204,8 @@ const AdsDetailsPage = () => {
 
         <div className="w-full md:p-6">
           <DesktopHeader />
-          <ImageGallery />
+          <ImageGallery images={pageImages} currentIndex={galleryIndex} setCurrentIndex={setGalleryIndex} />
+          <PictureModal />
           <TitleAndPrice />
 
           {/* MAIN CONTENT */}
@@ -1090,6 +1228,7 @@ const AdsDetailsPage = () => {
                     onFavorite={handleToggleFavourite}
                     onReportAd={handleReportAd}
                     isFavourited={isFavourited}
+                    favouritePending={toggleFavourite.status === "pending"}
                     caller1={callerNumber1}
                     caller2={callerNumber2}
                     showCaller1={showCaller1}
@@ -1127,6 +1266,7 @@ const AdsDetailsPage = () => {
                       onFavorite={handleToggleFavourite}
                       onReportAd={handleReportAd}
                       isFavourited={isFavourited}
+                      favouritePending={toggleFavourite.status === "pending"}
                       caller1={callerNumber1}
                       caller2={callerNumber2}
                       showCaller1={showCaller1}

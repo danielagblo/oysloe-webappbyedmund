@@ -28,7 +28,7 @@ export interface Product {
   is_taken: boolean;
   description?: string;
   price: string | number;
-  duration?: string;
+  duration?: string | null;
   category: number;
 }
 
@@ -41,6 +41,6 @@ export type ProductPayload = {
   is_taken?: boolean;
   description?: string;
   price: string | number;
-  duration?: string;
+  duration?: string | null;
   category: number;
 };
