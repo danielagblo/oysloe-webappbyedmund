@@ -92,52 +92,82 @@ export default function PostAdForm() {
                 .then((res) => ({ fid: f.id, res }))
                 .catch(() => ({ fid: f.id, res: null })),
             );
+            console.log("Fetching possible feature values for features:", perFeaturePromises);
             const perFeatureResults = await Promise.all(perFeaturePromises);
-            const normalizeResToValues = (res: unknown, fid: number): string[] => {
-              if (!res) return [];
-              // Case A: server returns a mapping { featureId: ["a","b"] }
+            console.log("Fetched possible feature values results:", perFeatureResults);
+            const normalizeResToValues = (raw: unknown, fid: number): string[] => {
+              // Defensive normalizer: handle axios-like wrappers, mappings, arrays,
+              // and entries with `value`/`name` fields. Always returns a sorted,
+              // de-duplicated array of trimmed strings.
+              if (!raw) return [];
+
+              let res: any = raw as any;
+
+              // Unwrap common wrappers (axios response, paginated results)
+              if (res && typeof res === "object") {
+                if ("data" in res) res = (res as any).data;
+                else if ("results" in res) res = (res as any).results;
+              }
+
+              const normalizeArrayToStrings = (arr: any[]): string[] => {
+                const out: string[] = arr
+                  .map((it) => {
+                    if (it == null) return null;
+                    if (typeof it === "string") return String(it).trim();
+                    if (typeof it.value === "string") return String(it.value).trim();
+                    if (typeof it.name === "string") return String(it.name).trim();
+                    // sometimes values are objects like { value: 'x' } inside arrays
+                    return null;
+                  })
+                  .filter(Boolean) as string[];
+                return Array.from(new Set(out)).sort((a, b) => a.localeCompare(b));
+              };
+
+              // Case: object mapping by feature id -> array
               if (typeof res === "object" && !Array.isArray(res)) {
-                const map = res as Record<string, unknown>;
+                const map = res as Record<string, any>;
                 const byKey = map[String(fid)];
-                if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
-                // maybe res is a single feature object with `id` and `values`
-                if (typeof (res as any).id !== "undefined") {
-                  const vals = (res as any).values ?? [];
-                  if (Array.isArray(vals)) {
-                    return vals
-                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                      .filter(Boolean) as string[];
-                  }
+                if (Array.isArray(byKey)) return normalizeArrayToStrings(byKey);
+
+                // maybe res is a single feature object with `id` and `values`/`values_list`
+                if (typeof map.id !== "undefined") {
+                  const vals = map.values ?? map.values_list ?? map.options ?? [];
+                  if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
                 }
               }
 
-              // Case B: server returned an array — could be strings, feature objects, or product-feature entries
+              // Case: array
               if (Array.isArray(res)) {
                 if (res.length === 0) return [];
                 // array of strings
-                if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
-                // array of objects: try to find a feature object with matching id
+                if (typeof res[0] === "string") return normalizeArrayToStrings(res as string[]);
+
                 const arr = res as any[];
+
+                // array of feature objects where one item contains values for this fid
                 const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
                 if (featureObj) {
-                  const vals = featureObj.values ?? featureObj.values_list ?? [];
-                  if (Array.isArray(vals)) {
-                    return vals
-                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                      .filter(Boolean) as string[];
-                  }
+                  const vals = featureObj.values ?? featureObj.values_list ?? featureObj.options ?? [];
+                  if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
                 }
-                // fallback: maybe array of product-feature entries with `value` field
+
+                // fallback: entries with `value` or `name` fields
                 const valsFromEntries = arr
-                  .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
+                  .map((it) => {
+                    if (!it) return null;
+                    if (typeof it === "string") return String(it).trim();
+                    if (typeof it.value === "string") return String(it.value).trim();
+                    if (typeof it.name === "string") return String(it.name).trim();
+                    return null;
+                  })
                   .filter(Boolean) as string[];
-                if (valsFromEntries.length > 0) {
-                  return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-                }
+
+                if (valsFromEntries.length > 0) return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
               }
 
               return [];
             };
+            console.log("Normalizing possible feature values from responses", normalizeResToValues);
 
             // Debug: log raw responses and normalized values for troubleshooting
             try {
@@ -153,6 +183,10 @@ export default function PostAdForm() {
               console.warn("possible-feature-values: debug logging failed", e);
             }
             setPossibleFeatureValues(normalized);
+            // Log the normalized payload we just built (state updates are async,
+            // so logging `possibleFeatureValues` immediately here will show the
+            // previous value). Use this to inspect what will be stored.
+            console.debug("possibleFeatureValues set to (normalized):", normalized);
           } catch (e) {
             console.warn("Failed to fetch product feature values", e);
             setPossibleFeatureValues({});
@@ -183,6 +217,17 @@ export default function PostAdForm() {
     }
   }, [featureDefinitions]);
 
+  // DEV: log possibleFeatureValues when it actually changes (state updates are async)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      try {
+        console.debug("possibleFeatureValues updated:", possibleFeatureValues);
+      } catch (e) {
+        void e;
+      }
+    }
+  }, [possibleFeatureValues]);
+
   // Ensure possible values are fetched when an attached feature is selected
   useEffect(() => {
     let mounted = true;
@@ -201,45 +246,61 @@ export default function PostAdForm() {
         if (!mounted) return;
         const next = { ...possibleFeatureValues };
         results.forEach(({ fid, r }) => {
-          const normalizeResToValues = (res: unknown, fid: number): string[] => {
-            if (!res) return [];
-            if (typeof res === "object" && !Array.isArray(res)) {
-              const map = res as Record<string, unknown>;
+          const values = ((): string[] => {
+            // reuse the same normalizer logic as above but scoped here for clarity
+            if (!r) return [];
+            let raw = r as any;
+            if (raw && typeof raw === "object") {
+              if ("data" in raw) raw = raw.data;
+              else if ("results" in raw) raw = raw.results;
+            }
+
+            const normalizeArrayToStrings = (arr: any[]): string[] => {
+              const out: string[] = arr
+                .map((it) => {
+                  if (it == null) return null;
+                  if (typeof it === "string") return String(it).trim();
+                  if (typeof it.value === "string") return String(it.value).trim();
+                  if (typeof it.name === "string") return String(it.name).trim();
+                  return null;
+                })
+                .filter(Boolean) as string[];
+              return Array.from(new Set(out)).sort((a, b) => a.localeCompare(b));
+            };
+
+            if (typeof raw === "object" && !Array.isArray(raw)) {
+              const map = raw as Record<string, any>;
               const byKey = map[String(fid)];
-              if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
-              if (typeof (res as any).id !== "undefined") {
-                const vals = (res as any).values ?? [];
-                if (Array.isArray(vals)) {
-                  return vals
-                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                    .filter(Boolean) as string[];
-                }
+              if (Array.isArray(byKey)) return normalizeArrayToStrings(byKey);
+              if (typeof map.id !== "undefined") {
+                const vals = map.values ?? map.values_list ?? map.options ?? [];
+                if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
               }
             }
-            if (Array.isArray(res)) {
-              if (res.length === 0) return [];
-              if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
-              const arr = res as any[];
+
+            if (Array.isArray(raw)) {
+              if (raw.length === 0) return [];
+              if (typeof raw[0] === "string") return normalizeArrayToStrings(raw as string[]);
+              const arr = raw as any[];
               const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
               if (featureObj) {
-                const vals = featureObj.values ?? featureObj.values_list ?? [];
-                if (Array.isArray(vals)) {
-                  return vals
-                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                    .filter(Boolean) as string[];
-                }
+                const vals = featureObj.values ?? featureObj.values_list ?? featureObj.options ?? [];
+                if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
               }
               const valsFromEntries = arr
-                .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
+                .map((it) => {
+                  if (!it) return null;
+                  if (typeof it === "string") return String(it).trim();
+                  if (typeof it.value === "string") return String(it.value).trim();
+                  if (typeof it.name === "string") return String(it.name).trim();
+                  return null;
+                })
                 .filter(Boolean) as string[];
-              if (valsFromEntries.length > 0) {
-                return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-              }
+              if (valsFromEntries.length > 0) return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
             }
-            return [];
-          };
 
-          const values = normalizeResToValues(r, Number(fid));
+            return [];
+          })();
           if (values && values.length > 0) next[Number(fid)] = values;
         });
         // Debug: log attached-feature raw responses and normalization
@@ -667,7 +728,7 @@ export default function PostAdForm() {
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
                     <label className="block mb-1 font-medium">Features for selected subcategory</label>
-                    
+
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
