@@ -415,7 +415,7 @@ export default function PostAdForm() {
           value: price !== "" ? Number(price) : 0,
         },
       },
-      location: regionLocation || "Unknown" ?? "",
+      location: regionLocation || "",
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
