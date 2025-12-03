@@ -103,7 +103,7 @@ const AdsPage = () => {
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
                   className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
-                  src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/placeholder.png"}
+                  src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/no-image.jpeg"}
                   alt={ad.name}
                 />
                 <button
@@ -114,7 +114,9 @@ const AdsPage = () => {
                 </button>
               </div>
               <div className="mt-2">
-                <p className="font-medium">{ad.name}</p>
+                <div className="w-4/5">
+                  <p onClick={() => console.log(ad)} className="font-medium truncate">{ad.name}</p>
+                </div>
                 <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
               </div>
             </div>

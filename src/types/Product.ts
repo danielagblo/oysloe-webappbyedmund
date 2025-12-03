@@ -1,4 +1,4 @@
-import type { Location } from "./Location";
+import type { Location, LocationPayload } from "./Location";
 import type { ProductFeature } from "./ProductFeature";
 import type { ProductImage } from "./ProductImage";
 
@@ -34,11 +34,12 @@ export interface Product {
 }
 
 export type ProductPayload = {
-  pid: string;
+  pid?: string;
   name: string;
   image?: string;
   type: ProductType;
   status: ProductStatus;
+  location?: LocationPayload;
   is_taken?: boolean;
   description?: string;
   price: string | number;

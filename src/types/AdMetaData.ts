@@ -1,8 +1,10 @@
+import type { LocationPayload } from "./Location";
+
 export interface AdMetadata {
   title: string;
   category: string;
   purpose: string;
-  location: string;
+  location: LocationPayload;
   duration: string;
   pricing: {
     monthly: {

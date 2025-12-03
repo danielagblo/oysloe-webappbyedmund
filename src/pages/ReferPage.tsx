@@ -505,7 +505,7 @@ const ReferPage = () => {
 
       {(how || apply || redraw || showLevel) && (
         <div className="fixed inset-0 bg-white z-50 flex flex-col md:hidden animate-fadeIn">
-          <div className="flex items-center gap-3 p-4 border-b border-gray-200">
+          <div className="flex items-center gap-3 p-4 pl-16 pt-7 border-b border-gray-200">
             <button
               onClick={() => {
                 setHow(false);

@@ -58,12 +58,12 @@ const FavouritesPage = () => {
           ) : (
             favourites.map((ad, index) => (
               <div
-                key={(ad as any).id ?? index}
+                key={ad.id ?? index}
                 className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
               >
                 <div className="flex flex-row justify-between items-center mb-2">
                   <img
-                    className="bg-pink-200 h-20 w-auto rounded-lg object-cover"
+                    className="bg-gray-200 h-20 w-auto rounded-lg object-cover max-w-40 min-w-20"
                     src={(ad).image ?? "/no-image.jpeg"}
                     alt={(ad).name ?? "Favourite"}
                   />
@@ -75,8 +75,10 @@ const FavouritesPage = () => {
                   </p>
                 </div>
                 <div className="mt-2">
-                  <p className="font-medium">{(ad as any).name}</p>
-                  <p className="text-xs text-gray-600">{formatMoney((ad as any).price)}</p>
+                  <div className="w-4/5">
+                    <p className="font-medium truncate">{ad.name}</p>
+                  </div>
+                  <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
                 </div>
               </div>
             ))

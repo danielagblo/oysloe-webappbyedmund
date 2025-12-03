@@ -8,9 +8,9 @@ import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
-import { type AdMetadata } from "../types/AdMetaData";
-import DebuggerButton from "./DebuggerButton";
 import DropdownPopup from "./DropDownPopup";
+import type { Region } from "../types/Location";
+import type { ProductPayload } from "../types/Product";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -261,7 +261,7 @@ export default function PostAdForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<string | null>("");
+  const [regionLocation, setRegionLocation] = useState<Region | null>(null);
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -385,10 +385,15 @@ export default function PostAdForm() {
     }
 
     const display = regionFound ? `${opt}, ${regionFound}` : opt;
-    setRegionLocation(display);
+    const regionValue: Region = display.split(" - ")[0].trim() as Region;
+    const cityValue = display.split(" - ")[1].trim();
+    setLocationDetails({ region: regionValue, place: cityValue });
+    setRegionLocation(regionValue || null);
     setTempSelectedLocation(opt);
     setShowSaveLocationModal(true);
   }
+
+  const [LocationDetails, setLocationDetails] = useState<{ region: string; place: string } | null>(null);
 
 
   async function handleSave(e?: React.FormEvent) {
@@ -426,37 +431,53 @@ export default function PostAdForm() {
         : []),
     ];
 
-    const metadata: AdMetadata & { price?: number | "" } = {
-      title: title.trim(),
-      // backend expects category PK (number) but AdMetadata.category is a string type; cast to string
-      category: String(categoryId ?? ""),
-      purpose,
-      // If the user didn't pick a duration, send a safe default of "0"
-      duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
-      // Provide `pricing` shape so `createProductFromAd` can read duration/value
-      pricing: {
-        monthly: {
-          duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
-          value: price !== "" ? Number(price) : 0,
-        },
+    const metadata: ProductPayload & { price?: number | "" } = {
+      name: title.trim(),
+      image: uploadedImages[0]?.url || "",
+      type: purpose === "Sale" ? "SALE" : purpose === "Rent" ? "RENT" : "SERVICE",
+      status: "PENDING",
+      location: {
+        region: LocationDetails?.region as Region || null,
+        name: LocationDetails?.place || "Unknown",
       },
-      location: regionLocation || "Unknown",
-      images: uploadedImages.map((img) => ({
-        id: img.id,
-        url: img.url,
-        hasFile: !!img.file,
-        // include file object for upload handling (will be stripped/handled server-side)
-        file: img.file ?? null,
-      })),
-      createdAt: new Date().toISOString(),
-      ...(price !== "" ? { price } : {}),
-      ...(subcategoryId !== "" && subcategoryId != null ? { subcategory: String(subcategoryId) } : {}),
-      // include keyFeatures if user added any (filter out empty strings)
-      ...(keyFeatures && Array.isArray(keyFeatures) && keyFeatures.filter((k) => k.trim() !== "").length > 0
-        ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
-        : {}),
-      // include merged explicit feature values (from fetched defs and user attachments)
-      ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
+      price: price !== "" ? Number(price) : 0,
+      duration: null,
+      category: Number(categoryId ?? ""),
+
+
+
+      // name: title.trim(),
+      // category: Number(categoryId ?? ""),
+      // purpose,
+      // // If the user didn't pick a duration, send a safe default of "0"
+      // duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+      // // Provide `pricing` shape so `createProductFromAd` can read duration/value
+      // pricing: {
+      //   monthly: {
+      //     duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+      //     value: price !== "" ? Number(price) : 0,
+      //   },
+      // },
+      // location: {
+      //   region: LocationDetails?.region as Region || null,
+      //   name: LocationDetails?.place || "",
+      // },
+      // images: uploadedImages.map((img) => ({
+      //   id: img.id,
+      //   url: img.url,
+      //   hasFile: !!img.file,
+      //   // include file object for upload handling (will be stripped/handled server-side)
+      //   file: img.file ?? null,
+      // })),
+      // createdAt: new Date().toISOString(),
+      // ...(price !== "" ? { price } : {}),
+      // ...(subcategoryId !== "" && subcategoryId != null ? { subcategory: String(subcategoryId) } : {}),
+      // // include keyFeatures if user added any (filter out empty strings)
+      // ...(keyFeatures && Array.isArray(keyFeatures) && keyFeatures.filter((k) => k.trim() !== "").length > 0
+      //   ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
+      //   : {}),
+      // // include merged explicit feature values (from fetched defs and user attachments)
+      // ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
     };
 
     console.log("Ad metadata (JSON):", metadata);
@@ -479,6 +500,9 @@ export default function PostAdForm() {
       setIsSubmitting(false);
       return;
     }
+
+    console.log("Location Details:", LocationDetails);
+    console.log("Ad Metadata to submit:", metadata);
 
     try {
       // pass the metadata including file objects (mutation handler will detect files)

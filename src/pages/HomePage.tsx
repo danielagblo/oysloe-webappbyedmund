@@ -507,7 +507,7 @@ const HomePage = () => {
     }
 
     return (
-      <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 h-50">
+      <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 lg:h-50 h-25">
         <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2">
 
 
