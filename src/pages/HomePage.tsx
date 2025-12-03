@@ -598,7 +598,7 @@ const HomePage = () => {
                   ? <Loader className={"h-40 my-0"} />
                   : categoryProducts.map(
                     (ad) =>
-                      ad.status === "ACTIVE" && (
+                      (ad.status === "ACTIVE" && !ad.is_taken) && (
                         <Link
                           key={ad.id}
                           to={`/ads/${ad.id}`}
