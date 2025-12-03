@@ -15,6 +15,7 @@ import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import type { Product } from "../types/Product";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,7 +44,7 @@ const AdsDetailsPage = () => {
   const markTaken = useMarkProductAsTaken();
 
   useEffect(() => {
-    const favFromProduct = Boolean((currentAdDataFromQuery as any)?.favourited_by_user);
+    const favFromProduct = Boolean((currentAdDataFromQuery as Product)?.favourited_by_user);
     const favFromList = favourites.some((p) => p.id === (currentAdDataFromQuery)?.id);
     setIsFavourited(Boolean(favFromProduct || favFromList));
   }, [currentAdDataFromQuery, favourites]);

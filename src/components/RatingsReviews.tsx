@@ -1,6 +1,6 @@
 import React from "react";
 import useReviews, { useReviewsByOwner } from "../features/reviews/useReviews";
-import type { Review } from "../types/Review";
+import type { Review } from "../types/Review"
 
 interface RatingReviewsProps {
   layout?: "column" | "row"; // default: column
@@ -67,7 +67,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
       <p
         className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}
       >
-        {isLoading ? "..." : `${rd?.count || count} Reviews`}
+        {isLoading ? "..." : `${(rd?.count || rd?.count === 0) ? rd?.count : count} Reviews`}
       </p>
     </div>
   );
