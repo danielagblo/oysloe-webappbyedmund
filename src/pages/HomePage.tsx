@@ -568,7 +568,7 @@ const HomePage = () => {
             <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-(--dark-def)">
               {category.name}
             </h2>
-            <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+            <button className="bg-gray-200 hidden px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
               Show All
             </button>
             <div className="flex gap-2 ml-auto">
