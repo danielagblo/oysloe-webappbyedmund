@@ -1180,7 +1180,7 @@ const AdsDetailsPage = () => {
                 className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
               />
               <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                {ad.location?.name}
+                {ad.location?.name || "Unknown"}
               </p>
             </div>
             <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">

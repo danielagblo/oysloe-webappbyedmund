@@ -337,6 +337,28 @@ export default function PostAdForm() {
     setUploadedImages((prev) => [...prev, ...newImages]);
   }
 
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value;
+
+    if (v.includes("-")) return;
+
+    if (v === "") {
+      setPrice("")
+      return;
+    }
+
+    if (!/^[0-9.]*$/.test(v)) return;
+
+    if ((v.match(/\./g) || []).length > 1) return;
+
+    if (v.includes(".")) {
+      const [int, dec] = v.split(".");
+      if (dec.length > 2) return;
+    }
+
+    setPrice(v === "" ? "" : Number(v));
+  };
+
   function handleDeleteImage(id: number) {
     const img = uploadedImages.find((x) => x.id === id);
     if (img && img.url && img.file) {
@@ -573,10 +595,10 @@ export default function PostAdForm() {
                 <div className="relative">
                   <input
                     value={price}
-                    onChange={(e) => setPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                    onChange={(e) => handlePriceChange(e)}
                     type="number"
-                    placeholder="0"
-                    className="w-full border rounded-xl border-[var(--div-border)] p-3 pl-7"
+                    placeholder="0.00"
+                    className="w-full border rounded-xl border-(--div-border) p-3 pl-7"
                   />
                   <p className="absolute inline top-3.25 left-3">₵</p>
                 </div>
@@ -607,7 +629,7 @@ export default function PostAdForm() {
             <div>
               <div>
                 <DropdownPopup
-                  triggerLabel={regionLocation ?? "Ad Area Location"}
+                  triggerLabel={regionLocation || "Ad Area Location"}
                   options={groupedLocations}
                   onSelect={(opt) => handleRegionSelect(opt)}
                   supportsSubmenu
