@@ -55,18 +55,6 @@ export const updateProduct = async (
   id: number | string,
   body: ProductPayload,
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    mockProducts[idx] = {
-      ...mockProducts[idx],
-      ...body,
-      updated_at: new Date().toISOString(),
-    };
-    console.log("Mock updateProduct:", mockProducts[idx]);
-    return mockProducts[idx];
-  }
-
   return apiClient.put<Product>(products.update(id), body);
 };
 
@@ -77,18 +65,6 @@ export const patchProduct = async (
   id: number | string,
   body: Partial<ProductPayload>,
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    mockProducts[idx] = {
-      ...mockProducts[idx],
-      ...body,
-      updated_at: new Date().toISOString(),
-    };
-    console.log("Mock patchProduct:", mockProducts[idx]);
-    return mockProducts[idx];
-  }
-
   return apiClient.patch<Product>(products.patch(id), body);
 };
 

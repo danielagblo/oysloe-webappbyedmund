@@ -6,13 +6,13 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
-import useLocationSelection from "../hooks/useLocationSelection";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
+import useLocationSelection from "../hooks/useLocationSelection";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
-import DropdownPopup from "./DropDownPopup";
-import type { LocationPayload, Region } from "../types/Location";
 import type { AdMetadata } from "../types/AdMetaData";
+import type { LocationPayload, Region } from "../types/Location";
+import DropdownPopup from "./DropDownPopup";
 
 const isMobile = window.innerWidth < 1024;
 
@@ -247,12 +247,10 @@ export default function PostAdForm() {
     savedLocations,
     showSaveLocationModal: showSaveModal,
     newLocationName,
-    grouped,
     setNewLocationName,
     selectPlace,
     applySavedLocation,
     saveCurrentLocation,
-    removeSavedLocation,
     setShowSaveLocationModal,
     reset: resetLocationSelection,
   } = useLocationSelection(groupedLocations);
@@ -370,8 +368,6 @@ export default function PostAdForm() {
       // duration: null,
       // category: Number(categoryId ?? ""),
 
-
-
       title: title.trim(),
       category: String(categoryId ?? ""),
       purpose,
@@ -384,7 +380,8 @@ export default function PostAdForm() {
           value: price !== "" ? Number(price) : 0,
         },
       },
-      location: locationDetails ? { region: (locationDetails.region as Region) || null, name: locationDetails.place } as LocationPayload : null,
+      // Always include a `location` object (AdMetadata expects this field); use safe defaults when no selection
+      location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload,
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
