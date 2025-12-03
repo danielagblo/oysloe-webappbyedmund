@@ -39,6 +39,7 @@ export type ProductPayload = {
   image?: string;
   type: ProductType;
   status: ProductStatus;
+  location: Location;
   is_taken?: boolean;
   description?: string;
   price: string | number;

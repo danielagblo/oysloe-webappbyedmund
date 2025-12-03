@@ -341,9 +341,6 @@ const AdsDetailsPage = () => {
   };
 
 
-  // navigation
-  const currentId = parseInt(id || "1");
-
   // mini components
   const MobileHeader = () => (
     <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) sticky top-0 z-50">

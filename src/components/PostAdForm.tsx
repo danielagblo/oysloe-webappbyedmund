@@ -10,6 +10,7 @@ import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
+import type { Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
 
 const isMobile = window.innerWidth < 1024;
@@ -30,7 +31,7 @@ export default function PostAdForm() {
   const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
-  const [duration, setDuration] = useState<string>("Duration (days)");
+  const [duration] = useState<string>("Duration (days)");
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [price, setPrice] = useState<number | "">("");
@@ -236,7 +237,7 @@ export default function PostAdForm() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<string>("");
+  const [regionLocation, setRegionLocation] = useState<Region>(null);
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -321,7 +322,7 @@ export default function PostAdForm() {
     if (!/^[0-9.]*$/.test(v)) return;
     if ((v.match(/\./g) || []).length > 1) return;
     if (v.includes(".")) {
-      const [int, dec] = v.split(".");
+      const [, dec] = v.split(".");
       if (dec.length > 2) return;
     }
     setPrice(v === "" ? "" : Number(v));
@@ -360,7 +361,9 @@ export default function PostAdForm() {
     }
 
     const display = regionFound ? `${opt}, ${regionFound}` : opt;
-    setRegionLocation(display);
+    const cityValue = regionFound ? regionFound.trim() : "";
+    const regionValue: Region = display.split(" -")[0].trim() as Region;
+    setRegionLocation({ region: regionValue, place: cityValue });
     setTempSelectedLocation(opt);
     setShowSaveLocationModal(true);
   }
@@ -963,9 +966,7 @@ export default function PostAdForm() {
                             regionFound = "";
                           }
 
-                          // set as currently selected location for the ad (show place,region)
-                          const display = tempSelectedLocation + (regionFound ? `, ${regionFound}` : "");
-                          setRegionLocation(display);
+                          setRegionLocation({ region: regionValue, place: cityValue });
 
                           // determine label to save: prefer a provided name, otherwise the chosen place
                           const label = newLocationName.trim() !== "" ? newLocationName.trim() : tempSelectedLocation;

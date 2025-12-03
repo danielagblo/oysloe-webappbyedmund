@@ -313,6 +313,8 @@ export const createProductFromAd = async (metadata: any) => {
     category: categoryId,
     // note: some backends accept subcategory; include if provided in metadata
     ...(metadata.subcategory ? { subcategory: Number(metadata.subcategory) } : {}),
+    // include simple location string from ad metadata when present
+    ...(metadata.location ? { location: String(metadata.location) } : {}),
   };
 
   // Helper: convert blob: URL to File by fetching it

@@ -2,7 +2,7 @@ export interface AdMetadata {
   title: string;
   category: string;
   purpose: string;
-  location: string;
+  location: Location;
   duration: string;
   pricing: {
     monthly: {
