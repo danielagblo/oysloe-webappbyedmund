@@ -3,7 +3,9 @@ export function formatCount(n : number | string | null | undefined) : string {
 
   n = Number(n);
 
-  if (n < 100) return n.toString();
+  if (n < 50) return n.toString();
+
+  if (n < 100) return n.toString() + "+";
 
   if (n < 200) {
     const rounded = Math.floor(n / 10) * 10;

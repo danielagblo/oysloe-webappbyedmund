@@ -27,7 +27,7 @@ export default function InboxPage() {
         {/* Live Chat — desktop: right column; mobile: full-screen when open */}
         {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
         <div
-          className={`sm:w-[50vw] w-full h-screen overflow-y-auto sm:py-5 sm:pr-1 ${selectedCase ? "hidden sm:block" : ""}`}
+          className={`sm:w-[50vw] w-full h-screen overflow-y-auto no-scrollbar sm:py-5 sm:pr-1 ${selectedCase ? "hidden sm:block" : ""}`}
         >
           <SupportAndCases
             onSelectCase={(caseId) =>

@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useState } from "react";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -7,7 +7,7 @@ interface DropdownPopupProps {
   supportsSubmenu?: boolean;
   title?: string;
   truncate?: boolean;
-  setLocation?: Dispatch<SetStateAction<string | null>>;
+  setLocation?: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export default function DropdownPopup({
@@ -17,6 +17,7 @@ export default function DropdownPopup({
   supportsSubmenu = false,
   title = "Select an Option",
   truncate = false,
+  setLocation,
 }: DropdownPopupProps) {
   const [open, setOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState(false);

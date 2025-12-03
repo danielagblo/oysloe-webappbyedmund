@@ -232,6 +232,7 @@ export default function SupportAndCases({
               <OpenCases />
             </>
           )}
+          <div className="w-1 h-13" />
         </div>
       </div>
     </div>

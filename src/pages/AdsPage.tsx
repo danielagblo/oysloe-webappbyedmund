@@ -102,7 +102,7 @@ const AdsPage = () => {
             >
               <div className="flex flex-row justify-between items-center mb-2">
                 <img
-                  className="bg-gray-300 h-20 w-auto rounded-lg object-cover"
+                  className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
                   src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/placeholder.png"}
                   alt={ad.name}
                 />
