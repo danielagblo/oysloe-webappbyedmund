@@ -6,10 +6,10 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
-import { getFeatures } from "../services/featureService";
-import { getProductFeatures } from "../services/productFeatureService";
+import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
+import DebuggerButton from "./DebuggerButton";
 import DropdownPopup from "./DropDownPopup";
 
 // (mock toggle not used here; kept in file earlier) 
@@ -32,7 +32,7 @@ export default function PostAdForm() {
   const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
-  const [duration, setDuration] = useState<string | null>("Duration (days)");
+  const [duration, setDuration] = useState<string>("Duration (days)");
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [price, setPrice] = useState<number | "">("");
@@ -87,25 +87,71 @@ export default function PostAdForm() {
           try {
             const normalized: Record<number, string[]> = {};
             const perFeaturePromises = feats.map((f) =>
-              getProductFeatures({ feature: f.id })
+              // fetch canonical possible values for this feature (not product-specific values)
+              getPossibleFeatureValues({ feature: f.id })
                 .then((res) => ({ fid: f.id, res }))
                 .catch(() => ({ fid: f.id, res: null })),
             );
             const perFeatureResults = await Promise.all(perFeaturePromises);
-            perFeatureResults.forEach(({ fid, res }) => {
-              if (!res || !Array.isArray(res)) return;
-              const valuesSet = new Set<string>();
-              res.forEach((pf: any) => {
-                const nested = pf?.feature?.values ?? pf?.values ?? [];
-                if (Array.isArray(nested)) {
-                  nested.forEach((v: any) => {
-                    if (v && typeof v.value === "string") valuesSet.add(v.value);
-                  });
+            const normalizeResToValues = (res: unknown, fid: number): string[] => {
+              if (!res) return [];
+              // Case A: server returns a mapping { featureId: ["a","b"] }
+              if (typeof res === "object" && !Array.isArray(res)) {
+                const map = res as Record<string, unknown>;
+                const byKey = map[String(fid)];
+                if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
+                // maybe res is a single feature object with `id` and `values`
+                if (typeof (res as any).id !== "undefined") {
+                  const vals = (res as any).values ?? [];
+                  if (Array.isArray(vals)) {
+                    return vals
+                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
+                      .filter(Boolean) as string[];
+                  }
                 }
-                if (pf && typeof pf.value === "string") valuesSet.add(pf.value);
+              }
+
+              // Case B: server returned an array — could be strings, feature objects, or product-feature entries
+              if (Array.isArray(res)) {
+                if (res.length === 0) return [];
+                // array of strings
+                if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
+                // array of objects: try to find a feature object with matching id
+                const arr = res as any[];
+                const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
+                if (featureObj) {
+                  const vals = featureObj.values ?? featureObj.values_list ?? [];
+                  if (Array.isArray(vals)) {
+                    return vals
+                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
+                      .filter(Boolean) as string[];
+                  }
+                }
+                // fallback: maybe array of product-feature entries with `value` field
+                const valsFromEntries = arr
+                  .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
+                  .filter(Boolean) as string[];
+                if (valsFromEntries.length > 0) {
+                  return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
+                }
+              }
+
+              return [];
+            };
+
+            // Debug: log raw responses and normalized values for troubleshooting
+            try {
+              console.debug("possible-feature-values: raw responses", perFeatureResults);
+              const debugNorm: Record<number, string[]> = {};
+              perFeatureResults.forEach(({ fid, res }) => {
+                const values = normalizeResToValues(res, Number(fid));
+                if (values && values.length > 0) debugNorm[Number(fid)] = values;
+                if (values && values.length > 0) normalized[Number(fid)] = values;
               });
-              normalized[Number(fid)] = Array.from(valuesSet);
-            });
+              console.debug("possible-feature-values: normalized", debugNorm);
+            } catch (e) {
+              console.warn("possible-feature-values: debug logging failed", e);
+            }
             setPossibleFeatureValues(normalized);
           } catch (e) {
             console.warn("Failed to fetch product feature values", e);
@@ -147,7 +193,7 @@ export default function PostAdForm() {
           .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
         if (toFetch.length === 0) return;
         const promises = toFetch.map((fid) =>
-          getProductFeatures({ feature: fid })
+          getPossibleFeatureValues({ feature: fid })
             .then((r) => ({ fid, r }))
             .catch(() => ({ fid, r: null })),
         );
@@ -155,19 +201,54 @@ export default function PostAdForm() {
         if (!mounted) return;
         const next = { ...possibleFeatureValues };
         results.forEach(({ fid, r }) => {
-          if (!r || !Array.isArray(r)) return;
-          const valuesSet = new Set<string>();
-          (r as any[]).forEach((pf) => {
-            const nested = pf?.feature?.values ?? pf?.values ?? [];
-            if (Array.isArray(nested)) {
-              nested.forEach((v: any) => {
-                if (v && typeof v.value === "string") valuesSet.add(v.value);
-              });
+          const normalizeResToValues = (res: unknown, fid: number): string[] => {
+            if (!res) return [];
+            if (typeof res === "object" && !Array.isArray(res)) {
+              const map = res as Record<string, unknown>;
+              const byKey = map[String(fid)];
+              if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
+              if (typeof (res as any).id !== "undefined") {
+                const vals = (res as any).values ?? [];
+                if (Array.isArray(vals)) {
+                  return vals
+                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
+                    .filter(Boolean) as string[];
+                }
+              }
             }
-            if (pf && typeof pf.value === "string") valuesSet.add(pf.value);
-          });
-          next[Number(fid)] = Array.from(valuesSet);
+            if (Array.isArray(res)) {
+              if (res.length === 0) return [];
+              if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
+              const arr = res as any[];
+              const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
+              if (featureObj) {
+                const vals = featureObj.values ?? featureObj.values_list ?? [];
+                if (Array.isArray(vals)) {
+                  return vals
+                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
+                    .filter(Boolean) as string[];
+                }
+              }
+              const valsFromEntries = arr
+                .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
+                .filter(Boolean) as string[];
+              if (valsFromEntries.length > 0) {
+                return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
+              }
+            }
+            return [];
+          };
+
+          const values = normalizeResToValues(r, Number(fid));
+          if (values && values.length > 0) next[Number(fid)] = values;
         });
+        // Debug: log attached-feature raw responses and normalization
+        try {
+          console.debug("attached-feature-values: raw responses", results);
+          console.debug("attached-feature-values: normalized next", next);
+        } catch (e) {
+          console.warn("attached-feature-values: debug logging failed", e);
+        }
         setPossibleFeatureValues(next);
       } catch {
         // ignore
@@ -305,6 +386,7 @@ export default function PostAdForm() {
     if (!categoryId) errors.push("Category is required.");
     if (regionLocation == null)
       errors.push("Please choose a location.");
+    // If duration is not chosen, we'll send a backend-friendly default later.
 
     if (errors.length > 0) {
       console.warn("Validation errors:", errors);
@@ -334,7 +416,15 @@ export default function PostAdForm() {
       // backend expects category PK (number) but AdMetadata.category is a string type; cast to string
       category: String(categoryId ?? ""),
       purpose,
-      duration,
+      // If the user didn't pick a duration, send a safe default of "0"
+      duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+      // Provide `pricing` shape so `createProductFromAd` can read duration/value
+      pricing: {
+        monthly: {
+          duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+          value: price !== "" ? Number(price) : 0,
+        },
+      },
       location: regionLocation,
       images: uploadedImages.map((img) => ({
         id: img.id,
@@ -577,19 +667,29 @@ export default function PostAdForm() {
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
                     <label className="block mb-1 font-medium">Features for selected subcategory</label>
+                    
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
+                        <DebuggerButton data={possibleFeatureValues} />
                         return (
                           <div key={`def-${fd.id}`} className="flex items-center gap-2">
                             <div className="w-1/3 text-sm">{fd.name}</div>
                             {values && values.length > 0 ? (
-                              <DropdownPopup
-                                triggerLabel={featureValues[fd.id] && featureValues[fd.id] !== "" ? featureValues[fd.id] : `Select ${fd.name}`}
-                                options={values}
-                                onSelect={(opt) => setFeatureValues((prev) => ({ ...prev, [fd.id]: opt }))}
-                                title={`Select ${fd.name}`}
-                              />
+                              <div className="flex-1">
+                                <input
+                                  list={`feature-values-${fd.id}`}
+                                  placeholder={`Select or type ${fd.name}`}
+                                  value={featureValues[fd.id] ?? ""}
+                                  onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                  className="w-full p-3 border rounded-xl border-[var(--div-border)]"
+                                />
+                                <datalist id={`feature-values-${fd.id}`}>
+                                  {values.map((v) => (
+                                    <option key={v} value={v} />
+                                  ))}
+                                </datalist>
+                              </div>
                             ) : (
                               <input
                                 type="text"

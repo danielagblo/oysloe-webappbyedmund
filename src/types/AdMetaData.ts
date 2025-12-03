@@ -4,6 +4,12 @@ export interface AdMetadata {
   purpose: string;
   location: string;
   duration: string;
+  pricing: {
+    monthly: {
+      duration: string;
+      value: number;
+    };
+  };
   images: { id: number; url: string; hasFile: boolean }[];
   createdAt: string;
 }
