@@ -31,7 +31,7 @@ export default function PostAdForm() {
   const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
-  const [duration, setDuration] = useState<string>("Duration (days)");
+  const [duration] = useState<string>("Duration (days)");
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [price, setPrice] = useState<number | "">("");
@@ -322,7 +322,7 @@ export default function PostAdForm() {
     if (!/^[0-9.]*$/.test(v)) return;
     if ((v.match(/\./g) || []).length > 1) return;
     if (v.includes(".")) {
-      const [int, dec] = v.split(".");
+      const [, dec] = v.split(".");
       if (dec.length > 2) return;
     }
     setPrice(v === "" ? "" : Number(v));
@@ -988,9 +988,7 @@ export default function PostAdForm() {
                             regionFound = "";
                           }
 
-                          // set as currently selected location for the ad (show place,region)
-                          const display = tempSelectedLocation + (regionFound ? `, ${regionFound}` : "");
-                          setRegionLocation(display);
+                          setRegionLocation({ region: regionValue, place: cityValue });
 
                           // determine label to save: prefer a provided name, otherwise the chosen place
                           const label = newLocationName.trim() !== "" ? newLocationName.trim() : tempSelectedLocation;
