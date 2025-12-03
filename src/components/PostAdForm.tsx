@@ -6,6 +6,7 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
+import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import DropdownPopup from "./DropDownPopup";
@@ -66,110 +67,91 @@ export default function PostAdForm() {
     };
   }, [categoryId]);
 
-  // Fetch feature definitions for chosen subcategory
+  // Fetch feature definitions when a subcategory is selected
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
-          const feats = await getFeatures({ subcategory: Number(subcategoryId) });
+          if (import.meta.env.DEV) console.debug("Fetching feature definitions for subcategory:", subcategoryId);
+          const features = await getFeatures({ subcategory: subcategoryId });
           if (!mounted) return;
-          setFeatureDefinitions(feats.map((f) => ({ id: f.id, name: f.name })));
-          // initialize values map for these features
-          const map: Record<number, string> = {};
-          feats.forEach((f) => {
-            map[f.id] = "";
-          });
-          setFeatureValues(map);
-          // fetch possible values for each feature using product-features endpoint
-          try {
-            const normalized: Record<number, string[]> = {};
-            const perFeaturePromises = feats.map((f) =>
-              // fetch canonical possible values for this feature (not product-specific values)
-              getPossibleFeatureValues({ feature: f.id })
-                .then((res) => ({ fid: f.id, res }))
-                .catch(() => ({ fid: f.id, res: null })),
-            );
-            const perFeatureResults = await Promise.all(perFeaturePromises);
-            
-            const normalizeResToValues = (res: unknown, fid: number): string[] => {
-              if (!res) return [];
-              // Case A: server returns a mapping { featureId: ["a","b"] }
-              if (typeof res === "object" && !Array.isArray(res)) {
-                const map = res as Record<string, unknown>;
-                const byKey = map[String(fid)];
-                if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
-                // maybe res is a single feature object with `id` and `values`
-                if (typeof (res as any).id !== "undefined") {
-                  const vals = (res as any).values ?? [];
-                  if (Array.isArray(vals)) {
-                    return vals
-                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                      .filter(Boolean) as string[];
-                  }
-                }
-              }
-
-              // Case B: server returned an array — could be strings, feature objects, or product-feature entries
-              if (Array.isArray(res)) {
-                if (res.length === 0) return [];
-                // array of strings
-                if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
-                // array of objects: try to find a feature object with matching id
-                const arr = res as any[];
-                const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
-                if (featureObj) {
-                  const vals = featureObj.values ?? featureObj.values_list ?? [];
-                  if (Array.isArray(vals)) {
-                    return vals
-                      .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                      .filter(Boolean) as string[];
-                  }
-                }
-                // fallback: maybe array of product-feature entries with `value` field
-                const valsFromEntries = arr
-                  .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
-                  .filter(Boolean) as string[];
-                if (valsFromEntries.length > 0) {
-                  return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-                }
-              }
-
-              return [];
-            };
-
-            // Debug: log raw responses and normalized values for troubleshooting
-            try {
-              console.debug("possible-feature-values: raw responses", perFeatureResults);
-              const debugNorm: Record<number, string[]> = {};
-              perFeatureResults.forEach(({ fid, res }) => {
-                const values = normalizeResToValues(res, Number(fid));
-                if (values && values.length > 0) debugNorm[Number(fid)] = values;
-                if (values && values.length > 0) normalized[Number(fid)] = values;
-              });
-              console.debug("possible-feature-values: normalized", debugNorm);
-            } catch (e) {
-              console.warn("possible-feature-values: debug logging failed", e);
-            }
-            setPossibleFeatureValues(normalized);
-          } catch (e) {
-            console.warn("Failed to fetch product feature values", e);
-            setPossibleFeatureValues({});
-          }
+          // map to minimal definition shape used by this component
+          const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
+          if (import.meta.env.DEV) console.debug("Fetched feature definitions:", defs);
+          setFeatureDefinitions(defs);
         } else {
           setFeatureDefinitions([]);
-          setFeatureValues({});
         }
       } catch (e) {
-        console.warn("Failed to fetch feature definitions", e);
-        setFeatureDefinitions([]);
-        setFeatureValues({});
+        console.warn("Failed to fetch feature definitions for subcategory", e);
+        if (mounted) setFeatureDefinitions([]);
       }
     })();
+
+    return () => { mounted = false };
+  }, [subcategoryId]);
+
+  // Fetch possible values for feature definitions when they change
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Attempting to fetch possible feature values for featureDefinitions:", featureDefinitions.map(f => f.id));
+          } catch (e) { void e; }
+        }
+
+        const perFeaturePromises = (featureDefinitions || []).map((fd) =>
+          getPossibleFeatureValues({ feature: fd.id })
+            .then((res) => ({ fid: fd.id, res }))
+            .catch((err) => {
+              if (import.meta.env.DEV) console.debug(`Failed fetch for feature ${fd.id}`, err);
+              return ({ fid: fd.id, res: null });
+            }),
+        );
+
+        if (perFeaturePromises.length === 0) {
+          if (import.meta.env.DEV) console.debug("No feature definitions to fetch possible values for.");
+          if (mounted) setPossibleFeatureValues({});
+          return;
+        }
+
+        const perFeatureResults = await Promise.all(perFeaturePromises);
+
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Raw possible-values responses:", perFeatureResults);
+          } catch (e) { void e; }
+        }
+
+        const normalized: Record<number, string[]> = {};
+        perFeatureResults.forEach(({ fid, res }) => {
+          const values = normalizePossibleFeatureValues(res, fid);
+          if (values.length > 0) normalized[fid] = values;
+        });
+
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Normalized possibleFeatureValues to be set:", normalized);
+          } catch (e) { void e; }
+        }
+
+        if (mounted) setPossibleFeatureValues(normalized);
+      } catch (e) {
+        console.warn("Failed to fetch possible feature values", e);
+        if (mounted) setPossibleFeatureValues({});
+      }
+    })();
+
     return () => {
       mounted = false;
     };
-  }, [subcategoryId]);
+  }, [featureDefinitions]);
+
 
   // DEV: log feature definitions when they change so UI debugging is easier
   useEffect(() => {
@@ -182,81 +164,75 @@ export default function PostAdForm() {
     }
   }, [featureDefinitions]);
 
+  // DEV: log possibleFeatureValues when it actually changes (state updates are async)
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      try {
+        console.debug("possibleFeatureValues updated:", possibleFeatureValues);
+      } catch (e) {
+        void e;
+      }
+    }
+  }, [possibleFeatureValues]);
+
   // Ensure possible values are fetched when an attached feature is selected
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      try {
-        const toFetch = attachedFeatures
-          .map((a) => a.feature)
-          .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
-        if (toFetch.length === 0) return;
-        const promises = toFetch.map((fid) =>
-          getPossibleFeatureValues({ feature: fid })
-            .then((r) => ({ fid, r }))
-            .catch(() => ({ fid, r: null })),
-        );
-        const results = await Promise.all(promises);
-        if (!mounted) return;
-        const next = { ...possibleFeatureValues };
-        results.forEach(({ fid, r }) => {
-          const normalizeResToValues = (res: unknown, fid: number): string[] => {
-            if (!res) return [];
-            if (typeof res === "object" && !Array.isArray(res)) {
-              const map = res as Record<string, unknown>;
-              const byKey = map[String(fid)];
-              if (Array.isArray(byKey)) return byKey.filter((v) => typeof v === "string") as string[];
-              if (typeof (res as any).id !== "undefined") {
-                const vals = (res as any).values ?? [];
-                if (Array.isArray(vals)) {
-                  return vals
-                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                    .filter(Boolean) as string[];
-                }
-              }
-            }
-            if (Array.isArray(res)) {
-              if (res.length === 0) return [];
-              if (typeof res[0] === "string") return (res as string[]).filter((s) => typeof s === "string");
-              const arr = res as any[];
-              const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
-              if (featureObj) {
-                const vals = featureObj.values ?? featureObj.values_list ?? [];
-                if (Array.isArray(vals)) {
-                  return vals
-                    .map((v: any) => (typeof v === "string" ? v : v && typeof v.value === "string" ? v.value : null))
-                    .filter(Boolean) as string[];
-                }
-              }
-              const valsFromEntries = arr
-                .map((it) => (it && typeof it.value === "string" ? String(it.value).trim() : null))
-                .filter(Boolean) as string[];
-              if (valsFromEntries.length > 0) {
-                return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-              }
-            }
-            return [];
-          };
 
-          const values = normalizeResToValues(r, Number(fid));
-          if (values && values.length > 0) next[Number(fid)] = values;
-        });
-        // Debug: log attached-feature raw responses and normalization
+    (async () => {
+      const toFetch = attachedFeatures
+        .map(a => a.feature)
+        .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
+
+      if (import.meta.env.DEV) {
         try {
-          console.debug("attached-feature-values: raw responses", results);
-          console.debug("attached-feature-values: normalized next", next);
-        } catch (e) {
-          console.warn("attached-feature-values: debug logging failed", e);
-        }
-        setPossibleFeatureValues(next);
-      } catch {
-        // ignore
+          console.debug("attachedFeatures triggered; toFetch:", toFetch);
+        } catch (e) { void e; }
       }
+
+      if (toFetch.length === 0) {
+        if (import.meta.env.DEV) console.debug("No attached features require fetching possible values.");
+        return;
+      }
+
+      const responses = await Promise.all(
+        toFetch.map(fid =>
+          getPossibleFeatureValues({ feature: fid })
+            .then(res => ({ fid, res }))
+            .catch((err) => {
+              if (import.meta.env.DEV) console.debug(`Failed fetch for attached feature ${fid}`, err);
+              return ({ fid, res: null });
+            })
+        )
+      );
+
+      if (import.meta.env.DEV) {
+        try {
+          console.debug("Responses for attached feature fetches:", responses);
+        } catch (e) { void e; }
+      }
+
+      if (!mounted) return;
+
+      const next = { ...possibleFeatureValues };
+
+      responses.forEach(({ fid, res }) => {
+        const values = normalizePossibleFeatureValues(res, fid);
+        if (values.length) next[fid] = values;
+      });
+
+      if (import.meta.env.DEV) {
+        try {
+          console.debug("PossibleFeatureValues after merging attached responses:", next);
+        } catch (e) { void e; }
+      }
+
+      setPossibleFeatureValues(next);
     })();
-    return () => {
-      mounted = false;
-    };
+
+    return () => { mounted = false };
   }, [attachedFeatures, possibleFeatureValues]);
+
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
@@ -513,8 +489,49 @@ export default function PostAdForm() {
       setShowSuccess(true);
     } catch (err: unknown) {
       console.error("Upload failed:", err);
-      const msg = err instanceof Error ? err.message : String(err);
-      toast.error(msg || "An error occurred while saving.");
+
+      // Try to extract a helpful server-side error message (e.g. { detail: '...' })
+      let friendly = "An error occurred while saving.";
+
+      try {
+        const raw = err instanceof Error ? err.message : String(err);
+
+        // Look for a JSON object in the error text and parse it
+        const jsonMatch = raw.match(/(\{[\s\S]*\})$/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[1]);
+            if (parsed && typeof parsed === "object") {
+              if (typeof parsed.detail === "string") friendly = parsed.detail;
+              else if (typeof parsed.message === "string") friendly = parsed.message;
+            }
+          } catch (e) {
+            // not JSON — ignore
+            void e;
+          }
+        } else {
+          // fallback: if message contains a JSON-like substring elsewhere, try to find it
+          const curly = raw.match(/(\{[\s\S]*\})/m);
+          if (curly) {
+            try {
+              const parsed = JSON.parse(curly[1]);
+              if (parsed && typeof parsed === "object") {
+                if (typeof parsed.detail === "string") friendly = parsed.detail;
+                else if (typeof parsed.message === "string") friendly = parsed.message;
+              }
+            } catch (e) { void e; }
+          } else {
+            // final fallback: show the entire error text
+            if (raw && raw.trim()) friendly = raw;
+          }
+        }
+
+        if (import.meta.env.DEV) console.debug("Parsed server error message:", friendly);
+      } catch (e) {
+        void e;
+      }
+
+      toast.error(friendly);
     } finally {
       setIsSubmitting(false);
     }
@@ -706,7 +723,7 @@ export default function PostAdForm() {
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
                     <label className="block mb-1 font-medium">Features for selected subcategory</label>
-                    
+
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
