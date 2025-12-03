@@ -12,8 +12,6 @@ import { type AdMetadata } from "../types/AdMetaData";
 import DebuggerButton from "./DebuggerButton";
 import DropdownPopup from "./DropDownPopup";
 
-// (mock toggle not used here; kept in file earlier) 
-
 const isMobile = window.innerWidth < 1024;
 
 interface UploadedImage {
@@ -93,6 +91,7 @@ export default function PostAdForm() {
                 .catch(() => ({ fid: f.id, res: null })),
             );
             const perFeatureResults = await Promise.all(perFeaturePromises);
+            
             const normalizeResToValues = (res: unknown, fid: number): string[] => {
               if (!res) return [];
               // Case A: server returns a mapping { featureId: ["a","b"] }
@@ -339,23 +338,17 @@ export default function PostAdForm() {
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
-
     if (v.includes("-")) return;
-
     if (v === "") {
       setPrice("")
       return;
     }
-
     if (!/^[0-9.]*$/.test(v)) return;
-
     if ((v.match(/\./g) || []).length > 1) return;
-
     if (v.includes(".")) {
       const [int, dec] = v.split(".");
       if (dec.length > 2) return;
     }
-
     setPrice(v === "" ? "" : Number(v));
   };
 
@@ -447,7 +440,7 @@ export default function PostAdForm() {
           value: price !== "" ? Number(price) : 0,
         },
       },
-      location: regionLocation,
+      location: regionLocation || "Unknown",
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
@@ -693,9 +686,9 @@ export default function PostAdForm() {
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
-                        <DebuggerButton data={possibleFeatureValues} />
                         return (
                           <div key={`def-${fd.id}`} className="flex items-center gap-2">
+
                             <div className="w-1/3 text-sm">{fd.name}</div>
                             {values && values.length > 0 ? (
                               <div className="flex-1">
