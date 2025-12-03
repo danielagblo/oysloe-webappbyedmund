@@ -184,7 +184,7 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
 };
 
 export const getProductReportCount = async (productId: number | string) => {
-  return apiClient.get(endpoints.products.report(productId));
+  return apiClient.get<number>(endpoints.products.report(productId));
 };
 
 
