@@ -6,10 +6,10 @@ import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
+import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import { type AdMetadata } from "../types/AdMetaData";
-import DebuggerButton from "./DebuggerButton";
 import DropdownPopup from "./DropDownPopup";
 
 // (mock toggle not used here; kept in file earlier) 
@@ -68,143 +68,91 @@ export default function PostAdForm() {
     };
   }, [categoryId]);
 
-  // Fetch feature definitions for chosen subcategory
+  // Fetch feature definitions when a subcategory is selected
   useEffect(() => {
     let mounted = true;
+
     (async () => {
       try {
         if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
-          const feats = await getFeatures({ subcategory: Number(subcategoryId) });
+          if (import.meta.env.DEV) console.debug("Fetching feature definitions for subcategory:", subcategoryId);
+          const features = await getFeatures({ subcategory: subcategoryId });
           if (!mounted) return;
-          setFeatureDefinitions(feats.map((f) => ({ id: f.id, name: f.name })));
-          // initialize values map for these features
-          const map: Record<number, string> = {};
-          feats.forEach((f) => {
-            map[f.id] = "";
-          });
-          setFeatureValues(map);
-          // fetch possible values for each feature using product-features endpoint
-          try {
-            const normalized: Record<number, string[]> = {};
-            const perFeaturePromises = feats.map((f) =>
-              // fetch canonical possible values for this feature (not product-specific values)
-              getPossibleFeatureValues({ feature: f.id })
-                .then((res) => ({ fid: f.id, res }))
-                .catch(() => ({ fid: f.id, res: null })),
-            );
-            console.log("Fetching possible feature values for features:", perFeaturePromises);
-            const perFeatureResults = await Promise.all(perFeaturePromises);
-            console.log("Fetched possible feature values results:", perFeatureResults);
-            const normalizeResToValues = (raw: unknown, fid: number): string[] => {
-              // Defensive normalizer: handle axios-like wrappers, mappings, arrays,
-              // and entries with `value`/`name` fields. Always returns a sorted,
-              // de-duplicated array of trimmed strings.
-              if (!raw) return [];
-
-              let res: any = raw as any;
-
-              // Unwrap common wrappers (axios response, paginated results)
-              if (res && typeof res === "object") {
-                if ("data" in res) res = (res as any).data;
-                else if ("results" in res) res = (res as any).results;
-              }
-
-              const normalizeArrayToStrings = (arr: any[]): string[] => {
-                const out: string[] = arr
-                  .map((it) => {
-                    if (it == null) return null;
-                    if (typeof it === "string") return String(it).trim();
-                    if (typeof it.value === "string") return String(it.value).trim();
-                    if (typeof it.name === "string") return String(it.name).trim();
-                    // sometimes values are objects like { value: 'x' } inside arrays
-                    return null;
-                  })
-                  .filter(Boolean) as string[];
-                return Array.from(new Set(out)).sort((a, b) => a.localeCompare(b));
-              };
-
-              // Case: object mapping by feature id -> array
-              if (typeof res === "object" && !Array.isArray(res)) {
-                const map = res as Record<string, any>;
-                const byKey = map[String(fid)];
-                if (Array.isArray(byKey)) return normalizeArrayToStrings(byKey);
-
-                // maybe res is a single feature object with `id` and `values`/`values_list`
-                if (typeof map.id !== "undefined") {
-                  const vals = map.values ?? map.values_list ?? map.options ?? [];
-                  if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
-                }
-              }
-
-              // Case: array
-              if (Array.isArray(res)) {
-                if (res.length === 0) return [];
-                // array of strings
-                if (typeof res[0] === "string") return normalizeArrayToStrings(res as string[]);
-
-                const arr = res as any[];
-
-                // array of feature objects where one item contains values for this fid
-                const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
-                if (featureObj) {
-                  const vals = featureObj.values ?? featureObj.values_list ?? featureObj.options ?? [];
-                  if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
-                }
-
-                // fallback: entries with `value` or `name` fields
-                const valsFromEntries = arr
-                  .map((it) => {
-                    if (!it) return null;
-                    if (typeof it === "string") return String(it).trim();
-                    if (typeof it.value === "string") return String(it.value).trim();
-                    if (typeof it.name === "string") return String(it.name).trim();
-                    return null;
-                  })
-                  .filter(Boolean) as string[];
-
-                if (valsFromEntries.length > 0) return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-              }
-
-              return [];
-            };
-            console.log("Normalizing possible feature values from responses", normalizeResToValues);
-
-            // Debug: log raw responses and normalized values for troubleshooting
-            try {
-              console.debug("possible-feature-values: raw responses", perFeatureResults);
-              const debugNorm: Record<number, string[]> = {};
-              perFeatureResults.forEach(({ fid, res }) => {
-                const values = normalizeResToValues(res, Number(fid));
-                if (values && values.length > 0) debugNorm[Number(fid)] = values;
-                if (values && values.length > 0) normalized[Number(fid)] = values;
-              });
-              console.debug("possible-feature-values: normalized", debugNorm);
-            } catch (e) {
-              console.warn("possible-feature-values: debug logging failed", e);
-            }
-            setPossibleFeatureValues(normalized);
-            // Log the normalized payload we just built (state updates are async,
-            // so logging `possibleFeatureValues` immediately here will show the
-            // previous value). Use this to inspect what will be stored.
-            console.debug("possibleFeatureValues set to (normalized):", normalized);
-          } catch (e) {
-            console.warn("Failed to fetch product feature values", e);
-            setPossibleFeatureValues({});
-          }
+          // map to minimal definition shape used by this component
+          const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
+          if (import.meta.env.DEV) console.debug("Fetched feature definitions:", defs);
+          setFeatureDefinitions(defs);
         } else {
           setFeatureDefinitions([]);
-          setFeatureValues({});
         }
       } catch (e) {
-        console.warn("Failed to fetch feature definitions", e);
-        setFeatureDefinitions([]);
-        setFeatureValues({});
+        console.warn("Failed to fetch feature definitions for subcategory", e);
+        if (mounted) setFeatureDefinitions([]);
       }
     })();
+
+    return () => { mounted = false };
+  }, [subcategoryId]);
+
+  // Fetch possible values for feature definitions when they change
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Attempting to fetch possible feature values for featureDefinitions:", featureDefinitions.map(f => f.id));
+          } catch (e) { void e; }
+        }
+
+        const perFeaturePromises = (featureDefinitions || []).map((fd) =>
+          getPossibleFeatureValues({ feature: fd.id })
+            .then((res) => ({ fid: fd.id, res }))
+            .catch((err) => {
+              if (import.meta.env.DEV) console.debug(`Failed fetch for feature ${fd.id}`, err);
+              return ({ fid: fd.id, res: null });
+            }),
+        );
+
+        if (perFeaturePromises.length === 0) {
+          if (import.meta.env.DEV) console.debug("No feature definitions to fetch possible values for.");
+          if (mounted) setPossibleFeatureValues({});
+          return;
+        }
+
+        const perFeatureResults = await Promise.all(perFeaturePromises);
+
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Raw possible-values responses:", perFeatureResults);
+          } catch (e) { void e; }
+        }
+
+        const normalized: Record<number, string[]> = {};
+        perFeatureResults.forEach(({ fid, res }) => {
+          const values = normalizePossibleFeatureValues(res, fid);
+          if (values.length > 0) normalized[fid] = values;
+        });
+
+        if (import.meta.env.DEV) {
+          try {
+            console.debug("Normalized possibleFeatureValues to be set:", normalized);
+          } catch (e) { void e; }
+        }
+
+        if (mounted) setPossibleFeatureValues(normalized);
+      } catch (e) {
+        console.warn("Failed to fetch possible feature values", e);
+        if (mounted) setPossibleFeatureValues({});
+      }
+    })();
+
     return () => {
       mounted = false;
     };
-  }, [subcategoryId]);
+  }, [featureDefinitions]);
+
 
   // DEV: log feature definitions when they change so UI debugging is easier
   useEffect(() => {
@@ -231,99 +179,66 @@ export default function PostAdForm() {
   // Ensure possible values are fetched when an attached feature is selected
   useEffect(() => {
     let mounted = true;
+
     (async () => {
-      try {
-        const toFetch = attachedFeatures
-          .map((a) => a.feature)
-          .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
-        if (toFetch.length === 0) return;
-        const promises = toFetch.map((fid) =>
-          getPossibleFeatureValues({ feature: fid })
-            .then((r) => ({ fid, r }))
-            .catch(() => ({ fid, r: null })),
-        );
-        const results = await Promise.all(promises);
-        if (!mounted) return;
-        const next = { ...possibleFeatureValues };
-        results.forEach(({ fid, r }) => {
-          const values = ((): string[] => {
-            // reuse the same normalizer logic as above but scoped here for clarity
-            if (!r) return [];
-            let raw = r as any;
-            if (raw && typeof raw === "object") {
-              if ("data" in raw) raw = raw.data;
-              else if ("results" in raw) raw = raw.results;
-            }
+      const toFetch = attachedFeatures
+        .map(a => a.feature)
+        .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
 
-            const normalizeArrayToStrings = (arr: any[]): string[] => {
-              const out: string[] = arr
-                .map((it) => {
-                  if (it == null) return null;
-                  if (typeof it === "string") return String(it).trim();
-                  if (typeof it.value === "string") return String(it.value).trim();
-                  if (typeof it.name === "string") return String(it.name).trim();
-                  return null;
-                })
-                .filter(Boolean) as string[];
-              return Array.from(new Set(out)).sort((a, b) => a.localeCompare(b));
-            };
-
-            if (typeof raw === "object" && !Array.isArray(raw)) {
-              const map = raw as Record<string, any>;
-              const byKey = map[String(fid)];
-              if (Array.isArray(byKey)) return normalizeArrayToStrings(byKey);
-              if (typeof map.id !== "undefined") {
-                const vals = map.values ?? map.values_list ?? map.options ?? [];
-                if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
-              }
-            }
-
-            if (Array.isArray(raw)) {
-              if (raw.length === 0) return [];
-              if (typeof raw[0] === "string") return normalizeArrayToStrings(raw as string[]);
-              const arr = raw as any[];
-              const featureObj = arr.find((it) => it && (Number(it.id) === Number(fid) || Number(it.feature) === Number(fid)));
-              if (featureObj) {
-                const vals = featureObj.values ?? featureObj.values_list ?? featureObj.options ?? [];
-                if (Array.isArray(vals)) return normalizeArrayToStrings(vals);
-              }
-              const valsFromEntries = arr
-                .map((it) => {
-                  if (!it) return null;
-                  if (typeof it === "string") return String(it).trim();
-                  if (typeof it.value === "string") return String(it.value).trim();
-                  if (typeof it.name === "string") return String(it.name).trim();
-                  return null;
-                })
-                .filter(Boolean) as string[];
-              if (valsFromEntries.length > 0) return Array.from(new Set(valsFromEntries)).sort((a, b) => a.localeCompare(b));
-            }
-
-            return [];
-          })();
-          if (values && values.length > 0) next[Number(fid)] = values;
-        });
-        // Debug: log attached-feature raw responses and normalization
+      if (import.meta.env.DEV) {
         try {
-          console.debug("attached-feature-values: raw responses", results);
-          console.debug("attached-feature-values: normalized next", next);
-        } catch (e) {
-          console.warn("attached-feature-values: debug logging failed", e);
-        }
-        setPossibleFeatureValues(next);
-      } catch {
-        // ignore
+          console.debug("attachedFeatures triggered; toFetch:", toFetch);
+        } catch (e) { void e; }
       }
+
+      if (toFetch.length === 0) {
+        if (import.meta.env.DEV) console.debug("No attached features require fetching possible values.");
+        return;
+      }
+
+      const responses = await Promise.all(
+        toFetch.map(fid =>
+          getPossibleFeatureValues({ feature: fid })
+            .then(res => ({ fid, res }))
+            .catch((err) => {
+              if (import.meta.env.DEV) console.debug(`Failed fetch for attached feature ${fid}`, err);
+              return ({ fid, res: null });
+            })
+        )
+      );
+
+      if (import.meta.env.DEV) {
+        try {
+          console.debug("Responses for attached feature fetches:", responses);
+        } catch (e) { void e; }
+      }
+
+      if (!mounted) return;
+
+      const next = { ...possibleFeatureValues };
+
+      responses.forEach(({ fid, res }) => {
+        const values = normalizePossibleFeatureValues(res, fid);
+        if (values.length) next[fid] = values;
+      });
+
+      if (import.meta.env.DEV) {
+        try {
+          console.debug("PossibleFeatureValues after merging attached responses:", next);
+        } catch (e) { void e; }
+      }
+
+      setPossibleFeatureValues(next);
     })();
-    return () => {
-      mounted = false;
-    };
+
+    return () => { mounted = false };
   }, [attachedFeatures, possibleFeatureValues]);
+
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const [regionLocation, setRegionLocation] = useState<string | null>("");
+  const [regionLocation, setRegionLocation] = useState<string>("");
   const { groupedLocations = {}, loading: locationsLoading } = useLocations();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -508,7 +423,7 @@ export default function PostAdForm() {
           value: price !== "" ? Number(price) : 0,
         },
       },
-      location: regionLocation,
+      location: regionLocation ?? "",
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
@@ -557,8 +472,49 @@ export default function PostAdForm() {
       setShowSuccess(true);
     } catch (err: unknown) {
       console.error("Upload failed:", err);
-      const msg = err instanceof Error ? err.message : String(err);
-      toast.error(msg || "An error occurred while saving.");
+
+      // Try to extract a helpful server-side error message (e.g. { detail: '...' })
+      let friendly = "An error occurred while saving.";
+
+      try {
+        const raw = err instanceof Error ? err.message : String(err);
+
+        // Look for a JSON object in the error text and parse it
+        const jsonMatch = raw.match(/(\{[\s\S]*\})$/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[1]);
+            if (parsed && typeof parsed === "object") {
+              if (typeof parsed.detail === "string") friendly = parsed.detail;
+              else if (typeof parsed.message === "string") friendly = parsed.message;
+            }
+          } catch (e) {
+            // not JSON — ignore
+            void e;
+          }
+        } else {
+          // fallback: if message contains a JSON-like substring elsewhere, try to find it
+          const curly = raw.match(/(\{[\s\S]*\})/m);
+          if (curly) {
+            try {
+              const parsed = JSON.parse(curly[1]);
+              if (parsed && typeof parsed === "object") {
+                if (typeof parsed.detail === "string") friendly = parsed.detail;
+                else if (typeof parsed.message === "string") friendly = parsed.message;
+              }
+            } catch (e) { void e; }
+          } else {
+            // final fallback: show the entire error text
+            if (raw && raw.trim()) friendly = raw;
+          }
+        }
+
+        if (import.meta.env.DEV) console.debug("Parsed server error message:", friendly);
+      } catch (e) {
+        void e;
+      }
+
+      toast.error(friendly);
     } finally {
       setIsSubmitting(false);
     }
@@ -754,7 +710,6 @@ export default function PostAdForm() {
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
-                        <DebuggerButton data={possibleFeatureValues} />
                         return (
                           <div key={`def-${fd.id}`} className="flex items-center gap-2">
                             <div className="w-1/3 text-sm">{fd.name}</div>
