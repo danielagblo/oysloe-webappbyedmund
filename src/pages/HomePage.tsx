@@ -65,7 +65,7 @@ export const HomePageHeader = ({
           }`}
       >
         <h2
-          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-6xl"
+          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[4vw]"
             } font-medium text-(--dark-def) whitespace-nowrap`}
         >
           Oysloe
@@ -335,12 +335,12 @@ const HomePage = () => {
                 key={i}
                 className="
                   flex flex-col items-center justify-center
-                  min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                  w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
                   bg-gray-200 rounded-lg 
                   p-2 sm:p-3 cursor-progress animate-pulse
                 "
               >
-                <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                <div className="w-[8vw] h-[8vw]  min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
                   <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 rounded-full bg-white" />
 
                 </div>
@@ -387,17 +387,17 @@ const HomePage = () => {
                 onClick={() => toast("Data is currently unavailable for " + category)}
                 className="
                       flex flex-col items-center justify-center
-                      min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                      w-[12vw] h-[12vw] min-h-[75px] min-w-[75px] 
                       bg-(--div-active) rounded-lg 
                       p-2 sm:p-3 cursor-pointer 
                       hover:bg-gray-300
                   "
               >
-                <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
                   <img
                     src={`/${category.toLowerCase()}.png`}
                     alt={category}
-                    className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
+                    className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%]object-contain left-1/2 -translate-x-1/2"
                   />
                 </div>
                 <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
@@ -430,20 +430,20 @@ const HomePage = () => {
               onClick={() => onCategoryClick(category.name)}
               className="
                     flex flex-col items-center justify-center
-                    min-w-16 min-h-[75px] sm:min-w-4/5 sm:h-4/5 sm:min-h-full
+                    w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
                     bg-(--div-active) rounded-lg 
                     p-2 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
                 "
             >
-              <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+              <div className="w-[8vw] h-[8vw]  min-h-[45px] min-w-[45px] relative rounded-full bg-white">
                 <img
                   src={`/${category.name.toLowerCase()}.png`}
                   alt={category.name}
-                  className="absolute bottom-1 sm:bottom-3 w-[85%] h-[85%] object-contain left-1/2 -translate-x-1/2"
+                  className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
                 />
               </div>
-              <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
+              <h3 className="text-center text-[10px] sm:text-[1.25vw] mt-1 truncate">
                 {category.name}
               </h3>
             </div>
@@ -568,8 +568,8 @@ const HomePage = () => {
             <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-(--dark-def)">
               {category.name}
             </h2>
-            <button className="bg-gray-200 hidden px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
-              Show All
+            <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+              Filter
             </button>
             <div className="flex gap-2 ml-auto">
               <button

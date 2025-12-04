@@ -79,7 +79,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
   });
 
   const barsSection = (
-    <div className="w-full flex flex-col justify-center items-center md:gap-2 md:px-2">
+    <div className="w-full flex flex-col justify-center items-center gap-1 md:gap-2">
       {rd
         ? Object.entries(rd.stars)
           .sort((a, b) => Number(b[0]) - Number(a[0]))
@@ -88,18 +88,19 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
             return (
               <div
                 key={star}
-                className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+                className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap"
+                style={{ gap: 'clamp(0.5rem, 1.5vw, 1.5rem)' }}
               >
-                <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+                <span className="text-(--dark-def) flex-shrink-0 text-xs md:text-[1.25vw] text-right" style={{ width: 'clamp(2rem, 3vw, 4rem)' }}>
                   ★ {star}
                 </span>
-                <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+                <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded" style={{ minWidth: '100px', maxWidth: '600px' }}>
                   <div
                     className="h-full bg-(--dark-def) rounded"
                     style={{ width: `${Math.round(pct)}%` }}
                   />
                 </div>
-                <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+                <span className="text-sm md:text-[1vw] text-gray-500 flex-shrink-0 text-left" style={{ width: 'clamp(2.5rem, 3.5vw, 5rem)' }}>
                   {Math.round(pct)}%
                 </span>
               </div>
@@ -108,18 +109,19 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
         : distribution.map((item) => (
           <div
             key={item.stars}
-            className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap gap-3 md:gap-0"
+            className="flex items-center max-md:mb-1 max-md:-ml-5 sm:ml-0 w-full whitespace-nowrap"
+            style={{ gap: 'clamp(0.5rem, 1.5vw, 1.5rem)' }}
           >
-            <span className="text-(--dark-def) w-8 text-xs md:text-[1.25vw]">
+            <span className="text-(--dark-def) flex-shrink-0 text-xs md:text-[1.25vw] text-right" style={{ width: 'clamp(2rem, 3vw, 4rem)' }}>
               ★ {item.stars}
             </span>
-            <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded mx-2">
+            <div className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded" style={{ minWidth: '100px', maxWidth: '600px' }}>
               <div
                 className="h-full bg-(--dark-def) rounded"
                 style={{ width: `${Math.round(item.pct)}%` }}
               />
             </div>
-            <span className="text-sm md:text-[1vw] text-gray-500 w-8">
+            <span className="text-sm md:text-[1vw] text-gray-500 flex-shrink-0 text-left" style={{ width: 'clamp(2.5rem, 3.5vw, 5rem)' }}>
               {Math.round(item.pct)}%
             </span>
           </div>
@@ -133,7 +135,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
         <>
           <div className={containerClasses}>
             <div className="flex-[0.35]">{ratingSection}</div>
-            <div className="flex-[0.65] ml-4">{barsSection}</div>
+            <div className="flex-[0.65] ml-4 flex items-center justify-center w-full">{barsSection}</div>
           </div>
           <div className="flex flex-row mt-2 gap-4 items-center justify-center md:justify-around md:px-[10%] md:text-[1.25vw]">
             <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
