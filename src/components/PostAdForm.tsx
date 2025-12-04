@@ -25,7 +25,13 @@ interface UploadedImage {
   hasFile?: boolean;
 }
 
-export default function PostAdForm() {
+interface PostAdFormProps {
+  editId?: string | null;
+  onClose?: () => void;
+  embedded?: boolean;
+}
+
+export default function PostAdForm({ editId: propEditId, onClose, embedded = false }: PostAdFormProps) {
   const [mobileStep, setMobileStep] = useState("images");
   const [category, setCategory] = useState("Select Product Category");
   const [categoryId, setCategoryId] = useState<number | null>(null);
@@ -279,8 +285,9 @@ export default function PostAdForm() {
   // Mutation hook for posting ads
   const postAdMutation = usePostAd();
   const [searchParams] = useSearchParams();
-  const editId = searchParams.get("edit");
-  const { data: existingProduct } = useProduct(editId ?? "");
+  const editIdFromUrl = searchParams.get("edit");
+  const effectiveEditId = propEditId ?? editIdFromUrl;
+  const { data: existingProduct } = useProduct(effectiveEditId ?? "");
   const patchMutation = usePatchProduct();
 
   // Prefill form when editing an existing product (robust handling)
@@ -654,15 +661,13 @@ export default function PostAdForm() {
       : false;
     if (uploadedImages.length > 0 && !hasFile) {
       toast.error("One or more images are not actual files. Please re-upload images.");
-      setIsSubmitting(false);
-      return;
     }
 
     console.log("Location Details:", locationDetails);
     console.log("Ad Metadata to submit:", metadata);
 
     try {
-      if (editId) {
+      if (effectiveEditId) {
         // Patch existing product (partial update)
         const patchBody: Partial<any> = {
           name: metadata.title,
@@ -673,10 +678,14 @@ export default function PostAdForm() {
           ...(uploadedImages && uploadedImages[0] && uploadedImages[0].url ? { image: uploadedImages[0].url } : {}),
         };
 
-        const result = await patchMutation.mutateAsync({ id: editId, body: patchBody });
+        const result = await patchMutation.mutateAsync({ id: effectiveEditId, body: patchBody });
         toast.success("Ad updated successfully");
         console.log("Patch response:", result);
         setShowSuccess(true);
+        if (embedded && typeof onClose === 'function') {
+          // close after small delay so the success toast is visible
+          setTimeout(() => onClose(), 700);
+        }
       } else {
         // pass the metadata including file objects (mutation handler will detect files)
         const result = await postAdMutation.mutateAsync(metadata as any);
@@ -684,6 +693,9 @@ export default function PostAdForm() {
         const serverMessage = (result as { message?: string })?.message;
         toast.success(serverMessage ?? "Ad saved successfully!");
         setShowSuccess(true);
+        if (embedded && typeof onClose === 'function') {
+          setTimeout(() => onClose(), 700);
+        }
       }
     } catch (err: unknown) {
       console.error("Upload failed:", err);
@@ -765,15 +777,15 @@ export default function PostAdForm() {
     <button
       disabled={isSubmitting}
       type="submit"
-      className="w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]"
+      className={`w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]`}
     >
-      {isSubmitting ? (editId ? "Updating..." : "Saving...") : (editId ? "Update" : "Save")}
+      {isSubmitting ? (effectiveEditId ? "Updating..." : "Saving...") : (effectiveEditId ? "Update" : "Save")}
     </button>
   );
 
   return (
     <form
-      className="flex flex-col w-full h-[100dvh] py-2"
+      className="flex flex-col w-full h-dvh min-h-0 py-2"
       onSubmit={handleSave}
     >
       <div className="text-xs flex lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
