@@ -215,7 +215,7 @@ const ReviewPage = () => {
                             next.delete(rev.id);
                             return next;
                           });
-                        }, 600);
+                        }, 300);
                         likeMutation.mutate({ id: rev.id });
                       }}
                       className="flex items-center gap-1"

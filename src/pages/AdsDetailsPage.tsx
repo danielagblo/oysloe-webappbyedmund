@@ -540,10 +540,16 @@ const AdsDetailsPage = () => {
                     setPictureModalIndex(absIdx);
                     setIsPictureModalOpen(true);
                   }}
-                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center`}
+                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative`}
                   aria-label={`Show image ${absIdx + 1}`}
                 >
-                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full" />
+                  {/* Blurred background image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center blur-sm opacity-50"
+                    style={{ backgroundImage: `url(${src})` }}
+                  />
+                  {/* Main image on top */}
+                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full relative z-10" />
                 </button>
               );
             })}
@@ -566,7 +572,13 @@ const AdsDetailsPage = () => {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <img src={getMainImage()} alt="Ad main" className="object-cover w-full h-full cursor-zoom-in" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
+          {/* Blurred background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-md opacity-40"
+            style={{ backgroundImage: `url(${getMainImage()})` }}
+          />
+          {/* Main image on top */}
+          <img src={getMainImage()} alt="Ad main" className="object-contain w-full h-full cursor-zoom-in relative z-10" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
           <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
           <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
         </div>
@@ -623,11 +635,17 @@ const AdsDetailsPage = () => {
             </button>
           )}
 
-          <div className="flex items-center justify-center w-full">
+          <div className="relative flex items-center justify-center w-full">
+            {/* Blurred background image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center blur-md opacity-40 rounded"
+              style={{ backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})` }}
+            />
+            {/* Main image on top */}
             <img
               src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
               alt={`Modal image ${pictureModalIndex + 1}`}
-              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded"
+              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded relative z-10"
             />
           </div>
 
