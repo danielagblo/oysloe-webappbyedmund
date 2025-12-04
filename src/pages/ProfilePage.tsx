@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
@@ -13,7 +13,23 @@ import SubscriptionPage from "./SubscriptionPage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
 
 const ProfilePage = () => {
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    try {
+      const saved = localStorage.getItem("profile_active_tab");
+      return saved || "profile";
+    } catch {
+      return "profile";
+    }
+  });
+
+  // Persist the active tab so it remains selected across page reloads
+  useEffect(() => {
+    try {
+      localStorage.setItem("profile_active_tab", activeTab);
+    } catch {
+      // ignore write failures (e.g., storage disabled)
+    }
+  }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {
