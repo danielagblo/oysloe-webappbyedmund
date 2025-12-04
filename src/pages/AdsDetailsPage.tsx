@@ -11,11 +11,11 @@ import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
+import type { Product } from "../types/Product";
 import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import type { Product } from "../types/Product";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -215,7 +215,7 @@ const AdsDetailsPage = () => {
   const totalAds = ads.length;
   const currentAdData =
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
-
+  console.log("AdsDetailsPage: currentAdData", { currentAdData });
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as array of objects or a single `image` string.
   const pageImages: string[] = (() => {
@@ -398,7 +398,7 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">{String(reportCount)}</h2>
+        <h2 className="text-base md:text-[1.125vw]">{String(currentAdData?.total_reports)}</h2>
       </div>
       <div className="flex items-center gap-2">
         <img
@@ -511,7 +511,7 @@ const AdsDetailsPage = () => {
                 className={`w-full h-20 rounded overflow-hidden border ${idx === currentIndex ? "border-(--dark-def)" : "border-gray-200"}`}
                 aria-label={`Show image ${idx + 1}`}
               >
-                <img src={src} alt={`Thumbnail ${idx + 1}`} className="object-cover w-full h-full" />
+                <img src={src} alt={`Thumbnail ${idx + 1}`} className="object-scale-down w-full h-full" />
               </button>
             ))}
           </div>
@@ -556,7 +556,7 @@ const AdsDetailsPage = () => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={close}>
         <div
-          className="relative max-w-4xl w-[95%] sm:w-[80%] bg-transparent p-4 max-h-[90vh] overflow-auto flex flex-col items-center justify-center"
+          className="relative max-w-4xl w-[95%] sm:w-[80%] bg-transparent p-4 max-h-[90vh] overflow-auto no-scrollbar flex flex-col items-center justify-center"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -595,7 +595,7 @@ const AdsDetailsPage = () => {
             </button>
           )}
 
-          <div className="mt-4 flex gap-2 overflow-x-auto py-2 rounded justify-center items-center">
+          <div className="mt-4 flex gap-2 overflow-hidden py-2 rounded justify-center items-center">
             {imgs.map((s, i) => (
               <button
                 key={i}
@@ -1055,11 +1055,11 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={currentUserProfile?.avatar || "/userPfp2.jpg"}
-            alt={currentUserProfile?.name || "Seller"}
+            src={owner?.avatar || "/public/userPfp2.jpg"}
+            alt={owner?.name || "Seller"}
             className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
           />
-          {currentUserProfile?.admin_verified && (
+          {owner?.admin_verified && (
             <img
               src="/verified.svg"
               alt="Verified"
@@ -1071,7 +1071,7 @@ const AdsDetailsPage = () => {
           <h2 className="text-sm text-gray-500 md:text-[1vw]">
             {currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}
           </h2>
-          <h3 className="font-semibold md:text-[1.2vw]">{currentAdData?.owner?.name ?? "Seller"}</h3>
+          <h3 className="font-semibold md:text-[1.2vw]">{owner?.name ?? "Seller"}</h3>
           <h3 className="text-sm text-gray-600 md:text-[1vw]">Total Ads: {sellerProducts.length}</h3>
         </div>
       </div>
@@ -1079,14 +1079,13 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-start gap-2 flex-col">
           <h4 className="text-xl md:text-[1.5vw]">{currentAdData?.owner?.name ?? "Seller"}</h4>
-          <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
+                <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
             <span className="text-[10px] md:text-[0.9vw] text-green-800">
               {(() => {
-                // prefer level from product owner if available, otherwise from current user profile when viewing own ad
-                const ownerLevel = (currentAdData?.owner as unknown as { level?: string })?.level as string | undefined;
+                // prefer level from product owner if available (use owner only)
+                const ownerLevel = (owner as unknown as { level?: string })?.level as string | undefined;
                 if (ownerLevel) return ownerLevel;
-                if (currentUserProfile && currentUserProfile.id === ownerId) return currentUserProfile.level;
                 return "High level";
               })()}
             </span>

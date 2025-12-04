@@ -1,15 +1,17 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from 'sonner';
 import submittedGif from "../assets/Submitted.gif";
 import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
+import { usePatchProduct, useProduct } from "../features/products/useProducts";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import useLocationSelection from "../hooks/useLocationSelection";
-import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
-import { getSubcategories } from "../services/subcategoryService";
+import { getFeature, getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import { getSubcategories, getSubcategory } from "../services/subcategoryService";
 import type { AdMetadata } from "../types/AdMetaData";
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
@@ -52,9 +54,23 @@ export default function PostAdForm() {
     (async () => {
       try {
         if (typeof categoryId === "number" && !isNaN(categoryId)) {
-          const subs = await getSubcategories({ category: categoryId });
+          let subs = await getSubcategories({ category: categoryId }) as any;
           if (!mounted) return;
-          setSubcategories(subs.map((s) => ({ id: s.id, name: s.name })));
+          // DEV: inspect raw response to help debug why subcategories might be empty
+          if (import.meta.env.DEV) {
+            try {
+              console.debug("Raw subcategories response for category", categoryId, subs);
+            } catch { void 0; }
+          }
+          // Some APIs return { results: [...] } while others return an array directly.
+          if (!Array.isArray(subs) && subs && Array.isArray(subs.results)) subs = subs.results;
+          const mapped = (subs || []).map((s: any) => ({ id: s.id, name: s.name ?? s.title ?? s.display_name ?? s.label ?? "" }));
+          if (import.meta.env.DEV) {
+            try {
+              console.debug("Mapped subcategories:", mapped);
+            } catch { void 0; }
+          }
+          setSubcategories(mapped);
         } else {
           setSubcategories([]);
         }
@@ -76,8 +92,10 @@ export default function PostAdForm() {
       try {
         if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
           if (import.meta.env.DEV) console.debug("Fetching feature definitions for subcategory:", subcategoryId);
-          const features = await getFeatures({ subcategory: subcategoryId });
+          let features = await getFeatures({ subcategory: subcategoryId }) as any;
           if (!mounted) return;
+          // Some backends return { results: [...] }
+          if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
           // map to minimal definition shape used by this component
           const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
           if (import.meta.env.DEV) console.debug("Fetched feature definitions:", defs);
@@ -260,6 +278,225 @@ export default function PostAdForm() {
 
   // Mutation hook for posting ads
   const postAdMutation = usePostAd();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("edit");
+  const { data: existingProduct } = useProduct(editId ?? "");
+  const patchMutation = usePatchProduct();
+
+  // Prefill form when editing an existing product (robust handling)
+  useEffect(() => {
+    if (!existingProduct) return;
+
+    if (import.meta.env.DEV) {
+      try {
+        console.debug("[Edit Prefill] existingProduct:", existingProduct);
+        console.debug("[Edit Prefill] fetchedCategories:", fetchedCategories);
+        console.debug("[Edit Prefill] current subcategories:", subcategories);
+        console.debug("[Edit Prefill] groupedLocations keys:", Object.keys(groupedLocations || {}));
+      } catch (e) { void e; }
+    }
+
+    try {
+      setTitle(existingProduct.name ?? "");
+      setPrice(typeof existingProduct.price === "number" ? existingProduct.price : Number(existingProduct.price ?? "") || "");
+
+      // category: accept object or id
+      try {
+        const prodCatRaw = (existingProduct as any).category ?? null;
+        let prodCatId = null as number | null;
+        if (prodCatRaw != null) {
+          if (typeof prodCatRaw === 'object' && prodCatRaw !== null) {
+            prodCatId = Number(prodCatRaw.id ?? prodCatRaw.value ?? null);
+          } else {
+            prodCatId = Number(prodCatRaw);
+          }
+        }
+        if (prodCatId && !isNaN(prodCatId)) {
+          const cat = fetchedCategories.find((c) => Number(c.id) === Number(prodCatId));
+          if (cat) {
+            setCategory(cat.name);
+            setCategoryId(Number(cat.id));
+          } else {
+            setCategoryId(prodCatId);
+          }
+        }
+      } catch { void 0; }
+
+      // subcategory: handle multiple shapes/keys
+      try {
+        const prodSubRaw = (existingProduct as any).subcategory ?? (existingProduct as any).subcategory_id ?? (existingProduct as any).sub_category ?? (existingProduct as any).subCategory ?? null;
+        if (prodSubRaw != null) {
+          if (typeof prodSubRaw === 'object' && prodSubRaw !== null && typeof prodSubRaw.id !== 'undefined') {
+            setSubcategoryId(Number(prodSubRaw.id));
+          } else if (!isNaN(Number(prodSubRaw))) {
+            setSubcategoryId(Number(prodSubRaw));
+          } else {
+            // try to match by name later when subcategories loaded
+            // store on a temporary attribute via closure (handled in next effect)
+          }
+        }
+      } catch { void 0; }
+
+      // type -> purpose mapping
+      if (existingProduct.type === "SALE") setPurpose("Sale");
+      else if (existingProduct.type === "RENT") setPurpose("Rent");
+      else setPurpose("Pay Later");
+
+      // images
+      const imgs = Array.isArray((existingProduct as any).images) ? (existingProduct as any).images : [];
+      const mapped = imgs.map((im: any, i: number) => ({
+        id: i + 1,
+        url: (im && (im.url || im.image || im.src || im.path)) || String(im || ""),
+        file: undefined,
+        hasFile: false,
+      }));
+
+      // Include top-level image if present and not duplicated
+      try {
+        const topImage = (existingProduct as any).image;
+        if (topImage && typeof topImage === "string") {
+          const normalizedTop = String(topImage).trim();
+          const already = mapped.find((m) => String(m.url).trim() === normalizedTop);
+          if (!already) mapped.unshift({ id: mapped.length + 1, url: normalizedTop, file: undefined, hasFile: false });
+        }
+      } catch { void 0; }
+
+      if (mapped.length > 0) setUploadedImages(mapped as any);
+
+      // product features
+      try {
+        const pfs = Array.isArray((existingProduct as any).product_features) ? (existingProduct as any).product_features : [];
+        if (pfs.length > 0) {
+          const fv: Record<number, string> = {};
+          pfs.forEach((pf: any) => {
+            if (!pf) return;
+            let fid = NaN;
+            if (typeof pf.feature === 'number') fid = Number(pf.feature);
+            else if (pf.feature && typeof pf.feature === 'object' && (pf.feature.id || pf.feature_id)) fid = Number(pf.feature.id ?? pf.feature.feature_id ?? pf.feature_id);
+            else if (typeof pf.feature_id === 'number' || typeof pf.feature_id === 'string') fid = Number(pf.feature_id);
+            if (!isNaN(fid) && typeof pf.value !== 'undefined') fv[fid] = String(pf.value ?? '');
+          });
+          if (Object.keys(fv).length > 0) setFeatureValues((prev) => ({ ...prev, ...fv }));
+
+          // If the product already includes product_features with nested feature objects,
+          // derive feature definitions from them so we can fetch possible values immediately
+          // without waiting for subcategory-based feature discovery.
+          try {
+            const defs = pfs
+              .map((pf: any) => {
+                const f = pf && pf.feature ? pf.feature : null;
+                if (!f) return null;
+                const id = Number(f.id ?? f.feature_id ?? null);
+                const name = String(f.name ?? f.display_name ?? f.title ?? f.label ?? "").trim();
+                if (isNaN(id)) return null;
+                return { id, name };
+              })
+              .filter((d: any) => d !== null)
+              // de-duplicate by id
+              .reduce((acc: any[], cur: any) => {
+                if (!acc.find((x) => x.id === cur.id)) acc.push(cur);
+                return acc;
+              }, [] as any[]);
+
+            if (defs.length > 0) {
+              // Merge with any existing definitions (avoid overwriting if already present)
+              setFeatureDefinitions((prev) => {
+                const merged = [...prev];
+                defs.forEach((d: any) => {
+                  if (!merged.find((m) => m.id === d.id)) merged.push(d);
+                });
+                return merged;
+              });
+            }
+            // If we don't already have a subcategory selected, try to infer one
+            // from the feature definitions by fetching feature details and
+            // reading their linked subcategory. This helps prefill the form
+            // when the product includes feature objects but not explicit
+            // subcategory/category fields.
+            try {
+              if ((subcategoryId === "" || subcategoryId == null) && defs.length > 0) {
+                (async () => {
+                  const fids = defs.map((d: any) => Number(d.id)).filter((n: number) => !isNaN(n));
+                  if (fids.length > 0) {
+                    const details = await Promise.allSettled(fids.map((fid: number) => getFeature(fid)));
+                    for (const r of details) {
+                      if (r.status === "fulfilled") {
+                        const feat = r.value as any;
+                        const possibleSub = feat?.subcategory ?? feat?.subcategory_id ?? feat?.sub_category ?? feat?.category ?? null;
+                        let subId = null as number | null;
+                        if (possibleSub != null) {
+                          if (typeof possibleSub === "object" && possibleSub?.id) subId = Number(possibleSub.id);
+                          else if (!isNaN(Number(possibleSub))) subId = Number(possibleSub);
+                        }
+                        if (subId && !isNaN(subId)) {
+                          setSubcategoryId(Number(subId));
+                          // fetch subcategory to determine its category and set categoryId
+                          try {
+                            const sub = await getSubcategory(Number(subId));
+                            const catRaw = (sub as any)?.category ?? (sub as any)?.category_id ?? null;
+                            let catId = null as number | null;
+                            if (catRaw != null) {
+                              if (typeof catRaw === "object" && catRaw?.id) catId = Number(catRaw.id);
+                              else if (!isNaN(Number(catRaw))) catId = Number(catRaw);
+                            }
+                            if (catId && !isNaN(catId)) {
+                              setCategoryId(Number(catId));
+                              const cat = fetchedCategories.find((c) => Number(c.id) === Number(catId));
+                              if (cat) setCategory(cat.name);
+                            }
+                          } catch { void 0; }
+                          break;
+                        }
+                      }
+                    }
+                  }
+                })().catch(() => { /* ignore errors */ });
+              }
+            } catch { void 0; }
+          } catch { void 0; }
+        }
+      } catch { void 0; }
+
+      // location
+      try {
+        const loc = (existingProduct as any).location ?? (existingProduct as any).place ?? null;
+        if (loc) {
+          if (typeof loc === 'string') {
+            // try to parse "Place, Region" or "Region - Place"
+            selectPlace(String(loc));
+          } else if (typeof loc === 'object') {
+            const place = String(loc.name || loc.place || loc.title || '').trim();
+            const region = String(loc.region || loc.state || loc.area || '').trim();
+            if (place) applySavedLocation({ label: region ? `${place}, ${region}` : place, region, place });
+          }
+        }
+      } catch { void 0; }
+    } catch (e) {
+      void e;
+    }
+  }, [existingProduct, fetchedCategories]);
+
+  // Ensure subcategory is applied when subcategories for the selected category are available
+  useEffect(() => {
+    if (!existingProduct) return;
+    const prodSubRaw = (existingProduct as any).subcategory ?? (existingProduct as any).subcategory_id ?? (existingProduct as any).sub_category ?? (existingProduct as any).subCategory ?? null;
+    if (!prodSubRaw) return;
+    try {
+      const candidateId = typeof prodSubRaw === 'object' && prodSubRaw !== null && typeof prodSubRaw.id !== 'undefined' ? Number(prodSubRaw.id) : Number(prodSubRaw);
+      if (!isNaN(candidateId) && subcategories.find((s) => Number(s.id) === candidateId)) {
+        setSubcategoryId(candidateId);
+        return;
+      }
+      // try matching by name
+      const name = String((typeof prodSubRaw === 'object' ? (prodSubRaw.name ?? prodSubRaw.title ?? '') : prodSubRaw) || '').trim();
+      if (name) {
+        const matched = subcategories.find((s) => String(s.name).trim().toLowerCase() === name.toLowerCase());
+        if (matched) setSubcategoryId(Number(matched.id));
+      }
+    } catch {
+      void 0;
+    }
+  }, [subcategories, existingProduct]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -425,12 +662,30 @@ export default function PostAdForm() {
     console.log("Ad Metadata to submit:", metadata);
 
     try {
-      // pass the metadata including file objects (mutation handler will detect files)
-      const result = await postAdMutation.mutateAsync(metadata as any);
-      console.log("Server response:", result);
-      const serverMessage = (result as { message?: string })?.message;
-      toast.success(serverMessage ?? "Ad saved successfully!");
-      setShowSuccess(true);
+      if (editId) {
+        // Patch existing product (partial update)
+        const patchBody: Partial<any> = {
+          name: metadata.title,
+          price: metadata.price ?? metadata.pricing?.monthly?.value ?? 0,
+          category: Number(metadata.category) || undefined,
+          duration: metadata.duration ?? undefined,
+          description: metadata.description ?? undefined,
+          // If we have an existing image URL, include it so the server can set product.image
+          ...(uploadedImages && uploadedImages[0] && uploadedImages[0].url ? { image: uploadedImages[0].url } : {}),
+        };
+
+        const result = await patchMutation.mutateAsync({ id: editId, body: patchBody });
+        toast.success("Ad updated successfully");
+        console.log("Patch response:", result);
+        setShowSuccess(true);
+      } else {
+        // pass the metadata including file objects (mutation handler will detect files)
+        const result = await postAdMutation.mutateAsync(metadata as any);
+        console.log("Server response:", result);
+        const serverMessage = (result as { message?: string })?.message;
+        toast.success(serverMessage ?? "Ad saved successfully!");
+        setShowSuccess(true);
+      }
     } catch (err: unknown) {
       console.error("Upload failed:", err);
 
@@ -513,7 +768,7 @@ export default function PostAdForm() {
       type="submit"
       className="w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]"
     >
-      {isSubmitting ? "Saving..." : "Save"}
+      {isSubmitting ? (editId ? "Updating..." : "Saving...") : (editId ? "Update" : "Save")}
     </button>
   );
 

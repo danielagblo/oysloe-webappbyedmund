@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import "../App.css";
 import Button from "../components/Button";
 import CopyButton from "../components/CopyButton";
+import LevelProgress from "../components/LevelProgress";
 import MenuButton from "../components/MenuButton";
 import ProgressBar from "../components/ProgressBar";
 import useApplyCoupon from "../features/coupons/useApplyCoupon";
@@ -97,7 +98,7 @@ const ReferPage = () => {
   let goldPercent = Math.round(
     ((points - THRESHOLDS.gold) /
       Math.max(1, THRESHOLDS.diamond - THRESHOLDS.gold)) *
-      100,
+    100,
   );
   if (!isFinite(goldPercent) || goldPercent < 0) goldPercent = 0;
   if (goldPercent > 100) goldPercent = 100;
@@ -449,38 +450,14 @@ const ReferPage = () => {
     );
   };
   const Level = () => (
-    <div className="w-full px-3 h-full bg-white shadom-sm rounded-2xl pt-4 pb-18">
-      <div className="w-full h-full flex flex-col md:justify-center gap-2 md:py-8">
-        <div className=" flex rounded-lg flex-col justify-between bg-[#F9F9F9] p-3">
-          <h2 className="text-sm">Silver</h2>
-          <h3 className="text-xs text-gray-500">
-            {remainingToGold.toLocaleString()} points to gold
-          </h3>
-          <div className="my-2 w-full">
-            <ProgressBar percent={silverPercent} />
-          </div>
-        </div>
-        <div className=" flex flex-col rounded-lg justify-between bg-[#F9F9F9] p-3">
-          <h2 className="text-sm">{"Gold"}</h2>
-          <h3 className="text-xs text-gray-500">
-            {remainingToDiamond.toLocaleString()} points to diamond
-          </h3>
-          <div className="my-2 w-full">
-            <ProgressBar percent={goldPercent} />
-          </div>
-        </div>
-        <div className=" flex flex-col rounded-lg justify-between bg-[#F9F9F9] p-3">
-          <h2 className="text-sm">Diamond</h2>
-          <h3 className="text-xs text-gray-500">{diamondPointsText}</h3>
-          <div className="my-2 w-full">
-            <ProgressBar percent={diamondPercent} />
-          </div>
-        </div>
-        <h2 className="text-xs text-gray-500">
-          Your earning levels also helps us to rank you.
-        </h2>
-      </div>
-    </div>
+    <LevelProgress
+      silverPercent={silverPercent}
+      goldPercent={goldPercent}
+      diamondPercent={diamondPercent}
+      remainingToGold={remainingToGold}
+      remainingToDiamond={remainingToDiamond}
+      diamondPointsText={diamondPointsText}
+    />
   );
 
   return (

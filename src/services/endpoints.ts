@@ -58,11 +58,12 @@ export const endpoints = {
     patch: (id: number | string) => `/products/${id}/`,
     delete: (id: number | string) => `/products/${id}/`,
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
+    confirmMarkAsTaken: (id: number | string) => `/products/${id}/confirm-mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     related: "/products/related/",
-    report: (id: number | string) => `/products/${id}/report/`,
+    // report: (id: number | string) => `/products/${id}/report/`,
     // Legacy per-product reports endpoint (kept for compatibility)
-    reports: (id: number | string) => `/products/${id}/reports/`,
+    report: (id: number | string) => `/products/${id}/report/`,
     favourite: (id: number | string) => `/products/${id}/favourite/`,
     favouritesList: () => `/products/favourites/`,
 

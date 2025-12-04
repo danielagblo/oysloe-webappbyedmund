@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  confirmMarkProductAsTaken,
   createProduct,
   deleteProduct,
   getProduct,
@@ -156,6 +157,28 @@ export const useMarkProductAsTaken = () => {
       id: number | string;
       body?: Record<string, unknown>;
     }) => markProductAsTaken(id, body),
+
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({
+        queryKey: productKeys.detail(variables.id),
+      });
+      qc.invalidateQueries({ queryKey: productKeys.all });
+    },
+  });
+};
+
+// Hook to confirm the mark-as-taken action (actually sets is_taken)
+export const useConfirmMarkAsTaken = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      body,
+    }: {
+      id: number | string;
+      body?: Record<string, unknown>;
+    }) => confirmMarkProductAsTaken(id, body),
 
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({

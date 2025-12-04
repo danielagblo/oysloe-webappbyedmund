@@ -17,6 +17,7 @@ export interface Product {
   images: ProductImage[];
   product_features: ProductFeature[];
   favourited_by_user?: boolean;
+  total_reports?: number;
   location: Location;
   owner: ProductOwner;
   created_at: string;

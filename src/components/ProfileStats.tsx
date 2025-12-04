@@ -1,8 +1,8 @@
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
+import LevelProgress from "./LevelProgress";
 import ProgressBar from "./ProgressBar";
-import RatingReviews from "./RatingsReviews";
 
 export default function ProfileStats() {
   const { profile: user, loading } = useUserProfile();
@@ -93,7 +93,8 @@ export default function ProfileStats() {
           <AdStats />
         </div>
         <div className="shadow-sm py-2 rounded-xl bg-white w-full h-[46vh]">
-          <RatingReviews userId={user ? (user as UserProfile).id : undefined} />
+          <LevelProgress compact />
+          {/* <RatingReviews userId={user ? (user as UserProfile).id : undefined} /> */}
         </div>
       </div>
     </div>

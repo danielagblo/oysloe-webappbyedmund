@@ -93,8 +93,9 @@ export const markProductAsTaken = async (
   if (useMocks) {
     const idx = mockProducts.findIndex((p) => p.id === +id);
     if (idx === -1) throw new Error("Mock product not found");
-    mockProducts[idx].is_taken = true;
-    console.log("Mock markProductAsTaken:", mockProducts[idx]);
+    // mark-as-taken endpoint should only notify the owner (create alert + sms)
+    // It does NOT set `is_taken` — confirmation endpoint actually performs that.
+    console.log("Mock markProductAsTaken (notify owner):", mockProducts[idx]);
     return mockProducts[idx];
   }
 
@@ -103,6 +104,27 @@ export const markProductAsTaken = async (
   if (payload.product == null) payload.product = Number(id);
 
   return apiClient.post<Product>(products.markAsTaken(id), payload);
+};
+
+// ---------------------
+// CONFIRM MARK AS TAKEN
+// ---------------------
+export const confirmMarkProductAsTaken = async (
+  id: number | string,
+  body: Record<string, unknown> = {},
+): Promise<Product> => {
+  if (useMocks) {
+    const idx = mockProducts.findIndex((p) => p.id === +id);
+    if (idx === -1) throw new Error("Mock product not found");
+    mockProducts[idx].is_taken = true;
+    console.log("Mock confirmMarkProductAsTaken (marked taken):", mockProducts[idx]);
+    return mockProducts[idx];
+  }
+
+  const payload = { ...(body || {}) } as Record<string, unknown>;
+  if (payload.product == null) payload.product = Number(id);
+
+  return apiClient.post<Product>(products.confirmMarkAsTaken(id), payload);
 };
 
 // ---------------------
@@ -160,7 +182,7 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
 };
 
 export const getProductReportCount = async (productId: number | string) => {
-  return apiClient.get<number>(endpoints.products.report(productId));
+  return apiClient.get<number>(endpoints.productReports.detail(productId));
 };
 
 
@@ -520,6 +542,7 @@ export default {
   patchProduct,
   deleteProduct,
   markProductAsTaken,
+  confirmMarkProductAsTaken,
   setProductStatus,
   getProductsForOwner,
   getRelatedProducts,

@@ -113,7 +113,7 @@ const ReviewPage = () => {
   }, [sendSuccess]);
 
   return (
-    <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-(--div-active) text-(--dark-def) relative">
+    <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-(--div-active) text-(--dark-def) relative overflow-hidden">
       {/* Mobile header */}
       <div className="sm:hidden w-full fixed top-0 z-30">
         <MobileBanner page="Reviews" />

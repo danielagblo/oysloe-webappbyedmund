@@ -14,7 +14,9 @@ export const getFeatures = async (params?: {
     qs.append("subcategory", String(params.subcategory));
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Feature[]>(`${endpoints.features.list()}${query}`);
+  const resp = await apiClient.get<any>(`${endpoints.features.list()}${query}`);
+  if (!Array.isArray(resp) && resp && Array.isArray(resp.results)) return resp.results as Feature[];
+  return (resp as Feature[]) || [];
 };
 
 export const getFeature = async (id: number): Promise<Feature> => {

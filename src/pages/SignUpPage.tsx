@@ -113,7 +113,7 @@ const SignInPage = () => {
     }
 
     try {
-      console.log("Sending formdata to server...");
+      console.log("Redirecting to referral verification...");
       const registerData: RegisterRequest = {
         email: phoneVal === data.phone ? data.email : data.email,
         phone: phoneVal,
@@ -123,19 +123,17 @@ const SignInPage = () => {
         referral_code: data.referral_code || "",
       };
 
-      await registerMutation.mutateAsync(registerData as any);
-
-      // Navigate to login (mutation already stores token/user)
-      console.log("Registration successful, navigating to login...");
-      navigate("/login");
+      // Navigate to the referral verification page first and pass the
+      // registration payload in location state so the verification page
+      // can handle verification and then submit the registration.
+      navigate("/referal-verification", { state: { registerData } });
+      return;
     } catch (err) {
-      console.log("could not register user");
+      console.log("could not navigate to referral verification");
       const errorMessage =
         err instanceof Error
           ? err.message
-          : err && typeof err === "object" && "message" in err
-            ? (err as any).message
-            : "Registration failed. Please try again.";
+          : "Navigation failed. Please try again.";
       setError(errorMessage as string);
     }
   };

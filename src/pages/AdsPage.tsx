@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
 import {
@@ -22,6 +23,7 @@ const AdsPage = () => {
   const deleteMutation = useDeleteProduct();
   const markTakenMutation = useMarkProductAsTaken();
   const setStatusMutation = useSetProductStatus();
+  const navigate = useNavigate();
 
   const mapToLabel = (p: any) => {
     if (p.is_taken) return "Taken";
@@ -86,41 +88,41 @@ const AdsPage = () => {
         </div>
 
         <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2 justify-evenly">
-          {filteredAds.length < 1 
+          {filteredAds.length < 1
             ? <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
-                <img 
-                  src="/public/nothing-to-show.png" 
-                  alt="Nothing to show here" 
-                  className="h-40 lg:h-50 w-auto"
-                />
-                <p className="text-xl text-(--dark-def)">No {activeTab} ads to show.</p>
-              </div>
-            : filteredAds.map((ad) => (
-            <div
-              key={ad.id}
-              className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
-            >
-              <div className="flex flex-row justify-between items-center mb-2">
-                <img
-                  className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
-                  src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/no-image.jpeg"}
-                  alt={ad.name}
-                />
-                <button
-                  className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-(--div-active) px-4 rounded-full pb-2 "
-                  onClick={() => setSelectedAd(ad)}
-                >
-                  ...
-                </button>
-              </div>
-              <div className="mt-2">
-                <div className="w-4/5">
-                  <p onClick={() => console.log(ad)} className="font-medium truncate">{ad.name}</p>
-                </div>
-                <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
-              </div>
+              <img
+                src="/public/nothing-to-show.png"
+                alt="Nothing to show here"
+                className="h-40 lg:h-50 w-auto"
+              />
+              <p className="text-xl text-(--dark-def)">No {activeTab} ads to show.</p>
             </div>
-          ))}
+            : filteredAds.map((ad) => (
+              <div
+                key={ad.id}
+                className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
+              >
+                <div className="flex flex-row justify-between items-center mb-2">
+                  <img
+                    className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
+                    src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/no-image.jpeg"}
+                    alt={ad.name}
+                  />
+                  <button
+                    className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-(--div-active) px-4 rounded-full pb-2 "
+                    onClick={() => setSelectedAd(ad)}
+                  >
+                    ...
+                  </button>
+                </div>
+                <div className="mt-2">
+                  <div className="w-4/5">
+                    <p onClick={() => console.log(ad)} className="font-medium truncate">{ad.name}</p>
+                  </div>
+                  <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
+                </div>
+              </div>
+            ))}
           <div className="h-20 w-full" />
         </div>
 
@@ -139,18 +141,23 @@ const AdsPage = () => {
                   <div className="flex justify-around text-xs">
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
-                      onClick={async () => {
-                        try {
-                          await setStatusMutation.mutateAsync({ id: selectedAd.id, status: "ACTIVE" });
-                          toast.success("Ad reposted");
-                          setSelectedAd(null);
-                        } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
-                          toast.error(msg);
-                        }
+                      onClick={() => {
+                        // Open the post-ad page in "duplicate" mode; saving will create a new ad
+                        setSelectedAd(null);
+                        navigate(`/postad?duplicate=${selectedAd.id}`);
                       }}
                     >
                       Repost Ad
+                    </button>
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        // navigate to post ad page in edit mode
+                        setSelectedAd(null);
+                        navigate(`/postad?edit=${selectedAd.id}`);
+                      }}
+                    >
+                      Edit Details
                     </button>
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40"
@@ -166,15 +173,6 @@ const AdsPage = () => {
                       }}
                     >
                       Delete Ad
-                    </button>
-                    <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
-                      onClick={() => {
-                        // navigate to edit page or open edit UI (not implemented)
-                        toast.info("Edit details not implemented yet");
-                      }}
-                    >
-                      Edit Details
                     </button>
                   </div>
 
@@ -223,6 +221,16 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        // navigate to edit page or open edit UI (not implemented)
+                        setSelectedAd(null);
+                        navigate(`/postad?edit=${selectedAd.id}`);
+                      }}
+                    >
+                      Edit Details
+                    </button>
+                    <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
                       onClick={async () => {
                         try {
@@ -236,15 +244,6 @@ const AdsPage = () => {
                       }}
                     >
                       Delete Ad
-                    </button>
-                    <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
-                      onClick={() => {
-                        // navigate to edit page or open edit UI (not implemented)
-                        toast.info("Edit details not implemented yet");
-                      }}
-                    >
-                      Edit Details
                     </button>
                   </div>
                 </div>
@@ -267,6 +266,15 @@ const AdsPage = () => {
                       Mark as Taken
                     </button>
                     <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/postad?edit=${selectedAd.id}`);
+                      }}
+                    >
+                      Edit Details
+                    </button>
+                    <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
                       onClick={async () => {
                         try {
@@ -281,12 +289,35 @@ const AdsPage = () => {
                     >
                       Delete Ad
                     </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 mt-6 font-medium">
+                  <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/postad?duplicate=${selectedAd.id}`);
+                      }}
+                    >
+                      Repost Ad
+                    </button>
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/postad?edit=${selectedAd.id}`);
+                      }}
+                    >
+                      Edit Details
+                    </button>
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
                       onClick={async () => {
                         try {
-                          await setStatusMutation.mutateAsync({ id: selectedAd.id, status: "SUSPENDED" });
-                          toast.success("Ad suspended");
+                          await deleteMutation.mutateAsync(selectedAd.id);
+                          toast.success("Ad deleted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
                           const msg = err instanceof Error ? err.message : String(err);
@@ -294,14 +325,10 @@ const AdsPage = () => {
                         }
                       }}
                     >
-                      Suspend
+                      Delete Ad
                     </button>
                   </div>
                 </div>
-              ) : (
-                <p className="mt-6 text-center text-gray-600">
-                  No actions available for {mapToLabel(selectedAd)} ads.
-                </p>
               )}
             </div>
           </div>
