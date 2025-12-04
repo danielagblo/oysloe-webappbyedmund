@@ -992,7 +992,7 @@ const AdsDetailsPage = () => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => {
-                      if (likeMutation.isLoading) return;
+                      if (likeMutation.isPending) return;
                       setAnimatingLikes((prev) => new Set(prev).add(review.id));
                       setTimeout(() => {
                         setAnimatingLikes((prev) => {
