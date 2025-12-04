@@ -252,7 +252,7 @@ const AdsDetailsPage = () => {
 
   const favouriteCount = getLikeCount(currentAdData) || getLikeCount(currentAdDataFromQuery) || favourites.length || 0;
 
-  const ownerId = currentAdData?.owner?.id ?? null;
+  // const ownerId = currentAdData?.owner?.id ?? null;
 
   const openChatWithOwnerAndSend = async (text: string) => {
     if (!owner || !owner.id) {

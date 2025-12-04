@@ -6,7 +6,7 @@ import {
   useDeleteProduct,
   useMarkProductAsTaken,
   useOwnerProducts,
-  useSetProductStatus,
+  // useSetProductStatus,
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { formatMoney } from "../utils/formatMoney";
@@ -22,7 +22,7 @@ const AdsPage = () => {
 
   const deleteMutation = useDeleteProduct();
   const markTakenMutation = useMarkProductAsTaken();
-  const setStatusMutation = useSetProductStatus();
+  // const setStatusMutation = useSetProductStatus();
   const navigate = useNavigate();
 
   const mapToLabel = (p: any) => {

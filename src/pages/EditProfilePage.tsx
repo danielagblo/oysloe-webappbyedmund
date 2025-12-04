@@ -130,16 +130,16 @@ const EditProfilePage = () => {
     return 'Upload';
   };
 
-  const stripAssetPath = (val?: string) => {
-    if (!val) return val;
-    try {
-      // If the value is an assets path, return just the filename
-      if (val.includes("/assets/")) return val.split("/").pop();
-    } catch {
-      // ignore
-    }
-    return val;
-  };
+  // const stripAssetPath = (val?: string) => {
+  //   if (!val) return val;
+  //   try {
+  //     // If the value is an assets path, return just the filename
+  //     if (val.includes("/assets/")) return val.split("/").pop();
+  //   } catch {
+  //     // ignore
+  //   }
+  //   return val;
+  // };
 
   const navigate = useNavigate();
 

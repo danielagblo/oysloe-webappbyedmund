@@ -344,7 +344,7 @@ export default function PostAdForm() {
 
       // images
       const imgs = Array.isArray((existingProduct as any).images) ? (existingProduct as any).images : [];
-      const mapped = imgs.map((im: any, i: number) => ({
+      const mapped: UploadedImage[] = imgs.map((im: any, i: number) => ({
         id: i + 1,
         url: (im && (im.url || im.image || im.src || im.path)) || String(im || ""),
         file: undefined,
@@ -356,12 +356,12 @@ export default function PostAdForm() {
         const topImage = (existingProduct as any).image;
         if (topImage && typeof topImage === "string") {
           const normalizedTop = String(topImage).trim();
-          const already = mapped.find((m) => String(m.url).trim() === normalizedTop);
+          const already = mapped.find((m: UploadedImage) => String(m.url).trim() === normalizedTop);
           if (!already) mapped.unshift({ id: mapped.length + 1, url: normalizedTop, file: undefined, hasFile: false });
         }
       } catch { void 0; }
 
-      if (mapped.length > 0) setUploadedImages(mapped as any);
+      if (mapped.length > 0) setUploadedImages(mapped);
 
       // product features
       try {
@@ -669,7 +669,6 @@ export default function PostAdForm() {
           price: metadata.price ?? metadata.pricing?.monthly?.value ?? 0,
           category: Number(metadata.category) || undefined,
           duration: metadata.duration ?? undefined,
-          description: metadata.description ?? undefined,
           // If we have an existing image URL, include it so the server can set product.image
           ...(uploadedImages && uploadedImages[0] && uploadedImages[0].url ? { image: uploadedImages[0].url } : {}),
         };
