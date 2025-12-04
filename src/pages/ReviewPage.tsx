@@ -9,8 +9,7 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
-import { createReview, patchReview } from "../services/reviewService";
-import { likeReview } from "../services/reviewService";
+import { createReview, likeReview, patchReview } from "../services/reviewService";
 import type { ReviewPayload } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
 
@@ -225,9 +224,8 @@ const ReviewPage = () => {
                       <img
                         src="/like.svg"
                         alt=""
-                        className={`w-4 h-4 transition-opacity ${
-                          animatingLikes.has(rev.id) ? "animate-like-heartbeat" : ""
-                        } ${rev.liked ? "opacity-100" : "opacity-60"}`}
+                        className={`w-4 h-4 transition-opacity ${animatingLikes.has(rev.id) ? "animate-like-heartbeat" : ""
+                          } ${rev.liked ? "opacity-100" : "opacity-60"}`}
                       />
                     </button>
                     <span className="text-xs">{rev.likes_count ?? 0}</span>

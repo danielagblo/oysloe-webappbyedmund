@@ -1,3 +1,4 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import "../App.css";
@@ -8,11 +9,10 @@ import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { likeReview } from "../services/reviewService";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
+import { likeReview } from "../services/reviewService";
 import type { Product } from "../types/Product";
 import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
@@ -978,9 +978,8 @@ const AdsDetailsPage = () => {
                     <img
                       src="/like.svg"
                       alt=""
-                      className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${
-                        animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
-                      } ${review.liked ? "opacity-100" : "opacity-60"}`}
+                      className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
+                        } ${review.liked ? "opacity-100" : "opacity-60"}`}
                     />
                     <h3>Like</h3>
                   </button>
