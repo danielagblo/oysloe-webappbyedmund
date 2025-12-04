@@ -692,7 +692,7 @@ const AdsDetailsPage = () => {
     </div>
   );
   const SafetyTips = () => (
-    <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-lg py-1 px-2 pb-5">
+    <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-2xl py-1 px-2 pb-5 lg:mx-6">
       <h2 className="text-xl font-bold mb-2 md:text-[1.75vw]">Safety tips</h2>
       <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-(--div-active) sm:bg-white md:text-[0.9vw]">
         Follow this tips and report any suspicious activity.
@@ -937,7 +937,7 @@ const AdsDetailsPage = () => {
         </h2>
         <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
           {productReviews.length === 0 && (
-            <p>
+            <p className="text-[1.2vw]">
               No <span className="max-sm:hidden">comments</span>
               <span className="sm:hidden">reviews</span> to show. Leave one?
             </p>
@@ -1287,7 +1287,7 @@ const AdsDetailsPage = () => {
                   <RatingReviews layout="row" rd={reviewDeconstruction} />
                   <CommentsSection />
                 </div>
-                <div className="p-6 rounded-lg w-full -mt-17">
+                <div className="p-6 rounded-lg w-full">
                   <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
                     <ActionButtons
                       onMarkTaken={handleMarkAsTaken}
