@@ -2,7 +2,7 @@ import type { Location, LocationPayload } from "./Location";
 import type { ProductFeature } from "./ProductFeature";
 import type { ProductImage } from "./ProductImage";
 
-export type ProductType = "SALE" | "RENT" | "SERVICE";
+export type ProductType = "SALE" | "RENT" | "PAYLATER";
 export type ProductStatus = "ACTIVE" | "SUSPENDED" | "PENDING" | "REJECTED";
 
 export interface ProductOwner {

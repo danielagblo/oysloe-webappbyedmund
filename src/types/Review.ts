@@ -8,10 +8,17 @@ export interface Review {
   rating: number;
   comment?: string;
   created_at: string;
+  likes_count?: number;
+  liked?: boolean;
 }
 
 export type ReviewPayload = {
   product: number;
   rating: number;
+  comment?: string;
+};
+
+export type LikeReviewPayload = {
+  rating?: number;
   comment?: string;
 };
