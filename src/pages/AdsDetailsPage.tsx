@@ -451,16 +451,28 @@ const AdsDetailsPage = () => {
     const galleryImages = images.length > 0 ? images : ["/no-image.jpeg"];
     const max = galleryImages.length;
 
+    const maxStart = Math.max(0, max - 3);
+
+    // Ensure the gallery window start index is always clamped so we show up to
+    // three images. If external code sets the index to a value that would
+    // produce fewer than three images at the left edge, move it left to the
+    // last valid start so users can navigate back.
+    useEffect(() => {
+      if (currentIndex > maxStart) {
+        setCurrentIndex(maxStart);
+      }
+    }, [currentIndex, maxStart, setCurrentIndex]);
+
     const prevImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex === 0) return;
+      if (currentIndex <= 0) return;
       setCurrentIndex(Math.max(0, currentIndex - 1));
     };
 
     const nextImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex >= max - 1) return;
-      setCurrentIndex(Math.min(max - 1, currentIndex + 1));
+      if (currentIndex >= maxStart) return;
+      setCurrentIndex(Math.min(maxStart, currentIndex + 1));
     };
 
     const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
@@ -469,52 +481,47 @@ const AdsDetailsPage = () => {
     return (
       <div className="w-full flex justify-center my-4 sm:mb-8">
 
-        {/* DESKTOP: main image left, thumbnails right */}
-        <div className="hidden sm:flex flex-row w-9/10 lg:w-full h-64 md:h-80 lg:h-100 gap-4 items-stretch">
-          <div className="flex-1 relative bg-white rounded-lg overflow-hidden flex items-center justify-center">
-            {max > 1 && currentIndex > 0 && (
-              <button
-                onClick={prevImage}
-                className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
-                aria-label="Previous image"
-              >
-                <img src="/arrowleft.svg" alt="Previous" />
-              </button>
-            )}
-            <img
-              src={getMainImage()}
-              alt={`Ad image ${currentIndex + 1}`}
-              className="object-cover h-full w-full cursor-zoom-in"
-              onClick={() => {
-                setPictureModalIndex(currentIndex);
-                setIsPictureModalOpen(true);
-              }}
+        {/* DESKTOP: show 3 side-by-side square images (carousel) */}
+        <div className="hidden sm:flex w-full h-80 gap-4 items-stretch relative">
+          {currentIndex > 0 && (
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              aria-label="Previous image"
+            >
+              <img src="/arrowleft.svg" alt="Previous" />
+            </button>
+          )}
 
-            />
-
-            {max > 1 && currentIndex < max - 1 && (
-              <button
-                onClick={nextImage}
-                className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
-                aria-label="Next image"
-              >
-                <img src="/arrowright.svg" alt="Next" />
-              </button>
-            )}
+          <div className="grid grid-cols-3 gap-4 w-full px-4 max-w-[1100px] mx-auto items-center">
+            {galleryImages.slice(currentIndex, currentIndex + 3).map((src, i) => {
+              const absIdx = currentIndex + i;
+              return (
+                <button
+                  key={absIdx}
+                  onClick={() => {
+                    setCurrentIndex(absIdx);
+                    setPictureModalIndex(absIdx);
+                    setIsPictureModalOpen(true);
+                  }}
+                  className={`w-full aspect-square max-w-[360px] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center`}
+                  aria-label={`Show image ${absIdx + 1}`}
+                >
+                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full" />
+                </button>
+              );
+            })}
           </div>
 
-          <div className="w-20 flex flex-col gap-2 overflow-y-auto">
-            {galleryImages.map((src, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={`w-full h-20 rounded overflow-hidden border ${idx === currentIndex ? "border-(--dark-def)" : "border-gray-200"}`}
-                aria-label={`Show image ${idx + 1}`}
-              >
-                <img src={src} alt={`Thumbnail ${idx + 1}`} className="object-scale-down w-full h-full" />
-              </button>
-            ))}
-          </div>
+          {currentIndex < maxStart && (
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              aria-label="Next image"
+            >
+              <img src="/arrowright.svg" alt="Next" />
+            </button>
+          )}
         </div>
 
         {/* MOBILE: full-width swipeable image */}
@@ -548,7 +555,10 @@ const AdsDetailsPage = () => {
 
     const close = () => {
       setIsPictureModalOpen(false);
-      setGalleryIndex(pictureModalIndex);
+      // Clamp gallery start so closing the modal doesn't leave the gallery
+      // showing a single image at the far right with no left navigation.
+      const clampStart = Math.max(0, max - 3);
+      setGalleryIndex(Math.max(0, Math.min(pictureModalIndex, clampStart)));
     };
 
     // keyboard handling is registered at top-level useEffect when modal is open
