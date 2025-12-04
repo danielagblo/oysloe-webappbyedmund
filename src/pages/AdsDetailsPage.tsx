@@ -9,6 +9,7 @@ import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
+import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
 import type { Product } from "../types/Product";
@@ -32,6 +33,16 @@ const AdsDetailsPage = () => {
   const { data: ads = [], isLoading: adsLoading } = useProducts();
   const { profile: currentUserProfile } = useUserProfile();
   const { reviews: reviews = [] } = useReviews();
+  const { data: userSubscriptions = [] } = useUserSubscriptions();
+
+  const activeUserSubscription = (userSubscriptions as any[]).find((us) => us?.is_active) || null;
+  const subscriptionMultiplierRaw = activeUserSubscription?.subscription?.multiplier ?? null;
+  const multiplierLabel = (() => {
+    if (subscriptionMultiplierRaw == null) return null;
+    const n = Number(subscriptionMultiplierRaw);
+    if (!Number.isNaN(n)) return `x${n}`;
+    return String(subscriptionMultiplierRaw);
+  })();
 
   // chat hook (declare early before any conditional returns)
   const { sendMessage, addLocalMessage } = useWsChat();
@@ -360,6 +371,11 @@ const AdsDetailsPage = () => {
           <img src="/favorited.svg" alt="" className="w-4 h-4" />
           <span className="text-xs">{favouriteCount}</span>
         </div>
+        {multiplierLabel && (
+          <div className="ml-2 text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+            {multiplierLabel}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -414,7 +430,12 @@ const AdsDetailsPage = () => {
           {imageCount > 0 ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}` : `0/0`}
         </h2>
       </div>
-      <div className="flex gap-2 ml-auto">
+      <div className="flex gap-2 ml-auto items-center">
+        {multiplierLabel && (
+          <div className="text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+            {multiplierLabel}
+          </div>
+        )}
         <button
           onClick={handlePrevious}
           className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
@@ -482,7 +503,7 @@ const AdsDetailsPage = () => {
       <div className="w-full flex justify-center my-4 sm:mb-8">
 
         {/* DESKTOP: show 3 side-by-side square images (carousel) */}
-        <div className="hidden sm:flex w-full h-80 gap-4 items-stretch relative">
+        <div className="hidden sm:flex w-full h-fit gap-4 items-stretch relative">
           {currentIndex > 0 && (
             <button
               onClick={prevImage}
@@ -493,7 +514,7 @@ const AdsDetailsPage = () => {
             </button>
           )}
 
-          <div className="grid grid-cols-3 gap-4 w-full px-4 max-w-[1100px] mx-auto items-center">
+          <div className="grid grid-cols-3 gap-4 w-full px-4 max-w-[95vw] mx-auto items-center">
             {galleryImages.slice(currentIndex, currentIndex + 3).map((src, i) => {
               const absIdx = currentIndex + i;
               return (
@@ -504,7 +525,7 @@ const AdsDetailsPage = () => {
                     setPictureModalIndex(absIdx);
                     setIsPictureModalOpen(true);
                   }}
-                  className={`w-full aspect-square max-w-[360px] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center`}
+                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center`}
                   aria-label={`Show image ${absIdx + 1}`}
                 >
                   <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full" />
