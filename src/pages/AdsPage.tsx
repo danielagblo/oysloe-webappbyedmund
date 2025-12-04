@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
+import PostAdForm from "../components/PostAdForm";
 import {
   useDeleteProduct,
   useMarkProductAsTaken,
@@ -24,6 +25,8 @@ const AdsPage = () => {
   const markTakenMutation = useMarkProductAsTaken();
   // const setStatusMutation = useSetProductStatus();
   const navigate = useNavigate();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingAdId, setEditingAdId] = useState<string | null>(null);
 
   const mapToLabel = (p: any) => {
     if (p.is_taken) return "Taken";
@@ -152,9 +155,10 @@ const AdsPage = () => {
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
-                        // navigate to post ad page in edit mode
+                        // open edit modal instead of navigation
                         setSelectedAd(null);
-                        navigate(`/postad?edit=${selectedAd.id}`);
+                        setEditingAdId(String(selectedAd.id));
+                        setShowEditModal(true);
                       }}
                     >
                       Edit Details
@@ -223,9 +227,10 @@ const AdsPage = () => {
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
-                        // navigate to edit page or open edit UI (not implemented)
+                        // open edit modal instead of navigation
                         setSelectedAd(null);
-                        navigate(`/postad?edit=${selectedAd.id}`);
+                        setEditingAdId(String(selectedAd.id));
+                        setShowEditModal(true);
                       }}
                     >
                       Edit Details
@@ -269,7 +274,8 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/postad?edit=${selectedAd.id}`);
+                        setEditingAdId(String(selectedAd.id));
+                        setShowEditModal(true);
                       }}
                     >
                       Edit Details
@@ -307,7 +313,8 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/postad?edit=${selectedAd.id}`);
+                        setEditingAdId(String(selectedAd.id));
+                        setShowEditModal(true);
                       }}
                     >
                       Edit Details
@@ -334,6 +341,20 @@ const AdsPage = () => {
           </div>
         )}
       </div>
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="relative bg-transparent rounded-xl w-[90%] max-w-[85vw] h-fit overflow-auto no-scrollbar">
+            <button
+              onClick={() => { setShowEditModal(false); setEditingAdId(null); }}
+              className="fixed top-0 right-3 text-6xl text-white z-50 rotate-45"
+            >
+              +
+            </button>
+            {/* <p className="sticky top-0 right-2 bg-white font-semibold pl-8 pt-4 -mb-6 pb-2">Edit Ad</p> */}
+            <PostAdForm editId={editingAdId ?? null} onClose={() => { setShowEditModal(false); setEditingAdId(null); }} embedded />
+          </div>
+        </div>
+      )}
       <MenuButton />
     </div>
   );
