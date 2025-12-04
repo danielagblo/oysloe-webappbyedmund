@@ -49,6 +49,13 @@ export const deleteReview = async (id: number): Promise<void> => {
   await apiClient.delete<void>(endpoints.reviews.delete(id));
 };
 
+export const likeReview = async (
+  id: number,
+  body?: { rating?: number; comment?: string },
+): Promise<Review> => {
+  return apiClient.post<Review>(endpoints.reviews.like(id), body || {});
+};
+
 export default {
   getReviews,
   getReview,
@@ -56,6 +63,7 @@ export default {
   updateReview,
   patchReview,
   deleteReview,
+  likeReview,
 };
 
 export const getReviewsForOwner = async (

@@ -11,6 +11,7 @@ import { usePatchProduct, useProduct } from "../features/products/useProducts";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import useLocationSelection from "../hooks/useLocationSelection";
 import { getFeature, getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import { createProductImage } from "../services/productImageService";
 import { getSubcategories, getSubcategory } from "../services/subcategoryService";
 import type { AdMetadata } from "../types/AdMetaData";
 import type { LocationPayload, Region } from "../types/Location";
@@ -655,14 +656,6 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       }
     }
 
-    // quick guard: ensure at least one actual File is present when there are images
-    const hasFile = metadata.images && Array.isArray(metadata.images)
-      ? metadata.images.some((i: any) => i && i.file instanceof File)
-      : false;
-    if (uploadedImages.length > 0 && !hasFile) {
-      toast.error("One or more images are not actual files. Please re-upload images.");
-    }
-
     console.log("Location Details:", locationDetails);
     console.log("Ad Metadata to submit:", metadata);
 
@@ -674,11 +667,28 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
           price: metadata.price ?? metadata.pricing?.monthly?.value ?? 0,
           category: Number(metadata.category) || undefined,
           duration: metadata.duration ?? undefined,
-          // If we have an existing image URL, include it so the server can set product.image
-          ...(uploadedImages && uploadedImages[0] && uploadedImages[0].url ? { image: uploadedImages[0].url } : {}),
+          type: purpose === "Sale" ? "SALE" : purpose === "Rent" ? "RENT" : "PAY LATER",
         };
 
+        // Check if we have actual File objects to upload
+        const newFiles = uploadedImages.filter((img) => img.file instanceof File);
+
+        // First, update the product metadata
         const result = await patchMutation.mutateAsync({ id: effectiveEditId, body: patchBody });
+
+        // Then, upload any new images to the productImages endpoint
+        if (newFiles.length > 0) {
+          const imageUploadPromises = newFiles.map(async (img) => {
+            const formData = new FormData();
+            formData.append('image', img.file as File);
+            formData.append('product', String(effectiveEditId));
+
+            return createProductImage(formData as any);
+          });
+
+          await Promise.all(imageUploadPromises);
+        }
+
         toast.success("Ad updated successfully");
         console.log("Patch response:", result);
         setShowSuccess(true);
@@ -1143,68 +1153,69 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                 </div>
               </div>
             )}
-            {showSaveModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
-                  <h2 className="text-lg font-semibold text-[var(--dark-def)] mb-2">
-                    Would you want to save this location for future use?
-                  </h2>
 
-                  <p className="text-sm text-gray-600 mb-4 flex flex-row justify-center place-items-center">
-                    <svg
-                      className="inline"
-                      width="10"
-                      height="12"
-                      viewBox="0 0 6 8"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M3 0C2.20467 0.000970362 1.44216 0.351758 0.879752 0.975408C0.317341 1.59906 0.000954678 2.44464 0 3.32666C0 4.18333 0.598136 5.52399 1.77788 7.31132C1.91832 7.5247 2.10221 7.69828 2.31458 7.81796C2.52694 7.93763 2.76179 8 3 8C3.23821 8 3.47305 7.93763 3.68542 7.81796C3.89779 7.69828 4.08168 7.5247 4.22212 7.31132C5.40186 5.52399 6 4.18333 6 3.32666C5.99905 2.44464 5.68266 1.59906 5.12025 0.975408C4.55784 0.351758 3.79533 0.000970362 3 0ZM3 4.65266C2.76221 4.65266 2.52976 4.57446 2.33205 4.42795C2.13433 4.28144 1.98023 4.07321 1.88923 3.82957C1.79824 3.58594 1.77443 3.31785 1.82082 3.05921C1.86721 2.80057 1.98171 2.56299 2.14986 2.37652C2.318 2.19005 2.53223 2.06306 2.76545 2.01162C2.99867 1.96017 3.24041 1.98657 3.46009 2.08749C3.67978 2.18841 3.86755 2.3593 3.99966 2.57857C4.13177 2.79783 4.20228 3.05562 4.20228 3.31933C4.20228 3.67295 4.07561 4.01209 3.85014 4.26214C3.62467 4.51218 3.31887 4.65266 3 4.65266Z"
-                        fill="#6B7983"
-                      />
-                    </svg>
-                    &#160;
-                    <span>{regionLabel}</span>
-                  </p>
+          </div>
+        )}
+        {showSaveModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
+              <h2 className="text-lg font-semibold text-[var(--dark-def)] mb-2">
+                Would you want to save this location for future use?
+              </h2>
 
-                  <input
-                    type="text"
-                    value={newLocationName}
-                    onChange={(e) => setNewLocationName(e.target.value)}
-                    placeholder="Name this location. Ex: Accra Shop"
-                    className="w-full border border-[var(--div-border)] rounded-xl p-3 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--dark-def)]"
+              <p className="text-sm text-gray-600 mb-4 flex flex-row justify-center place-items-center">
+                <svg
+                  className="inline"
+                  width="10"
+                  height="12"
+                  viewBox="0 0 6 8"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 0C2.20467 0.000970362 1.44216 0.351758 0.879752 0.975408C0.317341 1.59906 0.000954678 2.44464 0 3.32666C0 4.18333 0.598136 5.52399 1.77788 7.31132C1.91832 7.5247 2.10221 7.69828 2.31458 7.81796C2.52694 7.93763 2.76179 8 3 8C3.23821 8 3.47305 7.93763 3.68542 7.81796C3.89779 7.69828 4.08168 7.5247 4.22212 7.31132C5.40186 5.52399 6 4.18333 6 3.32666C5.99905 2.44464 5.68266 1.59906 5.12025 0.975408C4.55784 0.351758 3.79533 0.000970362 3 0ZM3 4.65266C2.76221 4.65266 2.52976 4.57446 2.33205 4.42795C2.13433 4.28144 1.98023 4.07321 1.88923 3.82957C1.79824 3.58594 1.77443 3.31785 1.82082 3.05921C1.86721 2.80057 1.98171 2.56299 2.14986 2.37652C2.318 2.19005 2.53223 2.06306 2.76545 2.01162C2.99867 1.96017 3.24041 1.98657 3.46009 2.08749C3.67978 2.18841 3.86755 2.3593 3.99966 2.57857C4.13177 2.79783 4.20228 3.05562 4.20228 3.31933C4.20228 3.67295 4.07561 4.01209 3.85014 4.26214C3.62467 4.51218 3.31887 4.65266 3 4.65266Z"
+                    fill="#6B7983"
                   />
+                </svg>
+                &#160;
+                <span>{regionLabel}</span>
+              </p>
 
-                  <div className="flex gap-3 w-full">
-                    <button
-                      onClick={() => {
-                        const ok = saveCurrentLocation();
-                        if (ok) {
-                          toast.success("Saved location locally");
-                        } else {
-                          toast.error("Could not save location");
-                        }
-                      }}
-                      className="w-full py-3 rounded-xl bg-[var(--dark-def)] text-white hover:bg-[var(--div-active)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] active:scale-98 transition"
-                      type="button"
-                    >
-                      Save Location
-                    </button>
+              <input
+                type="text"
+                value={newLocationName}
+                onChange={(e) => setNewLocationName(e.target.value)}
+                placeholder="Name this location. Ex: Accra Shop"
+                className="w-full border border-[var(--div-border)] rounded-xl p-3 mb-6 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--dark-def)]"
+              />
 
-                    <button
-                      onClick={() => {
-                        setNewLocationName("");
-                        setShowSaveLocationModal(false);
-                      }}
-                      className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => {
+                    const ok = saveCurrentLocation();
+                    if (ok) {
+                      toast.success("Saved location locally");
+                    } else {
+                      toast.error("Could not save location");
+                    }
+                  }}
+                  className="w-full py-3 rounded-xl bg-[var(--dark-def)] text-white hover:bg-[var(--div-active)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] active:scale-98 transition"
+                  type="button"
+                >
+                  Save Location
+                </button>
+
+                <button
+                  onClick={() => {
+                    setNewLocationName("");
+                    setShowSaveLocationModal(false);
+                  }}
+                  className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
+                >
+                  Cancel
+                </button>
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>

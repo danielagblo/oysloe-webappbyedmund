@@ -8,6 +8,8 @@ import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { likeReview } from "../services/reviewService";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
@@ -39,6 +41,7 @@ const AdsDetailsPage = () => {
   // Favourites hook and local state (declare early to obey hook rules)
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
+  const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
 
   // mark-as-taken mutation (declare early)
   const markTaken = useMarkProductAsTaken();
@@ -118,6 +121,18 @@ const AdsDetailsPage = () => {
   const { data: relatedProducts = [] } = useRelatedProducts(numericId ?? undefined);
   const reportProduct = useReportProduct();
   const { data: reportCount = 0 } = useProductReportCount(numericId ?? undefined);
+  const queryClient = useQueryClient();
+  const likeMutation = useMutation({
+    mutationFn: async ({ id, body }: { id: number; body?: any }) => likeReview(id, body),
+    onSuccess: (data: any) => {
+      // update single review cache and refresh reviews lists
+      queryClient.setQueryData(["review", data.id], data);
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+    },
+    onError: (err: unknown) => {
+      console.warn("like failed", err);
+    },
+  });
 
   // Caller phone tooltip visibility (hook must be declared before any early returns)
   const [showCaller1, setShowCaller1] = useState(false);
@@ -944,15 +959,32 @@ const AdsDetailsPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button className="flex items-center gap-1 m-2 md:text-[1vw]">
+                  <button
+                    onClick={() => {
+                      if (likeMutation.isLoading) return;
+                      setAnimatingLikes((prev) => new Set(prev).add(review.id));
+                      setTimeout(() => {
+                        setAnimatingLikes((prev) => {
+                          const next = new Set(prev);
+                          next.delete(review.id);
+                          return next;
+                        });
+                      }, 600);
+                      likeMutation.mutate({ id: review.id });
+                    }}
+                    className="flex items-center gap-1 m-2 md:text-[1vw]"
+                    aria-label={review.liked ? "Unlike review" : "Like review"}
+                  >
                     <img
                       src="/like.svg"
                       alt=""
-                      className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]"
+                      className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${
+                        animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
+                      } ${review.liked ? "opacity-100" : "opacity-60"}`}
                     />
                     <h3>Like</h3>
                   </button>
-                  <span className="text-sm md:text-[1vw]">20</span>
+                  <span className="text-sm md:text-[1vw]">{review.likes_count ?? 0}</span>
                 </div>
               </div>
               <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">

@@ -10,6 +10,7 @@ import ProfileStats from "../components/ProfileStats";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { createReview, patchReview } from "../services/reviewService";
+import { likeReview } from "../services/reviewService";
 import type { ReviewPayload } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
 
@@ -18,6 +19,7 @@ const ReviewPage = () => {
   const [selectedStars, setSelectedStars] = useState(0);
   const [showMobileForm, setShowMobileForm] = useState(false);
   const [comment, setComment] = useState("");
+  const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
   const location = useLocation();
 
   // Try to determine a product id from either location state or query string.
@@ -100,6 +102,22 @@ const ReviewPage = () => {
         }
       }
       toast.error(message);
+    },
+  });
+  const likeMutation = useMutation({
+    mutationFn: async ({ id, body }: { id: number; body?: any }) => {
+      return likeReview(id, body);
+    },
+    onSuccess: (data: any) => {
+      // update the single review cache and refresh list
+      const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+      queryClient.setQueryData(["review", data.id], data);
+      queryClient.invalidateQueries({ queryKey: key });
+      refetch();
+    },
+    onError: (err: unknown) => {
+      const m = err instanceof Error ? err.message : String(err);
+      toast.error(m);
     },
   });
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
@@ -188,8 +206,31 @@ const ReviewPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 text-gray-500">
-                    <img src="/like.svg" alt="" className="w-4 h-4" />
-                    <span className="text-xs">0</span>
+                    <button
+                      onClick={() => {
+                        if (likeMutation.isLoading) return;
+                        setAnimatingLikes((prev) => new Set(prev).add(rev.id));
+                        setTimeout(() => {
+                          setAnimatingLikes((prev) => {
+                            const next = new Set(prev);
+                            next.delete(rev.id);
+                            return next;
+                          });
+                        }, 600);
+                        likeMutation.mutate({ id: rev.id });
+                      }}
+                      className="flex items-center gap-1"
+                      aria-label={rev.liked ? "Unlike review" : "Like review"}
+                    >
+                      <img
+                        src="/like.svg"
+                        alt=""
+                        className={`w-4 h-4 transition-opacity ${
+                          animatingLikes.has(rev.id) ? "animate-like-heartbeat" : ""
+                        } ${rev.liked ? "opacity-100" : "opacity-60"}`}
+                      />
+                    </button>
+                    <span className="text-xs">{rev.likes_count ?? 0}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
