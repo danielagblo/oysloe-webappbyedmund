@@ -1079,7 +1079,7 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-start gap-2 flex-col">
           <h4 className="text-xl md:text-[1.5vw]">{currentAdData?.owner?.name ?? "Seller"}</h4>
-                <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
+          <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
             <span className="text-[10px] md:text-[0.9vw] text-green-800">
               {(() => {

@@ -1,13 +1,13 @@
 import type { FormEvent, FormEventHandler } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useRegister } from "../features/Auth/useAuth";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
 import PhoneInput from "../components/PhoneInput";
 import { ResetDropdown } from "../components/ResetDropdown";
+import { useRegister } from "../features/Auth/useAuth";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import type { RegisterRequest } from "../types/Auth";
 
 const SignInPage = () => {
