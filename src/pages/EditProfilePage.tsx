@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import mailGif from "../assets/mail.gif";
+import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
-import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 
 const EditProfilePage = () => {
   const [closeProgress, setCloseProgress] = useState(true);
@@ -61,6 +61,13 @@ const EditProfilePage = () => {
     accountName?: string;
     accountNumber?: string;
     mobileNetwork?: string;
+    // verification flags populated from backend profile
+    emailVerified?: boolean;
+    phoneVerified?: boolean;
+    idVerified?: boolean;
+    // ID pages
+    idFrontImage?: string;
+    idBackImage?: string;
   }>({});
 
   useEffect(() => {
@@ -77,9 +84,19 @@ const EditProfilePage = () => {
         accountName: profile.account_name || undefined,
         accountNumber: profile.account_number || undefined,
         mobileNetwork: profile.mobile_network || undefined,
+        // read verification flags (backend uses snake_case)
+        emailVerified: (profile as any).email_verified ?? false,
+        phoneVerified: (profile as any).phone_verified ?? false,
+        idVerified: (profile as any).id_verified ?? false,
+        idFrontImage: (profile as any).id_front_page || undefined,
+        idBackImage: (profile as any).id_back_page || undefined,
       });
     }
   }, [profile]);
+
+  // hold chosen id files to submit to backend directly
+  const [idFrontFile, setIdFrontFile] = useState<File | null>(null);
+  const [idBackFile, setIdBackFile] = useState<File | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -90,6 +107,10 @@ const EditProfilePage = () => {
     "https://placehold.co/100x100?text=Avatar&bg=EFEFEF&fg=666";
   const logoPlaceholder =
     "https://placehold.co/100x100?text=Logo&bg=EFEFEF&fg=666";
+  const idFrontPlaceholder =
+    "https://placehold.co/200x120?text=ID+Front&bg=EFEFEF&fg=666";
+  const idBackPlaceholder =
+    "https://placehold.co/200x120?text=ID+Back&bg=EFEFEF&fg=666";
   // removed ID front/back placeholders — ID pages are no longer collected here
 
   const onImgError = (
@@ -98,6 +119,15 @@ const EditProfilePage = () => {
   ) => {
     e.currentTarget.onerror = null;
     e.currentTarget.src = fallback;
+  };
+
+  const getFileLabel = (file?: File | null, path?: string) => {
+    if (file && file.name) return file.name.length > 24 ? file.name.slice(0, 21) + '...' : file.name;
+    if (path) {
+      const name = path.split('/').pop();
+      if (name) return name.length > 24 ? name.slice(0, 21) + '...' : name;
+    }
+    return 'Upload';
   };
 
   const stripAssetPath = (val?: string) => {
@@ -151,6 +181,10 @@ const EditProfilePage = () => {
   // hold chosen files to submit to backend directly
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  // image modal for previewing larger images
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [imageModalSrc, setImageModalSrc] = useState<string | null>(null);
+  const [imageModalAlt, setImageModalAlt] = useState<string | null>(null);
 
   return (
     <div className="flex justify-between min-h-screen w-screen relative">
@@ -215,32 +249,39 @@ const EditProfilePage = () => {
                     avatarPlaceholder
                   }
                   alt="Profile"
-                  className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100"
+                  className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setImageModalSrc(buildMediaUrl(selectedUser?.profileImage) || avatarPlaceholder);
+                    setImageModalAlt("Profile Image");
+                    setImageModalOpen(true);
+                  }}
                   onError={(e) => onImgError(e, avatarPlaceholder)}
                 />
                 <p className="text-xs">Profile Image</p>
-                <label
-                  htmlFor="avatar-file-input"
-                  className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
-                >
-                  <input
-                    id="avatar-file-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0] ?? null;
-                      if (f) {
-                        setAvatarFile(f);
-                        setSelectedUser((p) => ({
-                          ...p,
-                          profileImage: URL.createObjectURL(f),
-                        }));
-                      }
-                    }}
-                  />
-                  <Camera size={16} />
-                </label>
+                {!isReadonly && (
+                  <label
+                    htmlFor="avatar-file-input"
+                    className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                  >
+                    <input
+                      id="avatar-file-input"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0] ?? null;
+                        if (f) {
+                          setAvatarFile(f);
+                          setSelectedUser((p) => ({
+                            ...p,
+                            profileImage: URL.createObjectURL(f),
+                          }));
+                        }
+                      }}
+                    />
+                    <Camera size={16} />
+                  </label>
+                )}
               </div>
               <div className="flex flex-col items-center gap-2 relative">
                 <img
@@ -248,32 +289,39 @@ const EditProfilePage = () => {
                     buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder
                   }
                   alt="Business Logo"
-                  className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100"
+                  className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    setImageModalSrc(buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder);
+                    setImageModalAlt("Business Logo");
+                    setImageModalOpen(true);
+                  }}
                   onError={(e) => onImgError(e, logoPlaceholder)}
                 />
                 <p className="text-xs">Business Logo</p>
-                <label
-                  htmlFor="logo-file-input"
-                  className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
-                >
-                  <input
-                    id="logo-file-input"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0] ?? null;
-                      if (f) {
-                        setLogoFile(f);
-                        setSelectedUser((p) => ({
-                          ...p,
-                          businessLogo: URL.createObjectURL(f),
-                        }));
-                      }
-                    }}
-                  />
-                  <Camera size={16} />
-                </label>
+                {!isReadonly && (
+                  <label
+                    htmlFor="logo-file-input"
+                    className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                  >
+                    <input
+                      id="logo-file-input"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0] ?? null;
+                        if (f) {
+                          setLogoFile(f);
+                          setSelectedUser((p) => ({
+                            ...p,
+                            businessLogo: URL.createObjectURL(f),
+                          }));
+                        }
+                      }}
+                    />
+                    <Camera size={16} />
+                  </label>
+                )}
               </div>
             </div>
 
@@ -315,7 +363,7 @@ const EditProfilePage = () => {
                 <label className="text-xs text-gray-600">Email</label>
                 &nbsp;
                 <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
-                  {selectedUser?.email ? "Verified" : "Unverified"}
+                  {selectedUser?.emailVerified ? "Verified" : "Unverified"}
                 </p>
               </div>
               <input
@@ -327,7 +375,13 @@ const EditProfilePage = () => {
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
 
-              <label className="text-xs text-gray-600">First Number</label>
+              <div className="flex items-center">
+                <label className="text-xs text-gray-600">First Number</label>
+                &nbsp;
+                <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
+                  {selectedUser?.phoneVerified ? "Verified" : "Unverified"}
+                </p>
+              </div>
               <input
                 name="phonePrimary"
                 readOnly={isReadonly}
@@ -351,7 +405,7 @@ const EditProfilePage = () => {
                 <label className="text-xs text-gray-600">National ID</label>
                 &nbsp;
                 <p className="mb-1 inline text-xs text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
-                  {selectedUser?.nationalId ? "Verified" : "Not Verified"}
+                  {selectedUser?.idVerified ? "Verified" : "Unverified"}
                 </p>
               </div>
               <input
@@ -362,6 +416,90 @@ const EditProfilePage = () => {
                 onChange={handleInputChange}
                 className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
+
+              {/* ID front/back previews and upload inputs */}
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="flex flex-col items-center">
+                  <img
+                    src={
+                      buildMediaUrl(selectedUser?.idFrontImage) || idFrontPlaceholder
+                    }
+                    alt="ID Front"
+                    className="w-full max-w-[200px] h-auto rounded-md object-cover bg-gray-100 mb-2 cursor-pointer"
+                    onClick={() => {
+                      setImageModalSrc(buildMediaUrl(selectedUser?.idFrontImage) || idFrontPlaceholder);
+                      setImageModalAlt("ID Front");
+                      setImageModalOpen(true);
+                    }}
+                    onError={(e) => onImgError(e, idFrontPlaceholder)}
+                  />
+                  <label className="text-xs">ID Front</label>
+                  {!isReadonly && (
+                    <>
+                      <input
+                        id="id-front-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0] ?? null;
+                          if (f) {
+                            setIdFrontFile(f);
+                            setSelectedUser((p) => ({ ...p, idFrontImage: URL.createObjectURL(f) }));
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="id-front-input"
+                        className="mt-2 inline-block text-sm px-3 py-1 bg-gray-200 rounded cursor-pointer"
+                        title={selectedUser?.idFrontImage}
+                      >
+                        {getFileLabel(idFrontFile, selectedUser?.idFrontImage)}
+                      </label>
+                    </>
+                  )}
+                </div>
+                <div className="flex flex-col items-center">
+                  <img
+                    src={
+                      buildMediaUrl(selectedUser?.idBackImage) || idBackPlaceholder
+                    }
+                    alt="ID Back"
+                    className="w-full max-w-[200px] h-auto rounded-md object-cover bg-gray-100 mb-2 cursor-pointer"
+                    onClick={() => {
+                      setImageModalSrc(buildMediaUrl(selectedUser?.idBackImage) || idBackPlaceholder);
+                      setImageModalAlt("ID Back");
+                      setImageModalOpen(true);
+                    }}
+                    onError={(e) => onImgError(e, idBackPlaceholder)}
+                  />
+                  <label className="text-xs">ID Back</label>
+                  {!isReadonly && (
+                    <>
+                      <input
+                        id="id-back-input"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0] ?? null;
+                          if (f) {
+                            setIdBackFile(f);
+                            setSelectedUser((p) => ({ ...p, idBackImage: URL.createObjectURL(f) }));
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="id-back-input"
+                        className="mt-2 inline-block text-sm px-3 py-1 bg-gray-200 rounded cursor-pointer"
+                        title={selectedUser?.idBackImage}
+                      >
+                        {getFileLabel(idBackFile, selectedUser?.idBackImage)}
+                      </label>
+                    </>
+                  )}
+                </div>
+              </div>
 
               {setupProgress === 100 ? (
                 <>
@@ -386,7 +524,7 @@ const EditProfilePage = () => {
         {/* business details */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-0 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
-            {!linkSent && (
+            {!selectedUser?.emailVerified && !linkSent && (
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>
                 <p className="mb-3 text-center">
@@ -437,99 +575,104 @@ const EditProfilePage = () => {
                 className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
               />
 
-              <button
-                onClick={async () => {
-                  setSaveError(null);
-                  setIsSaving(true);
-                  try {
-                    // If files were selected, send multipart/form-data to backend
-                    if (avatarFile || logoFile) {
-                      const form = new FormData();
-                      if (avatarFile) form.append("avatar", avatarFile);
-                      if (logoFile) form.append("business_logo", logoFile);
-                      // other fields
-                      form.append("name", selectedUser?.name ?? "");
-                      form.append("email", selectedUser?.email ?? "");
-                      form.append("phone", selectedUser?.phonePrimary ?? "");
-                      if ((selectedUser as any)?.address)
-                        form.append("address", (selectedUser as any).address);
-                      if (selectedUser?.businessName)
-                        form.append("business_name", selectedUser.businessName);
-                      if (selectedUser?.accountName)
-                        form.append("account_name", selectedUser.accountName);
-                      if (selectedUser?.accountNumber)
-                        form.append(
-                          "account_number",
-                          selectedUser.accountNumber,
-                        );
-                      if (selectedUser?.mobileNetwork)
-                        form.append(
-                          "mobile_network",
-                          selectedUser.mobileNetwork,
-                        );
-                      form.append(
-                        "preferred_notification_email",
-                        selectedUser?.email ?? "",
-                      );
-                      form.append(
-                        "preferred_notification_phone",
-                        selectedUser?.phonePrimary ?? "",
-                      );
+              {!isReadonly && (
+                <>
+                  <button
+                    onClick={async () => {
+                      setSaveError(null);
+                      setIsSaving(true);
+                      try {
+                        // If files were selected, send multipart/form-data to backend
+                        if (avatarFile || logoFile || idFrontFile || idBackFile) {
+                          const form = new FormData();
+                          if (avatarFile) form.append("avatar", avatarFile);
+                          if (logoFile) form.append("business_logo", logoFile);
+                          if (idFrontFile) form.append("id_front_page", idFrontFile);
+                          if (idBackFile) form.append("id_back_page", idBackFile);
+                          // other fields
+                          form.append("name", selectedUser?.name ?? "");
+                          form.append("email", selectedUser?.email ?? "");
+                          form.append("phone", selectedUser?.phonePrimary ?? "");
+                          if ((selectedUser as any)?.address)
+                            form.append("address", (selectedUser as any).address);
+                          if (selectedUser?.businessName)
+                            form.append("business_name", selectedUser.businessName);
+                          if (selectedUser?.accountName)
+                            form.append("account_name", selectedUser.accountName);
+                          if (selectedUser?.accountNumber)
+                            form.append(
+                              "account_number",
+                              selectedUser.accountNumber,
+                            );
+                          if (selectedUser?.mobileNetwork)
+                            form.append(
+                              "mobile_network",
+                              selectedUser.mobileNetwork,
+                            );
+                          form.append(
+                            "preferred_notification_email",
+                            selectedUser?.email ?? "",
+                          );
+                          form.append(
+                            "preferred_notification_phone",
+                            selectedUser?.phonePrimary ?? "",
+                          );
 
-                      await apiClient.put(
-                        endpoints.userProfile.userProfile,
-                        form,
-                      );
-                    } else {
-                      // build JSON payload according to UserProfileUpdatePayload
-                      const payload: any = {
-                        name: selectedUser?.name,
-                        email: selectedUser?.email,
-                        phone: selectedUser?.phonePrimary,
-                        address: (selectedUser as any)?.address,
-                        // strip local asset paths so backend doesn't try to process them
-                        avatar: stripAssetPath(selectedUser?.profileImage),
-                        business_logo: stripAssetPath(
-                          selectedUser?.businessLogo,
-                        ),
-                        business_name: selectedUser?.businessName,
-                        account_name: selectedUser?.accountName,
-                        account_number: selectedUser?.accountNumber,
-                        mobile_network: selectedUser?.mobileNetwork,
-                        preferred_notification_email: selectedUser?.email,
-                        preferred_notification_phone:
-                          selectedUser?.phonePrimary,
-                      };
+                          // Use PATCH for partial updates including file uploads
+                          await apiClient.patch(
+                            endpoints.userProfile.userProfile,
+                            form,
+                          );
+                        } else {
+                          // build JSON payload according to UserProfileUpdatePayload
+                          // Do NOT include file fields when no File objects are selected —
+                          // sending filename/URL strings causes the backend to validate
+                          // them as files and return "The submitted data was not a file.".
+                          const payload: any = {
+                            name: selectedUser?.name,
+                            email: selectedUser?.email,
+                            phone: selectedUser?.phonePrimary,
+                            address: (selectedUser as any)?.address,
+                            business_name: selectedUser?.businessName,
+                            account_name: selectedUser?.accountName,
+                            account_number: selectedUser?.accountNumber,
+                            mobile_network: selectedUser?.mobileNetwork,
+                            preferred_notification_email: selectedUser?.email,
+                            preferred_notification_phone:
+                              selectedUser?.phonePrimary,
+                          };
 
-                      // reuse existing updateProfile when not sending files
-                      await updateProfile(payload);
-                    }
-                    // close edit view on success
-                    // setShowEdit(false);
-                    toast.success("Profile saved");
-                  } catch (err: any) {
-                    const msg =
-                      err instanceof Error ? err.message : String(err);
-                    setSaveError(msg || "Failed to save profile");
-                    toast.error(msg || "Failed to save profile");
-                  } finally {
-                    setIsSaving(false);
-                  }
-                }}
-                disabled={isSaving}
-                className={`w-full hover:scale-95 active:scale-100 cursor-pointer transition py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? "bg-gray-300 text-gray-500" : "bg-gray-200 text-gray-800"}`}
-              >
-                {isSaving
-                  ? "Saving..."
-                  : setupProgress === 100
-                    ? "Finish"
-                    : "Save"}
-              </button>
+                          // reuse existing updateProfile when not sending files
+                          await updateProfile(payload);
+                        }
+                        // close edit view on success
+                        // setShowEdit(false);
+                        toast.success("Profile saved");
+                      } catch (err: any) {
+                        const msg =
+                          err instanceof Error ? err.message : String(err);
+                        setSaveError(msg || "Failed to save profile");
+                        toast.error(msg || "Failed to save profile");
+                      } finally {
+                        setIsSaving(false);
+                      }
+                    }}
+                    disabled={isSaving}
+                    className={`w-full hover:scale-95 active:scale-100 cursor-pointer transition py-4 rounded-xl text-[1.1rem] mt-6 ${isSaving ? "bg-gray-300 text-gray-500" : "bg-gray-200 text-gray-800"}`}
+                  >
+                    {isSaving
+                      ? "Saving..."
+                      : setupProgress === 100
+                        ? "Finish"
+                        : "Save"}
+                  </button>
 
-              {saveError && (
-                <div className="mt-2 text-bas text-red-600 w-full text-right">
-                  An error occurred.
-                </div>
+                  {saveError && (
+                    <div className="mt-2 text-bas text-red-600 w-full text-right">
+                      An error occurred.
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -557,73 +700,89 @@ const EditProfilePage = () => {
         </div>
       )}
 
+      {imageModalOpen && imageModalSrc && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 flex items-center justify-center p-4"
+          onClick={() => setImageModalOpen(false)}
+        >
+          <div className="max-w-[90vw] max-h-[90vh]">
+            <img
+              src={imageModalSrc}
+              alt={imageModalAlt ?? "Image preview"}
+              className="max-w-full max-h-[90vh] rounded-lg object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
+
       {accountDeletionRequested && (
         <div className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center ">
 
           {!deleteConfirmation ? (
-              <div className="bg-white flex justify-center items-center flex-col p-10 px-6 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
-                <h2 className="text-lg w-[80%] text-center">
-                  <span>Are you sure you want to delete your account?</span>
-                  <br />
-                  <span className="text-red-600 text-xl font-bold">
-                    ⚠️ This action is irreversible.
-                  </span>
-                </h2>
-                <div className="grid grid-cols-2 gap-4 lg:gap-6 w-4/5">
-                  <button
-                    onClick={() => setDeleteConfirmation(true) }               
-                    className="text-base bg-red-600 text-white  hover:bg-red-700 cursor-pointer rounded-lg py-2 px-4 transition"
-                  >
-                    Yes, Delete My Account
-                  </button>
-                  <button
-                    onClick={() => {
-                      setAccountDeletionRequested(false);
-                    }}
-                    className="text-base cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-2 px-4 transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
+            <div className="bg-white flex justify-center items-center flex-col p-10 px-6 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
+              <h2 className="text-lg w-[80%] text-center">
+                <span>Are you sure you want to delete your account?</span>
+                <br />
+                <span className="text-red-600 text-xl font-bold">
+                  ⚠️ This action is irreversible.
+                </span>
+              </h2>
+              <div className="grid grid-cols-2 gap-4 lg:gap-6 w-4/5">
+                <button
+                  onClick={() => setDeleteConfirmation(true)}
+                  className="text-base bg-red-600 text-white  hover:bg-red-700 cursor-pointer rounded-lg py-2 px-4 transition"
+                >
+                  Yes, Delete My Account
+                </button>
+                <button
+                  onClick={() => {
+                    setAccountDeletionRequested(false);
+                  }}
+                  className="text-base cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-2 px-4 transition"
+                >
+                  Cancel
+                </button>
               </div>
+            </div>
           ) : (
             <div className="bg-white flex justify-center items-center flex-col p-10 px-20 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
 
               <h3 className="text-xl font-semibold">
-                  Why do you want to delete your account?
-                </h3>
-                <textarea
-                  placeholder="Please provide your reason for deleting your account here."
-                  value={deleteReason}
-                  onChange={(e) => setDeleteReason(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded resize-none"
-                  rows={4}
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer transition"
-                    onClick={() => {
-                      setAccountDeletionRequested(false);
-                      setDeleteConfirmation(false);
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer transition"
-                    onClick={() => {
-                      handleDelete();
-                      setDeleteConfirmation(false);
-                      setAccountDeletionRequested(false);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
+                Why do you want to delete your account?
+              </h3>
+              <textarea
+                placeholder="Please provide your reason for deleting your account here."
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded resize-none"
+                rows={4}
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer transition"
+                  onClick={() => {
+                    setAccountDeletionRequested(false);
+                    setDeleteConfirmation(false);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer transition"
+                  onClick={() => {
+                    handleDelete();
+                    setDeleteConfirmation(false);
+                    setAccountDeletionRequested(false);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           )
-        }
-      </div>
+          }
+        </div>
       )}
     </div>
   );
