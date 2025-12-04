@@ -9,8 +9,8 @@ import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
-import useUserProfile from "../features/userProfile/useUserProfile";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
+import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
 import { likeReview } from "../services/reviewService";
@@ -992,7 +992,7 @@ const AdsDetailsPage = () => {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => {
-                      if (likeMutation.isLoading) return;
+                      if (likeMutation.isPending) return;
                       setAnimatingLikes((prev) => new Set(prev).add(review.id));
                       setTimeout(() => {
                         setAnimatingLikes((prev) => {

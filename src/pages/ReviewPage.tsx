@@ -207,7 +207,7 @@ const ReviewPage = () => {
                   <div className="flex items-center gap-1 text-gray-500">
                     <button
                       onClick={() => {
-                        if (likeMutation.isLoading) return;
+                        if (likeMutation.isPending) return;
                         setAnimatingLikes((prev) => new Set(prev).add(rev.id));
                         setTimeout(() => {
                           setAnimatingLikes((prev) => {
