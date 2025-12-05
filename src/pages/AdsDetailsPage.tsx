@@ -210,15 +210,19 @@ const AdsDetailsPage = () => {
     );
   if (adLoading || adsLoading)
     return (
-      <div className="relative h-screen max-h-[97vh] w-screen m-0 flex flex-col items-center justify-center">
-        <Loader />
-        <p className="loading absolute bottom-0 loading-dots">Loading</p>
+      <div className="inset bg-black/40 h-screen max-h-[97vh] w-screen m-0 flex flex-col items-center justify-center">
+        <div className="bg-white relative flex flex-col items-center justify-center w-1/2 h-1/2 z-50 rounded-2xl">
+          <Loader />
+          <p className="loading absolute bottom-4 loading-dots">Loading</p>
+        </div>
       </div>
     );
   if (adError)
     return (
-      <p className="h-screen w-screen m-0 flex items-center justify-center">
-        Error loading ad: {String(adError)}
+      <p className="h-screen w-screen m-0 flex flex-col items-center justify-center">
+        <span className="text-8xl font-bold text-gray-400 animate-pulse">404</span>
+        <span>There was an error loading this ad</span>
+        <span className="text-3xl">(┬┬﹏┬┬)</span>
       </p>
     );
 
@@ -1188,7 +1192,8 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
-        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => (
+        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => 
+          ad.is_taken && (
           <Link
             key={ad.id}
             to={`/ads/${ad.id}`}

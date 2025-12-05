@@ -361,10 +361,6 @@ const EditProfilePage = () => {
 
               <div className="flex items-center">
                 <label className="text-xs text-gray-600">Email</label>
-                &nbsp;
-                <p className="mb-1 text-xs inline text-white bg-blue-400 px-1 py-0.5 text-[0.6rem] rounded-2xl">
-                  {selectedUser?.emailVerified ? "Verified" : "Unverified"}
-                </p>
               </div>
               <input
                 name="email"
@@ -523,8 +519,8 @@ const EditProfilePage = () => {
 
         {/* business details */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
-          <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-0 flex flex-col justify-start items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
-            {!selectedUser?.emailVerified && !linkSent && (
+          <div className="bg-white lg:shadow-lg w-full mt-2 md:mt-0 flex flex-col justify-center items-center h-fit sm:min-h-[92vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
+            {/* {!selectedUser?.emailVerified && !linkSent && (
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>
                 <p className="mb-3 text-center">
@@ -540,7 +536,7 @@ const EditProfilePage = () => {
                   Send Link
                 </button>
               </div>
-            )}
+            )} */}
 
             <div className="w-[95%] bg-white p-4 rounded-md">
               <div className="flex gap-6 items-center my-2">

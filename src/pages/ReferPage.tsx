@@ -252,7 +252,7 @@ const ReferPage = () => {
               <CopyButton
                 value={profile?.referral_code ?? ""}
                 timeout={2000}
-                className="absolute right-1 top-1 md:right-1 md:top-0.5  md:px-6 hover:text-gray-500 hover:cursor-pointer bg-[var(--div-active)] rounded-lg px-3 py-1.5 justify-center"
+                className="absolute right-1 top-0.75 h-9/10  md:px-6 hover:text-gray-500 hover:cursor-pointer bg-[var(--div-active)] rounded-lg px-3 justify-center"
               />
             </div>
           </div>
