@@ -1243,7 +1243,7 @@ const AdsDetailsPage = () => {
                 ))
               ) : (
                 <>
-                  <p className="text-gray-500 md:text-[1vw]">No other ads from this seller.</p>
+                  <p className="text-gray-500 md:text-[1vw] h-20 w-full text-center pt-10">No other ads from this seller.</p>
                 </>
               )}
             </div>
@@ -1329,16 +1329,16 @@ const AdsDetailsPage = () => {
           {/* MAIN CONTENT */}
           <div className="flex flex-col gap-4 w-full">
             <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
-              <div className="flex w-full justify-between ad-details-page">
-                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px]">
+
+              {/* mobile layout */}
+              <div className="sm:hidden flex w-full justify-between ad-details-page">
+                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px] pt-7">
                   <AdDetails />
                 </div>
-                <div className="flex flex-col space-y-6 w-full md:w-1/2">
+                <div className="flex flex-col space-y-6 w-full md:w-1/2 pt-10">
                   <SafetyTips />
                 </div>
               </div>
-
-              {/* mobile layout */}
               <div className="sm:hidden flex w-full ad-details-page">
                 <div className="flex flex-col w-fit space-y-6 md:w-1/2  bg-white p-6 rounded-lg mb-5">
                   <ActionButtons
@@ -1372,29 +1372,35 @@ const AdsDetailsPage = () => {
               </div>
 
               {/* desktop layout */}
-              <div className=" hidden sm:grid sm:grid-cols-2 gap-1.5 w-full ad-details-page">
-                <div className="flex flex-col w-full space-y-6 p-6 lg:p-0 mb-5">
-                  <RatingReviews layout="row" rd={reviewDeconstruction} />
-                  <CommentsSection />
-                </div>
-                <div className="p-6 rounded-lg w-full">
-                  <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
-                    <ActionButtons
-                      onMarkTaken={handleMarkAsTaken}
-                      onFavorite={handleToggleFavourite}
-                      onReportAd={handleReportAd}
-                      isFavourited={isFavourited}
-                      favouritePending={toggleFavourite.status === "pending"}
-                      caller1={callerNumber1}
-                      caller2={callerNumber2}
-                      showCaller1={showCaller1}
-                      showCaller2={showCaller2}
-                      toggleCaller1={toggleCaller1}
-                      toggleCaller2={toggleCaller2}
-                    />
-                    <QuickChat />
+              <div className="hidden sm:flex w-full justify-between ad-details-page">
+                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px]">
+                  <AdDetails />
+                  <div className="flex flex-col w-full space-y-6 p-6 lg:p-0 mb-5">
+                    <RatingReviews layout="row" rd={reviewDeconstruction} />
+                    <CommentsSection />
                   </div>
-                  <SellerInfo />
+                </div>
+                <div className="flex flex-col space-y-6 w-full md:w-1/2">
+                  <SafetyTips />
+                  <div className="p-6 rounded-lg w-full">
+                    <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
+                      <ActionButtons
+                        onMarkTaken={handleMarkAsTaken}
+                        onFavorite={handleToggleFavourite}
+                        onReportAd={handleReportAd}
+                        isFavourited={isFavourited}
+                        favouritePending={toggleFavourite.status === "pending"}
+                        caller1={callerNumber1}
+                        caller2={callerNumber2}
+                        showCaller1={showCaller1}
+                        showCaller2={showCaller2}
+                        toggleCaller1={toggleCaller1}
+                        toggleCaller2={toggleCaller2}
+                      />
+                      <QuickChat />
+                    </div>
+                    <SellerInfo />
+                  </div>
                 </div>
               </div>
             </div>
