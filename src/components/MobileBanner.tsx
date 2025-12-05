@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 interface MobileBannerProps {
   backto?: string;
   page: string;
+  onMenuClick?: () => void;
+  showMenuButton?: boolean;
 }
 
 export const MobileBanner: React.FC<MobileBannerProps> = ({
   backto = "Back",
   page = "",
+  onMenuClick,
+  showMenuButton = false,
 }) => {
   const navigate = useNavigate();
 
@@ -27,6 +31,16 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
           <h2 className="absolute w-full flex justify-center items-center text-sm font-medium rounded-2xl py-1 px-2">
             {page}
           </h2>
+          {showMenuButton && onMenuClick && (
+            <button
+              onClick={onMenuClick}
+              className="absolute right-2 p-2 hover:bg-gray-100 rounded-full transition"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+              </svg>
+            </button>
+          )}
         </div>
       </div>
       <div className="h-10 bg-white" />

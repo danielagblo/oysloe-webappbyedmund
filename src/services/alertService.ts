@@ -1,7 +1,7 @@
+import mockAlertsRaw from "../assets/mocks/alerts.json";
 import type { Alert } from "../types/Alert";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
-import mockAlertsRaw from "../assets/mocks/alerts.json";
 
 const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
 const mockAlerts: Alert[] = mockAlertsRaw as Alert[];
@@ -17,7 +17,8 @@ export const getAlerts = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Alert[]>(`${endpoints.alerts.list()}${query}`);
+  const result = await apiClient.get<Alert[]>(`${endpoints.alerts.list()}${query}`);
+  return result || [];
 };
 
 export const getAlert = async (id: number): Promise<Alert> => {
