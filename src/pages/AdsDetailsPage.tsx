@@ -571,7 +571,7 @@ const AdsDetailsPage = () => {
                     style={{ backgroundImage: `url(${src})` }}
                   />
                   {/* Main image on top */}
-                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full relative z-10" />
+                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-cover w-full h-full relative z-10" />
                 </button>
               );
             })}
@@ -615,10 +615,12 @@ const AdsDetailsPage = () => {
     const max = imgs.length;
 
     const prev = (e?: React.MouseEvent) => {
+      e?.preventDefault();
       e?.stopPropagation();
       setPictureModalIndex((i) => Math.max(0, i - 1));
     };
     const next = (e?: React.MouseEvent) => {
+      e?.preventDefault();
       e?.stopPropagation();
       setPictureModalIndex((i) => Math.min(max - 1, i + 1));
     };
@@ -640,17 +642,25 @@ const AdsDetailsPage = () => {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1"
-            onClick={close}
+            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1 z-30 hover:bg-black/60 transition"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              close();
+            }}
             aria-label="Close"
           >
             ✕
           </button>
 
-          {max > 1 && (
+          {max > 1 && pictureModalIndex > 0 && (
             <button
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
-              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                prev(e);
+              }}
               aria-label="Previous"
             >
               <img src="/arrowleft.svg" alt="Prev" />
@@ -671,10 +681,14 @@ const AdsDetailsPage = () => {
             />
           </div>
 
-          {max > 1 && (
+          {max > 1 && pictureModalIndex < max - 1 && (
             <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
-              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                next(e);
+              }}
               aria-label="Next"
             >
               <img src="/arrowright.svg" alt="Next" />
