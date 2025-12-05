@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import "../App.css";
 import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
@@ -80,43 +81,62 @@ const AdsDetailsPage = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
 
-    // assemble a full product payload to match backend schema expectations
-    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-    const payload = {
-      pid: (src)?.pid ?? `pid_${pid}`,
-      name: (src)?.name ?? "",
-      image: src?.image ?? (src?.images?.[0]?.image ?? ""),
-      type: (src)?.type ?? ("SALE" as const),
-      status: (src)?.status ?? ("ACTIVE" as const),
-      is_taken: true,
-      description: (src)?.description ?? "",
-      price: (src)?.price ?? 0,
-      duration: (src)?.duration ?? "",
-      category: (src)?.category ?? (src)?.category_id ?? 0,
-    } as Record<string, unknown>;
+    toast.promise(
+      Promise.resolve().then(() => {
+        // assemble a full product payload to match backend schema expectations
+        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const payload = {
+          pid: (src)?.pid ?? `pid_${pid}`,
+          name: (src)?.name ?? "",
+          image: src?.image ?? (src?.images?.[0]?.image ?? ""),
+          type: (src)?.type ?? ("SALE" as const),
+          status: (src)?.status ?? ("ACTIVE" as const),
+          is_taken: true,
+          description: (src)?.description ?? "",
+          price: (src)?.price ?? 0,
+          duration: (src)?.duration ?? "",
+          category: (src)?.category ?? (src)?.category_id ?? 0,
+        } as Record<string, unknown>;
 
-    // call mutation with full payload so server receives the expected schema
-    markTaken.mutate({ id: pid, body: payload });
+        // call mutation with full payload so server receives the expected schema
+        markTaken.mutate({ id: pid, body: payload });
+      }),
+      {
+        loading: "Sending alert to owner to mark ad as taken...",
+        success: "Alert sent to owner to mark ad as taken!",
+        error: "Failed to send alert to owner to mark ad as taken",
+      }
+    );
   };
 
   const handleReportAd = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
-    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-    const payload = {
-      pid: (src)?.pid ?? `pid_${pid}`,
-      name: (src)?.name ?? "",
-      image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
-      type: (src)?.type ?? ("SALE" as const),
-      status: (src)?.status ?? ("ACTIVE" as const),
-      is_taken: Boolean((src)?.is_taken),
-      description: (src)?.description ?? "",
-      price: (src)?.price ?? 0,
-      duration: (src)?.duration ?? "",
-      category: (src)?.category ?? (src)?.category_id ?? 0,
-    } as Record<string, unknown>;
 
-    reportProduct.mutate({ id: pid, body: payload });
+    toast.promise(
+      Promise.resolve().then(() => {
+        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const payload = {
+          pid: (src)?.pid ?? `pid_${pid}`,
+          name: (src)?.name ?? "",
+          image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
+          type: (src)?.type ?? ("SALE" as const),
+          status: (src)?.status ?? ("ACTIVE" as const),
+          is_taken: Boolean((src)?.is_taken),
+          description: (src)?.description ?? "",
+          price: (src)?.price ?? 0,
+          duration: (src)?.duration ?? "",
+          category: (src)?.category ?? (src)?.category_id ?? 0,
+        } as Record<string, unknown>;
+
+        reportProduct.mutate({ id: pid, body: payload });
+      }),
+      {
+        loading: "Reporting ad...",
+        success: "Ad reported successfully!",
+        error: "Failed to report ad",
+      }
+    );
   };
 
   // Determine a candidate owner id early so hooks can be called unconditionally
@@ -139,9 +159,11 @@ const AdsDetailsPage = () => {
       // update single review cache and refresh reviews lists
       queryClient.setQueryData(["review", data.id], data);
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      toast.success("Review liked!");
     },
     onError: (err: unknown) => {
-      console.warn("like failed", err);
+      const message = err instanceof Error ? err.message : "Failed to like review";
+      toast.error(message);
     },
   });
 
@@ -695,7 +717,7 @@ const AdsDetailsPage = () => {
       </div>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price
-          ? formatMoney(currentAdData?.price)
+          ? `${formatMoney(currentAdData?.price)}${currentAdData?.type?.toLowerCase() === 'rent' ? ' per month' : ''}`
           : "Please Contact the Seller for the Price of this Product"}
       </h2>
     </div>
