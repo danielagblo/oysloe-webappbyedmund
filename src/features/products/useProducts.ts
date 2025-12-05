@@ -235,8 +235,11 @@ export const useReportProduct = () => {
   return useMutation({
     mutationFn: ({ id, body }: { id: number | string; body?: Record<string, unknown> }) => reportProduct(id, body),
     onSuccess: (_data, variables) => {
+      // Invalidate product detail to refetch and get updated total_reports
       qc.invalidateQueries({ queryKey: productKeys.detail(variables.id) });
       qc.invalidateQueries({ queryKey: productKeys.all });
+      // Also invalidate the report count query
+      qc.invalidateQueries({ queryKey: productKeys.reports(Number(variables.id)) });
     },
   });
 };
