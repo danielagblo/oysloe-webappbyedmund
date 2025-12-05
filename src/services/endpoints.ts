@@ -39,6 +39,7 @@ export const endpoints = {
     update: (id: number) => `/reviews/${id}/`,
     partial: (id: number) => `/reviews/${id}/`,
     delete: (id: number) => `/reviews/${id}/`,
+    like: (id: number) => `/reviews/${id}/like/`,
   },
 
   categories: {

@@ -291,7 +291,7 @@ export const createProductFromAd = async (metadata: any) => {
     if (!p) return ("SALE") as const;
     if (p.toLowerCase() === "sale") return ("SALE") as const;
     if (p.toLowerCase() === "rent") return ("RENT") as const;
-    return ("SERVICE") as const;
+    return ("PAYLATER") as const;
   };
 
   const price =

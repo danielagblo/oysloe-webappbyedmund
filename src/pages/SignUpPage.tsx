@@ -205,12 +205,15 @@ const SignInPage = () => {
                 <Link to="/terms">
                   <span className="text-black inline"> terms & conditions</span>
                 </Link>
-                <label
+                <label htmlFor="g">
+                  <input type="checkbox" id="g" required/>
+                </label>
+                {/* <label
                   className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline"
                   htmlFor="custom-checkbox"
-                >
+                > */}
                   {/* <!-- Hidden default checkbox --> */}
-                  <input
+                  {/* <input
                     type="checkbox"
                     name="agreedToTerms"
                     checked={formData.agreedToTerms}
@@ -218,8 +221,8 @@ const SignInPage = () => {
                     className="peer relative h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400  checked:bg-[url(check.svg)] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
                     id="custom-checkbox"
                     required
-                  />
-                </label>
+                  /> */}
+                {/* </label> */}
               </p>
             </div>
             <div className="flex flex-col gap-3 w-full">

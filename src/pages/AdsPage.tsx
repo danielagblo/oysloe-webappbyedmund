@@ -7,7 +7,6 @@ import {
   useDeleteProduct,
   useMarkProductAsTaken,
   useOwnerProducts,
-  // useSetProductStatus,
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { formatMoney } from "../utils/formatMoney";
@@ -122,7 +121,10 @@ const AdsPage = () => {
                   <div className="w-4/5">
                     <p onClick={() => console.log(ad)} className="font-medium truncate">{ad.name}</p>
                   </div>
-                  <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
+                  <p className="text-xs text-gray-600">
+                    {formatMoney(ad.price)}
+                    {ad.type?.toUpperCase() === 'RENT' && ' per month'}
+                  </p>
                 </div>
               </div>
             ))}
@@ -138,6 +140,15 @@ const AdsPage = () => {
               >
                 +
               </button>
+
+              {/* Show price preview with rent indicator */}
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg text-center">
+                <p className="text-sm text-gray-600">Price shown to users:</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {formatMoney(selectedAd.price)}
+                  {selectedAd.type?.toUpperCase() === 'RENT' && ' per month'}
+                </p>
+              </div>
 
               {mapToLabel(selectedAd) === "Suspended" || mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">

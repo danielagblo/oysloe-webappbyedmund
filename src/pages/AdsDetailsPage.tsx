@@ -1,5 +1,7 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
 import "../App.css";
 import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
@@ -8,10 +10,11 @@ import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
-import useUserProfile from "../features/userProfile/useUserProfile";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
+import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
 import { resolveChatroomId } from "../services/chatService";
+import { likeReview } from "../services/reviewService";
 import type { Product } from "../types/Product";
 import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
@@ -50,6 +53,7 @@ const AdsDetailsPage = () => {
   // Favourites hook and local state (declare early to obey hook rules)
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
+  const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
 
   // mark-as-taken mutation (declare early)
   const markTaken = useMarkProductAsTaken();
@@ -77,43 +81,62 @@ const AdsDetailsPage = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
 
-    // assemble a full product payload to match backend schema expectations
-    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-    const payload = {
-      pid: (src)?.pid ?? `pid_${pid}`,
-      name: (src)?.name ?? "",
-      image: src?.image ?? (src?.images?.[0]?.image ?? ""),
-      type: (src)?.type ?? ("SALE" as const),
-      status: (src)?.status ?? ("ACTIVE" as const),
-      is_taken: true,
-      description: (src)?.description ?? "",
-      price: (src)?.price ?? 0,
-      duration: (src)?.duration ?? "",
-      category: (src)?.category ?? (src)?.category_id ?? 0,
-    } as Record<string, unknown>;
+    toast.promise(
+      Promise.resolve().then(() => {
+        // assemble a full product payload to match backend schema expectations
+        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const payload = {
+          pid: (src)?.pid ?? `pid_${pid}`,
+          name: (src)?.name ?? "",
+          image: src?.image ?? (src?.images?.[0]?.image ?? ""),
+          type: (src)?.type ?? ("SALE" as const),
+          status: (src)?.status ?? ("ACTIVE" as const),
+          is_taken: true,
+          description: (src)?.description ?? "",
+          price: (src)?.price ?? 0,
+          duration: (src)?.duration ?? "",
+          category: (src)?.category ?? (src)?.category_id ?? 0,
+        } as Record<string, unknown>;
 
-    // call mutation with full payload so server receives the expected schema
-    markTaken.mutate({ id: pid, body: payload });
+        // call mutation with full payload so server receives the expected schema
+        markTaken.mutate({ id: pid, body: payload });
+      }),
+      {
+        loading: "Sending alert to owner to mark ad as taken...",
+        success: "Alert sent to owner to mark ad as taken!",
+        error: "Failed to send alert to owner to mark ad as taken",
+      }
+    );
   };
 
   const handleReportAd = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
-    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-    const payload = {
-      pid: (src)?.pid ?? `pid_${pid}`,
-      name: (src)?.name ?? "",
-      image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
-      type: (src)?.type ?? ("SALE" as const),
-      status: (src)?.status ?? ("ACTIVE" as const),
-      is_taken: Boolean((src)?.is_taken),
-      description: (src)?.description ?? "",
-      price: (src)?.price ?? 0,
-      duration: (src)?.duration ?? "",
-      category: (src)?.category ?? (src)?.category_id ?? 0,
-    } as Record<string, unknown>;
 
-    reportProduct.mutate({ id: pid, body: payload });
+    toast.promise(
+      Promise.resolve().then(() => {
+        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const payload = {
+          pid: (src)?.pid ?? `pid_${pid}`,
+          name: (src)?.name ?? "",
+          image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
+          type: (src)?.type ?? ("SALE" as const),
+          status: (src)?.status ?? ("ACTIVE" as const),
+          is_taken: Boolean((src)?.is_taken),
+          description: (src)?.description ?? "",
+          price: (src)?.price ?? 0,
+          duration: (src)?.duration ?? "",
+          category: (src)?.category ?? (src)?.category_id ?? 0,
+        } as Record<string, unknown>;
+
+        reportProduct.mutate({ id: pid, body: payload });
+      }),
+      {
+        loading: "Reporting ad...",
+        success: "Ad reported successfully!",
+        error: "Failed to report ad",
+      }
+    );
   };
 
   // Determine a candidate owner id early so hooks can be called unconditionally
@@ -129,6 +152,20 @@ const AdsDetailsPage = () => {
   const { data: relatedProducts = [] } = useRelatedProducts(numericId ?? undefined);
   const reportProduct = useReportProduct();
   const { data: reportCount = 0 } = useProductReportCount(numericId ?? undefined);
+  const queryClient = useQueryClient();
+  const likeMutation = useMutation({
+    mutationFn: async ({ id, body }: { id: number; body?: any }) => likeReview(id, body),
+    onSuccess: (data: any) => {
+      // update single review cache and refresh reviews lists
+      queryClient.setQueryData(["review", data.id], data);
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      toast.success("Review liked!");
+    },
+    onError: (err: unknown) => {
+      const message = err instanceof Error ? err.message : "Failed to like review";
+      toast.error(message);
+    },
+  });
 
   // Caller phone tooltip visibility (hook must be declared before any early returns)
   const [showCaller1, setShowCaller1] = useState(false);
@@ -529,10 +566,16 @@ const AdsDetailsPage = () => {
                     setPictureModalIndex(absIdx);
                     setIsPictureModalOpen(true);
                   }}
-                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center`}
+                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative`}
                   aria-label={`Show image ${absIdx + 1}`}
                 >
-                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-contain w-full h-full" />
+                  {/* Blurred background image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center blur-sm opacity-50"
+                    style={{ backgroundImage: `url(${src})` }}
+                  />
+                  {/* Main image on top */}
+                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-cover w-full h-full relative z-10" />
                 </button>
               );
             })}
@@ -555,7 +598,13 @@ const AdsDetailsPage = () => {
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
-          <img src={getMainImage()} alt="Ad main" className="object-cover w-full h-full cursor-zoom-in" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
+          {/* Blurred background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center blur-md opacity-40"
+            style={{ backgroundImage: `url(${getMainImage()})` }}
+          />
+          {/* Main image on top */}
+          <img src={getMainImage()} alt="Ad main" className="object-contain w-full h-full cursor-zoom-in relative z-10" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
           <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
           <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
         </div>
@@ -570,10 +619,12 @@ const AdsDetailsPage = () => {
     const max = imgs.length;
 
     const prev = (e?: React.MouseEvent) => {
+      e?.preventDefault();
       e?.stopPropagation();
       setPictureModalIndex((i) => Math.max(0, i - 1));
     };
     const next = (e?: React.MouseEvent) => {
+      e?.preventDefault();
       e?.stopPropagation();
       setPictureModalIndex((i) => Math.min(max - 1, i + 1));
     };
@@ -595,35 +646,53 @@ const AdsDetailsPage = () => {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1"
-            onClick={close}
+            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1 z-30 hover:bg-black/60 transition"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              close();
+            }}
             aria-label="Close"
           >
             ✕
           </button>
 
-          {max > 1 && (
+          {max > 1 && pictureModalIndex > 0 && (
             <button
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
-              onClick={prev}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                prev(e);
+              }}
               aria-label="Previous"
             >
               <img src="/arrowleft.svg" alt="Prev" />
             </button>
           )}
 
-          <div className="flex items-center justify-center w-full">
+          <div className="relative flex items-center justify-center w-full">
+            {/* Blurred background image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center blur-md opacity-40 rounded"
+              style={{ backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})` }}
+            />
+            {/* Main image on top */}
             <img
               src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
               alt={`Modal image ${pictureModalIndex + 1}`}
-              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded"
+              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded relative z-10"
             />
           </div>
 
-          {max > 1 && (
+          {max > 1 && pictureModalIndex < max - 1 && (
             <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2"
-              onClick={next}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                next(e);
+              }}
               aria-label="Next"
             >
               <img src="/arrowright.svg" alt="Next" />
@@ -666,7 +735,7 @@ const AdsDetailsPage = () => {
       </div>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price
-          ? formatMoney(currentAdData?.price)
+          ? `${formatMoney(currentAdData?.price)}${currentAdData?.type?.toLowerCase() === 'rent' ? ' per month' : ''}`
           : "Please Contact the Seller for the Price of this Product"}
       </h2>
     </div>
@@ -979,15 +1048,31 @@ const AdsDetailsPage = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button className="flex items-center gap-1 m-2 md:text-[1vw]">
+                  <button
+                    onClick={() => {
+                      if (likeMutation.isPending) return;
+                      setAnimatingLikes((prev) => new Set(prev).add(review.id));
+                      setTimeout(() => {
+                        setAnimatingLikes((prev) => {
+                          const next = new Set(prev);
+                          next.delete(review.id);
+                          return next;
+                        });
+                      }, 600);
+                      likeMutation.mutate({ id: review.id });
+                    }}
+                    className="flex items-center gap-1 m-2 md:text-[1vw]"
+                    aria-label={review.liked ? "Unlike review" : "Like review"}
+                  >
                     <img
                       src="/like.svg"
                       alt=""
-                      className="w-5 h-5 md:h-[1.2vw] md:w-[1.2vw]"
+                      className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
+                        } ${review.liked ? "opacity-100" : "opacity-60"}`}
                     />
                     <h3>Like</h3>
                   </button>
-                  <span className="text-sm md:text-[1vw]">20</span>
+                  <span className="text-sm md:text-[1vw]">{review.likes_count ?? 0}</span>
                 </div>
               </div>
               <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">

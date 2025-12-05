@@ -9,8 +9,8 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
-import { createReview, patchReview } from "../services/reviewService";
-import type { ReviewPayload } from "../types/Review";
+import { createReview, likeReview, patchReview } from "../services/reviewService";
+import type { Review, ReviewPayload } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
 
 const ReviewPage = () => {
@@ -18,6 +18,8 @@ const ReviewPage = () => {
   const [selectedStars, setSelectedStars] = useState(0);
   const [showMobileForm, setShowMobileForm] = useState(false);
   const [comment, setComment] = useState("");
+  const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
   const location = useLocation();
 
   // Try to determine a product id from either location state or query string.
@@ -34,18 +36,39 @@ const ReviewPage = () => {
   const queryClient = useQueryClient();
   const { profile: currentUserProfile } = useUserProfile();
 
-  const createMutation = useMutation<any, unknown, Partial<ReviewPayload>>({
-    mutationFn: (body: Partial<ReviewPayload>) => createReview(body as ReviewPayload),
+  const handleOpenEditForm = (reviewId: number) => {
+    const review = reviews.find((r) => r.id === reviewId);
+    if (review) {
+      setEditingReviewId(reviewId);
+      setSelectedStars(Math.round(review.rating));
+      setComment(review.comment || "");
+      setShowMobileForm(true);
+    }
+  };
+
+  const handleResetForm = () => {
+    setEditingReviewId(null);
+    setSelectedStars(0);
+    setComment("");
+    setShowMobileForm(false);
+  };
+
+  const createMutation = useMutation<Review, unknown, Partial<ReviewPayload>>({
+    mutationFn: async (body: Partial<ReviewPayload>) => {
+      if (editingReviewId) {
+        return patchReview(editingReviewId, body);
+      }
+      return createReview(body as ReviewPayload);
+    },
     onSuccess: () => {
       setSendSuccess(true);
-      setSelectedStars(0);
-      setComment("");
+      handleResetForm();
       // refresh reviews list for this product (or all reviews if no product)
       const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
       queryClient.invalidateQueries({ queryKey: key });
       refetch();
     },
-    onError: (err: unknown, vars?: Partial<ReviewPayload>) => {
+    onError: (err: unknown) => {
       // apiClient throws an Error with the response body appended to the message.
       // Try to parse JSON from the error message to extract backend validation messages.
       const message = err instanceof Error ? err.message : String(err);
@@ -56,31 +79,6 @@ const ReviewPage = () => {
           const parsed = JSON.parse(jsonPart);
           if (parsed && typeof parsed === "object") {
             const nf = parsed.non_field_errors || [];
-            const already = Array.isArray(nf) && nf.find((s: string) => /already reviewed/i.test(String(s)));
-            if (already && productId) {
-              if (!currentUserProfile || !currentUserProfile.id) {
-                toast.error("You must be logged in to update your review.");
-                return;
-              }
-              const existing = reviews.find(
-                (r) => r.product && (r.product as any).id === productId && r.user && r.user.id === currentUserProfile.id,
-              );
-              if (existing) {
-                (async () => {
-                  try {
-                    await patchReview(existing.id, vars || { rating: selectedStars, comment });
-                    toast.success("Review updated");
-                    const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
-                    queryClient.invalidateQueries({ queryKey: key });
-                    refetch();
-                  } catch (e) {
-                    const fallback = e instanceof Error ? e.message : String(e);
-                    toast.error(fallback);
-                  }
-                })();
-                return;
-              }
-            }
 
             if (Array.isArray(nf) && nf.length > 0) {
               toast.error(nf.join(" "));
@@ -100,6 +98,22 @@ const ReviewPage = () => {
         }
       }
       toast.error(message);
+    },
+  });
+  const likeMutation = useMutation({
+    mutationFn: async ({ id, body }: { id: number; body?: Record<string, unknown> }) => {
+      return likeReview(id, body);
+    },
+    onSuccess: (data: Review) => {
+      // update the single review cache and refresh list
+      const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+      queryClient.setQueryData(["review", data.id], data);
+      queryClient.invalidateQueries({ queryKey: key });
+      refetch();
+    },
+    onError: (err: unknown) => {
+      const m = err instanceof Error ? err.message : String(err);
+      toast.error(m);
     },
   });
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
@@ -174,7 +188,11 @@ const ReviewPage = () => {
                     />
                     <div className="flex flex-col">
                       <p className="text-[10px] text-gray-400">{formatReviewDate(rev.created_at)}</p>
-                      <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
+                      <h3 className="font-semibold">
+                        {currentUserProfile?.id === rev.user?.id
+                          ? "You"
+                          : rev.user?.account_name || rev.user?.name || "User"}
+                      </h3>
                       <div className="flex">
                         {Array.from({ length: 5 }).map((_, j) => (
                           <img
@@ -187,9 +205,42 @@ const ReviewPage = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <img src="/like.svg" alt="" className="w-4 h-4" />
-                    <span className="text-xs">0</span>
+                  <div className="flex items-center gap-2">
+                    {currentUserProfile?.id === rev.user?.id && (
+                      <button
+                        onClick={() => handleOpenEditForm(rev.id)}
+                        className="text-gray-500 hover:text-gray-700 transition"
+                        aria-label="Edit review"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (likeMutation.isPending) return;
+                        setAnimatingLikes((prev) => new Set(prev).add(rev.id));
+                        setTimeout(() => {
+                          setAnimatingLikes((prev) => {
+                            const next = new Set(prev);
+                            next.delete(rev.id);
+                            return next;
+                          });
+                        }, 300);
+                        likeMutation.mutate({ id: rev.id });
+                      }}
+                      className="flex items-center gap-1"
+                      aria-label={rev.liked ? "Unlike review" : "Like review"}
+                    >
+                      <img
+                        src="/like.svg"
+                        alt=""
+                        className={`w-4 h-4 transition-opacity ${animatingLikes.has(rev.id) ? "animate-like-heartbeat" : ""
+                          } ${rev.liked ? "opacity-100" : "opacity-60"}`}
+                      />
+                    </button>
+                    <span className="text-xs text-gray-500">{rev.likes_count ?? 0}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
@@ -256,7 +307,7 @@ const ReviewPage = () => {
             }}
             className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition"
           >
-            Send Review
+            {editingReviewId ? "Update Review" : "Send Review"}
           </button>
 
           {/* Success Modal */}
@@ -310,9 +361,24 @@ const ReviewPage = () => {
                   <img src={rev.user?.avatar || "/userPfp2.jpg"} alt="" className="w-8 h-8 rounded-lg" />
                   <div className="flex flex-col">
                     <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
-                    <h3 className="font-semibold">{rev.user?.account_name || rev.user?.name || "User"}</h3>
+                    <h3 className="font-semibold">
+                      {currentUserProfile?.id === rev.user?.id
+                        ? "You"
+                        : rev.user?.account_name || rev.user?.name || "User"}
+                    </h3>
                   </div>
                 </div>
+                {currentUserProfile?.id === rev.user?.id && (
+                  <button
+                    onClick={() => handleOpenEditForm(rev.id)}
+                    className="text-gray-500 hover:text-gray-700 transition"
+                    aria-label="Edit review"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                  </button>
+                )}
               </div>
               <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
             </div>
@@ -332,9 +398,13 @@ const ReviewPage = () => {
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex justify-center items-end">
             <div className="bg-white w-full rounded-t-3xl p-6 animate-slide-up">
               <div className="flex justify-between items-center mb-3">
-                <h2 className="text-xl font-semibold">Make a Review</h2>
+                <h2 className="text-xl font-semibold">
+                  {editingReviewId ? "Edit Review" : "Make a Review"}
+                </h2>
                 <button
-                  onClick={() => setShowMobileForm(false)}
+                  onClick={() => {
+                    handleResetForm();
+                  }}
                   className="text-gray-500 text-2xl"
                 >
                   ×
@@ -368,11 +438,10 @@ const ReviewPage = () => {
                     return;
                   }
                   createMutation.mutate({ product: productId, rating: selectedStars, comment });
-                  setShowMobileForm(false);
                 }}
                 className="w-full p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
               >
-                Send Review
+                {editingReviewId ? "Update Review" : "Send Review"}
               </button>
             </div>
           </div>

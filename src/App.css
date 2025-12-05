@@ -247,3 +247,22 @@ body {
   66%  { content: '. . '; }
   100% { content: '. . .'; }
 }
+
+@keyframes likeHeartbeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.8);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-like-heartbeat {
+  animation: likeHeartbeat 0.6s ease-in-out;
+}
