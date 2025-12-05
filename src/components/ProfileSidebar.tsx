@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logoutAnim from "../assets/logout.json";
 import { useLogout } from "../features/Auth/useAuth";
+import Tooltip from "./Tooltip";
 
 export type MenuItem = {
   key: string;
@@ -64,37 +65,40 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
           {items.map((item) => {
             const isActive = item.key === active;
             return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => handleSelect(item.key)}
-                className={`text-left py-1 px-4 flex items-center gap-2 flex-col w-full transition-all ${isActive
-                    ? "border-r-4 border-[var(--dark-def)]"
+              <Tooltip key={item.key} content={item.label} position="right">
+                <button
+                  type="button"
+                  onClick={() => handleSelect(item.key)}
+                  className={`text-left py-2 px-4 flex items-center gap-3 w-full transition-all ${isActive
+                    ? "border-r-4 border-(--dark-def) bg-gray-50"
                     : "hover:bg-gray-100"
-                  }`}
-              >
-                {item.icon && (
-                  <img
-                    src={item.icon}
-                    alt={item.label}
-                    className="w-5 2xl:w-7 h-auto mx-auto"
-                  />
-                )}
-                <span className="text-center text-[8px]">{item.label}</span>
-              </button>
+                    }`}
+                >
+                  {item.icon && (
+                    <img
+                      src={item.icon}
+                      alt={item.label}
+                      className="w-5 2xl:w-7 h-auto shrink-0"
+                    />
+                  )}
+                  <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis" title={item.label}>{item.label}</span>
+                </button>
+              </Tooltip>
             );
           })}
         </div>
 
         {/* Logout button for desktop */}
         <div className="w-full h-2/10 sm:mb-auto flex items-end mb-12 sm:mt-7">
-          <button
-            className="text-left py-3 px-4 hover:bg-gray-200 flex items-center gap-2 flex-col rounded-2xl w-full justify-center h-8/10"
-            onClick={() => setLogout(true)}
-          >
-            <img src="/logout.svg" alt="Logout" className="w-4 h-auto" />
-            <span className="text-center text-[10px]">Logout</span>
-          </button>
+          <Tooltip content="Logout" position="right">
+            <button
+              className="text-left py-2 px-4 hover:bg-gray-200 flex items-center gap-3 rounded-2xl w-full justify-start"
+              onClick={() => setLogout(true)}
+            >
+              <img src="/logout.svg" alt="Logout" className="w-5 h-auto shrink-0" />
+              <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis" title="Logout">Logout</span>
+            </button>
+          </Tooltip>
         </div>
       </div>
 
@@ -132,8 +136,8 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                       key={item.key}
                       onClick={() => handleSelect(item.key)}
                       className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${isActive
-                          ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
-                          : "hover:bg-gray-100"
+                        ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
+                        : "hover:bg-gray-100"
                         }`}
                     >
                       {item.icon && (
