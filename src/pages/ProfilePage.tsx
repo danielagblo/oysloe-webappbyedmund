@@ -60,8 +60,8 @@ const ProfilePage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex no-scrollbar h-full items-start sm:items-center justify-center sm:w-[65vw] sm:mr-6 sm:ml-2 overflow-y-auto no-scrollbar">
-        <div className="flex gap-2 sm:h-full sm:w-full">
+      <div className="flex no-scrollbar h-full items-start sm:items-center justify-center sm:w-[63vw] sm:mr-6 sm:ml-2 overflow-y-hidden no-scrollbar">
+        <div className="flex gap-2 sm:h-full sm:w-[60vw]">
           {renderContent()}
         </div>
       </div>

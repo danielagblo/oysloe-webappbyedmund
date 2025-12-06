@@ -6,6 +6,7 @@ import "../App.css";
 import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
@@ -54,6 +55,7 @@ const AdsDetailsPage = () => {
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
   const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
+  const [isAdLoading, setIsAdLoading] = useState(false);
 
   // mark-as-taken mutation (declare early)
   const markTaken = useMarkProductAsTaken();
@@ -245,15 +247,6 @@ const AdsDetailsPage = () => {
         Invalid ad ID
       </p>
     );
-  if (adLoading || adsLoading)
-    return (
-      <div className="inset bg-black/40 h-screen max-h-[97vh] w-screen m-0 flex flex-col items-center justify-center">
-        <div className="bg-white relative flex flex-col items-center justify-center w-1/2 h-1/2 z-50 rounded-2xl">
-          <Loader />
-          <p className="loading absolute bottom-4 loading-dots">Loading</p>
-        </div>
-      </div>
-    );
   if (adError)
     return (
       <p className="h-screen w-screen m-0 flex flex-col items-center justify-center">
@@ -364,18 +357,32 @@ const AdsDetailsPage = () => {
 
 
 
-  const handlePrevious = () => {
+  const handlePrevious = async () => {
     if (currentIndex > 0) {
       const prevAd = ads[currentIndex - 1];
+      setIsAdLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 100));
       navigate(`/ads/${prevAd.id}`, { state: { adData: prevAd } });
+      setTimeout(() => setIsAdLoading(false), 500);
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentIndex < totalAds - 1) {
       const nextAd = ads[currentIndex + 1];
+      setIsAdLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 100));
       navigate(`/ads/${nextAd.id}`, { state: { adData: nextAd } });
+      setTimeout(() => setIsAdLoading(false), 500);
     }
+  };
+
+  const handleRelatedAdClick = async (ad: Product, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsAdLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    navigate(`/ads/${ad.id}`, { state: { adData: ad } });
+    setTimeout(() => setIsAdLoading(false), 500);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -1232,10 +1239,18 @@ const AdsDetailsPage = () => {
                     alt={p.name || "Seller product"}
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate(`/ads/${p.id}`, { state: { adData: p } })}
-                    onKeyDown={(e) => {
+                    onClick={async () => {
+                      setIsAdLoading(true);
+                      await new Promise(resolve => setTimeout(resolve, 100));
+                      navigate(`/ads/${p.id}`, { state: { adData: p } });
+                      setTimeout(() => setIsAdLoading(false), 500);
+                    }}
+                    onKeyDown={async (e) => {
                       if (e.key === "Enter" || e.key === " ") {
+                        setIsAdLoading(true);
+                        await new Promise(resolve => setTimeout(resolve, 100));
                         navigate(`/ads/${p.id}`, { state: { adData: p } });
+                        setTimeout(() => setIsAdLoading(false), 500);
                       }
                     }}
                     className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
@@ -1243,7 +1258,7 @@ const AdsDetailsPage = () => {
                 ))
               ) : (
                 <>
-                  <p className="text-gray-500 md:text-[1vw] h-20 w-full text-center pt-10">No other ads from this seller.</p>
+                  <p className="text-gray-500 md:text-[1vw] w-full text-center">No other ads from this seller.</p>
                 </>
               )}
             </div>
@@ -1283,6 +1298,7 @@ const AdsDetailsPage = () => {
             key={ad.id}
             to={`/ads/${ad.id}`}
             state={{ adData: ad }}
+            onClick={(e) => handleRelatedAdClick(ad, e)}
             className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
           >
             <img
@@ -1314,6 +1330,7 @@ const AdsDetailsPage = () => {
 
   return (
     <div className="lg:pt-5">
+      <AdLoadingOverlay isVisible={isAdLoading || adLoading || adsLoading} />
       <div
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"

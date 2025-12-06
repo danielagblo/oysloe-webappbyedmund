@@ -17,6 +17,8 @@ import { toast } from "sonner";
 import Loader from "../components/LoadingDots";
 import { formatCount } from "../utils/formatCount";
 import { formatMoney } from "../utils/formatMoney";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
+import { useNavigate } from "react-router-dom";
 
 type HomePageHeaderProps = {
   searchValue: string;
@@ -164,6 +166,8 @@ export const HomePageHeader = ({
 };
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [isAdLoading, setIsAdLoading] = useState(false);
   const {
     categories,
     loading: categoriesLoading,
@@ -173,6 +177,16 @@ const HomePage = () => {
     null,
   );
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+
+  const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsAdLoading(true);
+    // Small delay to ensure overlay renders
+    await new Promise(resolve => setTimeout(resolve, 100));
+    navigate(`/ads/${ad.id}`, { state: { adData: ad } });
+    // Reset after navigation (component will unmount but just in case)
+    setTimeout(() => setIsAdLoading(false), 500);
+  };
 
   const handleCategoryClick = (name: string) => {
     const category = categories.find((c) => c.name === name) || null;
@@ -468,7 +482,7 @@ const HomePage = () => {
       );
     }
     return (
-      <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto">
+      <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
         <div
           className="
             grid 
@@ -476,7 +490,7 @@ const HomePage = () => {
             gap-2 sm:gap-4 
             place-items-center
             justify-items-center
-            max-w-full w-full
+            max-w-full w-full sm:max-w-4/5
 
             max-sm:flex max-sm:flex-wrap max-sm:w-screen
             max-sm:items-center max-sm:justify-center
@@ -664,13 +678,14 @@ const HomePage = () => {
                 ? <Loader className={"h-40 my-0"} />
                 : categoryProducts.map(
                   (ad) =>
-                    (ad.status === "ACTIVE" && !ad.is_taken) && (
-                      <Link
-                        key={ad.id}
-                        to={`/ads/${ad.id}`}
-                        state={{ adData: ad }}
-                        className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-                      >
+                      (ad.status === "ACTIVE" && !ad.is_taken) && (
+                        <Link
+                          key={ad.id}
+                          to={`/ads/${ad.id}`}
+                          state={{ adData: ad }}
+                          onClick={(e) => handleAdClick(ad, e)}
+                          className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                        >
                         <img
                           src={ad.image || "/no-image.jpeg"}
                           alt={ad.name}
@@ -739,7 +754,7 @@ const HomePage = () => {
           {categoryProducts.length > 0 ? (
             categoryProducts.map((ad) => (
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
-                <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
+                <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
                   <img
                     src={ad.image || "/no-image.jpeg"}
                     alt={ad.name}
@@ -793,7 +808,7 @@ const HomePage = () => {
         >
           {results.map((ad) => (
             <div key={ad.id} className="flex flex-col w-full overflow-hidden">
-              <Link to={`/ads/${ad.id}`} state={{ adData: ad }}>
+              <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
                 <img
                   src={ad.image || "/no-image.jpeg"}
                   alt={ad.name}
@@ -819,6 +834,7 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
+      <AdLoadingOverlay isVisible={isAdLoading} />
       <HomePageHeader searchValue={searchTerm} setSearchValue={setSearchTerm} />
       <div className="flex flex-col items-center justify-center">
         <div className="bg-(--div-active) w-screen">

@@ -12,8 +12,8 @@ const FavouritesPage = () => {
   const navigate = useNavigate(); 
 
   return (
-    <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent">
-      <div className="w-full flex flex-col h-full items-center gap-2 relative">
+    <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent lg:overflow-hidden">
+      <div className="w-full flex flex-col h-full lg:max-h-[97vh] items-center gap-2 relative lg:overflow-auto no-scrollbar">
         <div className="hidden sticky top-3 bg-white w-full mt-3 sm:flex items-center px-8 py-3 md:py-5 rounded-2xl z-50">
           <img
             src="/favorited.svg"

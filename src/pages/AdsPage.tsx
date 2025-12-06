@@ -38,8 +38,8 @@ const AdsPage = () => {
   const filteredAds = products.filter((ad) => mapToLabel(ad) === activeTab);
 
   return (
-    <div className="flex justify-between h-screen w-screen items-center bg-transparent">
-      <div className="w-full flex flex-col h-full items-center gap-2 relative">
+    <div className="flex justify-between h-screen w-screen items-center bg-transparent lg:overflow-hidden">
+      <div className="w-full flex flex-col h-full lg:max-h-[97vh] items-center gap-2 relative lg:overflow-auto no-scrollbar">
         <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
           <div className="hidden sm:flex justify-around items-center px-4 max-sm:pb-2">
             {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
