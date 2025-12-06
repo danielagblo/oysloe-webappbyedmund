@@ -90,12 +90,12 @@ export const HomePageHeader = ({
                 className={`search-input ${isSmallScreen && isCondensed
                     ? "text-[16px]"
                     : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 rounded-full outline-0 bg-white text-center`}
+                  } px-4 py-3 h-12 sm:h-14 max-sm: max-w-[70vw] rounded-full outline-0 bg-white text-center`}
               />
 
               <img
                 src="/search.svg"
-                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-3 w-5 h-5 z-10"
+                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-1.5 w-5 h-5 z-10"
               />
             </div>
           </div>
@@ -410,7 +410,7 @@ const HomePage = () => {
       );
     }
     return (
-      <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+      <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto">
         <div
           className="
             grid 
@@ -418,7 +418,10 @@ const HomePage = () => {
             gap-2 sm:gap-4 
             place-items-center
             justify-items-center
-            max-w-full
+            max-w-full w-full
+
+            max-sm:flex max-sm:flex-wrap max-sm:w-screen
+            max-sm:items-center max-sm:justify-center
         "
           style={{
             gridAutoRows: "1fr",
@@ -432,18 +435,21 @@ const HomePage = () => {
                     flex flex-col items-center justify-center
                     w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
                     bg-(--div-active) rounded-lg 
-                    p-2 sm:p-3 cursor-pointer 
+                    p-0 sm:p-3 cursor-pointer 
                     hover:bg-gray-300
+
+                    max-sm:w-[20vw] max-sm:h-[20vw]
+                    max-sm:min-w-[75px] max-sm:min-h-[75px]
                 "
             >
-              <div className="w-[8vw] h-[8vw]  min-h-[45px] min-w-[45px] relative rounded-full bg-white">
+              <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
                 <img
                   src={`/${category.name.toLowerCase()}.png`}
                   alt={category.name}
-                  className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
+                  className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] max-sm:w-[8vw] max-sm:h-[8vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
                 />
               </div>
-              <h3 className="text-center text-[10px] sm:text-[1.25vw] mt-1 truncate">
+              <h3 className="text-center flex items-center justify-center text-xs sm:text-[1.25vw] mt-1 truncate">
                 {category.name}
               </h3>
             </div>
@@ -508,7 +514,7 @@ const HomePage = () => {
 
     return (
       <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 lg:h-50 h-25">
-        <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2">
+        <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2 max-sm:px-3">
 
 
           {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
@@ -535,10 +541,10 @@ const HomePage = () => {
                     }}
                   />
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[8px] md:text-xs lg:text-sm min-w-[60px]">
+                    <span className="text-[10px] md:text-xs lg:text-sm min-w-[60px]">
                       {category.name}
                     </span>
-                    <span className="text-[10px] md:text-xl lg:text-2xl font-bold text-(--accent-color)">
+                    <span className="text-xs md:text-xl lg:text-2xl font-bold text-(--accent-color)">
                       {formatCount(category.adsCount)}
                     </span>
                   </div>
@@ -552,7 +558,16 @@ const HomePage = () => {
 
   const ScrollableAds = () => {
     if (!categories || categories.length === 0) {
-      return <p className="text-xl mt-5 w-full text-center">No ad categories available at this time.</p>;
+      return (
+        <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
+          <img 
+            src="/nothing-to-show.png" 
+            alt="Nothing to show" 
+            className="max-w-[50vw] sm:max-w-50"
+          />
+          <p>No ad categories are available at this time.</p>
+        </div>
+      )
     }
 
     return categories.map((category) => {
@@ -650,7 +665,6 @@ const HomePage = () => {
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
         <div
-          style={{ transform: "scale(0.9)" }}
           className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
         >
           {categoryProducts.length > 0 ? (
@@ -749,7 +763,7 @@ const HomePage = () => {
           <SearchResults />
         ) : (
           <>
-            <div className="transform scale-90 sm:transform-none sm:scale-100">
+            <div>
               <SelectACategory
                 categories={categories}
                 onCategoryClick={handleCategoryClick}

@@ -87,6 +87,29 @@ body {
   z-index: 0;
 }
 
+@media (max-width: 640px) {
+  .rotating-bg {
+    width: 75vw;
+    max-width: 75vw;
+    height: 84px;
+  }
+  .rotating-bg-inner {
+    width: 73vw;
+    max-width: 73vw;
+    height: 78px;
+  }
+  .search-input {
+    width: 65vw;
+    max-width: 65vw;
+    font-size: 0.95rem;
+    padding-left: 35px;
+    text-align: left;
+  }
+  .search-input::placeholder {
+    text-align: center;
+  }
+}
+
 .rotating-bg::before {
   content: "";
   position: absolute;
@@ -178,6 +201,10 @@ body {
 
   .search-input {
     width: 420px;
+    text-align: left;
+  }
+  .search-input::placeholder {
+    text-align: center;
   }
 }
 
