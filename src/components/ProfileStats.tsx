@@ -92,7 +92,7 @@ export default function ProfileStats() {
           <Profile />
           <AdStats />
         </div>
-        <div className="shadow-sm py-2 rounded-xl bg-white w-full h-[46vh]">
+        <div className="shadow-sm py-2 rounded-xl bg-white w-full h-[46vh] flex flex-col justify-around items-center">
           <LevelProgress compact />
           {/* <RatingReviews userId={user ? (user as UserProfile).id : undefined} /> */}
         </div>

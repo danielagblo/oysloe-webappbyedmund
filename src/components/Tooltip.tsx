@@ -24,17 +24,18 @@ const Tooltip = ({ content, children, position = "top" }: Props) => {
     };
 
     return (
-        <div className="relative inline-block group">
+        <div className={`relative ${content.toUpperCase() === "LOGOUT" ? "w-full flex justify-center items-center" : `inline-block group`}`}>
             <div
                 onMouseEnter={() => setIsVisible(true)}
                 onMouseLeave={() => setIsVisible(false)}
+                className={content.toUpperCase() === "LOGOUT" ? "w-full flex items-center justify-center" : ""}
             >
                 {children}
             </div>
 
             {isVisible && content && (
                 <div
-                    className={`absolute z-50 px-3 py-2 text-sm font-medium text-white bg-gray-800 rounded-lg whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
+                    className={`absolute z-50 px-3 py-2 text-[1.2vw] font-medium text-white bg-gray-800 rounded-lg whitespace-nowrap pointer-events-none ${positionClasses[position]}`}
                 >
                     {content}
                     <div

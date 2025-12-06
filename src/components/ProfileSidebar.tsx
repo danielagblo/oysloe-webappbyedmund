@@ -60,8 +60,8 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
   return (
     <>
       {/* ---------- DESKTOP SIDEBAR ---------- */}
-      <div className="hidden sm:flex flex-col h-full w-[18vw] sm:w-[10vw] justify-center items-center bg-white py-10">
-        <div className="flex flex-col h-full gap-10 sm:gap-2 justify-center w-full">
+      <div className="hidden sm:flex flex-col h-full w-[18vw] sm:w-[14vw] justify-between items-center bg-white pt-[7vh]">
+        <div className="flex flex-col h-full max-h-[65vh] justify-around w-full">
           {items.map((item) => {
             const isActive = item.key === active;
             return (
@@ -69,8 +69,8 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 <button
                   type="button"
                   onClick={() => handleSelect(item.key)}
-                  className={`text-left py-2 px-4 flex items-center gap-3 w-full transition-all ${isActive
-                    ? "border-r-4 border-(--dark-def) bg-gray-50"
+                  className={`text-left py-[2vh] px-2 pl-3 flex items-center gap-3 w-full cursor-pointer transition-all ${isActive
+                    ? "border-r-[0.425vw] border-(--dark-def) bg-gray-50"
                     : "hover:bg-gray-100"
                     }`}
                 >
@@ -78,10 +78,10 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                     <img
                       src={item.icon}
                       alt={item.label}
-                      className="w-5 2xl:w-7 h-auto shrink-0"
+                      className="h-auto shrink-0 w-[2vw]"
                     />
                   )}
-                  <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis" title={item.label}>{item.label}</span>
+                  <span className="text-[1.25vw] whitespace-nowrap overflow-hidden text-ellipsis" title={item.label}>{item.label}</span>
                 </button>
               </Tooltip>
             );
@@ -89,14 +89,16 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
         </div>
 
         {/* Logout button for desktop */}
-        <div className="w-full h-2/10 sm:mb-auto flex items-end mb-12 sm:mt-7">
+        <div className="w-full flex items-center justify-center pb-[5vh]">
           <Tooltip content="Logout" position="right">
             <button
-              className="text-left py-2 px-4 hover:bg-gray-200 flex items-center gap-3 rounded-2xl w-full justify-start"
+              className="text-left h-[14vh] hover:rounded-2xl hover:bg-gray-100 flex items-center w-9/10 px-4"
               onClick={() => setLogout(true)}
             >
-              <img src="/logout.svg" alt="Logout" className="w-5 h-auto shrink-0" />
-              <span className="text-sm whitespace-nowrap overflow-hidden text-ellipsis" title="Logout">Logout</span>
+              <img src="/logout.svg" alt="Logout" className="w-[2vw] h-auto" />
+              <span 
+                className={`text-left text-[1.25vw] flex items-center justify-center gap-3 w-full cursor-pointer transition            `}
+              >Logout</span>
             </button>
           </Tooltip>
         </div>

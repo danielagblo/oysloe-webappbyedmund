@@ -112,7 +112,7 @@ const ReferPage = () => {
   // paymentData removed (no transactions endpoint available)
 
   const Refer = () => (
-    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full flex flex-col gap-2">
+    <div className="h-full md:h-[93vh] min-h-0 md:overflow-auto no-scrollbar w-full flex flex-col gap-2 rounded-2xl">
       <h2 className="md:hidden max-md:block w-full text-center text-2xl font-bold max-md:mt-2 text-[var(--dark-def)]">
         &nbsp; &nbsp; &nbsp;Refer a Friend
       </h2>
@@ -262,7 +262,7 @@ const ReferPage = () => {
     </div>
   );
   const How = () => (
-    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full px-8 py-9 bg-white rounded-2xl flex flex-col gap-1 items-start">
+    <div className="h-full md:h-[93vh] lg:overflow-auto no-scrollbar w-full px-8 py-9 pb-17.5 bg-white rounded-2xl flex flex-col gap-1 items-start">
       <div>
         <h2 className="text-sm md:text-[1.2vw]">We value friendship</h2>
         <h2 className="text-xs text-gray-400 md:text-[1vw]">
@@ -327,7 +327,7 @@ const ReferPage = () => {
     </div>
   );
   const Redraw = () => (
-    <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
+    <div className="h-full md:h-[93vh] lg:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
       <RedrawInner />
       <div>
         <div className="pb-3 text-center">
@@ -402,8 +402,8 @@ const ReferPage = () => {
     };
 
     return (
-      <div className="h-full md:min-h-[92vh] md:overflow-auto no-scrollbar w-full rounded-2xl flex flex-col gap-2">
-        <div className="bg-white w-full shadom-sm h-56 rounded-2xl pt-8 p-5 flex flex-col justify-between items-start gap-6">
+      <div className="h-full md:h-[93vh] w-full rounded-2xl flex flex-col gap-2">
+        <div className="bg-white w-full shadom-sm h-56 rounded-2xl pt-8 p-5 flex flex-col justify-between items-start gap-6 lg:overflow-auto no-scrollbar">
           <div className="flex gap-2 text-sm">
             <img src="/Redeem.svg" alt="" className="w-5 h-5" />
             <h2 className="inline">Apply Coupon</h2>
@@ -450,21 +450,26 @@ const ReferPage = () => {
     );
   };
   const Level = () => (
-    <LevelProgress
-      silverPercent={silverPercent}
-      goldPercent={goldPercent}
-      diamondPercent={diamondPercent}
-      remainingToGold={remainingToGold}
-      remainingToDiamond={remainingToDiamond}
-      diamondPointsText={diamondPointsText}
-    />
+    <div className="h-full md:h-[93vh] lg:overflow-auto no-scrollbar w-full rounded-2xl flex flex-col gap-2">
+      <div className="bg-white w-full shadow-sm rounded-2xl p-6 flex flex-col justify-between items-center">
+        <LevelProgress
+          silverPercent={silverPercent}
+          goldPercent={goldPercent}
+          diamondPercent={diamondPercent}
+          remainingToGold={remainingToGold}
+          remainingToDiamond={remainingToDiamond}
+          diamondPointsText={diamondPointsText}
+          fullHeight={false}
+        />
+      </div>
+    </div>
   );
 
   return (
     <div className="h-screen max-sm:w-screen lg:w-full max-lg:w-full bg-[var(--background)] mb-5 relative">
       <div className="w-full md:grid md:grid-cols-2 py-5 md:py-[3.5vh] h-full overflow-hidden gap-4">
         <Refer />
-        <div className="md:w-full md:overflow-auto no-scrollbar">
+        <div className="md:w-full no-scrollbar">
           <div className="hidden md:h-full md:block md:min-h-[94vh]">
             {how ? (
               <How />
