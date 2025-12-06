@@ -23,6 +23,64 @@ type HomePageHeaderProps = {
   setSearchValue: (v: string) => void;
 };
 
+// Hook to manage dynamic scroll fade effect
+const useScrollFade = (containerId: string) => {
+  const [maskStyle, setMaskStyle] = useState<string>(
+    "linear-gradient(to right, black 100%)"
+  );
+
+  useEffect(() => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const updateMask = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      const maxScroll = scrollWidth - clientWidth;
+
+      // Check if content is scrollable
+      if (maxScroll <= 0) {
+        setMaskStyle("linear-gradient(to right, black 100%)");
+        return;
+      }
+
+      const atStart = scrollLeft <= 5;
+      const atEnd = scrollLeft >= maxScroll - 5;
+
+      let gradient = "";
+      if (atStart && !atEnd) {
+        // Only fade on right
+        gradient = "linear-gradient(to right, black 0%, black 92%, transparent 100%)";
+      } else if (atEnd && !atStart) {
+        // Only fade on left
+        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 100%)";
+      } else if (!atStart && !atEnd) {
+        // Fade on both sides
+        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
+      } else {
+        // No fade needed (shouldn't happen but safety)
+        gradient = "linear-gradient(to right, black 100%)";
+      }
+
+      setMaskStyle(gradient);
+    };
+
+    // Initial check
+    updateMask();
+
+    // Listen to scroll events
+    container.addEventListener("scroll", updateMask, { passive: true });
+    // Also update on resize in case content changes
+    window.addEventListener("resize", updateMask, { passive: true });
+
+    return () => {
+      container.removeEventListener("scroll", updateMask);
+      window.removeEventListener("resize", updateMask);
+    };
+  }, [containerId]);
+
+  return maskStyle;
+};
+
 export const HomePageHeader = ({
   searchValue,
   setSearchValue,
@@ -556,6 +614,98 @@ const HomePage = () => {
     )
   };
 
+  // Component for individual scrollable ad row with dynamic fade
+  const ScrollableAdRow = ({ category }: { category: Category }) => {
+    const containerId = `move-${category.id}`;
+    const maskGradient = useScrollFade(containerId);
+    const categoryProducts = productsByCategory[category.id] || [];
+
+    if (!categoryProducts || categoryProducts.length === 0) return null;
+
+    return (
+      <div
+        key={category.id}
+        className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-(--dark-def)"
+      >
+        <div className="flex items-center gap-3 mb-2 px-2">
+          <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-(--dark-def)">
+            {category.name}
+          </h2>
+          <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
+            Filter
+          </button>
+          <div className="flex gap-2 ml-auto">
+            <button
+              onClick={() => handleArrowClick("left", category.id)}
+              className="bg-gray-200 p-2 rounded-full shrink-0"
+            >
+              <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
+            </button>
+            <button
+              onClick={() => handleArrowClick("right", category.id)}
+              className="bg-gray-200 p-2 rounded-full shrink-0"
+            >
+              <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
+            </button>
+          </div>
+        </div>
+
+        <div
+          id={containerId}
+          className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2"
+          style={{
+            WebkitMaskImage: maskGradient,
+            maskImage: maskGradient,
+          }}
+        >
+          {categoryProducts.length > 0 ? (
+            <div className="flex gap-2 sm:gap-3 w-max">
+              {productsLoading
+                ? <Loader className={"h-40 my-0"} />
+                : categoryProducts.map(
+                  (ad) =>
+                    (ad.status === "ACTIVE" && !ad.is_taken) && (
+                      <Link
+                        key={ad.id}
+                        to={`/ads/${ad.id}`}
+                        state={{ adData: ad }}
+                        className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                      >
+                        <img
+                          src={ad.image || "/no-image.jpeg"}
+                          alt={ad.name}
+                          className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+                        />
+                        <div className="flex items-center gap-1 px-2 py-1">
+                          <img
+                            src="/location.svg"
+                            alt=""
+                            className="w-3 sm:w-5 h-3 sm:h-5"
+                          />
+                          <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                            {ad.location?.name ?? ad.location?.region ?? "Unknown"}
+                          </p>
+                        </div>
+                        <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                          {ad.name}
+                        </p>
+                        <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                          {formatMoney(ad.price, "GHS")}
+                        </p>
+                      </Link>
+                    ),
+                )}
+            </div>
+          ) : (
+            <p className="px-2 text-sm text-gray-500">
+              No ads to show here...
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const ScrollableAds = () => {
     if (!categories || categories.length === 0) {
       return (
@@ -570,90 +720,9 @@ const HomePage = () => {
       )
     }
 
-    return categories.map((category) => {
-      const categoryProducts = productsByCategory[category.id] || [];
-      if (!categoryProducts || categoryProducts.length === 0) return;;
-
-      return (
-        <div
-          key={category.id}
-          className="flex flex-col w-[95vw] mt-6 mx-auto overflow-hidden text-(--dark-def)"
-        >
-          <div className="flex items-center gap-3 mb-2 px-2">
-            <h2 className="text-base sm:text-xl lg:text-[2vw] font-semibold truncate text-(--dark-def)">
-              {category.name}
-            </h2>
-            <button className="bg-gray-200 px-3 py-1 rounded-full text-xs sm:text-sm lg:text-xl whitespace-nowrap">
-              Filter
-            </button>
-            <div className="flex gap-2 ml-auto">
-              <button
-                onClick={() => handleArrowClick("left", category.id)}
-                className="bg-gray-200 p-2 rounded-full shrink-0"
-              >
-                <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
-              </button>
-              <button
-                onClick={() => handleArrowClick("right", category.id)}
-                className="bg-gray-200 p-2 rounded-full shrink-0"
-              >
-                <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
-              </button>
-            </div>
-          </div>
-
-          <div
-            id={`move-${category.id}`}
-            className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2 mask-[linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)] [--webkit-mask-image:linear-gradient(to_right,black_0%,black_8%,black_92%,transparent_100%)]"
-          >
-            {categoryProducts.length > 0 ? (
-              <div className="flex gap-2 sm:gap-3 w-max">
-
-                {productsLoading
-                  ? <Loader className={"h-40 my-0"} />
-                  : categoryProducts.map(
-                    (ad) =>
-                      (ad.status === "ACTIVE" && !ad.is_taken) && (
-                        <Link
-                          key={ad.id}
-                          to={`/ads/${ad.id}`}
-                          state={{ adData: ad }}
-                          className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-                        >
-                          <img
-                            src={ad.image || "/no-image.jpeg"}
-                            alt={ad.name}
-                            className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
-                          />
-                          <div className="flex items-center gap-1 px-2 py-1">
-                            <img
-                              src="/location.svg"
-                              alt=""
-                              className="w-3 sm:w-5 h-3 sm:h-5"
-                            />
-                            <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                              {ad.location?.name ?? ad.location?.region ?? "Unknown"}
-                            </p>
-                          </div>
-                          <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
-                            {ad.name}
-                          </p>
-                          <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
-                            {formatMoney(ad.price, "GHS")}
-                          </p>
-                        </Link>
-                      ),
-                  )}
-              </div>
-            ) : (
-              <p className="px-2 text-sm text-gray-500">
-                No ads to show here...
-              </p>
-            )}
-          </div>
-        </div>
-      );
-    });
+    return categories.map((category) => (
+      <ScrollableAdRow key={category.id} category={category} />
+    ));
   };
 
   const ConditionalAds = () => {
