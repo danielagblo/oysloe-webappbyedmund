@@ -1,8 +1,7 @@
-import { Camera, PlusIcon, X } from "lucide-react";
+import { Camera, PlusIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import mailGif from "../assets/mail.gif";
 import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
@@ -10,9 +9,7 @@ import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
 
 const EditProfilePage = () => {
-  const [closeProgress, setCloseProgress] = useState(true);
-  const [openVerificationModal, setOpenVerificationModal] = useState(false);
-  const [linkSent, setLinkSent] = useState(false);
+  const [closeProgress] = useState(true);
   // derive setup progress from profile completeness
 
   // load profile and prefill editable local state
@@ -199,18 +196,8 @@ const EditProfilePage = () => {
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2 lg:overflow-auto no-scrollbar">
           <div className="relative bg-white md:shadow-lg h-fit sm:min-h-[92vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
-            {closeProgress && (
+            {closeProgress && setupProgress < 100 && (
               <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
-                {setupProgress === 100 && (
-                  <div className="mt-[-5px] w-full flex justify-end items-center">
-                    <button
-                      className="p-2 cursor-pointer"
-                      onClick={() => setCloseProgress((prev) => !prev)}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
                 <div className="my-3 h-[6px] w-full bg-[#defeed] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#74ffa7] rounded-full"
@@ -589,6 +576,10 @@ const EditProfilePage = () => {
                           form.append("name", selectedUser?.name ?? "");
                           form.append("email", selectedUser?.email ?? "");
                           form.append("phone", selectedUser?.phonePrimary ?? "");
+                          if (selectedUser?.phoneSecondary)
+                            form.append("second_number", selectedUser.phoneSecondary);
+                          if (selectedUser?.nationalId)
+                            form.append("id_number", selectedUser.nationalId);
                           if ((selectedUser as any)?.address)
                             form.append("address", (selectedUser as any).address);
                           if (selectedUser?.businessName)
@@ -628,6 +619,8 @@ const EditProfilePage = () => {
                             name: selectedUser?.name,
                             email: selectedUser?.email,
                             phone: selectedUser?.phonePrimary,
+                            second_number: selectedUser?.phoneSecondary,
+                            id_number: selectedUser?.nationalId,
                             address: (selectedUser as any)?.address,
                             business_name: selectedUser?.businessName,
                             account_name: selectedUser?.accountName,
@@ -675,26 +668,6 @@ const EditProfilePage = () => {
           <div className="md:w-full md:h-20" />
         </div>
       </div>
-
-      {openVerificationModal && (
-        <div className="fixed inset-0 z-30 backdrop-blur-sm bg-black/50 flex justify-center items-center ">
-          <div className="bg-white flex justify-center items-center flex-col p-4 px-10 gap-4 rounded-3xl max-w-md w-full mx-4">
-            <img src={mailGif} alt="Mail animation" className="w-32 h-auto" />
-            <h2 className="text-xl w-[80%] text-center">
-              Verification link has been sent
-            </h2>
-            <button
-              onClick={() => {
-                setOpenVerificationModal(false);
-                setLinkSent(true);
-              }}
-              className="text-sm border-2 cursor-pointer border-gray-300 rounded-full py-1.5 px-4"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
 
       {imageModalOpen && imageModalSrc && (
         <div
