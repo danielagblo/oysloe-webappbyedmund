@@ -12,6 +12,9 @@ import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
+import { getSubcategories } from "../services/subcategoryService";
+import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 
 import { toast } from "sonner";
 import Loader from "../components/LoadingDots";
@@ -190,6 +193,9 @@ const HomePage = () => {
     min?: number;
     max?: number;
   }>({ mode: "none" });
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | "">(null);
+  const [selectedFeatures, setSelectedFeatures] = useState<Record<number, string>>({});
 
   const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -255,6 +261,30 @@ const HomePage = () => {
   // Filter utility functions
   const applyFilters = (productsToFilter: Product[]) => {
     let filtered = [...productsToFilter];
+
+    // Apply category filter
+    if (selectedCategoryId !== null) {
+      filtered = filtered.filter((p) => p.category === selectedCategoryId);
+    }
+
+    // Apply subcategory filter
+    if (selectedSubcategoryId !== null && selectedSubcategoryId !== "") {
+      filtered = filtered.filter((p) => {
+        // Check if product has product_features with matching subcategory
+        return p.product_features?.some((pf: any) => pf.feature?.subcategory === selectedSubcategoryId);
+      });
+    }
+
+    // Apply features filter
+    if (Object.keys(selectedFeatures).length > 0) {
+      filtered = filtered.filter((p) => {
+        // All selected features must be present in the product with matching values
+        return Object.entries(selectedFeatures).every(([featureId, featureValue]) => {
+          const fId = Number(featureId);
+          return p.product_features?.some((pf: any) => pf.feature?.id === fId && pf.value === featureValue);
+        });
+      });
+    }
 
     // Apply location filter
     if (selectedLocation) {
@@ -420,7 +450,22 @@ const HomePage = () => {
     }
   }, [isCondensed, isSmallScreen]);
 
-  const ShowFilter = () => {
+  const ShowFilter = ({
+    selectedCategoryId: propSelectedCategoryId,
+    setSelectedCategoryId: propSetSelectedCategoryId,
+    selectedSubcategoryId: propSelectedSubcategoryId,
+    setSelectedSubcategoryId: propSetSelectedSubcategoryId,
+    selectedFeatures: propSelectedFeatures,
+    setSelectedFeatures: propSetSelectedFeatures,
+  }: {
+    selectedCategoryId: number | null;
+    setSelectedCategoryId: (id: number | null) => void;
+    selectedSubcategoryId: number | "";
+    setSelectedSubcategoryId: (id: number | "") => void;
+    selectedFeatures: Record<number, string>;
+    setSelectedFeatures: (features: Record<number, string>) => void;
+  }) => {
+    // Local states for batch apply pattern
     const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
     const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
     const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
@@ -430,9 +475,107 @@ const HomePage = () => {
     const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
     const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
     const [localTimeframeSort, setLocalTimeframeSort] = useState<"none" | "newest" | "oldest">(timeframeSort);
+    const [localSelectedCategoryId, setLocalSelectedCategoryId] = useState<number | null>(propSelectedCategoryId);
+    const [localSelectedSubcategoryId, setLocalSelectedSubcategoryId] = useState<number | "">(propSelectedSubcategoryId);
+    const [localSelectedFeatures, setLocalSelectedFeatures] = useState<Record<number, string>>(propSelectedFeatures);
+    
+    // Subcategories and features state
+    const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
+    const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
+    const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
+
+    // Fetch subcategories when category changes
+    useEffect(() => {
+      let mounted = true;
+      (async () => {
+        try {
+          if (typeof localSelectedCategoryId === "number" && !isNaN(localSelectedCategoryId)) {
+            let subs = await getSubcategories({ category: localSelectedCategoryId }) as any;
+            if (!mounted) return;
+            if (!Array.isArray(subs) && subs && Array.isArray(subs.results)) subs = subs.results;
+            const mapped = (subs || []).map((s: any) => ({ id: s.id, name: s.name ?? s.title ?? s.display_name ?? s.label ?? "" }));
+            setSubcategories(mapped);
+          } else {
+            setSubcategories([]);
+          }
+        } catch (e) {
+          console.warn("Failed to fetch subcategories", e);
+          setSubcategories([]);
+        }
+      })();
+      return () => {
+        mounted = false;
+      };
+    }, [localSelectedCategoryId]);
+
+    // Fetch features when subcategory changes
+    useEffect(() => {
+      let mounted = true;
+
+      (async () => {
+        try {
+          if (typeof localSelectedSubcategoryId === "number" && !isNaN(localSelectedSubcategoryId)) {
+            let features = await getFeatures({ subcategory: localSelectedSubcategoryId }) as any;
+            if (!mounted) return;
+            if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
+            const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
+            setFeatureDefinitions(defs);
+          } else {
+            setFeatureDefinitions([]);
+          }
+        } catch (e) {
+          console.warn("Failed to fetch feature definitions for subcategory", e);
+          if (mounted) setFeatureDefinitions([]);
+        }
+      })();
+
+      return () => { mounted = false };
+    }, [localSelectedSubcategoryId]);
+
+    // Fetch possible feature values when feature definitions change
+    useEffect(() => {
+      let mounted = true;
+
+      (async () => {
+        try {
+          const perFeaturePromises = (featureDefinitions || []).map((fd) =>
+            getPossibleFeatureValues({ feature: fd.id })
+              .then((res) => ({ fid: fd.id, res }))
+              .catch((err) => {
+                return ({ fid: fd.id, res: null });
+              }),
+          );
+
+          if (perFeaturePromises.length === 0) {
+            if (mounted) setPossibleFeatureValues({});
+            return;
+          }
+
+          const perFeatureResults = await Promise.all(perFeaturePromises);
+
+          const normalized: Record<number, string[]> = {};
+          perFeatureResults.forEach(({ fid, res }) => {
+            const values = normalizePossibleFeatureValues(res, fid);
+            if (values.length > 0) normalized[fid] = values;
+          });
+
+          if (mounted) setPossibleFeatureValues(normalized);
+        } catch (e) {
+          console.warn("Failed to fetch possible feature values", e);
+          if (mounted) setPossibleFeatureValues({});
+        }
+      })();
+
+      return () => {
+        mounted = false;
+      };
+    }, [featureDefinitions]);
 
     const handleApplyFilters = () => {
       // Apply all local state changes to parent state at once
+      propSetSelectedCategoryId(localSelectedCategoryId);
+      propSetSelectedSubcategoryId(localSelectedSubcategoryId);
+      propSetSelectedFeatures(localSelectedFeatures);
       setSelectedLocation(localSelectedLocation);
       setSelectedTimeframe(localSelectedTimeframe);
       setPriceSort(localPriceSort);
@@ -452,6 +595,9 @@ const HomePage = () => {
     };
 
     const handleClearAllFilters = () => {
+      setLocalSelectedCategoryId(null);
+      setLocalSelectedSubcategoryId("");
+      setLocalSelectedFeatures({});
       setLocalSelectedLocation(null);
       setLocalSelectedTimeframe("anytime");
       setLocalPriceSort("none");
@@ -485,8 +631,106 @@ const HomePage = () => {
         </div>
 
         <div className="p-6 sm:p-8">
-          {/* Title */}
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
+
+          {/* Category Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 3H9V9H3V3ZM11 3H17V9H11V3ZM3 11H9V17H3V11ZM11 11H17V17H11V11Z" fill="#374957"/>
+              </svg>
+              Category
+            </h3>
+            <select
+              value={localSelectedCategoryId || ""}
+              onChange={(e) => {
+                const val = e.target.value;
+                setLocalSelectedCategoryId(val ? Number(val) : null);
+                setLocalSelectedSubcategoryId("");
+                setLocalSelectedFeatures({});
+              }}
+              className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+            >
+              <option value="">All Categories</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subcategory Section - Only show if category selected */}
+          {localSelectedCategoryId !== null && subcategories.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 5H16V7H4V5ZM6 10H14V12H6V10ZM8 15H12V17H8V15Z" fill="#374957"/>
+                </svg>
+                Subcategory (Optional)
+              </h3>
+              <select
+                value={localSelectedSubcategoryId || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setLocalSelectedSubcategoryId(val ? Number(val) : "");
+                  setLocalSelectedFeatures({});
+                }}
+                className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+              >
+                <option value="">All Subcategories</option>
+                {subcategories.map((sub) => (
+                  <option key={sub.id} value={sub.id}>
+                    {sub.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Features Section - Only show if features exist for selected subcategory */}
+          {featureDefinitions.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/circle-quarter-svgrepo-com.svg" alt="Features" className="h-5 w-5" />
+                Features
+              </h3>
+              <div className="flex flex-col gap-2">
+                {featureDefinitions.map((fd) => {
+                  const values = possibleFeatureValues[fd.id] ?? [];
+                  return (
+                    <div key={`def-${fd.id}`} className="flex items-center gap-2">
+                      <div className="w-1/3 text-sm font-medium">{fd.name}</div>
+                      {values && values.length > 0 ? (
+                        <div className="flex-1">
+                          <input
+                            list={`feature-values-${fd.id}`}
+                            placeholder={`Select ${fd.name}`}
+                            value={localSelectedFeatures[fd.id] ?? ""}
+                            onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                            className="w-full p-2 border rounded-lg border-(--div-border) text-sm"
+                          />
+                          <datalist id={`feature-values-${fd.id}`}>
+                            {values.map((v) => (
+                              <option key={v} value={v} />
+                            ))}
+                          </datalist>
+                        </div>
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder={`Value for ${fd.name}`}
+                          value={localSelectedFeatures[fd.id] ?? ""}
+                          onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                          className="flex-1 p-2 border rounded-lg border-(--div-border) text-sm"
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Location Section */}
           <div className="mb-8">
@@ -608,7 +852,7 @@ const HomePage = () => {
                     name="price-filter"
                     checked={localPriceMode === option.value}
                     onChange={() => setLocalPriceMode(option.value)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 focus:ring-(--dark-def)"
                   />
                   <span className="text-sm sm:text-base">{option.label}</span>
                 </label>
@@ -1159,6 +1403,9 @@ const HomePage = () => {
   const FilterButton = ({className} : {className? : string}) => {
     // Calculate active filter count
     const activeFiltersCount = [
+      selectedCategoryId !== null ? 1 : 0,
+      selectedSubcategoryId !== null && selectedSubcategoryId !== "" ? 1 : 0,
+      Object.keys(selectedFeatures).length > 0 ? 1 : 0,
       selectedLocation ? 1 : 0,
       selectedTimeframe !== "anytime" ? 1 : 0,
       priceSort !== "none" ? 1 : 0,
@@ -1189,7 +1436,16 @@ const HomePage = () => {
         <div className="bg-(--div-active) w-screen">
           {selectedCategory && <CategoryFilters />}
         </div>
-        {showFilterPopup && <ShowFilter />}
+        {showFilterPopup && (
+          <ShowFilter
+            selectedCategoryId={selectedCategoryId}
+            setSelectedCategoryId={setSelectedCategoryId}
+            selectedSubcategoryId={selectedSubcategoryId}
+            setSelectedSubcategoryId={setSelectedSubcategoryId}
+            selectedFeatures={selectedFeatures}
+            setSelectedFeatures={setSelectedFeatures}
+          />
+        )}
 
         {selectedCategory ? (
           <ConditionalAds />
