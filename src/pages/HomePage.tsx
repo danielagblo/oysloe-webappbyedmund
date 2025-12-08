@@ -125,7 +125,7 @@ export const HomePageHeader = ({
           }`}
       >
         <h2
-          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[4vw]"
+          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[6vw]"
             } font-medium text-(--dark-def) whitespace-nowrap`}
         >
           Oysloe
@@ -177,6 +177,18 @@ const HomePage = () => {
     null,
   );
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+
+  // Filter states
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedTimeframe, setSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">("anytime");
+  const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
+  const [priceFilter, setPriceFilter] = useState<{
+    mode: "none" | "below" | "above" | "between";
+    below?: number;
+    above?: number;
+    min?: number;
+    max?: number;
+  }>({ mode: "none" });
 
   const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -238,6 +250,84 @@ const HomePage = () => {
 
   /* API BIT ENDS HERE */
   if (categoriesLoading) console.log("Loading up categories...");
+
+  // Filter utility functions
+  const applyFilters = (productsToFilter: Product[]) => {
+    let filtered = [...productsToFilter];
+
+    // Apply location filter
+    if (selectedLocation) {
+      filtered = filtered.filter(
+        (p) => p.location?.name === selectedLocation || p.location?.region === selectedLocation
+      );
+    }
+
+    // Apply timeframe filter
+    if (selectedTimeframe !== "anytime") {
+      const filterDate = new Date();
+      
+      if (selectedTimeframe === "7days") {
+        filterDate.setDate(filterDate.getDate() - 7);
+      } else if (selectedTimeframe === "30days") {
+        filterDate.setDate(filterDate.getDate() - 30);
+      } else if (selectedTimeframe === "newest") {
+        filterDate.setDate(filterDate.getDate() - 1); // Last 24 hours
+      }
+      
+      filtered = filtered.filter((p) => {
+        if (!p.created_at) return true; // If no created_at, include the product
+        try {
+          const productDate = new Date(p.created_at);
+          return productDate >= filterDate;
+        } catch {
+          return true; // If date parsing fails, include the product
+        }
+      });
+    }
+
+    // Apply price filter
+    if (priceFilter.mode !== "none") {
+      filtered = filtered.filter((p) => {
+        const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;
+        if (priceFilter.mode === "below" && priceFilter.below !== undefined) {
+          return price <= priceFilter.below;
+        }
+        if (priceFilter.mode === "above" && priceFilter.above !== undefined) {
+          return price >= priceFilter.above;
+        }
+        if (priceFilter.mode === "between" && priceFilter.min !== undefined && priceFilter.max !== undefined) {
+          return price >= priceFilter.min && price <= priceFilter.max;
+        }
+        return true;
+      });
+    }
+
+    // Apply price sort
+    if (priceSort === "low-to-high") {
+      filtered.sort((a, b) => {
+        const priceA = typeof a.price === "number" ? a.price : Number(a.price) || 0;
+        const priceB = typeof b.price === "number" ? b.price : Number(b.price) || 0;
+        return priceA - priceB;
+      });
+    } else if (priceSort === "high-to-low") {
+      filtered.sort((a, b) => {
+        const priceA = typeof a.price === "number" ? a.price : Number(a.price) || 0;
+        const priceB = typeof b.price === "number" ? b.price : Number(b.price) || 0;
+        return priceB - priceA;
+      });
+    }
+
+    return filtered;
+  };
+
+  // Get all unique locations from products
+  const uniqueLocations = Array.from(
+    new Set(
+      products
+        .flatMap((p) => [p.location?.name, p.location?.region])
+        .filter((loc): loc is string => !!loc)
+    )
+  ).sort();
 
   const handleArrowClick = (
     direction: "left" | "right",
@@ -314,13 +404,51 @@ const HomePage = () => {
     }
   }, [isCondensed, isSmallScreen]);
 
-  /* HomePageHeader moved to module scope to avoid remounting on each render */
+  const ShowFilter = () => {
+    const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
+    const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
+    const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
+    const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
+    const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
+    const [localSelectedLocation, setLocalSelectedLocation] = useState<string | null>(selectedLocation);
+    const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
+    const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
 
-  const ShowFilter = () => (
+    const handleApplyFilters = () => {
+      // Apply all local state changes to parent state at once
+      setSelectedLocation(localSelectedLocation);
+      setSelectedTimeframe(localSelectedTimeframe);
+      setPriceSort(localPriceSort);
+      
+      if (localPriceMode === "below" && localPriceBelow) {
+        setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
+      } else if (localPriceMode === "above" && localPriceAbove) {
+        setPriceFilter({ mode: "above", above: Number(localPriceAbove) });
+      } else if (localPriceMode === "between" && localPriceMin && localPriceMax) {
+        setPriceFilter({ mode: "between", min: Number(localPriceMin), max: Number(localPriceMax) });
+      } else {
+        setPriceFilter({ mode: "none" });
+      }
+      
+      closeFilterPopup();
+    };
+
+    const handleClearAllFilters = () => {
+      setLocalSelectedLocation(null);
+      setLocalSelectedTimeframe("anytime");
+      setLocalPriceSort("none");
+      setLocalPriceMode("none");
+      setLocalPriceMin("");
+      setLocalPriceMax("");
+      setLocalPriceBelow("");
+      setLocalPriceAbove("");
+    };
+
+    return (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="relative pt-30 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
-        {/* Close button */}
-        <div className="absolute top-0 left-0 p-4 sm:p-6">
+      <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
+        
+        <div className="absolute top-0 right-0 p-4 sm:p-6">
           <button onClick={closeFilterPopup} className="block mb-3">
             <svg
               width="55"
@@ -335,57 +463,177 @@ const HomePage = () => {
               />
             </svg>
           </button>
+        </div>
 
-          {/* Header */}
-          <p className="bg-(--div-active) px-4 py-2 rounded-lg text-sm inline-flex items-center gap-3">
-            <span className="text-length:--font-size)">Category</span>
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 31 31"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+        <div className="p-6 sm:p-8">
+          {/* Title */}
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
+
+          {/* Location Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/location.svg" alt="Location" className="w-5 h-5" />
+              Location
+            </h3>
+            <select
+              value={localSelectedLocation || ""}
+              onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
+              className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
             >
-              <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
-              <path
-                d="M7.67394 21.4473L19.8827 10.8223L21.292 12.4935L9.08324 23.1184L7.67394 21.4473ZM8.44226 11.4926L10.0817 10.0658L20.5236 22.4482L18.8842 23.8749L8.44226 11.4926Z"
-                fill="white"
-              />
-            </svg>
-          </p>
-        </div>
-
-        {/* Categories list */}
-        <div className="category-list relative">
-          <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-3 p-4 sm:p-6">
-            {categories.map((category) => (
-              <label
-                key={category.id}
-                className="text-(length:--font-size) flex items-center gap-2 sm:gap-3 p-2 sm:p-3 w-fit border border-(--div-border) rounded-lg hover:bg-gray-200 cursor-pointer text-sm sm:text-base"
-              >
-                <input
-                  type="radio"
-                  name="category"
-                  value={category.name}
-                  checked={selectedCategory?.id === category.id}
-                  onChange={() => setSelectedCategory(category)}
-                  className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-size-[18px_18px]"
-                />
-                <span>{category.name}</span>
-              </label>
-            ))}
+              <option value="">All Locations</option>
+              {uniqueLocations.map((loc) => (
+                <option key={loc} value={loc}>
+                  {loc}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
 
-        {/* Search button */}
-        <div className="flex justify-center mb-6 mt-8">
-          <button className="px-10 sm:px-20 py-3 sm:py-4 bg-(--div-active) rounded-lg hover:bg-gray-200 text-xl sm:text-2xl">
-            Search
-          </button>
+          {/* Timeframe Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/time-svgrepo-com.svg" alt="Timeframe" className="w-5 h-5" />
+                Timeframe
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "newest" as const, label: "Newest (24h)" },
+                { value: "7days" as const, label: "Last 7 days" },
+                { value: "30days" as const, label: "Last 30 days" },
+                { value: "anytime" as const, label: "Anytime" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setLocalSelectedTimeframe(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                    localSelectedTimeframe === option.value
+                      ? "bg-(--dark-def) text-white"
+                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Price Sort Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/price-tag-svgrepo-com.svg" alt="Price Sort" className="w-5 h-5" />
+                Sort by Price
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "none" as const, label: "No Sort" },
+                { value: "low-to-high" as const, label: "Low to High" },
+                { value: "high-to-low" as const, label: "High to Low" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setLocalPriceSort(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                    localPriceSort === option.value
+                      ? "bg-(--dark-def) text-white"
+                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Price Filter Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
+                Filter by Price
+            </h3><div className="space-y-3">
+              {[
+                { value: "none" as const, label: "No Filter" },
+                { value: "below" as const, label: "Below a certain price" },
+                { value: "above" as const, label: "Above a certain price" },
+                { value: "between" as const, label: "Between two prices" },
+              ].map((option) => (
+                <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="price-filter"
+                    checked={localPriceMode === option.value}
+                    onChange={() => setLocalPriceMode(option.value)}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm sm:text-base">{option.label}</span>
+                </label>
+              ))}
+            </div>
+
+            {/* Price input fields */}
+            {localPriceMode === "below" && (
+              <div className="mt-3">
+                <input
+                  type="number"
+                  placeholder="Max price"
+                  value={localPriceBelow}
+                  onChange={(e) => setLocalPriceBelow(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+            )}
+
+            {localPriceMode === "above" && (
+              <div className="mt-3">
+                <input
+                  type="number"
+                  placeholder="Min price"
+                  value={localPriceAbove}
+                  onChange={(e) => setLocalPriceAbove(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+            )}
+
+            {localPriceMode === "between" && (
+              <div className="mt-3 space-y-2">
+                <input
+                  type="number"
+                  placeholder="Min price"
+                  value={localPriceMin}
+                  onChange={(e) => setLocalPriceMin(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                />
+                <input
+                  type="number"
+                  placeholder="Max price"
+                  value={localPriceMax}
+                  onChange={(e) => setLocalPriceMax(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3 justify-center mt-8 pb-4">
+            <button
+              onClick={handleClearAllFilters}
+              className="px-6 sm:px-10 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm sm:text-base font-medium"
+            >
+              Clear All
+            </button>
+            <button
+              onClick={handleApplyFilters}
+              className="px-6 sm:px-10 py-3 bg-(--dark-def) text-white rounded-lg hover:bg-gray-800 text-sm sm:text-base font-medium"
+            >
+              Apply Filters
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
+  };
 
   const SelectACategory = ({
     categories,
@@ -397,9 +645,9 @@ const HomePage = () => {
     if (categoriesLoading) {
 
       return (
-        <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+        <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
           <div
-            className="grid grid-cols-5 gap-2 sm:gap-4 place-items-center justify-items-center max-w-full"
+            className="grid grid-cols-5 gap-2 sm:gap-4 place-items-center justify-items-center max-w-full w-full sm:max-w-4/5 max-sm:flex max-sm:flex-wrap max-sm:w-screen max-sm:items-center max-sm:justify-center"
             style={{ gridAutoRows: "1fr" }}
           >
             {Array.from({ length: 10 }).map((_, i) => (
@@ -409,10 +657,12 @@ const HomePage = () => {
                   flex flex-col items-center justify-center
                   w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
                   bg-gray-200 rounded-lg 
-                  p-2 sm:p-3 cursor-progress animate-pulse
+                  p-0 sm:p-3 cursor-progress animate-pulse
+                  max-sm:w-[20vw] max-sm:h-[20vw]
+                  max-sm:min-w-[75px] max-sm:min-h-[75px]
                 "
               >
-                <div className="w-[8vw] h-[8vw]  min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
                   <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 rounded-full bg-white" />
 
                 </div>
@@ -588,8 +838,6 @@ const HomePage = () => {
       <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 lg:h-50 h-25">
         <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2 max-sm:px-3">
 
-
-          {/* crazy filter below makes sure it always shows the top 5 non-zero count categories */}
           {categories
             .sort((a, b) => b.adsCount - a.adsCount)
             .filter((cat) => cat.adsCount > 0)
@@ -613,7 +861,7 @@ const HomePage = () => {
                     }}
                   />
                   <div className="absolute flex flex-col items-center justify-center text-center">
-                    <span className="text-[10px] md:text-xs lg:text-sm min-w-[60px]">
+                    <span className="text-[2.5vw] md:text-xs lg:text-[1.2vw] min-w-[60px]">
                       {category.name}
                     </span>
                     <span className="text-xs md:text-xl lg:text-2xl font-bold text-(--accent-color)">
@@ -633,6 +881,7 @@ const HomePage = () => {
     const containerId = `move-${category.id}`;
     const maskGradient = useScrollFade(containerId);
     const categoryProducts = productsByCategory[category.id] || [];
+    const filteredProducts = applyFilters(categoryProducts);
 
     if (!categoryProducts || categoryProducts.length === 0) return null;
 
@@ -672,11 +921,11 @@ const HomePage = () => {
             maskImage: maskGradient,
           }}
         >
-          {categoryProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             <div className="flex gap-2 sm:gap-3 w-max">
               {productsLoading
                 ? <Loader className={"h-40 my-0"} />
-                : categoryProducts.map(
+                : filteredProducts.map(
                   (ad) =>
                       (ad.status === "ACTIVE" && !ad.is_taken) && (
                         <Link
@@ -712,9 +961,12 @@ const HomePage = () => {
                 )}
             </div>
           ) : (
-            <p className="px-2 text-sm text-gray-500">
-              No ads to show here...
-            </p>
+            <div className="flex flex-col items-center justify-center">
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7"/>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -745,14 +997,16 @@ const HomePage = () => {
     const categoryProducts = selectedCategory
       ? productsByCategory[selectedCategory.id] || []
       : [];
+    
+    const filteredProducts = applyFilters(categoryProducts);
 
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
         <div
-          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
+          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-45"
         >
-          {categoryProducts.length > 0 ? (
-            categoryProducts.map((ad) => (
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map((ad) => (
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
                 <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
                   <img
@@ -776,9 +1030,12 @@ const HomePage = () => {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 col-span-full">
-              No ads to show here...
-            </p>
+            <div className="flex flex-col items-center justify-center col-span-full">
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]"/>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -787,8 +1044,9 @@ const HomePage = () => {
 
   const SearchResults = () => {
     const results = products.filter((p) => p.status === "ACTIVE");
+    const filteredResults = applyFilters(results);
 
-    if (!results || results.length === 0) {
+    if (!filteredResults || filteredResults.length === 0) {
       return (
         <div className="bg-(--div-active) w-full flex justify-center -mb-4">
           <div style={{ transform: "scale(0.9)" }} className="w-[95vw] pb-8">
@@ -806,7 +1064,7 @@ const HomePage = () => {
           style={{ transform: "scale(0.9)" }}
           className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
         >
-          {results.map((ad) => (
+          {filteredResults.map((ad) => (
             <div key={ad.id} className="flex flex-col w-full overflow-hidden">
               <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
                 <img
@@ -831,6 +1089,30 @@ const HomePage = () => {
       </div>
     );
   };
+
+  const FilterButton = ({className} : {className? : string}) => {
+    // Calculate active filter count
+    const activeFiltersCount = [
+      selectedLocation ? 1 : 0,
+      selectedTimeframe !== "anytime" ? 1 : 0,
+      priceSort !== "none" ? 1 : 0,
+      priceFilter.mode !== "none" ? 1 : 0,
+    ].reduce((a, b) => a + b, 0);
+
+    return (
+      <button onClick={handleFilterSettings} className={className}>
+        <div className={`bg-gray-100 lg:bg-white w-30 h-14 lg:w-[10vw] lg:h-[4vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
+          {activeFiltersCount > 0 && (
+            <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {activeFiltersCount}
+            </div>
+          )}
+          <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7 lg:w-[2.1vw] lg:h-[2.1vw]" />
+          <p className="text-sm lg:text-[1.25vw]">Filter</p>
+        </div>
+      </button>    
+    );
+  }
 
   return (
     <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
@@ -861,10 +1143,13 @@ const HomePage = () => {
 
             <div className="bg-(--div-active) w-screen">
               <ScrollableAds />
-              <div className="h-26" />
+              <div className="h-35 lg:h-35" />
             </div>
           </>
         )}
+        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center" >
+          <FilterButton/>
+        </div>
         <MenuButton />
       </div>
     </div>

@@ -3,7 +3,7 @@ export function formatCount(n : number | string | null | undefined) : string {
 
   n = Number(n);
 
-  if (n < 50) return n.toString();
+  if (n < 20) return n.toString();
 
   if (n < 100) return n.toString() + "+";
 
