@@ -5,6 +5,7 @@ import MenuButton from "../components/MenuButton";
 import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
+import { timeAgo } from "../utils/timeAgo";
 
 type Alert = {
   id: number;
@@ -99,12 +100,7 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
     setShowActions(false);
     setDragOffset(0);
   };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-  };
-
+  
   return (
     <div className="relative rounded-lg overflow-hidden group">
       {/* Action buttons - Always in DOM but behind content */}
@@ -153,7 +149,7 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
         />
         <div className={`flex flex-col flex-1 ${alert.is_read ? "opacity-50" : ""}`}>
           <span className="text-xs text-gray-400">
-            {formatTime(alert.created_at)}
+            {timeAgo(alert.created_at)}
           </span>
           <div className="text-sm lg:text-base">
             <span className="font-semibold">{alert.title}</span>
