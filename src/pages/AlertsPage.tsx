@@ -27,20 +27,16 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
   const [dragOffset, setDragOffset] = useState(0);
   const [showActions, setShowActions] = useState(false);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const startX = e.clientX;
+  const handleDragStart = (startX: number) => {
     let currentOffset = dragOffset;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const offset = startX - moveEvent.clientX;
+    const handleDragMove = (moveX: number) => {
+      const offset = startX - moveX;
       currentOffset = Math.max(0, Math.min(offset, 140));
       setDragOffset(currentOffset);
     };
 
-    const handleMouseUp = () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-
+    const handleDragEnd = () => {
       if (currentOffset > 60) {
         setShowActions(true);
         setDragOffset(140);
@@ -51,9 +47,45 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
       onDragEnd();
     };
 
+    return { handleDragMove, handleDragEnd };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const startX = e.clientX;
     onDragStart();
+    const { handleDragMove, handleDragEnd } = handleDragStart(startX);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      handleDragMove(moveEvent.clientX);
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      handleDragEnd();
+    };
+
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const startX = e.touches[0].clientX;
+    onDragStart();
+    const { handleDragMove, handleDragEnd } = handleDragStart(startX);
+
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      handleDragMove(moveEvent.touches[0].clientX);
+    };
+
+    const handleTouchEnd = () => {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      handleDragEnd();
+    };
+
+    document.addEventListener("touchmove", handleTouchMove);
+    document.addEventListener("touchend", handleTouchEnd);
   };
 
   const handleMarkRead = () => {
@@ -106,6 +138,7 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
       {/* Main content */}
       <div
         onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
         className={`flex items-start gap-3 w-full relative bg-white p-3 transition-all ${showActions ? "cursor-default" : "cursor-grab active:cursor-grabbing"
           } hover:bg-gray-50`}
         style={{
