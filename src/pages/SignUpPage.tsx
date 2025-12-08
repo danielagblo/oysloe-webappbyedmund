@@ -1,6 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import type { FormEvent, FormEventHandler } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
@@ -8,6 +10,8 @@ import PhoneInput from "../components/PhoneInput";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { useRegister } from "../features/Auth/useAuth";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { apiClient } from "../services/apiClient";
+import { endpoints } from "../services/endpoints";
 import type { RegisterRequest } from "../types/Auth";
 
 const SignInPage = () => {
@@ -19,7 +23,7 @@ const SignInPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<
-    RegisterRequest & { confirmPassword: string; agreedToTerms: boolean }
+    RegisterRequest & { confirmPassword: string; agreedToPrivacy: boolean; agreedToTerms: boolean }
   >({
     name: "",
     email: "",
@@ -28,11 +32,35 @@ const SignInPage = () => {
     address: "",
     referral_code: "",
     confirmPassword: "",
+    agreedToPrivacy: false,
     agreedToTerms: false,
   });
 
+  // modal state for showing privacy policy / terms as a bottom sheet
+  const [policyModalOpen, setPolicyModalOpen] = useState(false);
+  const [policyModalType, setPolicyModalType] = useState<"privacy" | "terms" | null>(null);
+  // track whether user scrolled to end of policy content in modal
+  const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+
+  // Preload and cache latest policies using react-query (tanstack)
+  const privacyQuery = useQuery({
+    queryKey: ["policies", "privacyLatest"],
+    queryFn: () => apiClient.get(endpoints.policies.privacyLatest()),
+    staleTime: 1000 * 60 * 60, // 1 hour
+    gcTime: 1000 * 60 * 60 * 6, // 6 hours
+    refetchOnWindowFocus: false,
+  });
+
+  const termsQuery = useQuery({
+    queryKey: ["policies", "termsLatest"],
+    queryFn: () => apiClient.get(endpoints.policies.termsLatest()),
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 6,
+    refetchOnWindowFocus: false,
+  });
+
   const registerMutation = useRegister();
-  const [error, setError] = useState<string | null>(null);
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value, type, checked } = e.target;
@@ -62,43 +90,40 @@ const SignInPage = () => {
   const handleSubmit: FormEventHandler = async (e: FormEvent) => {
     console.log("Form Submitted");
     e.preventDefault();
-    setError(null);
 
     const data = formData;
 
     // Name validation
     if (!data.name?.trim()) {
       console.log("Name is required");
-      setError("Name is required");
+      toast.error("Name is required");
       return;
     }
 
     // Email validation (basic check)
     if (!data.email?.trim()) {
       console.log("Email is required");
-      setError("Email is required");
+      toast.error("Email is required");
       return;
     }
 
-    // Terms & conditions
-    if (!data.agreedToTerms) {
-      console.log(
-        "You must agree to the Privacy Policy and Terms & Conditions",
-      );
-      setError("You must agree to the Privacy Policy and Terms & Conditions");
+    // Terms & conditions: require both privacy and terms to be accepted
+    if (!(data.agreedToPrivacy && data.agreedToTerms)) {
+      console.log("You must agree to the Privacy Policy and Terms & Conditions");
+      toast.error("You must agree to the Privacy Policy and Terms & Conditions");
       return;
     }
 
     // Password validation
     if (!data.password || data.password.length < 6) {
       console.log("Password must be at least 6 characters long");
-      setError("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long");
       return;
     }
 
     if (data.password !== data.confirmPassword) {
       console.log("Passwords do not match");
-      setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
@@ -108,7 +133,7 @@ const SignInPage = () => {
     // Phone validation (trust sanitization)
     if (!data.phone || data.phone.length === 0) {
       console.log("Phone number is required");
-      setError("Phone number is required");
+      toast.error("Phone number is required");
       return;
     }
 
@@ -134,9 +159,18 @@ const SignInPage = () => {
         err instanceof Error
           ? err.message
           : "Navigation failed. Please try again.";
-      setError(errorMessage as string);
+      toast.error(errorMessage);
     }
   };
+
+  // Reset scroll/read state when modal opens
+  useEffect(() => {
+    if (policyModalOpen) {
+      setHasScrolledToEnd(false);
+      // reset scroll position
+      if (contentRef.current) contentRef.current.scrollTop = 0;
+    }
+  }, [policyModalOpen, policyModalType]);
 
   return (
     <div className="h-screen w-screen flex items-center justify-center ">
@@ -144,11 +178,6 @@ const SignInPage = () => {
         <div className=" flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl pt-10">Getting started</h2>
           <form className="relative" onSubmit={handleSubmit}>
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
             <div className="flex flex-col gap-3">
               <input
                 type="text"
@@ -197,23 +226,67 @@ const SignInPage = () => {
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
               />
               <p className="text-[10px] pb-2">
-                I have agreed to the
-                <Link to="/privacy-policy">
-                  <span className="text-black inline"> privacy policy</span>
-                </Link>{" "}
-                and
-                <Link to="/terms">
-                  <span className="text-black inline"> terms & conditions</span>
-                </Link>
-                <label htmlFor="g">
-                  <input type="checkbox" id="g" required/>
+                I have agreed to the {" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPolicyModalType("privacy");
+                    setPolicyModalOpen(true);
+                  }}
+                  className="text-black inline underline"
+                >
+                  privacy policy
+                </button>
+                {" "}
+                and {" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPolicyModalType("terms");
+                    setPolicyModalOpen(true);
+                  }}
+                  className="text-black inline underline"
+                >
+                  terms & conditions
+                </button> {" "}
+                <label className="inline-flex items-center gap-2">
+                  <div className="round">
+                    <input
+                      id="agree-checkbox"
+                      type="checkbox"
+                      checked={formData.agreedToPrivacy && formData.agreedToTerms}
+                      readOnly
+                    />
+                    <label
+                      htmlFor="agree-checkbox"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // If both policies already accepted, allow toggling off (clears both)
+                        if (formData.agreedToPrivacy && formData.agreedToTerms) {
+                          setFormData((p) => ({ ...p, agreedToPrivacy: false, agreedToTerms: false }));
+                          return;
+                        }
+
+                        // Not fully accepted yet — open the missing policy modal
+                        if (!formData.agreedToPrivacy) {
+                          setPolicyModalType("privacy");
+                          setPolicyModalOpen(true);
+                        } else if (!formData.agreedToTerms) {
+                          setPolicyModalType("terms");
+                          setPolicyModalOpen(true);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {/* no text next to checkbox by design */}
                 </label>
                 {/* <label
                   className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline"
                   htmlFor="custom-checkbox"
                 > */}
-                  {/* <!-- Hidden default checkbox --> */}
-                  {/* <input
+                {/* <!-- Hidden default checkbox --> */}
+                {/* <input
                     type="checkbox"
                     name="agreedToTerms"
                     checked={formData.agreedToTerms}
@@ -269,6 +342,94 @@ const SignInPage = () => {
       ) : (
         <OnboardingScreen />
       )}
+      {/* Bottom-sheet modal for Privacy Policy / Terms */}
+      {policyModalOpen && policyModalType && (() => {
+        const activeQuery = policyModalType === "privacy" ? privacyQuery : termsQuery;
+        const loading = activeQuery.isLoading || activeQuery.isFetching;
+        const raw = activeQuery.data as any;
+        const content = raw?.content || raw?.html || raw?.body || raw?.text || (typeof raw === 'string' ? raw : raw ? JSON.stringify(raw, null, 2) : null);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div
+              className="absolute inset-0 bg-black/40"
+              onClick={() => setPolicyModalOpen(false)}
+            />
+            <div className="relative w-full max-w-3xl bg-white rounded-t-2xl p-4 max-h-[85vh] overflow-hidden">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold">
+                  {policyModalType === "privacy" ? "Privacy Policy" : "Terms & Conditions"}
+                </h3>
+                <button
+                  aria-label="Close"
+                  onClick={() => setPolicyModalOpen(false)}
+                  className="text-2xl leading-none px-2"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div
+                ref={contentRef}
+                onScroll={() => {
+                  const el = contentRef.current;
+                  if (!el) return;
+                  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
+                    setHasScrolledToEnd(true);
+                  }
+                }}
+                className="border-t pt-2 overflow-auto"
+                style={{ maxHeight: '72vh' }}
+              >
+                {loading ? (
+                  <div className="w-full py-8 text-center">Loading...</div>
+                ) : content ? (
+                  (/<[^>]+>/.test(content)) ? (
+                    <div
+                      className="prose max-w-full"
+                      dangerouslySetInnerHTML={{ __html: content }}
+                    />
+                  ) : (
+                    <pre className="whitespace-pre-wrap text-sm text-gray-700">{content}</pre>
+                  )
+                ) : (
+                  <div className="w-full py-8 text-center text-gray-600">No content available.</div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-4 mt-3">
+                <div className="text-xs text-gray-500 invisible">Scroll to the end to enable confirmation</div>
+                <div>
+                  <button
+                    type="button"
+                    disabled={!hasScrolledToEnd}
+                    onClick={() => {
+                      setFormData((p) => {
+                        const next =
+                          policyModalType === "privacy"
+                            ? { ...p, agreedToPrivacy: true }
+                            : { ...p, agreedToTerms: true };
+
+                        if (next.agreedToPrivacy && next.agreedToTerms) {
+                          toast.success("Thanks — you have accepted the privacy policy and terms.");
+                        } else {
+                          toast.success("Thanks — you have accepted the policy.");
+                        }
+
+                        return next;
+                      });
+                      setPolicyModalOpen(false);
+                    }}
+                    className={`px-4 py-2 rounded-lg ${hasScrolledToEnd ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                  >
+                    I have read and accept
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

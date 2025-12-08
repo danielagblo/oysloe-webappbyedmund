@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
@@ -24,7 +25,6 @@ const LogInPage = () => {
     },
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const loginMutation: ReturnType<typeof useLogin> = useLogin();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,13 +34,12 @@ const LogInPage = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
     if (!formData.email) {
-      setError("Email is required");
+      toast.error("Email is required");
       return;
     }
     if (!formData.password) {
-      setError("Password is required");
+      toast.error("Password is required");
       return;
     }
 
@@ -52,8 +51,42 @@ const LogInPage = () => {
       });
       navigate("/");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Login failed";
-      setError(msg);
+      // Parse backend error payload when apiClient throws an Error containing
+      // the response body (e.g. '... failed (401) {"error_message":" Incorrect Credentials",...}')
+      const parseBackendError = (e: unknown): string => {
+        if (e instanceof Error) {
+          const text = e.message || "";
+          // try to find a JSON object in the error message
+          const start = text.indexOf("{");
+          const end = text.lastIndexOf("}");
+          if (start !== -1 && end !== -1 && end > start) {
+            const json = text.substring(start, end + 1);
+            try {
+              const parsed = JSON.parse(json) as any;
+              const candidate =
+                parsed?.error_message || parsed?.message || parsed?.detail || parsed?.error;
+              if (candidate) {
+                if (Array.isArray(candidate)) return candidate.join(" ").trim();
+                return String(candidate).trim();
+              }
+            } catch {
+              // ignore JSON parse errors
+            }
+          }
+
+          // fallback patterns: map known backend text to user-friendly messages
+          const lower = text.toLowerCase();
+          if (lower.includes("incorrect") && lower.includes("credentials"))
+            return "Email or password is incorrect. Please try again.";
+
+          // Generic fallback (do not expose raw backend payload)
+          return "Login failed. Please check your credentials and try again.";
+        }
+        return "Login failed. Please try again.";
+      };
+
+      const userMessage = parseBackendError(err);
+      toast.error(userMessage);
     } finally {
       setIsLoading(false);
     }
@@ -65,11 +98,6 @@ const LogInPage = () => {
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">Welcome!</h2>
           <form className="relative" onSubmit={handleSubmit}>
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
             <div className="flex flex-col gap-3">
               <input
                 type="email"

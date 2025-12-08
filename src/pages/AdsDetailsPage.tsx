@@ -1030,7 +1030,7 @@ const AdsDetailsPage = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <img
-                    src={review.user.avatar || "/public/userPfp2.jpg"}
+                    src={review.user.avatar || "/userPfp2.jpg"}
                     alt=""
                     className="w-10 h-10 rounded-lg"
                   />
@@ -1182,7 +1182,7 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={owner?.avatar || "/public/userPfp2.jpg"}
+            src={owner?.avatar || "/userPfp2.jpg"}
             alt={owner?.name || "Seller"}
             className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
           />

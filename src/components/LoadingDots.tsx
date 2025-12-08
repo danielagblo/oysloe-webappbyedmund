@@ -1,5 +1,5 @@
 import Lottie from "lottie-react";
-import LoadingDots from "/public/LoadingDots.json";
+import LoadingDots from "../assets/LoadingDots.json";
 
 const Loader = ({ className }: { className?: string }) => (
   <div className={className}>

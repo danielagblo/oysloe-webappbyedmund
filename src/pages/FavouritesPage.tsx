@@ -49,7 +49,7 @@ const FavouritesPage = () => {
           ) : favourites.length === 0 ? (
             <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
               <img 
-                src="/public/nothing-to-show.png" 
+                src="/nothing-to-show.png" 
                 alt="Nothing to show here" 
                 className="h-40 lg:h-50 w-auto"
               />
