@@ -1,4 +1,5 @@
 import React from "react";
+import { LEVELS } from "../constants/levels";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import ProgressBar from "./ProgressBar";
 
@@ -27,13 +28,13 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
 }) => {
     // If caller didn't provide values, compute them from the profile
     const { profile } = useUserProfile();
-    const points = Number(profile?.referral_points ?? 0) || 0;
+    const points = Number((profile as any)?.referral_points ?? 0) || 0;
 
-    // Level thresholds (kept in sync with ReferPage)
+    // Level thresholds (centralized)
     const THRESHOLDS = {
-        silver: 0,
-        gold: 10000,
-        diamond: 100000,
+        silver: LEVELS.silverStart,
+        gold: LEVELS.goldStart,
+        diamond: LEVELS.diamondStart,
     } as const;
 
     // compute values only when props are undefined
@@ -61,7 +62,7 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
     let computedDiamondPercent: number;
     if (typeof diamondPercent === "number") computedDiamondPercent = diamondPercent;
     else {
-        computedDiamondPercent = Math.round((points / Math.max(1, THRESHOLDS.diamond)) * 100);
+        computedDiamondPercent = Math.round((points / Math.max(1, LEVELS.diamondTop)) * 100);
         if (!isFinite(computedDiamondPercent) || computedDiamondPercent < 0) computedDiamondPercent = 0;
         if (computedDiamondPercent > 100) computedDiamondPercent = 100;
     }
@@ -83,30 +84,30 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
                 </div>
                 <div className="flex flex-col gap-2 w-full h-full justify-evenly">
                     <div className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between shadow-xs ${cardHeightClass}`}>
-                    <h2 className="text-[1vw]">Silver</h2>
-                    <h3 className="text-[0.9vw] text-gray-500">
-                        {computedRemainingToGold.toLocaleString()} points to gold
-                    </h3>
-                    <div className="my-2 w-full">
-                        <ProgressBar percent={computedSilverPercent} />
+                        <h2 className="text-[1vw]">Silver</h2>
+                        <h3 className="text-[0.9vw] text-gray-500">
+                            {computedRemainingToGold.toLocaleString()} points to gold
+                        </h3>
+                        <div className="my-2 w-full">
+                            <ProgressBar percent={computedSilverPercent} />
+                        </div>
                     </div>
-                </div>
-                <div className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between ${cardHeightClass}`}>
-                    <h2 className="text-[1vw]">Gold</h2>
-                    <h3 className="text-[0.9vw] text-gray-500">
-                        {computedRemainingToDiamond.toLocaleString()} points to diamond
-                    </h3>
-                    <div className="my-2 w-full">
-                        <ProgressBar percent={computedGoldPercent} />
+                    <div className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between ${cardHeightClass}`}>
+                        <h2 className="text-[1vw]">Gold</h2>
+                        <h3 className="text-[0.9vw] text-gray-500">
+                            {computedRemainingToDiamond.toLocaleString()} points to diamond
+                        </h3>
+                        <div className="my-2 w-full">
+                            <ProgressBar percent={computedGoldPercent} />
+                        </div>
                     </div>
-                </div>
-                <div className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between shadow-xs ${cardHeightClass}`}>
-                    <h2 className="text-[1vw]">Diamond</h2>
-                    <h3 className="text-[0.9vw] text-gray-500">{computedDiamondPointsText}</h3>
-                    <div className="my-1 w-full">
-                        <ProgressBar percent={computedDiamondPercent} />
+                    <div className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between shadow-xs ${cardHeightClass}`}>
+                        <h2 className="text-[1vw]">Diamond</h2>
+                        <h3 className="text-[0.9vw] text-gray-500">{computedDiamondPointsText}</h3>
+                        <div className="my-1 w-full">
+                            <ProgressBar percent={computedDiamondPercent} />
+                        </div>
                     </div>
-                </div>
                 </div>
 
             </div>

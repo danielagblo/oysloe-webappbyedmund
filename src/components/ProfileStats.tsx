@@ -1,3 +1,4 @@
+import { LEVELS } from "../constants/levels";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
@@ -52,11 +53,11 @@ export default function ProfileStats() {
         </div>
         {/* Referral progress: use reusable ProgressBar */}
         {(() => {
-          const raw = Number((user as UserProfile)?.referral_points ?? 0) || 0;
-          // referral_points may be provided as a fraction (0..1) or as a percentage (0..100).
-          // If the value looks like a fraction (<= 1), convert to percent by *100.
-          // Otherwise assume it's already a percent value.
-          let percent = raw <= 1 ? Math.round(raw * 100) : Math.round(raw);
+          // referral_points is an absolute points value. Show progress
+          // toward the Gold threshold for the summary bar (gold start).
+          const points = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          const DIAMOND = LEVELS.diamondTop;
+          let percent = Math.round((points / Math.max(1, DIAMOND)) * 100);
           if (!isFinite(percent) || percent < 0) percent = 0;
           if (percent > 100) percent = 100;
           return <ProgressBar percent={percent} />;
