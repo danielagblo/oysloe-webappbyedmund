@@ -152,8 +152,8 @@ const ReferPage = () => {
           className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm"
           onClick={() => {
             setRedraw(false);
-            setHow(false);
-            setApply(true);
+            setHow(true);
+            setApply(false);
             setShowLevel(false);
           }}
         >
