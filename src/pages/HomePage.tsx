@@ -182,6 +182,7 @@ const HomePage = () => {
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">("anytime");
   const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
+  const [timeframeSort, setTimeframeSort] = useState<"none" | "newest" | "oldest">("none");
   const [priceFilter, setPriceFilter] = useState<{
     mode: "none" | "below" | "above" | "between";
     below?: number;
@@ -317,6 +318,21 @@ const HomePage = () => {
       });
     }
 
+    // Apply timeframe sort
+    if (timeframeSort === "newest") {
+      filtered.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateB - dateA; // Newest first
+      });
+    } else if (timeframeSort === "oldest") {
+      filtered.sort((a, b) => {
+        const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return dateA - dateB; // Oldest first
+      });
+    }
+
     return filtered;
   };
 
@@ -413,12 +429,14 @@ const HomePage = () => {
     const [localSelectedLocation, setLocalSelectedLocation] = useState<string | null>(selectedLocation);
     const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
     const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
+    const [localTimeframeSort, setLocalTimeframeSort] = useState<"none" | "newest" | "oldest">(timeframeSort);
 
     const handleApplyFilters = () => {
       // Apply all local state changes to parent state at once
       setSelectedLocation(localSelectedLocation);
       setSelectedTimeframe(localSelectedTimeframe);
       setPriceSort(localPriceSort);
+      setTimeframeSort(localTimeframeSort);
       
       if (localPriceMode === "below" && localPriceBelow) {
         setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
@@ -437,6 +455,7 @@ const HomePage = () => {
       setLocalSelectedLocation(null);
       setLocalSelectedTimeframe("anytime");
       setLocalPriceSort("none");
+      setLocalTimeframeSort("none");
       setLocalPriceMode("none");
       setLocalPriceMin("");
       setLocalPriceMax("");
@@ -534,6 +553,33 @@ const HomePage = () => {
                   onClick={() => setLocalPriceSort(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
                     localPriceSort === option.value
+                      ? "bg-(--dark-def) text-white"
+                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Timeframe Sort Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/date-range-svgrepo-com.svg" alt="Timeframe Sort" className="w-5 h-5" />
+                Sort by Date
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "none" as const, label: "No Sort" },
+                { value: "newest" as const, label: "Newest First" },
+                { value: "oldest" as const, label: "Oldest First" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setLocalTimeframeSort(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                    localTimeframeSort === option.value
                       ? "bg-(--dark-def) text-white"
                       : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
                   }`}
@@ -987,7 +1033,27 @@ const HomePage = () => {
       )
     }
 
-    return categories.map((category) => (
+    // Filter out categories that have no filtered products
+    const categoriesWithAds = categories.filter((category) => {
+      const categoryProducts = productsByCategory[category.id] || [];
+      const filteredProducts = applyFilters(categoryProducts);
+      return filteredProducts.length > 0;
+    });
+
+    if (categoriesWithAds.length === 0) {
+      return (
+        <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
+          <img 
+            src="/nothing-to-show.png" 
+            alt="Nothing to show" 
+            className="max-w-[50vw] sm:max-w-50"
+          />
+          <p>No ads match your filters.</p>
+        </div>
+      )
+    }
+
+    return categoriesWithAds.map((category) => (
       <ScrollableAdRow key={category.id} category={category} />
     ));
   };
@@ -1096,6 +1162,7 @@ const HomePage = () => {
       selectedLocation ? 1 : 0,
       selectedTimeframe !== "anytime" ? 1 : 0,
       priceSort !== "none" ? 1 : 0,
+      timeframeSort !== "none" ? 1 : 0,
       priceFilter.mode !== "none" ? 1 : 0,
     ].reduce((a, b) => a + b, 0);
 

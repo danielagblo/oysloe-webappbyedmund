@@ -4,7 +4,6 @@ import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
-import Loader from "../components/LoadingDots";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";

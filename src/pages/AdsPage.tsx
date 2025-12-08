@@ -367,10 +367,10 @@ const AdsPage = () => {
       </div>
       {showEditModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="relative bg-transparent rounded-xl w-[90%] max-sm:w-screen max-w-[85vw] h-fit overflow-auto no-scrollbar">
+          <div className="relative max-lg:w-screen max-lg:h-screen max-lg:bg-white lg:bg-transparent rounded-xl w-[90%] max-sm:w-screen lg:max-w-[85vw] lg:h-fit overflow-auto no-scrollbar">
             <button
               onClick={() => { setShowEditModal(false); setEditingAdId(null); }}
-              className="fixed top-0 right-3 text-6xl text-white max-sm:text-(--dark-def) z-50 rotate-45"
+              className="fixed top-0 right-3 text-6xl text-white max-sm:text-(--dark-def) z-200 rotate-45"
             >
               +
             </button>

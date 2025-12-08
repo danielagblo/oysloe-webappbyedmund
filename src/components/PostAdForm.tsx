@@ -1106,7 +1106,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
             {isMobile && (
               <>
-                <div className="w-full flex justify-center items-center sm:hidden">
+                <div className="w-full flex justify-center items-center lg:hidden">
                   <button
                     onClick={() => setMobileStep("form")}
                     type="button"

@@ -197,7 +197,7 @@ const EditProfilePage = () => {
         <div className="lg:w-1/2">
           <div className="relative lg:overflow-auto no-scrollbar bg-white  h-fit sm:h-[93vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
             {closeProgress && setupProgress < 100 && (
-              <div className="flex-col gap-2 p-4 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
+              <div className="flex-col gap-2 p-4 max-sm:pt-10 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
                 <div className="my-3 h-[6px] w-full bg-[#defeed] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#74ffa7] rounded-full"
