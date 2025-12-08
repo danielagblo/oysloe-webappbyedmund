@@ -1042,7 +1042,13 @@ const HomePage = () => {
           {categories.slice(0, 10).map((category) => (
             <div
               key={category.id}
-              onClick={() => onCategoryClick(category.name)}
+              onClick={() => {
+                if (category.name.toUpperCase() === "SERVICES") {
+                  navigate("/apply");
+                  return;
+                }
+                onCategoryClick(category.name)
+              }}
               className="
                     flex flex-col items-center justify-center
                     w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]

@@ -16,6 +16,7 @@ import ResetPasswordWithPhonePage from "./pages/ResetPasswordWithPhonePage.tsx";
 import ReviewPage from "./pages/ReviewPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import VerificationPage from "./pages/VerificationPage.tsx";
+import ServiceApplicationPage from "./pages/ServiceApplicationPage.tsx";
 
 function App() {
   return (
@@ -98,6 +99,14 @@ function App() {
           element={
             <RequireAuth>
               <AlertsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/apply"
+          element={
+            <RequireAuth>
+              <ServiceApplicationPage />
             </RequireAuth>
           }
         />
