@@ -61,6 +61,7 @@ export const endpoints = {
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
     confirmMarkAsTaken: (id: number | string) => `/products/${id}/confirm-mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
+    repost: (id: number | string) => `/products/${id}/repost-ad/`,
     related: "/products/related/",
     // report: (id: number | string) => `/products/${id}/report/`,
     // Legacy per-product reports endpoint (kept for compatibility)

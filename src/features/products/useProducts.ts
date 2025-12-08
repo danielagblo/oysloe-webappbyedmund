@@ -1,30 +1,31 @@
 import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
+    queryOptions,
+    useMutation,
+    useQuery,
+    useQueryClient,
 } from "@tanstack/react-query";
 
 import {
-  confirmMarkProductAsTaken,
-  createProduct,
-  deleteProduct,
-  getProduct,
-  getProductReportCount,
-  getProducts,
-  getProductsForOwner,
-  getRelatedProducts,
-  markProductAsTaken,
-  patchProduct,
-  reportProduct,
-  setProductStatus,
-  updateProduct,
+    confirmMarkProductAsTaken,
+    createProduct,
+    deleteProduct,
+    getProduct,
+    getProductReportCount,
+    getProducts,
+    getProductsForOwner,
+    getRelatedProducts,
+    markProductAsTaken,
+    patchProduct,
+    reportProduct,
+    repostProduct,
+    setProductStatus,
+    updateProduct,
 } from "../../services/productService";
 
 import type {
-  Product,
-  ProductPayload,
-  ProductStatus,
+    Product,
+    ProductPayload,
+    ProductStatus,
 } from "../../types/Product";
 
 // query keys
@@ -240,6 +241,20 @@ export const useReportProduct = () => {
       qc.invalidateQueries({ queryKey: productKeys.all });
       // Also invalidate the report count query
       qc.invalidateQueries({ queryKey: productKeys.reports(Number(variables.id)) });
+    },
+  });
+};
+
+// useRepostProduct - clone a taken product to create a new draft
+export const useRepostProduct = () => {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, body }: { id: number | string; body?: Record<string, unknown> }) =>
+      repostProduct(id, body),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: productKeys.all });
+      qc.invalidateQueries({ queryKey: productKeys.lists() });
     },
   });
 };

@@ -114,7 +114,7 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
         }}
       >
         <img
-          src="/building.svg"
+          src="/favicon.png"
           alt="alert source"
           className="w-10 h-10 object-cover rounded-full shrink-0"
         />
