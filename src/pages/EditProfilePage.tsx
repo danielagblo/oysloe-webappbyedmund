@@ -697,10 +697,10 @@ const EditProfilePage = () => {
                   ⚠️ This action is irreversible.
                 </span>
               </h2>
-              <div className="grid grid-cols-2 gap-4 lg:gap-6 w-4/5">
+              <div className="grid grid-cols-2 max-sm:flex max-sm:flex-col gap-4 lg:gap-6 w-4/5">
                 <button
                   onClick={() => setDeleteConfirmation(true)}
-                  className="text-base bg-red-600 text-white  hover:bg-red-700 cursor-pointer rounded-lg py-2 px-4 transition"
+                  className="text-base bg-red-600 text-white  hover:bg-red-700 cursor-pointer rounded-lg py-2 px-4 max-sm:py-4 transition"
                 >
                   Yes, Delete My Account
                 </button>
@@ -708,14 +708,14 @@ const EditProfilePage = () => {
                   onClick={() => {
                     setAccountDeletionRequested(false);
                   }}
-                  className="text-base cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-2 px-4 transition"
+                  className="text-base cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-2 px-4 max-sm:py-4 transition"
                 >
                   Cancel
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-white flex justify-center items-center flex-col p-10 px-20 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
+            <div className="bg-white flex justify-center items-center flex-col p-10 lg:px-20 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
 
               <h3 className="text-xl font-semibold">
                 Why do you want to delete your account?
