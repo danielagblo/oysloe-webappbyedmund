@@ -52,9 +52,11 @@ export default function ProfileStats() {
         </div>
         {/* Referral progress: use reusable ProgressBar */}
         {(() => {
-          const points =
-            Number((user as UserProfile)?.referral_points ?? 0) || 0;
-          let percent = Math.round(points * 100);
+          const raw = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          // referral_points may be provided as a fraction (0..1) or as a percentage (0..100).
+          // If the value looks like a fraction (<= 1), convert to percent by *100.
+          // Otherwise assume it's already a percent value.
+          let percent = raw <= 1 ? Math.round(raw * 100) : Math.round(raw);
           if (!isFinite(percent) || percent < 0) percent = 0;
           if (percent > 100) percent = 100;
           return <ProgressBar percent={percent} />;

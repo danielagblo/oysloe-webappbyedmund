@@ -18,9 +18,16 @@ export function useApplyCoupon() {
         throw new Error("Coupon not found");
       }
       const coupon = list[0];
-      // Redeem by id
-      const redeemed = await redeemCoupon(coupon.id);
-      return redeemed;
+      try {
+        // Some backends expect a body when redeeming (e.g. { code })
+        const redeemed = await redeemCoupon(coupon.id, { code: coupon.code });
+        return redeemed;
+      } catch (err: unknown) {
+        // surface backend error message when available
+        if (err instanceof Error) throw err;
+        // attempt to stringify server error
+        throw new Error(JSON.stringify(err));
+      }
     },
     onSuccess: (data) => {
       console.log(data);
