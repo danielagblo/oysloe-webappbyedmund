@@ -12,8 +12,8 @@ function TermsAndConditionsPage() {
           h-screen sm:h-auto overflow-auto no-scrollbar
         `}
       >
-        <div className="flex lg:pt-5 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
-          <h3 className="text-2xl max-lg:pt-5">{policy?.title ?? "Terms & Conditions"}</h3>
+        <div className="flex lg:pt-15 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
+          <h3 className="text-2xl max-lg:pt-15">{policy?.title ?? "Terms & Conditions"}</h3>
           <p className="text-sm text-gray-500">{policy?.date ?? ""}</p>
           {isLoading && <p className="mt-4">Loading...</p>}
           {isError && (

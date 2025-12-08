@@ -50,10 +50,10 @@ const FeedbackPage = () => {
         <div className="md:bg-white w-full lg:h-[93vh] lg:w-1/2 mt-2 flex flex-col justify-start items-center gap-4 px-3 py-3 rounded-2xl text-xs lg:overflow-auto no-scrollbar">
           <div className="flex flex-col pt-5 px-5 gap-2 mb-2 w-full h-full min-h-0 justify-center items-center">
             <div className={`flex flex-col items-center justify-center w-full`}>
-              <h2 className="text- lg:text-[2.5vw] fontsize-20 text-gray-700 max-sm:font-medium max-sm:pt-15">
+              <h2 className="text-2xl lg:text-[2.5vw] fontsize-20 text-gray-700 max-sm:font-medium max-sm:pt-15">
                 Feedback
               </h2>
-              <p className="text-gray-500 lg:text-[1.2vw]">Help us improve on our app</p>
+              <p className="text-gray-500 text-xl lg:text-[1.2vw]">Help us improve on our app</p>
 
               <div className="my-4 text-5xl lg:text-[4.5vw]">
                 {Array.from({ length: 5 }).map((_, i) => {
@@ -69,7 +69,7 @@ const FeedbackPage = () => {
                   );
                 })}
               </div>
-              <p className="text-gray-500 lg:text-[1.2vw]">
+              <p className="text-gray-500 text-xl lg:text-[1.2vw]">
                 {selectedStars === 0 ? "No rating" : `${selectedStars} / 5`}
               </p>
             </div>
@@ -79,13 +79,13 @@ const FeedbackPage = () => {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            className="border w-full h-60 rounded-md resize-none p-2 border-gray-300 mt-[10%]"
+            className="border w-full h-60 rounded-md text-lg resize-none p-2 border-gray-300 mt-[10%]"
             placeholder="Comment"
           />
           <button
             onClick={submit}
             disabled={create.status === "pending"}
-            className="w-full cursor-pointer bg-gray-100 p-5 rounded-md hover:scale-95 active:scale-105 hover:bg-gray-200 transition"
+            className="w-full text-lg cursor-pointer bg-gray-100 p-5 rounded-md hover:scale-95 active:scale-105 hover:bg-gray-200 transition"
           >
             {create.status === "pending" ? "Sending..." : "Send Review"}
           </button>

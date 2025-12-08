@@ -514,7 +514,7 @@ const AdsDetailsPage = () => {
         )}
         <button
           onClick={handlePrevious}
-          className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
+          className="bg-gray-200 p-2 hidden rounded-full hover:bg-gray-300"
         >
           <img
             src="/arrowleft.svg"
@@ -524,7 +524,7 @@ const AdsDetailsPage = () => {
         </button>
         <button
           onClick={handleNext}
-          className="bg-gray-200 p-2 rounded-full hover:bg-gray-300"
+          className="bg-gray-200 p-2 hidden rounded-full hover:bg-gray-300"
         >
           <img
             src="/arrowright.svg"
@@ -1082,7 +1082,7 @@ const AdsDetailsPage = () => {
         </h2>
         <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
           {productReviews.length === 0 && (
-            <p className="text-[1.2vw]">
+            <p className="md:text-[1.2vw]">
               No <span className="max-sm:hidden">comments</span>
               <span className="sm:hidden">reviews</span> to show. Leave one?
             </p>
@@ -1136,13 +1136,15 @@ const AdsDetailsPage = () => {
                     className="flex items-center gap-1 m-2 md:text-[1vw]"
                     aria-label={review.liked ? "Unlike review" : "Like review"}
                   >
-                    <img
-                      src="/like.svg"
-                      alt=""
-                      className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
-                        } ${review.liked ? "opacity-100" : "opacity-60"}`}
-                    />
-                    <h3>Like</h3>
+                    <div className="flex items-center gap-2 justify-center px-2 py-1 bg-white rounded-xl hover:bg-gray-100 transition cursor-pointer">
+                      <img
+                        src="/like.svg"
+                        alt=""
+                        className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
+                          } ${review.liked ? "opacity-100" : "opacity-60"}`}
+                      />
+                      <h3>Like</h3>
+                    </div>
                   </button>
                   <span className="text-sm md:text-[1vw]">{review.likes_count ?? 0}</span>
                 </div>
@@ -1244,7 +1246,7 @@ const AdsDetailsPage = () => {
   const SellerInfo = () => (
     <div className="sm:mt-4">
       {/* profile bit pc */}
-      <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
+      <div className="hidden sm:flex flex-row gap-4bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
             src={owner?.avatar || "/userPfp2.jpg"}
@@ -1269,7 +1271,7 @@ const AdsDetailsPage = () => {
       </div>
       {/* store name */}
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-start gap-2 flex-col">
+        <div className="flex items-start gap-2 flex-col max-sm:p-4">
           <h4 className="text-xl md:text-[1.5vw]">{currentAdData?.owner?.name ?? "Seller"}</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
@@ -1291,11 +1293,11 @@ const AdsDetailsPage = () => {
       {/* product slideshow (keeps static visuals) */}
       <div className="flex items-center justify-center mb-4 w-full">
         <div className="pt-4 overflow-x-hidden w-full">
-          <div className="relative flex items-center justify-center gap-2 w-full">
+          <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4">
             <button className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
               <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
             </button>
-            <div className="flex gap-2 overflow-x-auto flex-1 no-scrollbar">
+            <div className="flex gap-2 overflow-x-auto flex-1 no-scrollbar p-">
               {sellerProducts && sellerProducts.length > 0 ? (
                 sellerProducts.slice(0, 6).map((p) => (
                   (!p.is_taken && p.status === "ACTIVE") && (
@@ -1337,7 +1339,7 @@ const AdsDetailsPage = () => {
       </div>
 
       {/* profile bit mobile*/}
-      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5 w-full mx-auto">
+      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
         <div className="relative">
           <img src={currentAdData?.owner?.avatar || "/userPfp2.jpg"} alt="" className="w-15 h-15 rounded-full" />
           {(currentAdData?.owner?.is_verified || currentAdData?.owner?.verified || currentAdData?.owner?.verified_at) && (
@@ -1440,7 +1442,7 @@ const AdsDetailsPage = () => {
                   />
                   <QuickChat />
                 </div>
-                <div className="bg-white p-6 rounded-lg w-full">
+                <div className="bg-white rounded-lg w-full">
                   <SellerInfo />
                   <div className="hidden md:block">
                     <RatingReviews layout="row" />
