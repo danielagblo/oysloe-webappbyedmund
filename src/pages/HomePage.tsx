@@ -125,7 +125,7 @@ export const HomePageHeader = ({
           }`}
       >
         <h2
-          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[6vw]"
+          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[4vw]"
             } font-medium text-(--dark-def) whitespace-nowrap`}
         >
           Oysloe
@@ -1168,7 +1168,7 @@ const HomePage = () => {
 
     return (
       <button onClick={handleFilterSettings} className={className}>
-        <div className={`bg-gray-100 lg:bg-white w-30 h-14 lg:w-[10vw] lg:h-[4vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
+        <div className={`bg-gray-100 lg:bg-white w-30 h-12 lg:w-[10vw] lg:h-[3.5vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
           {activeFiltersCount > 0 && (
             <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {activeFiltersCount}
