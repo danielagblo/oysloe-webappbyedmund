@@ -14,11 +14,13 @@ export default function ProfileStats() {
   // mini components
   const Profile = () => (
     <div className="flex flex-col items-center pb-6 md:pb-4">
-      <img
-        src={buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"}
-        alt="pfp"
-        className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
-      />
+      <div className="bg-green-300 rounded-full h-18 w-18 md:h-[9vw] md:w-[9vw] flex items-center justify-center max-md:mb-3">
+        <img
+          src={buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"}
+          alt="pfp"
+          className="rounded-full object-cover bg-green-100 h-16 w-16 md:h-[8vw] md:w-[8vw] border-[0.5vw] border-white"
+        />
+      </div>
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
         {loading || error ? "User" : (name !== " ") ? name : "User"}
       </h2>

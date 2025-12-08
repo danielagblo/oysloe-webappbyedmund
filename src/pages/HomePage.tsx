@@ -121,7 +121,7 @@ export const HomePageHeader = ({
       <div
         className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${isSmallScreen && isCondensed
             ? "justify-between px-4 py-2 gap-3"
-            : "flex-col items-center justify-center gap-8 mt-40"
+            : "flex-col items-center justify-center gap-8 mt-30"
           }`}
       >
         <h2
