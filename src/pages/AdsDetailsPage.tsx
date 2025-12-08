@@ -3,9 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
-import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
@@ -261,14 +261,42 @@ const AdsDetailsPage = () => {
     adDataFromState || currentAdDataFromQuery || ads[currentIndex];
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
   // derive a simple list of image URLs for the gallery. Backend may
-  // provide `images` as array of objects or a single `image` string.
+  // provide `images` as an array of objects, a paginated object, or a single `image` string.
+  // Include the main `image` plus any entries from `images` and remove duplicates.
   const pageImages: string[] = (() => {
-    const imgs = (currentAdData as any)?.images;
-    if (Array.isArray(imgs) && imgs.length > 0) {
-      return imgs.map((it: any) => (typeof it === "string" ? it : it?.image || it?.url || "/no-image.jpeg"));
+    const mainImage = (currentAdData as any)?.image;
+    const imgsRaw = (currentAdData as any)?.images;
+
+    const addFromArray = (arr: any[]) =>
+      arr
+        .map((it: any) => (typeof it === "string" ? it : it?.image ?? it?.url ?? null))
+        .filter(Boolean) as string[];
+
+    let list: string[] = [];
+    if (mainImage) list.push(mainImage);
+
+    if (Array.isArray(imgsRaw) && imgsRaw.length > 0) {
+      list = list.concat(addFromArray(imgsRaw));
+    } else if (imgsRaw && typeof imgsRaw === "object") {
+      // handle paginated shapes like { results: [...] } or { data: [...] }
+      const maybeArr = imgsRaw.results ?? imgsRaw.data ?? null;
+      if (Array.isArray(maybeArr)) {
+        list = list.concat(addFromArray(maybeArr));
+      } else {
+        // try to extract values if it's a keyed object
+        const vals = Object.values(imgsRaw).flat?.() ?? Object.values(imgsRaw);
+        if (Array.isArray(vals) && vals.length > 0) {
+          list = list.concat(addFromArray(vals as any[]));
+        }
+      }
     }
-    if ((currentAdData as any)?.image) return [(currentAdData as any).image];
-    return [];
+
+    // fallback: if no images but main image exists
+    if (list.length === 0 && mainImage) return [mainImage];
+
+    // dedupe while preserving order
+    const deduped = Array.from(new Set(list.filter(Boolean)));
+    return deduped.length > 0 ? deduped : [];
   })();
 
   const imageCount = pageImages.length;
@@ -1293,38 +1321,38 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
-        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => 
+        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) =>
           ad.is_taken && (
-          <Link
-            key={ad.id}
-            to={`/ads/${ad.id}`}
-            state={{ adData: ad }}
-            onClick={(e) => handleRelatedAdClick(ad, e)}
-            className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-          >
-            <img
-              src={ad.image || "/no-image.jpeg"}
-              alt={ad.name.slice(0, 10)}
-              className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
-            />
-            <div className="flex items-center gap-1 px-2 py-1">
+            <Link
+              key={ad.id}
+              to={`/ads/${ad.id}`}
+              state={{ adData: ad }}
+              onClick={(e) => handleRelatedAdClick(ad, e)}
+              className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+            >
               <img
-                src="/location.svg"
-                alt=""
-                className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                src={ad.image || "/no-image.jpeg"}
+                alt={ad.name.slice(0, 10)}
+                className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
               />
-              <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                {ad.location?.name || "Unknown"}
+              <div className="flex items-center gap-1 px-2 py-1">
+                <img
+                  src="/location.svg"
+                  alt=""
+                  className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                />
+                <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
+                  {ad.location?.name || "Unknown"}
+                </p>
+              </div>
+              <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
+                {ad.name}
               </p>
-            </div>
-            <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-              {ad.name}
-            </p>
-            <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-              {formatMoney(ad.price, "GHS")}
-            </p>
-          </Link>
-        ))}
+              <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
+                {formatMoney(ad.price, "GHS")}
+              </p>
+            </Link>
+          ))}
       </div>
     </div>
   );
