@@ -10,18 +10,18 @@ import "../App.css";
 
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
+import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
+import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import { getSubcategories } from "../services/subcategoryService";
 import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
-import { getSubcategories } from "../services/subcategoryService";
-import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
-import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import Loader from "../components/LoadingDots";
 import { formatCount } from "../utils/formatCount";
 import { formatMoney } from "../utils/formatMoney";
-import AdLoadingOverlay from "../components/AdLoadingOverlay";
-import { useNavigate } from "react-router-dom";
 
 type HomePageHeaderProps = {
   searchValue: string;
@@ -117,14 +117,14 @@ export const HomePageHeader = ({
     <div
       ref={headerRef}
       className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-          : "relative"
+        ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+        : "relative"
         }`}
     >
       <div
         className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${isSmallScreen && isCondensed
-            ? "justify-between px-4 py-2 gap-3"
-            : "flex-col items-center justify-center gap-8 mt-30"
+          ? "justify-between px-4 py-2 gap-3"
+          : "flex-col items-center justify-center gap-8 mt-30"
           }`}
       >
         <h2
@@ -137,8 +137,8 @@ export const HomePageHeader = ({
         <div className="flex w-full px-200">
           <div
             className={`relative flex items-center ${isSmallScreen && isCondensed
-                ? "justify-end flex-1"
-                : "justify-center w-full max-w-[520px]"
+              ? "justify-end flex-1"
+              : "justify-center w-full max-w-[520px]"
               }`}
           >
             <div className="rotating-bg" aria-hidden="true" />
@@ -151,8 +151,8 @@ export const HomePageHeader = ({
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
                 className={`search-input ${isSmallScreen && isCondensed
-                    ? "text-[16px]"
-                    : "text-2xl sm:text-2xl"
+                  ? "text-[16px]"
+                  : "text-2xl sm:text-2xl"
                   } px-4 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
               />
 
@@ -194,7 +194,7 @@ const HomePage = () => {
     max?: number;
   }>({ mode: "none" });
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | "">(null);
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | "">("");
   const [selectedFeatures, setSelectedFeatures] = useState<Record<number, string>>({});
 
   const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
@@ -296,7 +296,7 @@ const HomePage = () => {
     // Apply timeframe filter
     if (selectedTimeframe !== "anytime") {
       const filterDate = new Date();
-      
+
       if (selectedTimeframe === "7days") {
         filterDate.setDate(filterDate.getDate() - 7);
       } else if (selectedTimeframe === "30days") {
@@ -304,7 +304,7 @@ const HomePage = () => {
       } else if (selectedTimeframe === "newest") {
         filterDate.setDate(filterDate.getDate() - 1); // Last 24 hours
       }
-      
+
       filtered = filtered.filter((p) => {
         if (!p.created_at) return true; // If no created_at, include the product
         try {
@@ -478,7 +478,7 @@ const HomePage = () => {
     const [localSelectedCategoryId, setLocalSelectedCategoryId] = useState<number | null>(propSelectedCategoryId);
     const [localSelectedSubcategoryId, setLocalSelectedSubcategoryId] = useState<number | "">(propSelectedSubcategoryId);
     const [localSelectedFeatures, setLocalSelectedFeatures] = useState<Record<number, string>>(propSelectedFeatures);
-    
+
     // Subcategories and features state
     const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
     const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
@@ -580,7 +580,7 @@ const HomePage = () => {
       setSelectedTimeframe(localSelectedTimeframe);
       setPriceSort(localPriceSort);
       setTimeframeSort(localTimeframeSort);
-      
+
       if (localPriceMode === "below" && localPriceBelow) {
         setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
       } else if (localPriceMode === "above" && localPriceAbove) {
@@ -590,7 +590,7 @@ const HomePage = () => {
       } else {
         setPriceFilter({ mode: "none" });
       }
-      
+
       closeFilterPopup();
     };
 
@@ -610,319 +610,316 @@ const HomePage = () => {
     };
 
     return (
-    <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
-        
-        <div className="absolute top-0 right-0 p-4 sm:p-6">
-          <button onClick={closeFilterPopup} className="block mb-3">
-            <svg
-              width="55"
-              height="55"
-              viewBox="0 0 85 86"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M17.6479 60.2642L60.1816 17.9453L67.363 25.1631L24.8293 67.482L17.6479 60.2642ZM17.7371 25.0375L24.9549 17.8561L67.2738 60.3898L60.056 67.5712L17.7371 25.0375Z"
-                fill="#374957"
-              />
-            </svg>
-          </button>
-        </div>
+      <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
+        <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
 
-        <div className="p-6 sm:p-8">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
-
-          {/* Category Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 3H9V9H3V3ZM11 3H17V9H11V3ZM3 11H9V17H3V11ZM11 11H17V17H11V11Z" fill="#374957"/>
+          <div className="absolute top-0 right-0 p-4 sm:p-6">
+            <button onClick={closeFilterPopup} className="block mb-3">
+              <svg
+                width="55"
+                height="55"
+                viewBox="0 0 85 86"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M17.6479 60.2642L60.1816 17.9453L67.363 25.1631L24.8293 67.482L17.6479 60.2642ZM17.7371 25.0375L24.9549 17.8561L67.2738 60.3898L60.056 67.5712L17.7371 25.0375Z"
+                  fill="#374957"
+                />
               </svg>
-              Category
-            </h3>
-            <select
-              value={localSelectedCategoryId || ""}
-              onChange={(e) => {
-                const val = e.target.value;
-                setLocalSelectedCategoryId(val ? Number(val) : null);
-                setLocalSelectedSubcategoryId("");
-                setLocalSelectedFeatures({});
-              }}
-              className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            </button>
           </div>
 
-          {/* Subcategory Section - Only show if category selected */}
-          {localSelectedCategoryId !== null && subcategories.length > 0 && (
+          <div className="p-6 sm:p-8">
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
+
+            {/* Category Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4 5H16V7H4V5ZM6 10H14V12H6V10ZM8 15H12V17H8V15Z" fill="#374957"/>
+                  <path d="M3 3H9V9H3V3ZM11 3H17V9H11V3ZM3 11H9V17H3V11ZM11 11H17V17H11V11Z" fill="#374957" />
                 </svg>
-                Subcategory (Optional)
+                Category
               </h3>
               <select
-                value={localSelectedSubcategoryId || ""}
+                value={localSelectedCategoryId || ""}
                 onChange={(e) => {
                   const val = e.target.value;
-                  setLocalSelectedSubcategoryId(val ? Number(val) : "");
+                  setLocalSelectedCategoryId(val ? Number(val) : null);
+                  setLocalSelectedSubcategoryId("");
                   setLocalSelectedFeatures({});
                 }}
                 className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
               >
-                <option value="">All Subcategories</option>
-                {subcategories.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.name}
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
             </div>
-          )}
 
-          {/* Features Section - Only show if features exist for selected subcategory */}
-          {featureDefinitions.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <img src="/circle-quarter-svgrepo-com.svg" alt="Features" className="h-5 w-5" />
-                Features
-              </h3>
-              <div className="flex flex-col gap-2">
-                {featureDefinitions.map((fd) => {
-                  const values = possibleFeatureValues[fd.id] ?? [];
-                  return (
-                    <div key={`def-${fd.id}`} className="flex items-center gap-2">
-                      <div className="w-1/3 text-sm font-medium">{fd.name}</div>
-                      {values && values.length > 0 ? (
-                        <div className="flex-1">
+            {/* Subcategory Section - Only show if category selected */}
+            {localSelectedCategoryId !== null && subcategories.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 5H16V7H4V5ZM6 10H14V12H6V10ZM8 15H12V17H8V15Z" fill="#374957" />
+                  </svg>
+                  Subcategory (Optional)
+                </h3>
+                <select
+                  value={localSelectedSubcategoryId || ""}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setLocalSelectedSubcategoryId(val ? Number(val) : "");
+                    setLocalSelectedFeatures({});
+                  }}
+                  className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+                >
+                  <option value="">All Subcategories</option>
+                  {subcategories.map((sub) => (
+                    <option key={sub.id} value={sub.id}>
+                      {sub.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Features Section - Only show if features exist for selected subcategory */}
+            {featureDefinitions.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <img src="/circle-quarter-svgrepo-com.svg" alt="Features" className="h-5 w-5" />
+                  Features
+                </h3>
+                <div className="flex flex-col gap-2">
+                  {featureDefinitions.map((fd) => {
+                    const values = possibleFeatureValues[fd.id] ?? [];
+                    return (
+                      <div key={`def-${fd.id}`} className="flex items-center gap-2">
+                        <div className="w-1/3 text-sm font-medium">{fd.name}</div>
+                        {values && values.length > 0 ? (
+                          <div className="flex-1">
+                            <input
+                              list={`feature-values-${fd.id}`}
+                              placeholder={`Select ${fd.name}`}
+                              value={localSelectedFeatures[fd.id] ?? ""}
+                              onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                              className="w-full p-2 border rounded-lg border-(--div-border) text-sm"
+                            />
+                            <datalist id={`feature-values-${fd.id}`}>
+                              {values.map((v) => (
+                                <option key={v} value={v} />
+                              ))}
+                            </datalist>
+                          </div>
+                        ) : (
                           <input
-                            list={`feature-values-${fd.id}`}
-                            placeholder={`Select ${fd.name}`}
+                            type="text"
+                            placeholder={`Value for ${fd.name}`}
                             value={localSelectedFeatures[fd.id] ?? ""}
                             onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                            className="w-full p-2 border rounded-lg border-(--div-border) text-sm"
+                            className="flex-1 p-2 border rounded-lg border-(--div-border) text-sm"
                           />
-                          <datalist id={`feature-values-${fd.id}`}>
-                            {values.map((v) => (
-                              <option key={v} value={v} />
-                            ))}
-                          </datalist>
-                        </div>
-                      ) : (
-                        <input
-                          type="text"
-                          placeholder={`Value for ${fd.name}`}
-                          value={localSelectedFeatures[fd.id] ?? ""}
-                          onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                          className="flex-1 p-2 border rounded-lg border-(--div-border) text-sm"
-                        />
-                      )}
-                    </div>
-                  );
-                })}
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
+            )}
+
+            {/* Location Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/location.svg" alt="Location" className="w-5 h-5" />
+                Location
+              </h3>
+              <select
+                value={localSelectedLocation || ""}
+                onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
+                className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+              >
+                <option value="">All Locations</option>
+                {uniqueLocations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          {/* Location Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/location.svg" alt="Location" className="w-5 h-5" />
-              Location
-            </h3>
-            <select
-              value={localSelectedLocation || ""}
-              onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
-              className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
-            >
-              <option value="">All Locations</option>
-              {uniqueLocations.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Timeframe Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/time-svgrepo-com.svg" alt="Timeframe" className="w-5 h-5" />
+            {/* Timeframe Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/time-svgrepo-com.svg" alt="Timeframe" className="w-5 h-5" />
                 Timeframe
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "newest" as const, label: "Newest (24h)" },
-                { value: "7days" as const, label: "Last 7 days" },
-                { value: "30days" as const, label: "Last 30 days" },
-                { value: "anytime" as const, label: "Anytime" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setLocalSelectedTimeframe(option.value)}
-                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
-                    localSelectedTimeframe === option.value
-                      ? "bg-(--dark-def) text-white"
-                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "newest" as const, label: "Newest (24h)" },
+                  { value: "7days" as const, label: "Last 7 days" },
+                  { value: "30days" as const, label: "Last 30 days" },
+                  { value: "anytime" as const, label: "Anytime" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setLocalSelectedTimeframe(option.value)}
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localSelectedTimeframe === option.value
+                        ? "bg-(--dark-def) text-white"
+                        : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                      }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Price Sort Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/price-tag-svgrepo-com.svg" alt="Price Sort" className="w-5 h-5" />
+            {/* Price Sort Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/price-tag-svgrepo-com.svg" alt="Price Sort" className="w-5 h-5" />
                 Sort by Price
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "none" as const, label: "No Sort" },
-                { value: "low-to-high" as const, label: "Low to High" },
-                { value: "high-to-low" as const, label: "High to Low" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setLocalPriceSort(option.value)}
-                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
-                    localPriceSort === option.value
-                      ? "bg-(--dark-def) text-white"
-                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "none" as const, label: "No Sort" },
+                  { value: "low-to-high" as const, label: "Low to High" },
+                  { value: "high-to-low" as const, label: "High to Low" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setLocalPriceSort(option.value)}
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localPriceSort === option.value
+                        ? "bg-(--dark-def) text-white"
+                        : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                      }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Timeframe Sort Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/date-range-svgrepo-com.svg" alt="Timeframe Sort" className="w-5 h-5" />
+            {/* Timeframe Sort Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/date-range-svgrepo-com.svg" alt="Timeframe Sort" className="w-5 h-5" />
                 Sort by Date
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { value: "none" as const, label: "No Sort" },
-                { value: "newest" as const, label: "Newest First" },
-                { value: "oldest" as const, label: "Oldest First" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setLocalTimeframeSort(option.value)}
-                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
-                    localTimeframeSort === option.value
-                      ? "bg-(--dark-def) text-white"
-                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { value: "none" as const, label: "No Sort" },
+                  { value: "newest" as const, label: "Newest First" },
+                  { value: "oldest" as const, label: "Oldest First" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setLocalTimeframeSort(option.value)}
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localTimeframeSort === option.value
+                        ? "bg-(--dark-def) text-white"
+                        : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                      }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Price Filter Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
+            {/* Price Filter Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
                 Filter by Price
-            </h3><div className="space-y-3">
-              {[
-                { value: "none" as const, label: "No Filter" },
-                { value: "below" as const, label: "Below a certain price" },
-                { value: "above" as const, label: "Above a certain price" },
-                { value: "between" as const, label: "Between two prices" },
-              ].map((option) => (
-                <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+              </h3><div className="space-y-3">
+                {[
+                  { value: "none" as const, label: "No Filter" },
+                  { value: "below" as const, label: "Below a certain price" },
+                  { value: "above" as const, label: "Above a certain price" },
+                  { value: "between" as const, label: "Between two prices" },
+                ].map((option) => (
+                  <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="price-filter"
+                      checked={localPriceMode === option.value}
+                      onChange={() => setLocalPriceMode(option.value)}
+                      className="w-4 h-4 focus:ring-(--dark-def)"
+                    />
+                    <span className="text-sm sm:text-base">{option.label}</span>
+                  </label>
+                ))}
+              </div>
+
+              {/* Price input fields */}
+              {localPriceMode === "below" && (
+                <div className="mt-3">
                   <input
-                    type="radio"
-                    name="price-filter"
-                    checked={localPriceMode === option.value}
-                    onChange={() => setLocalPriceMode(option.value)}
-                    className="w-4 h-4 focus:ring-(--dark-def)"
+                    type="number"
+                    placeholder="Max price"
+                    value={localPriceBelow}
+                    onChange={(e) => setLocalPriceBelow(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                   />
-                  <span className="text-sm sm:text-base">{option.label}</span>
-                </label>
-              ))}
+                </div>
+              )}
+
+              {localPriceMode === "above" && (
+                <div className="mt-3">
+                  <input
+                    type="number"
+                    placeholder="Min price"
+                    value={localPriceAbove}
+                    onChange={(e) => setLocalPriceAbove(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                </div>
+              )}
+
+              {localPriceMode === "between" && (
+                <div className="mt-3 space-y-2">
+                  <input
+                    type="number"
+                    placeholder="Min price"
+                    value={localPriceMin}
+                    onChange={(e) => setLocalPriceMin(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max price"
+                    value={localPriceMax}
+                    onChange={(e) => setLocalPriceMax(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Price input fields */}
-            {localPriceMode === "below" && (
-              <div className="mt-3">
-                <input
-                  type="number"
-                  placeholder="Max price"
-                  value={localPriceBelow}
-                  onChange={(e) => setLocalPriceBelow(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-            )}
-
-            {localPriceMode === "above" && (
-              <div className="mt-3">
-                <input
-                  type="number"
-                  placeholder="Min price"
-                  value={localPriceAbove}
-                  onChange={(e) => setLocalPriceAbove(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-            )}
-
-            {localPriceMode === "between" && (
-              <div className="mt-3 space-y-2">
-                <input
-                  type="number"
-                  placeholder="Min price"
-                  value={localPriceMin}
-                  onChange={(e) => setLocalPriceMin(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-                <input
-                  type="number"
-                  placeholder="Max price"
-                  value={localPriceMax}
-                  onChange={(e) => setLocalPriceMax(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-3 justify-center mt-8 pb-4">
-            <button
-              onClick={handleClearAllFilters}
-              className="px-6 sm:px-10 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm sm:text-base font-medium"
-            >
-              Clear All
-            </button>
-            <button
-              onClick={handleApplyFilters}
-              className="px-6 sm:px-10 py-3 bg-(--dark-def) text-white rounded-lg hover:bg-gray-800 text-sm sm:text-base font-medium"
-            >
-              Apply Filters
-            </button>
+            {/* Action buttons */}
+            <div className="flex gap-3 justify-center mt-8 pb-4">
+              <button
+                onClick={handleClearAllFilters}
+                className="px-6 sm:px-10 py-3 bg-gray-200 rounded-lg hover:bg-gray-300 text-sm sm:text-base font-medium"
+              >
+                Clear All
+              </button>
+              <button
+                onClick={handleApplyFilters}
+                className="px-6 sm:px-10 py-3 bg-(--dark-def) text-white rounded-lg hover:bg-gray-800 text-sm sm:text-base font-medium"
+              >
+                Apply Filters
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
   };
 
   const SelectACategory = ({
@@ -1223,14 +1220,14 @@ const HomePage = () => {
                 ? <Loader className={"h-40 my-0"} />
                 : filteredProducts.map(
                   (ad) =>
-                      (ad.status === "ACTIVE" && !ad.is_taken) && (
-                        <Link
-                          key={ad.id}
-                          to={`/ads/${ad.id}`}
-                          state={{ adData: ad }}
-                          onClick={(e) => handleAdClick(ad, e)}
-                          className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-                        >
+                    (ad.status === "ACTIVE" && !ad.is_taken) && (
+                      <Link
+                        key={ad.id}
+                        to={`/ads/${ad.id}`}
+                        state={{ adData: ad }}
+                        onClick={(e) => handleAdClick(ad, e)}
+                        className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                      >
                         <img
                           src={ad.image || "/no-image.jpeg"}
                           alt={ad.name}
@@ -1258,7 +1255,7 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center">
-              <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7"/>
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7" />
               <p className="px-2 text-sm text-gray-500">
                 No ads to show here...
               </p>
@@ -1273,9 +1270,9 @@ const HomePage = () => {
     if (!categories || categories.length === 0) {
       return (
         <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-          <img 
-            src="/nothing-to-show.png" 
-            alt="Nothing to show" 
+          <img
+            src="/nothing-to-show.png"
+            alt="Nothing to show"
             className="max-w-[50vw] sm:max-w-50"
           />
           <p>No ad categories are available at this time.</p>
@@ -1293,9 +1290,9 @@ const HomePage = () => {
     if (categoriesWithAds.length === 0) {
       return (
         <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-          <img 
-            src="/nothing-to-show.png" 
-            alt="Nothing to show" 
+          <img
+            src="/nothing-to-show.png"
+            alt="Nothing to show"
             className="max-w-[50vw] sm:max-w-50"
           />
           <p>No ads match your filters.</p>
@@ -1313,7 +1310,7 @@ const HomePage = () => {
     const categoryProducts = selectedCategory
       ? productsByCategory[selectedCategory.id] || []
       : [];
-    
+
     const filteredProducts = applyFilters(categoryProducts);
 
     return (
@@ -1347,7 +1344,7 @@ const HomePage = () => {
             ))
           ) : (
             <div className="flex flex-col items-center justify-center col-span-full">
-              <img src="/nothing-to-show.png" alt="nothing to show" className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]"/>
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]" />
               <p className="px-2 text-sm text-gray-500">
                 No ads to show here...
               </p>
@@ -1406,7 +1403,7 @@ const HomePage = () => {
     );
   };
 
-  const FilterButton = ({className} : {className? : string}) => {
+  const FilterButton = ({ className }: { className?: string }) => {
     // Calculate active filter count
     const activeFiltersCount = [
       selectedCategoryId !== null ? 1 : 0,
@@ -1430,7 +1427,7 @@ const HomePage = () => {
           <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7 lg:w-[2.1vw] lg:h-[2.1vw]" />
           <p className="text-sm lg:text-[1.25vw]">Filter</p>
         </div>
-      </button>    
+      </button>
     );
   }
 
@@ -1477,7 +1474,7 @@ const HomePage = () => {
           </>
         )}
         <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center" >
-          <FilterButton/>
+          <FilterButton />
         </div>
         <MenuButton />
       </div>
