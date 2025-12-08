@@ -6,6 +6,7 @@ import CopyButton from "../components/CopyButton";
 import LevelProgress from "../components/LevelProgress";
 import MenuButton from "../components/MenuButton";
 import ProgressBar from "../components/ProgressBar";
+import { LEVELS } from "../constants/levels";
 import useApplyCoupon from "../features/coupons/useApplyCoupon";
 import useRedeemPoints from "../features/redeem/useRedeemPoints";
 import useUserProfile from "../features/userProfile/useUserProfile";
@@ -26,11 +27,11 @@ const ReferPage = () => {
   // referral_points is an absolute points value (e.g. 9000).
   const points = Number(profile?.referral_points ?? 0) || 0;
 
-  // Define level thresholds
+  // Define level thresholds (centralized)
   const THRESHOLDS = {
-    silver: 0,
-    gold: 10000,
-    diamond: 100000,
+    silver: LEVELS.silverStart,
+    gold: LEVELS.goldStart,
+    diamond: LEVELS.diamondStart,
   } as const;
 
   // Redeem rules: blocks of points can be redeemed for GH₵
@@ -49,7 +50,7 @@ const ReferPage = () => {
 
   // normalize level string
   const profileLevelTyped = (profile?.level || "") as Level | "";
-  const profileLevel = profileLevelTyped.toLowerCase();
+  const profileLevel = String(profileLevelTyped || "").trim().toLowerCase();
 
   // compute percent progress and the follow-up text
   let displayPercent = 0;
@@ -151,8 +152,8 @@ const ReferPage = () => {
           className="bg-white w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2 shadow-sm"
           onClick={() => {
             setRedraw(false);
-            setHow(false);
-            setApply(true);
+            setHow(true);
+            setApply(false);
             setShowLevel(false);
           }}
         >
