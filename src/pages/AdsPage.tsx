@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
 import PostAdForm from "../components/PostAdForm";
 import {
+  useConfirmMarkAsTaken,
   useDeleteProduct,
-  useMarkProductAsTaken,
   useOwnerProducts,
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
@@ -21,7 +21,7 @@ const AdsPage = () => {
   const { data: products = [] } = useOwnerProducts(ownerId);
 
   const deleteMutation = useDeleteProduct();
-  const markTakenMutation = useMarkProductAsTaken();
+  const confirmMarkTakenMutation = useConfirmMarkAsTaken();
   // const setStatusMutation = useSetProductStatus();
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -93,7 +93,7 @@ const AdsPage = () => {
           {filteredAds.length < 1
             ? <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
               <img
-                src="/public/nothing-to-show.png"
+                src="/nothing-to-show.png"
                 alt="Nothing to show here"
                 className="h-40 lg:h-50 w-auto"
               />
@@ -270,7 +270,7 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40"
                       onClick={async () => {
                         try {
-                          await markTakenMutation.mutateAsync({ id: selectedAd.id });
+                          await confirmMarkTakenMutation.mutateAsync({ id: selectedAd.id });
                           toast.success("Marked as taken");
                           setSelectedAd(null);
                         } catch (err: unknown) {
