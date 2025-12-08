@@ -275,9 +275,13 @@ const HomePage = () => {
       }
       
       filtered = filtered.filter((p) => {
-        if (!p.created_at) return false;
-        const productDate = new Date(p.created_at);
-        return productDate >= filterDate;
+        if (!p.created_at) return true; // If no created_at, include the product
+        try {
+          const productDate = new Date(p.created_at);
+          return productDate >= filterDate;
+        } catch {
+          return true; // If date parsing fails, include the product
+        }
       });
     }
 
@@ -400,23 +404,40 @@ const HomePage = () => {
     }
   }, [isCondensed, isSmallScreen]);
 
-  /* HomePageHeader moved to module scope to avoid remounting on each render */
-
   const ShowFilter = () => {
     const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
     const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
     const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
     const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
+    const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
+    const [localSelectedLocation, setLocalSelectedLocation] = useState<string | null>(selectedLocation);
+    const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
+    const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
 
     const handleApplyFilters = () => {
+      // Apply all local state changes to parent state at once
+      setSelectedLocation(localSelectedLocation);
+      setSelectedTimeframe(localSelectedTimeframe);
+      setPriceSort(localPriceSort);
+      
+      if (localPriceMode === "below" && localPriceBelow) {
+        setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
+      } else if (localPriceMode === "above" && localPriceAbove) {
+        setPriceFilter({ mode: "above", above: Number(localPriceAbove) });
+      } else if (localPriceMode === "between" && localPriceMin && localPriceMax) {
+        setPriceFilter({ mode: "between", min: Number(localPriceMin), max: Number(localPriceMax) });
+      } else {
+        setPriceFilter({ mode: "none" });
+      }
+      
       closeFilterPopup();
     };
 
     const handleClearAllFilters = () => {
-      setSelectedLocation(null);
-      setSelectedTimeframe("newest");
-      setPriceSort("none");
-      setPriceFilter({ mode: "none" });
+      setLocalSelectedLocation(null);
+      setLocalSelectedTimeframe("anytime");
+      setLocalPriceSort("none");
+      setLocalPriceMode("none");
       setLocalPriceMin("");
       setLocalPriceMax("");
       setLocalPriceBelow("");
@@ -425,9 +446,9 @@ const HomePage = () => {
 
     return (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="relative pt-30 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
-        {/* Close button */}
-        <div className="absolute top-0 left-0 p-4 sm:p-6">
+      <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
+        
+        <div className="absolute top-0 right-0 p-4 sm:p-6">
           <button onClick={closeFilterPopup} className="block mb-3">
             <svg
               width="55"
@@ -448,35 +469,6 @@ const HomePage = () => {
           {/* Title */}
           <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
 
-          {/* Category Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="15.5" cy="15.5" r="15.5" fill="#374957" />
-                <path d="M7.67394 21.4473L19.8827 10.8223L21.292 12.4935L9.08324 23.1184L7.67394 21.4473ZM8.44226 11.4926L10.0817 10.0658L20.5236 22.4482L18.8842 23.8749L8.44226 11.4926Z" fill="white" />
-              </svg>
-              Category
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <label
-                  key={category.id}
-                  className="flex items-center gap-2 p-2 sm:p-3 border border-(--div-border) rounded-lg hover:bg-gray-100 cursor-pointer text-sm sm:text-base"
-                >
-                  <input
-                    type="radio"
-                    name="filter-category"
-                    value={category.name}
-                    checked={selectedCategory?.id === category.id}
-                    onChange={() => setSelectedCategory(category)}
-                    className="peer h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400 checked:bg-[url('/check.svg')] checked:bg-center checked:bg-no-repeat checked:bg-size-[18px_18px]"
-                  />
-                  <span>{category.name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {/* Location Section */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -484,8 +476,8 @@ const HomePage = () => {
               Location
             </h3>
             <select
-              value={selectedLocation || ""}
-              onChange={(e) => setSelectedLocation(e.target.value || null)}
+              value={localSelectedLocation || ""}
+              onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
               className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
             >
               <option value="">All Locations</option>
@@ -499,7 +491,10 @@ const HomePage = () => {
 
           {/* Timeframe Section */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Timeframe</h3>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/time-svgrepo-com.svg" alt="Timeframe" className="w-5 h-5" />
+                Timeframe
+            </h3>
             <div className="flex flex-wrap gap-2">
               {[
                 { value: "newest" as const, label: "Newest (24h)" },
@@ -509,9 +504,9 @@ const HomePage = () => {
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setSelectedTimeframe(option.value)}
+                  onClick={() => setLocalSelectedTimeframe(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
-                    selectedTimeframe === option.value
+                    localSelectedTimeframe === option.value
                       ? "bg-(--dark-def) text-white"
                       : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
                   }`}
@@ -524,7 +519,10 @@ const HomePage = () => {
 
           {/* Price Sort Section */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Sort by Price</h3>
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/price-tag-svgrepo-com.svg" alt="Price Sort" className="w-5 h-5" />
+                Sort by Price
+            </h3>
             <div className="flex flex-wrap gap-2">
               {[
                 { value: "none" as const, label: "No Sort" },
@@ -533,9 +531,9 @@ const HomePage = () => {
               ].map((option) => (
                 <button
                   key={option.value}
-                  onClick={() => setPriceSort(option.value)}
+                  onClick={() => setLocalPriceSort(option.value)}
                   className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
-                    priceSort === option.value
+                    localPriceSort === option.value
                       ? "bg-(--dark-def) text-white"
                       : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
                   }`}
@@ -548,8 +546,10 @@ const HomePage = () => {
 
           {/* Price Filter Section */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold mb-3">Filter by Price</h3>
-            <div className="space-y-3">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
+                Filter by Price
+            </h3><div className="space-y-3">
               {[
                 { value: "none" as const, label: "No Filter" },
                 { value: "below" as const, label: "Below a certain price" },
@@ -560,8 +560,8 @@ const HomePage = () => {
                   <input
                     type="radio"
                     name="price-filter"
-                    checked={priceFilter.mode === option.value}
-                    onChange={() => setPriceFilter({ mode: option.value })}
+                    checked={localPriceMode === option.value}
+                    onChange={() => setLocalPriceMode(option.value)}
                     className="w-4 h-4"
                   />
                   <span className="text-sm sm:text-base">{option.label}</span>
@@ -570,64 +570,44 @@ const HomePage = () => {
             </div>
 
             {/* Price input fields */}
-            {priceFilter.mode === "below" && (
+            {localPriceMode === "below" && (
               <div className="mt-3">
                 <input
                   type="number"
                   placeholder="Max price"
                   value={localPriceBelow}
-                  onChange={(e) => {
-                    setLocalPriceBelow(e.target.value);
-                    if (e.target.value) {
-                      setPriceFilter({ mode: "below", below: Number(e.target.value) });
-                    }
-                  }}
+                  onChange={(e) => setLocalPriceBelow(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                 />
               </div>
             )}
 
-            {priceFilter.mode === "above" && (
+            {localPriceMode === "above" && (
               <div className="mt-3">
                 <input
                   type="number"
                   placeholder="Min price"
                   value={localPriceAbove}
-                  onChange={(e) => {
-                    setLocalPriceAbove(e.target.value);
-                    if (e.target.value) {
-                      setPriceFilter({ mode: "above", above: Number(e.target.value) });
-                    }
-                  }}
+                  onChange={(e) => setLocalPriceAbove(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                 />
               </div>
             )}
 
-            {priceFilter.mode === "between" && (
+            {localPriceMode === "between" && (
               <div className="mt-3 space-y-2">
                 <input
                   type="number"
                   placeholder="Min price"
                   value={localPriceMin}
-                  onChange={(e) => {
-                    setLocalPriceMin(e.target.value);
-                    if (e.target.value && localPriceMax) {
-                      setPriceFilter({ mode: "between", min: Number(e.target.value), max: Number(localPriceMax) });
-                    }
-                  }}
+                  onChange={(e) => setLocalPriceMin(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Max price"
                   value={localPriceMax}
-                  onChange={(e) => {
-                    setLocalPriceMax(e.target.value);
-                    if (e.target.value && localPriceMin) {
-                      setPriceFilter({ mode: "between", min: Number(localPriceMin), max: Number(e.target.value) });
-                    }
-                  }}
+                  onChange={(e) => setLocalPriceMax(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-lg text-sm"
                 />
               </div>
@@ -981,9 +961,12 @@ const HomePage = () => {
                 )}
             </div>
           ) : (
-            <p className="px-2 text-sm text-gray-500">
-              No ads to show here...
-            </p>
+            <div className="flex flex-col items-center justify-center">
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7"/>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -1020,7 +1003,7 @@ const HomePage = () => {
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
         <div
-          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
+          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-45"
         >
           {filteredProducts.length > 0 ? (
             filteredProducts.map((ad) => (
@@ -1047,9 +1030,12 @@ const HomePage = () => {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 col-span-full">
-              No ads to show here...
-            </p>
+            <div className="flex flex-col items-center justify-center col-span-full">
+              <img src="/nothing-to-show.png" alt="nothing to show" className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]"/>
+              <p className="px-2 text-sm text-gray-500">
+                No ads to show here...
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -1108,7 +1094,7 @@ const HomePage = () => {
     // Calculate active filter count
     const activeFiltersCount = [
       selectedLocation ? 1 : 0,
-      selectedTimeframe !== "newest" ? 1 : 0,
+      selectedTimeframe !== "anytime" ? 1 : 0,
       priceSort !== "none" ? 1 : 0,
       priceFilter.mode !== "none" ? 1 : 0,
     ].reduce((a, b) => a + b, 0);
@@ -1117,12 +1103,12 @@ const HomePage = () => {
       <button onClick={handleFilterSettings} className={className}>
         <div className={`bg-gray-100 lg:bg-white w-30 h-14 lg:w-[10vw] lg:h-[4vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
           {activeFiltersCount > 0 && (
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {activeFiltersCount}
             </div>
           )}
           <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7 lg:w-[2.1vw] lg:h-[2.1vw]" />
-          <p className="text-sm lg: text-[1.25vw]">Filter</p>
+          <p className="text-sm lg:text-[1.25vw]">Filter</p>
         </div>
       </button>    
     );
