@@ -205,6 +205,7 @@ const AdsDetailsPage = () => {
   );
 
   const touchStartX = useRef<number | null>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
 
   // Gallery state: keep hooks above any early returns so they're
   // invoked unconditionally on every render.
@@ -544,8 +545,13 @@ const AdsDetailsPage = () => {
     currentIndex: number;
     setCurrentIndex: (n: number) => void;
   }) => {
-    const galleryImages = images.length > 0 ? images : ["/no-image.jpeg"];
+    const galleryImages = useMemo(
+      () => images.length > 0 ? images : ["/no-image.jpeg"],
+      [images]
+    );
     const max = galleryImages.length;
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(max > 3);
 
     const maxStart = Math.max(0, max - 3);
 
@@ -559,16 +565,43 @@ const AdsDetailsPage = () => {
       }
     }, [currentIndex, maxStart, setCurrentIndex]);
 
+    const checkScroll = () => {
+      if (galleryScrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = galleryScrollRef.current;
+        setCanScrollLeft(scrollLeft > 0);
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      }
+    };
+
+    useEffect(() => {
+      const timer = setTimeout(checkScroll, 100);
+      return () => clearTimeout(timer);
+    }, [galleryImages]);
+
     const prevImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex <= 0) return;
-      setCurrentIndex(Math.max(0, currentIndex - 1));
+      if (galleryScrollRef.current) {
+        galleryScrollRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
     };
 
     const nextImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex >= maxStart) return;
-      setCurrentIndex(Math.min(maxStart, currentIndex + 1));
+      if (galleryScrollRef.current) {
+        galleryScrollRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
+    };
+
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (galleryScrollRef.current) {
+        // deltaX for trackpad horizontal scrolling, deltaY for vertical scrolling
+        const scrollAmount = Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
+        galleryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
     };
 
     const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
@@ -579,29 +612,33 @@ const AdsDetailsPage = () => {
 
         {/* DESKTOP: show 3 side-by-side square images (carousel) */}
         <div className="hidden sm:flex w-full h-fit gap-4 items-stretch relative">
-          {currentIndex > 0 && (
+          {canScrollLeft && (
             <button
               onClick={prevImage}
-              className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
               aria-label="Previous image"
             >
               <img src="/arrowleft.svg" alt="Previous" />
             </button>
           )}
 
-          <div className="grid grid-cols-3 gap-4 w-full px-4 max-w-[95vw] mx-auto items-center">
-            {galleryImages.slice(currentIndex, currentIndex + 3).map((src, i) => {
-              const absIdx = currentIndex + i;
+          <div 
+            ref={galleryScrollRef}
+            className="flex gap-4 px-4 max-w-screen mx-auto items-center overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar"
+            style={{ scrollBehavior: 'smooth', width: '95%'}}
+            onWheel={handleWheel}
+            onScroll={checkScroll}
+          >
+            {galleryImages.map((src, i) => {
               return (
-                <button
-                  key={absIdx}
+                <div
+                  key={i}
+                  className="shrink-0 max-w-[27vw] aspect-square rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => {
-                    setCurrentIndex(absIdx);
-                    setPictureModalIndex(absIdx);
+                    setPictureModalIndex(i);
                     setIsPictureModalOpen(true);
                   }}
-                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative`}
-                  aria-label={`Show image ${absIdx + 1}`}
+                  aria-label={`Show image ${i + 1}`}
                 >
                   {/* Blurred background image */}
                   <div
@@ -609,16 +646,16 @@ const AdsDetailsPage = () => {
                     style={{ backgroundImage: `url(${src})` }}
                   />
                   {/* Main image on top */}
-                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-cover w-full h-full relative z-10" />
-                </button>
+                  <img src={src} alt={`Image ${i + 1}`} className="object-cover w-full h-full relative z-10" />
+                </div>
               );
             })}
           </div>
 
-          {currentIndex < maxStart && (
+          {canScrollRight && (
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
               aria-label="Next image"
             >
               <img src="/arrowright.svg" alt="Next" />
