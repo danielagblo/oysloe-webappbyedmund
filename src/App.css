@@ -90,22 +90,39 @@ body {
 @media (max-width: 640px) {
   .rotating-bg {
     width: 75vw;
-    max-width: 75vw;
-    height: 84px;
+    max-width: 65vw;
+    min-height: 52px;
   }
 
   .rotating-bg-inner {
     width: 73vw;
-    max-width: 73vw;
-    height: 78px;
+    max-width: 64vw;
+    min-height: 50px;
   }
 
   .search-input {
     width: 65vw;
     max-width: 65vw;
     font-size: 0.95rem;
-    padding-left: 35px;
+    padding-left: 40px;
     text-align: left;
+  }
+
+  .search-input::placeholder {
+    text-align: center;
+  }
+}
+@media (min-width: 640px) {
+  .rotating-bg {
+    min-height: 75px;
+  }
+
+  .rotating-bg-inner {
+    min-height: 72px;
+  }
+
+  .search-input {
+    padding-left: 45px;
   }
 
   .search-input::placeholder {

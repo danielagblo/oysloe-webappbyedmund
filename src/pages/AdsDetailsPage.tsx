@@ -205,6 +205,7 @@ const AdsDetailsPage = () => {
   );
 
   const touchStartX = useRef<number | null>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
 
   // Gallery state: keep hooks above any early returns so they're
   // invoked unconditionally on every render.
@@ -544,8 +545,13 @@ const AdsDetailsPage = () => {
     currentIndex: number;
     setCurrentIndex: (n: number) => void;
   }) => {
-    const galleryImages = images.length > 0 ? images : ["/no-image.jpeg"];
+    const galleryImages = useMemo(
+      () => images.length > 0 ? images : ["/no-image.jpeg"],
+      [images]
+    );
     const max = galleryImages.length;
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+    const [canScrollRight, setCanScrollRight] = useState(max > 3);
 
     const maxStart = Math.max(0, max - 3);
 
@@ -559,16 +565,43 @@ const AdsDetailsPage = () => {
       }
     }, [currentIndex, maxStart, setCurrentIndex]);
 
+    const checkScroll = () => {
+      if (galleryScrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = galleryScrollRef.current;
+        setCanScrollLeft(scrollLeft > 0);
+        setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      }
+    };
+
+    useEffect(() => {
+      const timer = setTimeout(checkScroll, 100);
+      return () => clearTimeout(timer);
+    }, [galleryImages]);
+
     const prevImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex <= 0) return;
-      setCurrentIndex(Math.max(0, currentIndex - 1));
+      if (galleryScrollRef.current) {
+        galleryScrollRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
     };
 
     const nextImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
-      if (currentIndex >= maxStart) return;
-      setCurrentIndex(Math.min(maxStart, currentIndex + 1));
+      if (galleryScrollRef.current) {
+        galleryScrollRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
+    };
+
+    const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (galleryScrollRef.current) {
+        // deltaX for trackpad horizontal scrolling, deltaY for vertical scrolling
+        const scrollAmount = Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
+        galleryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        setTimeout(checkScroll, 300);
+      }
     };
 
     const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
@@ -579,29 +612,33 @@ const AdsDetailsPage = () => {
 
         {/* DESKTOP: show 3 side-by-side square images (carousel) */}
         <div className="hidden sm:flex w-full h-fit gap-4 items-stretch relative">
-          {currentIndex > 0 && (
+          {canScrollLeft && (
             <button
               onClick={prevImage}
-              className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
               aria-label="Previous image"
             >
               <img src="/arrowleft.svg" alt="Previous" />
             </button>
           )}
 
-          <div className="grid grid-cols-3 gap-4 w-full px-4 max-w-[95vw] mx-auto items-center">
-            {galleryImages.slice(currentIndex, currentIndex + 3).map((src, i) => {
-              const absIdx = currentIndex + i;
+          <div 
+            ref={galleryScrollRef}
+            className="flex gap-4 px-4 max-w-screen mx-auto items-center overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar"
+            style={{ scrollBehavior: 'smooth', width: '95%'}}
+            onWheel={handleWheel}
+            onScroll={checkScroll}
+          >
+            {galleryImages.map((src, i) => {
               return (
-                <button
-                  key={absIdx}
+                <div
+                  key={i}
+                  className="shrink-0 max-w-[27vw] aspect-square rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={() => {
-                    setCurrentIndex(absIdx);
-                    setPictureModalIndex(absIdx);
+                    setPictureModalIndex(i);
                     setIsPictureModalOpen(true);
                   }}
-                  className={`w-full aspect-square max-w-[30vw] rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative`}
-                  aria-label={`Show image ${absIdx + 1}`}
+                  aria-label={`Show image ${i + 1}`}
                 >
                   {/* Blurred background image */}
                   <div
@@ -609,16 +646,16 @@ const AdsDetailsPage = () => {
                     style={{ backgroundImage: `url(${src})` }}
                   />
                   {/* Main image on top */}
-                  <img src={src} alt={`Image ${absIdx + 1}`} className="object-cover w-full h-full relative z-10" />
-                </button>
+                  <img src={src} alt={`Image ${i + 1}`} className="object-cover w-full h-full relative z-10" />
+                </div>
               );
             })}
           </div>
 
-          {currentIndex < maxStart && (
+          {canScrollRight && (
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow"
+              className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
               aria-label="Next image"
             >
               <img src="/arrowright.svg" alt="Next" />
@@ -939,17 +976,18 @@ const AdsDetailsPage = () => {
                 {label === "Caller 1" && (showC1 && caller1) && (
                   <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-8">
-                      <div className="text-xs font-semibold flex items-center gap-2">
-                        <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
-                        <span className="text-[9px]">Caller 1</span>
+                      <div className="font-semibold flex items-center gap-2">
+                        <img src="/outgoing call.svg" alt="" className="w-4 lg:w-[1.5vw] h-auto" />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Caller 1</span>
                       </div>
                       <a
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2"
+                        className="font-normal flex items-center gap-2 text-sm sm:text-base lg:text-[1.2vw]"
                         style={{ color: "var(--dark-def)", textDecoration: "none" }}
                       >
-                        <span className="border border-gray-200 px-2 py-1">Call</span><span className="border border-gray-200 px-2 py-1"> {caller1}</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5"> {caller1}</span>
                       </a>
                     </div>
                   </div>
@@ -957,11 +995,11 @@ const AdsDetailsPage = () => {
 
                 {/* Make Offer modal */}
                 {label === "Make Offer" && showOffer && (
-                  <div className="absolute z-50 mt-2 p-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-54 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-96">
+                  <div className="absolute z-50 mt-2 p-4 lg:pb-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-fit overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:min-w-96 sm:w-fit">
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-xs font-semibold">
-                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto" />
-                        <span className="text-[9px]">Make Offer</span>
+                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto lg:w-[1.5vw]" />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Make Offer</span>
                       </div>
                       <div className="w-full flex flex-col gap-2">
                         {/* offer option buttons: no border */}
@@ -970,7 +1008,7 @@ const AdsDetailsPage = () => {
                             <button
                               key={opt}
                               type="button"
-                              className="w-full text-center py-2 rounded bg-(--div-active) text-[10px] text-(--dark-def) font-medium focus:outline-none"
+                              className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
                               onClick={(ev) => {
                                 ev.stopPropagation();
                                 // set the input value when an option is clicked
@@ -1139,7 +1177,7 @@ const AdsDetailsPage = () => {
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
           <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
-        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-400 sm:text-(--dark-def) font-extralight justify-start">
+        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-600 sm:text-(--dark-def) font-extralight justify-start">
           {[
             "Is this Original?",
             "Do you have delivery options?",
@@ -1299,7 +1337,7 @@ const AdsDetailsPage = () => {
       </div>
 
       {/* profile bit mobile*/}
-      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5">
+      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5 w-full mx-auto">
         <div className="relative">
           <img src={currentAdData?.owner?.avatar || "/userPfp2.jpg"} alt="" className="w-15 h-15 rounded-full" />
           {(currentAdData?.owner?.is_verified || currentAdData?.owner?.verified || currentAdData?.owner?.verified_at) && (
