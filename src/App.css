@@ -91,13 +91,13 @@ body {
   .rotating-bg {
     width: 75vw;
     max-width: 65vw;
-    min-height: 65px;
+    min-height: 52px;
   }
 
   .rotating-bg-inner {
     width: 73vw;
     max-width: 64vw;
-    min-height: 64px;
+    min-height: 50px;
   }
 
   .search-input {
