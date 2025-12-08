@@ -1273,7 +1273,7 @@ const AdsDetailsPage = () => {
   const SellerInfo = () => (
     <div className="sm:mt-4">
       {/* profile bit pc */}
-      <div className="hidden sm:flex flex-row gap-4bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
+      <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
             src={owner?.avatar || "/userPfp2.jpg"}
