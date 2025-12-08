@@ -4,6 +4,18 @@ import { useOnline } from "../context/ConnectivityStatusContext";
 const OfflineModal = () => {
   const isOnline = useOnline();
   const [showToast, setShowToast] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleRetry = async () => {
+    setIsChecking(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
+    if (navigator.onLine) {
+      window.location.reload();
+    } else {
+      setIsChecking(false);
+      alert("Still offline. Please check your connection and try again.");
+    }
+  };
 
   if (isOnline) return null;
 
@@ -30,10 +42,11 @@ const OfflineModal = () => {
         <p className="text-gray-600 mb-4">Please check your network settings.</p>
         <div className="grid grid-cols-2 justify-center gap-4 items-center">
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition"
-            // onClick={onRetry}
+            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleRetry}
+            disabled={isChecking}
           >
-            Retry
+            {isChecking ? "Checking..." : "Retry"}
           </button>
           <button
             className="bg-gray-200 px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition"

@@ -765,10 +765,10 @@ const HomePage = () => {
                   <img
                     src={`/${category.toLowerCase()}.png`}
                     alt={category}
-                    className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%]object-contain left-1/2 -translate-x-1/2"
+                    className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
                   />
                 </div>
-                <h3 className="text-center text-[10px] sm:text-(length:--font-size) mt-1 truncate">
+                <h3 className="text-center  text-xs sm:text-[1.25vw] mt-1 truncate">
                   {category}
                 </h3>
               </div>

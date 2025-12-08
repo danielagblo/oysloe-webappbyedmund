@@ -995,11 +995,11 @@ const AdsDetailsPage = () => {
 
                 {/* Make Offer modal */}
                 {label === "Make Offer" && showOffer && (
-                  <div className="absolute z-50 mt-2 p-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-54 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-96">
+                  <div className="absolute z-50 mt-2 p-4 lg:pb-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-fit overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:min-w-96 sm:w-fit">
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-xs font-semibold">
-                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto" />
-                        <span className="text-[9px]">Make Offer</span>
+                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto lg:w-[1.5vw]" />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Make Offer</span>
                       </div>
                       <div className="w-full flex flex-col gap-2">
                         {/* offer option buttons: no border */}
@@ -1008,7 +1008,7 @@ const AdsDetailsPage = () => {
                             <button
                               key={opt}
                               type="button"
-                              className="w-full text-center py-2 rounded bg-(--div-active) text-[10px] text-(--dark-def) font-medium focus:outline-none"
+                              className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
                               onClick={(ev) => {
                                 ev.stopPropagation();
                                 // set the input value when an option is clicked

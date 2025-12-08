@@ -1,24 +1,50 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 const OnlineStatusContext = createContext(true);
 
 export const useOnline = () => useContext(OnlineStatusContext);
 
 export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isOnline, setIsOnline] = useState(() => {
+    if (typeof window !== "undefined" && navigator) {
+      return navigator.onLine;
+    }
+    return true;
+  });
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    let isMounted = true;
+
+    const handleOnline = () => {
+      if (isMounted) {
+        console.log("Connection restored");
+        setIsOnline(true);
+      }
+    };
+
+    const handleOffline = () => {
+      if (isMounted) {
+        console.log("Connection lost");
+        setIsOnline(false);
+      }
+    };
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
+    const initialCheckTimeout = setTimeout(() => {
+      if (isMounted && navigator.onLine !== isOnline) {
+        setIsOnline(navigator.onLine);
+      }
+    }, 100);
+
     return () => {
+      isMounted = false;
+      clearTimeout(initialCheckTimeout);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, []);
+  }, [isOnline]);
 
   return (
     <OnlineStatusContext.Provider value={isOnline}>

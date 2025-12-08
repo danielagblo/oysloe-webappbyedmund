@@ -5,7 +5,7 @@ import LevelProgress from "./LevelProgress";
 import ProgressBar from "./ProgressBar";
 
 export default function ProfileStats() {
-  const { profile: user, loading } = useUserProfile();
+  const { profile: user, loading, error } = useUserProfile();
   let name = (user as UserProfile)?.name;
   // break names into single entities by the space ok
   const nameParts = name?.split(" ") || [];
@@ -20,7 +20,7 @@ export default function ProfileStats() {
         className="rounded-full object-cover mb-3 bg-green-100 h-16 w-16 md:h-[7vw] md:w-[7vw]"
       />
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        {loading ? "User" : (name !== " ") ? name : "User"}
+        {loading || error ? "User" : (name !== " ") ? name : "User"}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
