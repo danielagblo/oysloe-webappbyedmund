@@ -976,17 +976,18 @@ const AdsDetailsPage = () => {
                 {label === "Caller 1" && (showC1 && caller1) && (
                   <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-8">
-                      <div className="text-xs font-semibold flex items-center gap-2">
-                        <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
-                        <span className="text-[9px]">Caller 1</span>
+                      <div className="font-semibold flex items-center gap-2">
+                        <img src="/outgoing call.svg" alt="" className="w-4 lg:w-[1.5vw] h-auto" />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Caller 1</span>
                       </div>
                       <a
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2"
+                        className="font-normal flex items-center gap-2 text-sm sm:text-base lg:text-[1.2vw]"
                         style={{ color: "var(--dark-def)", textDecoration: "none" }}
                       >
-                        <span className="border border-gray-200 px-2 py-1">Call</span><span className="border border-gray-200 px-2 py-1"> {caller1}</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5"> {caller1}</span>
                       </a>
                     </div>
                   </div>
