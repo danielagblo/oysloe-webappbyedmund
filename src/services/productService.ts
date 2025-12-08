@@ -128,6 +128,52 @@ export const confirmMarkProductAsTaken = async (
 };
 
 // ---------------------
+// REPOST PRODUCT (clone a taken product)
+// ---------------------
+export const repostProduct = async (
+  id: number | string,
+  body: unknown = {},
+): Promise<Product> => {
+  if (useMocks) {
+    const idx = mockProducts.findIndex((p) => p.id === +id);
+    if (idx === -1) throw new Error("Mock product not found");
+    const original = mockProducts[idx];
+    if (!original.is_taken) throw new Error("Original product must be marked taken to repost");
+
+    // shallow clone core fields, images and features; do not carry likes/favourites/reports
+    const clone: any = {
+      ...original,
+      id: Math.max(...mockProducts.map((m) => m.id)) + 1,
+      pid: `ad_${Date.now()}`,
+      is_taken: false,
+      status: "PENDING",
+      // reset engagement fields
+      likes: 0,
+      favourites: 0,
+      reports: 0,
+    };
+    mockProducts.push(clone as Product);
+    return clone as Product;
+  }
+
+  // Normalize body: allow callers to pass the product id directly (number|string)
+  let payload: Record<string, unknown>;
+  if (body == null) {
+    payload = { product: Number(id) };
+  } else if (typeof body === "number" || typeof body === "string") {
+    payload = { product: Number(body) };
+  } else if (typeof body === "object") {
+    payload = { ...(body as Record<string, unknown>) };
+    if (payload.product == null) payload.product = Number(id);
+  } else {
+    // Unexpected body type — fall back to sending product id
+    payload = { product: Number(id) };
+  }
+
+  return apiClient.post<Product>(products.repost(id), payload);
+};
+
+// ---------------------
 // REPORT PRODUCT
 // ---------------------
 export const reportProduct = async (
@@ -546,6 +592,7 @@ export default {
   setProductStatus,
   getProductsForOwner,
   getRelatedProducts,
+  repostProduct,
   // Helper moved to named export
   createProductFromAd,
 };

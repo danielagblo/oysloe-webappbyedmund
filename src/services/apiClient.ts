@@ -80,13 +80,43 @@ async function request<T>(
     } catch (e) {
       void e;
     }
+    // Attempt to parse JSON body to extract a friendly message
+    let friendly: string | null = null;
+    try {
+      const parsed = text ? JSON.parse(text) : null;
+      if (parsed && typeof parsed === "object") {
+        // Common fields: detail, message, error, errors
+        if (typeof parsed.detail === "string") friendly = parsed.detail;
+        else if (typeof parsed.message === "string") friendly = parsed.message;
+        else if (typeof parsed.error === "string") friendly = parsed.error;
+        else if (Array.isArray((parsed as any).errors)) {
+          const errs = (parsed as any).errors;
+          friendly = errs.map((e: any) => (typeof e === "string" ? e : JSON.stringify(e))).join("; ");
+        } else {
+          // fallback: if object contains simple string values, join them
+          const parts: string[] = [];
+          for (const k of Object.keys(parsed)) {
+            const v = (parsed as any)[k];
+            if (typeof v === "string") parts.push(v);
+            else if (Array.isArray(v)) parts.push(v.join(", "));
+          }
+          if (parts.length) friendly = parts.join("; ");
+        }
+      }
+    } catch (e) {
+      // not JSON or parsing failed
+      void e;
+    }
+
+    const logBody = text || null;
     console.error(`Request failed: ${fullUrl}`, {
       status: response.status,
-      body: text,
+      body: logBody,
     });
-    throw new Error(
-      `${options.method ?? "GET"} ${fullUrl} failed (${response.status}) ${text}`,
-    );
+
+    // Use friendly message if available; otherwise fall back to plain text or status
+    const message = friendly || text || `Request failed (${response.status})`;
+    throw new Error(message);
   }
   // Some endpoints (DELETE, mark-all-read) return 204 No Content — handle that safely
   if (response.status === 204) return undefined as unknown as T;

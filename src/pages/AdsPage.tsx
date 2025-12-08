@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// react-router imports removed (not used in this page)
 import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
 import PostAdForm from "../components/PostAdForm";
@@ -7,6 +7,7 @@ import {
   useConfirmMarkAsTaken,
   useDeleteProduct,
   useOwnerProducts,
+  useRepostProduct,
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { formatMoney } from "../utils/formatMoney";
@@ -22,8 +23,9 @@ const AdsPage = () => {
 
   const deleteMutation = useDeleteProduct();
   const confirmMarkTakenMutation = useConfirmMarkAsTaken();
+  const repostMutation = useRepostProduct();
   // const setStatusMutation = useSetProductStatus();
-  const navigate = useNavigate();
+  // navigate removed (not used in this view)
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAdId, setEditingAdId] = useState<string | null>(null);
 
@@ -153,16 +155,6 @@ const AdsPage = () => {
               {mapToLabel(selectedAd) === "Suspended" || mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
-                    <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
-                      onClick={() => {
-                        // Open the post-ad page in "duplicate" mode; saving will create a new ad
-                        setSelectedAd(null);
-                        navigate(`/postad?duplicate=${selectedAd.id}`);
-                      }}
-                    >
-                      Repost Ad
-                    </button>
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
@@ -313,9 +305,30 @@ const AdsPage = () => {
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
-                      onClick={() => {
-                        setSelectedAd(null);
-                        navigate(`/postad?duplicate=${selectedAd.id}`);
+                      onClick={async () => {
+                        try {
+                          // Build minimal product payload matching backend schema
+                          const payload = {
+                            pid: selectedAd.pid ?? `ad_${Date.now()}`,
+                            name: selectedAd.name ?? "",
+                            image:
+                              selectedAd.image || (selectedAd.images?.[0] as any)?.url || (selectedAd.images?.[0] as any)?.src || "",
+                            type: selectedAd.type ?? "SALE",
+                            status: selectedAd.status ?? "ACTIVE",
+                            is_taken: selectedAd.is_taken ?? true,
+                            description: selectedAd.description ?? selectedAd.desc ?? "",
+                            price: String(selectedAd.price ?? ""),
+                            duration: selectedAd.duration ?? "",
+                            category: Number(selectedAd.category ?? selectedAd.category_id ?? 0),
+                          };
+
+                          await repostMutation.mutateAsync({ id: selectedAd.id, body: payload });
+                          toast.success("Ad reposted");
+                          setSelectedAd(null);
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : String(err);
+                          toast.error(msg);
+                        }
                       }}
                     >
                       Repost Ad
