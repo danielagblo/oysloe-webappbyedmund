@@ -112,6 +112,23 @@ body {
     text-align: center;
   }
 }
+@media (min-width: 640px) {
+  .rotating-bg {
+    min-height: 75px;
+  }
+
+  .rotating-bg-inner {
+    min-height: 72px;
+  }
+
+  .search-input {
+    padding-left: 45px;
+  }
+
+  .search-input::placeholder {
+    text-align: center;
+  }
+}
 
 .rotating-bg::before {
   content: "";
