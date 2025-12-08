@@ -1233,29 +1233,31 @@ const AdsDetailsPage = () => {
             <div className="flex gap-2 overflow-x-auto flex-1 no-scrollbar">
               {sellerProducts && sellerProducts.length > 0 ? (
                 sellerProducts.slice(0, 6).map((p) => (
-                  <img
-                    key={p.id}
-                    src={p.image || "/no-image.jpeg"}
-                    alt={p.name || "Seller product"}
-                    role="button"
-                    tabIndex={0}
-                    onClick={async () => {
-                      setIsAdLoading(true);
-                      await new Promise(resolve => setTimeout(resolve, 100));
-                      navigate(`/ads/${p.id}`, { state: { adData: p } });
-                      setTimeout(() => setIsAdLoading(false), 500);
-                    }}
-                    onKeyDown={async (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
+                  (!p.is_taken && p.status === "ACTIVE") && (
+                    <img
+                      key={p.id}
+                      src={p.image || "/no-image.jpeg"}
+                      alt={p.name || "Seller product"}
+                      role="button"
+                      tabIndex={0}
+                      onClick={async () => {
                         setIsAdLoading(true);
                         await new Promise(resolve => setTimeout(resolve, 100));
                         navigate(`/ads/${p.id}`, { state: { adData: p } });
                         setTimeout(() => setIsAdLoading(false), 500);
-                      }
-                    }}
-                    className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
-                  />
-                ))
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setIsAdLoading(true);
+                          await new Promise(resolve => setTimeout(resolve, 100));
+                          navigate(`/ads/${p.id}`, { state: { adData: p } });
+                          setTimeout(() => setIsAdLoading(false), 500);
+                        }
+                      }}
+                      className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
+                    />
+                  ))
+                )
               ) : (
                 <>
                   <p className="text-gray-500 md:text-[1vw] w-full text-center">No other ads from this seller.</p>
@@ -1291,7 +1293,7 @@ const AdsDetailsPage = () => {
         Similar Ads
       </h2>
 
-      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-center ">
+      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
         {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => 
           ad.is_taken && (
           <Link
