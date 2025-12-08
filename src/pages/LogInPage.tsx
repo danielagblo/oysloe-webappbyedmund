@@ -95,6 +95,20 @@ const LogInPage = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
+        <div className="w-full flex justify-end mb-4">
+          <button
+            type="button"
+            onClick={() => {
+              try {
+                localStorage.setItem("oysloe_guest", "true");
+              } catch { }
+              navigate("/");
+            }}
+            className="text-sm text-gray-500"
+          >
+            Skip &gt;
+          </button>
+        </div>
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">Welcome!</h2>
           <form className="relative" onSubmit={handleSubmit}>
@@ -145,6 +159,7 @@ const LogInPage = () => {
             <h2 className="text-black inline opacity-100"> Sign up</h2>
           </Link>
         </h2>
+
       </div>
       {isSmall ? (
         shouldShowOnboarding ? (
