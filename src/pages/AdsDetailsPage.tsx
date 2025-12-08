@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
-import Loader from "../components/LoadingDots";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
-import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
@@ -56,6 +56,10 @@ const AdsDetailsPage = () => {
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
   const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
   const [isAdLoading, setIsAdLoading] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportMessage, setReportMessage] = useState<string>("");
+  const reportTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const reportMessageRef = useRef<string>("");
 
   // mark-as-taken mutation (declare early)
   const markTaken = useMarkProductAsTaken();
@@ -112,34 +116,83 @@ const AdsDetailsPage = () => {
   };
 
   const handleReportAd = () => {
+    // open the modal so user can enter a message before reporting
+    setReportMessage("");
+    reportMessageRef.current = "";
+    setShowReportModal(true);
+  };
+
+  const submitReport = async () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
 
-    toast.promise(
-      Promise.resolve().then(() => {
-        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-        const payload = {
-          pid: (src)?.pid ?? `pid_${pid}`,
-          name: (src)?.name ?? "",
-          image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
-          type: (src)?.type ?? ("SALE" as const),
-          status: (src)?.status ?? ("ACTIVE" as const),
-          is_taken: Boolean((src)?.is_taken),
-          description: (src)?.description ?? "",
-          price: (src)?.price ?? 0,
-          duration: (src)?.duration ?? "",
-          category: (src)?.category ?? (src)?.category_id ?? 0,
-        } as Record<string, unknown>;
+    try {
+      const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+      const payload = {
+        pid: (src)?.pid ?? `pid_${pid}`,
+        name: (src)?.name ?? "",
+        image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
+        type: (src)?.type ?? ("SALE" as const),
+        status: (src)?.status ?? ("ACTIVE" as const),
+        is_taken: Boolean((src)?.is_taken),
+        description: (src)?.description ?? "",
+        price: (src)?.price ?? 0,
+        duration: (src)?.duration ?? "",
+        category: (src)?.category ?? (src)?.category_id ?? 0,
+        // include the user-supplied message
+        message: reportMessageRef.current || reportMessage,
+      } as Record<string, unknown>;
 
-        reportProduct.mutate({ id: pid, body: payload });
-      }),
-      {
-        loading: "Reporting ad...",
-        success: "Ad reported successfully!",
-        error: "Failed to report ad",
-      }
-    );
+      await toast.promise(
+        Promise.resolve().then(() => reportProduct.mutateAsync({ id: pid, body: payload })),
+        {
+          loading: "Reporting ad...",
+          success: "Ad reported successfully!",
+          error: "Failed to report ad",
+        }
+      );
+
+      setShowReportModal(false);
+      setReportMessage("");
+      reportMessageRef.current = "";
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(msg);
+    }
   };
+
+  // focus the textarea when the modal opens so users can type immediately
+  useEffect(() => {
+    if (!showReportModal) return;
+
+    const tryFocus = () => {
+      try {
+        const el = reportTextareaRef.current;
+        if (el) {
+          el.focus();
+          const len = el.value?.length ?? 0;
+          el.setSelectionRange(len, len);
+          return true;
+        }
+      } catch (e) {
+        void e;
+      }
+      return false;
+    };
+
+    // Try immediately, then again after short delays to handle portal mount timing
+    if (tryFocus()) return;
+    const t1 = setTimeout(() => {
+      if (tryFocus()) return;
+      const t2 = setTimeout(() => tryFocus(), 200);
+      // clear t2 if modal closes
+      const cleanup = () => clearTimeout(t2);
+      // keep cleanup reference in closure
+      return cleanup;
+    }, 50);
+
+    return () => clearTimeout(t1 as unknown as number);
+  }, [showReportModal]);
 
   // Determine a candidate owner id early so hooks can be called unconditionally
   const ownerIdCandidate =
@@ -1294,41 +1347,91 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
-        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) => 
+        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) =>
           ad.is_taken && (
-          <Link
-            key={ad.id}
-            to={`/ads/${ad.id}`}
-            state={{ adData: ad }}
-            onClick={(e) => handleRelatedAdClick(ad, e)}
-            className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-          >
-            <img
-              src={ad.image || "/no-image.jpeg"}
-              alt={ad.name.slice(0, 10)}
-              className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
-            />
-            <div className="flex items-center gap-1 px-2 py-1">
+            <Link
+              key={ad.id}
+              to={`/ads/${ad.id}`}
+              state={{ adData: ad }}
+              onClick={(e) => handleRelatedAdClick(ad, e)}
+              className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+            >
               <img
-                src="/location.svg"
-                alt=""
-                className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                src={ad.image || "/no-image.jpeg"}
+                alt={ad.name.slice(0, 10)}
+                className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
               />
-              <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                {ad.location?.name || "Unknown"}
+              <div className="flex items-center gap-1 px-2 py-1">
+                <img
+                  src="/location.svg"
+                  alt=""
+                  className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                />
+                <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
+                  {ad.location?.name || "Unknown"}
+                </p>
+              </div>
+              <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
+                {ad.name}
               </p>
-            </div>
-            <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-              {ad.name}
-            </p>
-            <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-              {formatMoney(ad.price, "GHS")}
-            </p>
-          </Link>
-        ))}
+              <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
+                {formatMoney(ad.price, "GHS")}
+              </p>
+            </Link>
+          ))}
       </div>
     </div>
   );
+
+  // Report modal UI: collect a message from the user before submitting
+  const ReportModal = () => {
+    if (!showReportModal) return null;
+
+    const modal = (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div
+          className="bg-white rounded-xl p-4 w-[92%] max-w-md shadow-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-lg font-semibold mb-2">Report Ad</h3>
+          <p className="text-sm text-gray-600 mb-3">Please provide details about the issue. Your message will be sent with the report.</p>
+          <textarea
+            ref={reportTextareaRef}
+            defaultValue={reportMessageRef.current}
+            rows={6}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              reportMessageRef.current = (e.target as HTMLTextAreaElement).value;
+            }}
+            autoFocus
+            className="w-full p-3 border border-gray-200 rounded-md mb-3 resize-none"
+            placeholder="Describe the issue (e.g. misleading description, scam, inappropriate content)..."
+          />
+
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => { setShowReportModal(false); setReportMessage(""); }}
+              className="px-4 py-2 rounded-lg bg-gray-100"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); void submitReport(); }}
+              className="px-4 py-2 rounded-lg bg-(--div-active) text-(--dark-def)"
+            >
+              Submit Report
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+
+    if (typeof document === "undefined") return modal;
+    return createPortal(modal, document.body);
+  };
 
   return (
     <div className="lg:pt-5">
@@ -1430,6 +1533,7 @@ const AdsDetailsPage = () => {
         <SimilarAds />
         <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
+      <ReportModal />
       <MenuButton />
     </div>
   );
