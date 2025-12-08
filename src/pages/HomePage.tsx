@@ -119,7 +119,7 @@ export const HomePageHeader = ({
         }`}
     >
       <div
-        className={`flex items-center transition-all duration-300 ${isSmallScreen && isCondensed
+        className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${isSmallScreen && isCondensed
             ? "justify-between px-4 py-2 gap-3"
             : "flex-col items-center justify-center gap-8 mt-40"
           }`}
@@ -143,19 +143,19 @@ export const HomePageHeader = ({
 
             <div className="relative flex">
               <input
-                type="text"
+                type="search"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
                 className={`search-input ${isSmallScreen && isCondensed
                     ? "text-[16px]"
                     : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 max-sm: max-w-[70vw] rounded-full outline-0 bg-white text-center`}
+                  } px-4 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
               />
 
               <img
                 src="/search.svg"
-                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-1.5 w-5 h-5 z-10"
+                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 w-5 h-5 z-10"
               />
             </div>
           </div>

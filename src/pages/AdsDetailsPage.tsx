@@ -1139,7 +1139,7 @@ const AdsDetailsPage = () => {
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
           <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
-        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-400 sm:text-(--dark-def) font-extralight justify-start">
+        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-600 sm:text-(--dark-def) font-extralight justify-start">
           {[
             "Is this Original?",
             "Do you have delivery options?",
@@ -1299,7 +1299,7 @@ const AdsDetailsPage = () => {
       </div>
 
       {/* profile bit mobile*/}
-      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5">
+      <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 rounded-2xl mb-5 w-full mx-auto">
         <div className="relative">
           <img src={currentAdData?.owner?.avatar || "/userPfp2.jpg"} alt="" className="w-15 h-15 rounded-full" />
           {(currentAdData?.owner?.is_verified || currentAdData?.owner?.verified || currentAdData?.owner?.verified_at) && (
