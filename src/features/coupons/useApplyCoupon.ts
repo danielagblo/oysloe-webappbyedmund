@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCoupon, getCoupons, redeemCoupon } from "../../services/couponService";
+import { getCoupons, redeemCoupon } from "../../services/couponService";
 import type { Coupon } from "../../types/Coupon";
 
 const QUERY_KEYS = {
@@ -19,35 +19,22 @@ export function useApplyCoupon() {
       }
       const coupon = list[0];
 
-      // Preflight: fetch latest coupon details to validate availability
+      // Directly redeem the coupon via POST /coupons/{id}/redeem/
       try {
-        const latest = await getCoupon(coupon.id);
-        // If backend exposes remaining_uses or uses/max_uses, validate
-        if (typeof latest.remaining_uses === "number" && latest.remaining_uses <= 0) {
-          throw new Error("Coupon usage limit reached");
-        }
-        if (typeof latest.uses === "number" && typeof latest.max_uses === "number" && latest.max_uses > 0 && latest.uses >= latest.max_uses) {
-          throw new Error("Coupon usage limit reached");
-        }
-        if (latest.is_active === false) {
-          throw new Error("Coupon is not active");
-        }
-        const now = new Date();
-        if (latest.valid_from && new Date(latest.valid_from) > now) {
-          throw new Error("Coupon is not yet valid");
-        }
-        if (latest.valid_until && new Date(latest.valid_until) < now) {
-          throw new Error("Coupon has expired");
-        }
-      } catch (preErr) {
-        // If getCoupon failed with a network/server error, rethrow that
-        if (preErr instanceof Error) throw preErr;
-        throw new Error(String(preErr));
-      }
+        // Some backends expect the full coupon payload when redeeming.
+        const payload = {
+          code: coupon.code,
+          description: (coupon as any).description ?? "",
+          discount_type: (coupon as any).discount_type ?? "percent",
+          discount_value: (coupon as any).discount_value ?? (coupon as any).discount ?? 0,
+          max_uses: (coupon as any).max_uses ?? undefined,
+          per_user_limit: (coupon as any).per_user_limit ?? undefined,
+          valid_from: (coupon as any).valid_from ?? undefined,
+          valid_until: (coupon as any).valid_until ?? undefined,
+          is_active: (coupon as any).is_active ?? true,
+        } as Record<string, unknown>;
 
-      try {
-        // Redeem — include code in body in case backend expects it
-        const redeemed = await redeemCoupon(coupon.id, { code: coupon.code });
+        const redeemed = await redeemCoupon(coupon.id, payload);
         return redeemed;
       } catch (err: unknown) {
         if (err instanceof Error) throw err;

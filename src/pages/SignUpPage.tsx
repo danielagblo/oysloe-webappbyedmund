@@ -173,7 +173,21 @@ const SignInPage = () => {
   }, [policyModalOpen, policyModalType]);
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center ">
+    <div className="h-screen w-screen flex items-center justify-center relative">
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              localStorage.setItem("oysloe_guest", "true");
+            } catch {/*ignore*/ }
+            navigate("/");
+          }}
+          className="text-sm text-gray-500"
+        >
+          Skip &gt;
+        </button>
+      </div>
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 overflow-auto no-scrollbar h-full py-20">
         <div className=" flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl pt-10">Getting started</h2>
@@ -342,6 +356,7 @@ const SignInPage = () => {
       ) : (
         <OnboardingScreen />
       )}
+
       {/* Bottom-sheet modal for Privacy Policy / Terms */}
       {policyModalOpen && policyModalType && (() => {
         const activeQuery = policyModalType === "privacy" ? privacyQuery : termsQuery;

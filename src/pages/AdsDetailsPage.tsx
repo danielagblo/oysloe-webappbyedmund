@@ -6,6 +6,7 @@ import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
+import ReportModal from "../components/ReportModal";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
@@ -113,31 +114,54 @@ const AdsDetailsPage = () => {
   const handleReportAd = () => {
     const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
     if (!pid) return;
+    // open modal to collect a message from the reporter
+    setIsReportModalOpen(true);
+  };
 
-    toast.promise(
-      Promise.resolve().then(() => {
-        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
-        const payload = {
-          pid: (src)?.pid ?? `pid_${pid}`,
-          name: (src)?.name ?? "",
-          image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
-          type: (src)?.type ?? ("SALE" as const),
-          status: (src)?.status ?? ("ACTIVE" as const),
-          is_taken: Boolean((src)?.is_taken),
-          description: (src)?.description ?? "",
-          price: (src)?.price ?? 0,
-          duration: (src)?.duration ?? "",
-          category: (src)?.category ?? (src)?.category_id ?? 0,
-        } as Record<string, unknown>;
+  // Report modal state + message
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
 
-        reportProduct.mutate({ id: pid, body: payload });
-      }),
-      {
+  const submitReport = async () => {
+    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
+    if (!pid) return;
+
+    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+    const payload = {
+      pid: (src)?.pid ?? `pid_${pid}`,
+      name: (src)?.name ?? "",
+      image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
+      type: (src)?.type ?? ("SALE" as const),
+      status: (src)?.status ?? ("ACTIVE" as const),
+      is_taken: Boolean((src)?.is_taken),
+      description: (src)?.description ?? "",
+      price: (src)?.price ?? 0,
+      duration: (src)?.duration ?? "",
+      category: (src)?.category ?? (src)?.category_id ?? 0,
+      // include the reporter's message
+      message: reportMessage,
+    } as Record<string, unknown>;
+
+    try {
+      // use mutateAsync when available so we can await and wrap with toast.promise
+      const mutatePromise = (reportProduct as any).mutateAsync
+        ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
+        : new Promise((resolve, reject) => {
+          reportProduct.mutate({ id: pid, body: payload }, { onSuccess: resolve, onError: reject });
+        });
+
+      await toast.promise(mutatePromise, {
         loading: "Reporting ad...",
         success: "Ad reported successfully!",
         error: "Failed to report ad",
-      }
-    );
+      });
+
+      setIsReportModalOpen(false);
+      setReportMessage("");
+    } catch (err) {
+      // toast.promise will already show the error; keep modal open for retry
+      console.warn("submitReport failed", err);
+    }
   };
 
   // Determine a candidate owner id early so hooks can be called unconditionally
@@ -622,10 +646,10 @@ const AdsDetailsPage = () => {
             </button>
           )}
 
-          <div 
+          <div
             ref={galleryScrollRef}
             className="flex gap-4 px-4 max-w-screen mx-auto items-center overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar"
-            style={{ scrollBehavior: 'smooth', width: '95%'}}
+            style={{ scrollBehavior: 'smooth', width: '95%' }}
             onWheel={handleWheel}
             onScroll={checkScroll}
           >
@@ -785,6 +809,9 @@ const AdsDetailsPage = () => {
       </div>
     );
   };
+
+  // Report modal is rendered via the stable `ReportModal` component
+  // (imported at top) to avoid remount/focus issues from parent rerenders.
 
   const TitleAndPrice = () => (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
@@ -1410,6 +1437,16 @@ const AdsDetailsPage = () => {
           <DesktopHeader />
           <ImageGallery images={pageImages} currentIndex={galleryIndex} setCurrentIndex={setGalleryIndex} />
           <PictureModal />
+          <ReportModal
+            isOpen={isReportModalOpen}
+            message={reportMessage}
+            setMessage={setReportMessage}
+            onClose={() => {
+              setIsReportModalOpen(false);
+              setReportMessage("");
+            }}
+            onSubmit={submitReport}
+          />
           <TitleAndPrice />
 
           {/* MAIN CONTENT */}
