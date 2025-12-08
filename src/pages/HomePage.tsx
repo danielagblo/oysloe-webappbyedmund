@@ -541,7 +541,7 @@ const HomePage = () => {
           const perFeaturePromises = (featureDefinitions || []).map((fd) =>
             getPossibleFeatureValues({ feature: fd.id })
               .then((res) => ({ fid: fd.id, res }))
-              .catch((err) => {
+              .catch(() => {
                 return ({ fid: fd.id, res: null });
               }),
           );
