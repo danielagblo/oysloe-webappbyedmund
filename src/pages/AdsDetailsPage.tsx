@@ -358,24 +358,9 @@ const AdsDetailsPage = () => {
   // derive owner contact numbers (prefer canonical fields)
   const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner);
   const callerNumber1: string | null = owner?.phone || owner?.phone_number || owner?.primary_phone || null;
-  const callerNumber2: string | null = owner?.phone2 || owner?.secondary_phone || owner?.alt_phone || null;
+  const callerNumber2: string | null = owner?.second_number || owner?.phone2 || owner?.secondary_phone || owner?.alt_phone || null;
   const toggleCaller1 = () => setShowCaller1((s) => !s);
   const toggleCaller2 = () => setShowCaller2((s) => !s);
-
-  const getLikeCount = (p: any) => {
-    if (!p) return 0;
-    return (
-      (typeof p.liked_count === "number" && p.liked_count) ||
-      (typeof p.likes_count === "number" && p.likes_count) ||
-      (typeof p.likes === "number" && p.likes) ||
-      (typeof p.favourites_count === "number" && p.favourites_count) ||
-      (typeof p.favourited_count === "number" && p.favourited_count) ||
-      (typeof p.favourite_count === "number" && p.favourite_count) ||
-      0
-    );
-  };
-
-  const favouriteCount = getLikeCount(currentAdData) || getLikeCount(currentAdDataFromQuery) || favourites.length || 0;
 
   // const ownerId = currentAdData?.owner?.id ?? null;
 
@@ -498,11 +483,11 @@ const AdsDetailsPage = () => {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
           <img src="/flag.svg" alt="" className="w-4 h-4" />
-          <span className="text-xs">{String(reportCount)}</span>
+          <span className="text-xs">{currentAdData?.total_reports}</span>
         </div>
         <div className="flex items-center gap-1">
           <img src="/favorited.svg" alt="" className="w-4 h-4" />
-          <span className="text-xs">{favouriteCount}</span>
+          <span className="text-xs">{currentAdData?.total_favourites}</span>
         </div>
         {multiplierLabel && (
           <div className="ml-2 text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
@@ -532,12 +517,10 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base  md:text-[1.125vw]">
-          {reviewDeconstruction.count
-            ? (reviewDeconstruction.sum / reviewDeconstruction.count).toFixed(1)
-            : "0.0"}{" "}
-          &nbsp;&nbsp;&nbsp;{reviewDeconstruction.count || "No"} Review
-          {(reviewDeconstruction.count > 1 ||
-            reviewDeconstruction.count === 0) &&
+          {currentAdData.average_rating ? currentAdData.average_rating : "0.0"}{" "}
+          &nbsp;&nbsp;&nbsp;{currentAdData.total_reviews || "No"} Review
+          {(currentAdData.total_reviews > 1 ||
+            currentAdData.total_reviews === 0) &&
             "s"}
         </h2>
       </div>
@@ -555,7 +538,7 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">{favouriteCount}</h2>
+        <h2 className="text-base md:text-[1.125vw]">{currentAdData?.total_favourites}</h2>
       </div>
       {/* Image count (desktop) - mirrors mobile header */}
       <div className="flex items-center gap-2">
