@@ -52,14 +52,6 @@ const AdsDetailsPage = () => {
 
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
-  const subscriptionMultiplierRaw =
-    activeUserSubscription?.subscription?.multiplier ?? null;
-  const multiplierLabel = (() => {
-    if (subscriptionMultiplierRaw == null) return null;
-    const n = Number(subscriptionMultiplierRaw);
-    if (!Number.isNaN(n)) return `x${n}`;
-    return String(subscriptionMultiplierRaw);
-  })();
 
   // chat hook (declare early before any conditional returns)
   const { sendMessage, addLocalMessage } = useWsChat();
@@ -415,6 +407,18 @@ const AdsDetailsPage = () => {
   const currentAdData =
     currentAdDataFromQuery != null ? currentAdDataFromQuery : adDataFromState;
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
+  // Prefer multiplier from the product (owner's product) when present,
+  // otherwise fall back to the user's active subscription multiplier.
+  const subscriptionMultiplierRaw =
+    (currentAdData as any)?.multiplier ??
+    activeUserSubscription?.subscription?.multiplier ??
+    null;
+  const multiplierLabel = (() => {
+    if (subscriptionMultiplierRaw == null) return null;
+    const n = Number(subscriptionMultiplierRaw);
+    if (!Number.isNaN(n)) return `${n}x`;
+    return String(subscriptionMultiplierRaw);
+  })();
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as an array of objects, a paginated object, or a single `image` string.
   // Include the main `image` plus any entries from `images` and remove duplicates.
@@ -1100,7 +1104,7 @@ const AdsDetailsPage = () => {
                       return;
                     }
                     if (label === "Make Offer") {
-                      (toggleOffer || (() => {}))();
+                      (toggleOffer || (() => { }))();
                       return;
                     }
                     // otherwise perform action
@@ -1150,37 +1154,43 @@ const AdsDetailsPage = () => {
                   )}
                 </button>
 
-                {/* caller tooltip */}
+                {/* caller modal (centered like report modal) */}
                 {label === "Caller 1" && showC1 && caller1 && (
-                  <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
-                    <div className="flex flex-col items-center gap-8">
-                      <div className="font-semibold flex items-center gap-2">
-                        <img
-                          src="/outgoing call.svg"
-                          alt=""
-                          className="w-4 lg:w-[1.5vw] h-auto"
-                        />
-                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">
-                          Caller 1
-                        </span>
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                    onClick={() => setOpenPanel(null)}
+                  >
+                    <div
+                      className="bg-white rounded-2xl p-4 shadow-md text-sm w-72"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="font-semibold flex items-center gap-2">
+                          <img
+                            src="/outgoing call.svg"
+                            alt=""
+                            className="w-4 h-auto"
+                          />
+                          <span className="text-sm">Caller 1</span>
+                        </div>
+                        <a
+                          href={`tel:${caller1}`}
+                          onClick={(ev) => ev.stopPropagation()}
+                          className="font-normal flex items-center gap-2 text-sm"
+                          style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        >
+                          <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                          <span className="border border-gray-200 px-2.5 py-1.5">{caller1}</span>
+                        </a>
+                        <div className="w-full flex justify-end">
+                          <button
+                            onClick={() => setOpenPanel(null)}
+                            className="mt-2 px-3 py-1 rounded bg-gray-100"
+                          >
+                            Close
+                          </button>
+                        </div>
                       </div>
-                      <a
-                        href={`tel:${caller1}`}
-                        onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2 text-sm sm:text-base lg:text-[1.2vw]"
-                        style={{
-                          color: "var(--dark-def)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <span className="border border-gray-200 px-2.5 py-1.5">
-                          Call
-                        </span>
-                        <span className="border border-gray-200 px-2.5 py-1.5">
-                          {" "}
-                          {caller1}
-                        </span>
-                      </a>
                     </div>
                   </div>
                 )}
@@ -1233,11 +1243,11 @@ const AdsDetailsPage = () => {
                             className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
                             onClick={async (ev) => {
                               ev.stopPropagation();
-                              if (!offerInput || offerInput.trim().length === 0)
-                                return;
+                              if (!offerInput || offerInput.trim().length === 0) return;
                               // send offer as chat message and open inbox
                               await openChatWithOwnerAndSend(offerInput.trim());
-                              setShowOffer(false);
+                              // close the offer panel
+                              (toggleOffer || (() => { }))();
                             }}
                           >
                             <img
@@ -1253,31 +1263,37 @@ const AdsDetailsPage = () => {
                 )}
 
                 {label === "Caller 2" && showC2 && caller2 && (
-                  <div className="absolute z-50 mt-2 p-3 bg-white border rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
-                    <div className="flex flex-col items-center gap-3">
-                      <img
-                        src="/outgoing call.svg"
-                        alt=""
-                        className="w-4 h-auto"
-                      />
-                      <span className="text-[9px]">Caller 2</span>
-                      <a
-                        href={`tel:${caller2}`}
-                        onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2"
-                        style={{
-                          color: "var(--dark-def)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <span className="border border-gray-200 px-2 py-1">
-                          Call
-                        </span>
-                        <span className="border border-gray-200 px-2 py-1">
-                          {" "}
-                          {caller2}
-                        </span>
-                      </a>
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                    onClick={() => setOpenPanel(null)}
+                  >
+                    <div
+                      className="bg-white rounded-2xl p-4 shadow-md text-sm w-72"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="font-semibold flex items-center gap-2">
+                          <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                          <span className="text-sm">Caller 2</span>
+                        </div>
+                        <a
+                          href={`tel:${caller2}`}
+                          onClick={(ev) => ev.stopPropagation()}
+                          className="font-normal flex items-center gap-2 text-sm"
+                          style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        >
+                          <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                          <span className="border border-gray-200 px-2.5 py-1.5">{caller2}</span>
+                        </a>
+                        <div className="w-full flex justify-end">
+                          <button
+                            onClick={() => setOpenPanel(null)}
+                            className="mt-2 px-3 py-1 rounded bg-gray-100"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1472,7 +1488,7 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={owner?.avatar || "/userPfp2.jpg"}
+            src={owner?.business_logo || owner?.avatar || "/userPfp2.jpg"}
             alt={owner?.name || "Seller"}
             className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
           />
@@ -1600,7 +1616,7 @@ const AdsDetailsPage = () => {
       <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
         <div className="relative">
           <img
-            src={currentAdData?.owner?.avatar || "/userPfp2.jpg"}
+            src={currentAdData?.owner?.business_logo || currentAdData?.owner?.avatar || "/userPfp2.jpg"}
             alt=""
             className="w-15 h-15 rounded-full"
           />
