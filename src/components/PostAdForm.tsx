@@ -491,7 +491,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
     } catch (e) {
       void e;
     }
-  }, [existingProduct, fetchedCategories]);
+  }, [existingProduct, fetchedCategories, applySavedLocation, groupedLocations, selectPlace, subcategories, subcategoryId]);
 
   // Ensure subcategory is applied when subcategories for the selected category are available
   useEffect(() => {
@@ -609,7 +609,25 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         : []),
     ];
 
-    const metadata: AdMetadata & { price?: number | "" } = {
+    const locationResolution = (function resolveLocation() {
+      try {
+        if (!locationDetails) return { location: { region: null as Region | null, name: "Unknown" } as LocationPayload };
+        const found = allLocations.find((l: any) => {
+          const regionMatch = String(l.region || "").trim().toLowerCase() === String(locationDetails.region || "").trim().toLowerCase();
+          const placeMatch = String(l.name || l.place || "").trim().toLowerCase() === String(locationDetails.place || "").trim().toLowerCase();
+          return regionMatch && placeMatch;
+        });
+        if (found && (typeof found.id === "number" || typeof found.id === "string")) {
+          return { location: Number(found.id) };
+        }
+        // fallback to legacy shape (region + place) so server can handle it
+        return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+      } catch (e) {
+        return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+      }
+    })();
+
+    const metadata = {
       // name: title.trim(),
       // image: uploadedImages[0]?.url || "",
       // type: purpose === "Sale" ? "SALE" : purpose === "Rent" ? "RENT" : "SERVICE",
@@ -636,23 +654,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       },
       // Prefer to submit the canonical `location` id when available.
       // Try to resolve the selected place+region back to the known locations list.
-      ...(function resolveLocation() {
-        try {
-          if (!locationDetails) return {};
-          const found = allLocations.find((l: any) => {
-            const regionMatch = String(l.region || "").trim().toLowerCase() === String(locationDetails.region || "").trim().toLowerCase();
-            const placeMatch = String(l.name || l.place || "").trim().toLowerCase() === String(locationDetails.place || "").trim().toLowerCase();
-            return regionMatch && placeMatch;
-          });
-          if (found && (typeof found.id === "number" || typeof found.id === "string")) {
-            return { location: Number(found.id) };
-          }
-          // fallback to legacy shape (region + place) so server can handle it
-          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
-        } catch (e) {
-          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
-        }
-      })(),
+      ...locationResolution,
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
@@ -669,7 +671,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         : {}),
       // include merged explicit feature values (from fetched defs and user attachments)
       ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
-    };
+    } as any;
 
     console.log("Ad metadata (JSON):", metadata);
 
@@ -1153,7 +1155,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
           </div>
         )}
-        
+
         {showSuccess && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
