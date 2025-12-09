@@ -61,6 +61,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
+  const [viewingSubcategoriesForCategoryId, setViewingSubcategoriesForCategoryId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.TouchEvent) => {
@@ -249,41 +250,45 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                       <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
                     </button>
                   </div>
+                </div>
+              )}
 
-                  {/* Features Section - Show if subcategories selected */}
-                  {selectedSubcategoryIds.length > 0 && availableFeatures.length > 0 && (
-                    <>
-                      <div className="border-t border-gray-200" />
-                      <div className="space-y-2">
-                        {availableFeatures.map((feature) => (
-                          <select
-                            key={feature.id}
-                            value={selectedFeatures[feature.id] || ""}
-                            onChange={(e) => {
-                              if (e.target.value) {
-                                setSelectedFeatures({
-                                  ...selectedFeatures,
-                                  [feature.id]: e.target.value,
-                                });
-                              } else {
-                                const updated = { ...selectedFeatures };
-                                delete updated[feature.id];
-                                setSelectedFeatures(updated);
-                              }
-                            }}
-                            className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
-                          >
-                            <option value="">Feature {feature.id}</option>
-                            {feature.values.map((value) => (
-                              <option key={value} value={value}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        ))}
+              {/* Features Section - Show if subcategories selected */}
+              {selectedSubcategoryIds.length > 0 && availableFeatures.length > 0 && (
+                <div className="bg-white rounded-3xl p-4 space-y-3">
+                  <h3 className="text-sm font-semibold text-gray-700">Features</h3>
+                  <div className="space-y-3">
+                    {availableFeatures.map((feature, idx) => (
+                      <div key={feature.id}>
+                        <select
+                          value={selectedFeatures[feature.id] || ""}
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              setSelectedFeatures({
+                                ...selectedFeatures,
+                                [feature.id]: e.target.value,
+                              });
+                            } else {
+                              const updated = { ...selectedFeatures };
+                              delete updated[feature.id];
+                              setSelectedFeatures(updated);
+                            }
+                          }}
+                          className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                        >
+                          <option value="">Feature {feature.id}</option>
+                          {feature.values.map((value) => (
+                            <option key={value} value={value}>
+                              {value}
+                            </option>
+                          ))}
+                        </select>
+                        {idx < availableFeatures.length - 1 && (
+                          <div className="border-t border-gray-200 mt-3" />
+                        )}
                       </div>
-                    </>
-                  )}
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -375,18 +380,11 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     <div key={category.id}>
                       <button
                         onClick={() => {
-                          if (selectedCategoryId === category.id) {
-                            setSelectedCategoryId(null);
-                          } else {
-                            setSelectedCategoryId(category.id);
-                          }
-                          setCurrentPanel("main");
+                          setSelectedCategoryId(category.id);
+                          setViewingSubcategoriesForCategoryId(category.id);
+                          setCurrentPanel("subcategories");
                         }}
-                        className={`w-full flex items-center gap-3 p-3 transition ${
-                          selectedCategoryId === category.id
-                            ? "bg-blue-50"
-                            : "hover:bg-gray-50"
-                        }`}
+                        className="w-full flex items-center gap-3 p-3 transition hover:bg-gray-50"
                       >
                         <img
                           src={getCategoryIcon(category.name)}
@@ -397,9 +395,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           }}
                         />
                         <span className="flex-1 text-left text-gray-800 text-sm">{category.name}</span>
-                        {selectedCategoryId === category.id && (
-                          <span className="text-blue-600">✓</span>
-                        )}
+                        <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
                       </button>
                       {index < categories.length - 1 && (
                         <div className="border-t border-gray-100" />
@@ -416,14 +412,40 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
             <div className="w-screen -mx-4">
               <div className="bg-white p-4">
                 <button
-                  onClick={() => setCurrentPanel("main")}
+                  onClick={() => setCurrentPanel("categories")}
                   className="flex items-center gap-2 text-gray-600 mb-4 hover:text-gray-900"
                 >
-                  <span>←</span>
-                  <span className="text-sm">Back to Main</span>
+                  <img src="/arrowleft.svg" alt="<" />
+                  <span className="text-sm">Back</span>
                 </button>
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Select Subcategories</h3>
                 <div>
+                  {/* All Subcategories Option */}
+                  <button
+                    onClick={() => {
+                      const allSelected = currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub));
+                      if (allSelected) {
+                        setSelectedSubcategoryIds(selectedSubcategoryIds.filter(id => !currentSubcategories.includes(id)));
+                      } else {
+                        setSelectedSubcategoryIds([...new Set([...selectedSubcategoryIds, ...currentSubcategories])]);
+                      }
+                    }}
+                    className={`w-full flex items-center gap-3 p-3 transition ${
+                      currentSubcategories.length > 0 && currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub))
+                        ? "bg-blue-50"
+                        : "hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={currentSubcategories.length > 0 && currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub))}
+                      onChange={() => {}}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                    <span className="text-gray-800 text-sm flex-1 font-semibold">All Subcategories</span>
+                  </button>
+                  <div className="border-t border-gray-100 my-2" />
+
                   {currentSubcategories.map((subcategory, index) => (
                     <div key={subcategory}>
                       <button
@@ -454,6 +476,45 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     </div>
                   ))}
                 </div>
+
+                {/* Features Section - Show if subcategories selected */}
+                {selectedSubcategoryIds.length > 0 && availableFeatures.length < 0 && (
+                  <div className="bg-white rounded-3xl p-4 space-y-3 mt-4">
+                    <h3 className="text-sm font-semibold text-gray-700">Features</h3>
+                    <div className="space-y-3">
+                      {availableFeatures.map((feature, featureIndex) => (
+                        <div key={feature.id}>
+                          <select
+                            value={selectedFeatures[feature.id] || ""}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setSelectedFeatures({
+                                  ...selectedFeatures,
+                                  [feature.id]: e.target.value,
+                                });
+                              } else {
+                                const updated = { ...selectedFeatures };
+                                delete updated[feature.id];
+                                setSelectedFeatures(updated);
+                              }
+                            }}
+                            className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                          >
+                            <option value="">Feature {feature.id}</option>
+                            {feature.values.map((value) => (
+                              <option key={value} value={value}>
+                                {value}
+                              </option>
+                            ))}
+                          </select>
+                          {featureIndex < availableFeatures.length - 1 && (
+                            <div className="border-t border-gray-200 mt-3" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
