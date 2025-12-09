@@ -151,9 +151,9 @@ export const HomePageHeader = ({
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
                 className={`search-input ${isSmallScreen && isCondensed
-                  ? "text-[16px]"
+                  ? ""
                   : "text-2xl sm:text-2xl"
-                  } px-4 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
+                  } pl-4 pr-2 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
               />
 
               <img
