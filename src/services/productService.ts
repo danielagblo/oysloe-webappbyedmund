@@ -386,8 +386,13 @@ export const createProductFromAd = async (metadata: any) => {
     ...(metadata.subcategory
       ? { subcategory: Number(metadata.subcategory) }
       : {}),
-    // include simple location string from ad metadata when present
-    ...(metadata.location ? { location: metadata.location } : {}),
+    // Prefer `location_id` (integer) when provided by the ad metadata.
+    // Fall back to including the legacy `location` shape/string if present.
+    ...(metadata.location_id
+      ? { location_id: Number(metadata.location_id) }
+      : metadata.location
+      ? { location: metadata.location }
+      : {}),
   };
 
   // Helper: convert blob: URL to File by fetching it

@@ -692,8 +692,8 @@ export default function PostAdForm({
     try {
       const candidateId =
         typeof prodSubRaw === "object" &&
-        prodSubRaw !== null &&
-        typeof prodSubRaw.id !== "undefined"
+          prodSubRaw !== null &&
+          typeof prodSubRaw.id !== "undefined"
           ? Number(prodSubRaw.id)
           : Number(prodSubRaw);
       if (
@@ -802,16 +802,16 @@ export default function PostAdForm({
     const explicitFeatureValues = [
       ...(featureValues && Object.keys(featureValues).length > 0
         ? Object.entries(featureValues)
-            .map(([k, v]) => ({ feature: Number(k), value: v }))
-            .filter((f) => f.value && String(f.value).trim() !== "")
+          .map(([k, v]) => ({ feature: Number(k), value: v }))
+          .filter((f) => f.value && String(f.value).trim() !== "")
         : []),
       ...(attachedFeatures && Array.isArray(attachedFeatures)
         ? attachedFeatures
-            .filter((a) => a.feature != null && String(a.value).trim() !== "")
-            .map((a) => ({
-              feature: Number(a.feature),
-              value: String(a.value),
-            }))
+          .filter((a) => a.feature != null && String(a.value).trim() !== "")
+          .map((a) => ({
+            feature: Number(a.feature),
+            value: String(a.value),
+          }))
         : []),
     ];
 
@@ -824,7 +824,8 @@ export default function PostAdForm({
           return regionMatch && placeMatch;
         });
         if (found && (typeof found.id === "number" || typeof found.id === "string")) {
-          return { location: Number(found.id) };
+          // Prefer sending the canonical integer id as `location_id`.
+          return { location_id: Number(found.id) };
         }
         // fallback to legacy shape (region + place) so server can handle it
         return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
@@ -877,8 +878,8 @@ export default function PostAdForm({
         : {}),
       // include keyFeatures if user added any (filter out empty strings)
       ...(keyFeatures &&
-      Array.isArray(keyFeatures) &&
-      keyFeatures.filter((k) => k.trim() !== "").length > 0
+        Array.isArray(keyFeatures) &&
+        keyFeatures.filter((k) => k.trim() !== "").length > 0
         ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
         : {}),
       // include merged explicit feature values (from fetched defs and user attachments)
@@ -1099,9 +1100,9 @@ export default function PostAdForm({
                   <DropdownPopup
                     triggerLabel={
                       subcategoryId &&
-                      subcategories.find((s) => s.id === subcategoryId)
+                        subcategories.find((s) => s.id === subcategoryId)
                         ? subcategories.find((s) => s.id === subcategoryId)!
-                            .name
+                          .name
                         : "Select subcategory"
                     }
                     options={subcategories.map((s) => s.name)}
