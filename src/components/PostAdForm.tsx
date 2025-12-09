@@ -17,8 +17,6 @@ import type { AdMetadata } from "../types/AdMetaData";
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
 
-const isMobile = window.innerWidth < 1024;
-
 interface UploadedImage {
   id: number;
   url: string;
@@ -33,7 +31,18 @@ interface PostAdFormProps {
 }
 
 export default function PostAdForm({ editId: propEditId, onClose, embedded = false }: PostAdFormProps) {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileStep, setMobileStep] = useState("images");
+
+  // Handle responsive resize for mobile layout
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const [category, setCategory] = useState("Select Product Category");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [subcategoryId, setSubcategoryId] = useState<number | "">("");

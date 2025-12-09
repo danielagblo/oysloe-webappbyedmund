@@ -55,6 +55,7 @@ const SubscriptionPage = () => {
         console.error("Paystack initiation failed", err);
       } finally {
         setSubscribingId(null);
+        window.close();
       }
     })();
   };
