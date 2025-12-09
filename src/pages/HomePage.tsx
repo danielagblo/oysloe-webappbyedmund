@@ -298,6 +298,8 @@ const HomePage = () => {
             setPriceFilter={setPriceFilter}
             categories={categories}
             uniqueLocations={uniqueLocations}
+            allProducts={products}
+            applyFilters={applyFilters}
           />
         </div>
         <MenuButton />
