@@ -36,11 +36,18 @@ const SubscriptionPage = () => {
           JSON.stringify({ subscription_id: id }),
         );
 
-        const res = await initiatePaystackPayment({ subscription_id: id, callback_url: callbackUrl });
+        const res = await initiatePaystackPayment({
+          subscription_id: id,
+          callback_url: callbackUrl,
+        });
 
         // attempt to extract redirect URL from common shapes
         const redirectUrl =
-          res?.data?.authorization_url || res?.authorization_url || res?.data?.url || res?.url || res?.authorizationUrl;
+          res?.data?.authorization_url ||
+          res?.authorization_url ||
+          res?.data?.url ||
+          res?.url ||
+          res?.authorizationUrl;
 
         if (redirectUrl) {
           // redirect to Paystack checkout in a new tab
@@ -62,9 +69,12 @@ const SubscriptionPage = () => {
 
   const handleRenew = (userSubId: number, subscriptionId: number) => {
     setUpdatingId(userSubId);
-    updateSub.mutate({ id: userSubId, body: { subscription_id: subscriptionId } }, {
-      onSettled: () => setUpdatingId(null),
-    });
+    updateSub.mutate(
+      { id: userSubId, body: { subscription_id: subscriptionId } },
+      {
+        onSettled: () => setUpdatingId(null),
+      },
+    );
   };
 
   return (
@@ -84,7 +94,8 @@ const SubscriptionPage = () => {
                         {activeUserSub.subscription.name}
                       </p>
                       <p className="font-medium max-md:text-[0.5rem]">
-                        Expires {new Date(activeUserSub.end_date).toLocaleDateString()}
+                        Expires{" "}
+                        {new Date(activeUserSub.end_date).toLocaleDateString()}
                       </p>
                     </div>
                   ) : (
@@ -105,10 +116,17 @@ const SubscriptionPage = () => {
                 <div className="w-full px-2">
                   <button
                     className="bg-(--div-active) w-full py-3 rounded text-center mt-2"
-                    onClick={() => handleRenew(activeUserSub.id, activeUserSub.subscription.id)}
+                    onClick={() =>
+                      handleRenew(
+                        activeUserSub.id,
+                        activeUserSub.subscription.id,
+                      )
+                    }
                     disabled={updatingId === activeUserSub.id}
                   >
-                    {updatingId === activeUserSub.id ? "Processing..." : "Renew / Update"}
+                    {updatingId === activeUserSub.id
+                      ? "Processing..."
+                      : "Renew / Update"}
                   </button>
                 </div>
               )}
@@ -119,13 +137,22 @@ const SubscriptionPage = () => {
         <div className="lg:w-1/2">
           <div className="bg-white w-full md:h-[95vh] lg:overflow-auto no-scrollbar mt-2 md:mt-0 flex flex-col justify-start items-center gap-4 h-fit px-2 py-3 md:rounded-2xl text-xs max-lg:mb-10 lg:pb-17">
             <div className="flex pt-5 px-5 flex-col justify-start gap-6 mb-2 w-full">
-              <p className="text-center text-gray-500">Choose a monthly plan that works for you</p>
+              <p className="text-center text-gray-500">
+                Choose a monthly plan that works for you
+              </p>
 
-              {subsQuery.isLoading && <p className="text-center">Loading plans...</p>}
-              {subsQuery.isError && <p className="text-center text-red-500">Failed to load plans</p>}
+              {subsQuery.isLoading && (
+                <p className="text-center">Loading plans...</p>
+              )}
+              {subsQuery.isError && (
+                <p className="text-center text-red-500">Failed to load plans</p>
+              )}
 
               {subscriptions.map((s) => (
-                <div key={s.id} className="relative bg-(--div-active) rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full">
+                <div
+                  key={s.id}
+                  className="relative bg-(--div-active) rounded-2xl flex flex-col justify-start items-start gap-2 p-4 w-full"
+                >
                   {s.discount_percentage && (
                     <div className="absolute -top-2 right-4 z-10 py-1 px-2 rounded-2xl bg-gray-900 text-white text-center text-xs">
                       {Number(s.discount_percentage).toString()}% off
@@ -133,7 +160,10 @@ const SubscriptionPage = () => {
                   )}
 
                   <p className="font-bold">
-                    {s.name} <span className="font-normal">{s.multiplier ? `${s.multiplier}x` : ""}</span>
+                    {s.name}{" "}
+                    <span className="font-normal">
+                      {s.multiplier ? `${s.multiplier}x` : ""}
+                    </span>
                   </p>
                   {s.features_list && (
                     <ul>
@@ -147,9 +177,16 @@ const SubscriptionPage = () => {
                   )}
 
                   <div className="flex justify-start items-start gap-4 w-full">
-                    <p className="font-bold text-sm">₵ {Number(s.effective_price ?? s.price).toFixed(2)}</p>
+                    <p className="font-bold text-sm">
+                      ₵ {Number(s.effective_price ?? s.price).toFixed(2)}
+                    </p>
                     {s.original_price && (
-                      <p className="text-gray-500">₵ <span className="line-through">{Number(s.original_price).toFixed(2)}</span></p>
+                      <p className="text-gray-500">
+                        ₵{" "}
+                        <span className="line-through">
+                          {Number(s.original_price).toFixed(2)}
+                        </span>
+                      </p>
                     )}
                   </div>
 
@@ -160,7 +197,9 @@ const SubscriptionPage = () => {
                       onClick={() => handleSubscribe(s.id)}
                       disabled={subscribingId === s.id}
                     >
-                      {subscribingId === s.id ? "Processing..." : "Subscribe / Pay Now"}
+                      {subscribingId === s.id
+                        ? "Processing..."
+                        : "Subscribe / Pay Now"}
                     </button>
                   </div>
                 </div>

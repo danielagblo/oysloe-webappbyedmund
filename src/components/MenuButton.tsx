@@ -60,8 +60,9 @@ const NavButton = ({
       <img
         src={icon}
         alt={label}
-        className={`w-6 h-6 transition-all ${active ? "opacity-100 scale-110" : "opacity-70"
-          }`}
+        className={`w-6 h-6 transition-all ${
+          active ? "opacity-100 scale-110" : "opacity-70"
+        }`}
       />
       {count !== undefined && count > 0 && (
         <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -70,8 +71,9 @@ const NavButton = ({
       )}
     </div>
     <span
-      className={`text-xs text-center transition-colors ${active ? "text-[var(--dark-def)] font-semibold" : "text-gray-500"
-        }`}
+      className={`text-xs text-center transition-colors ${
+        active ? "text-[var(--dark-def)] font-semibold" : "text-gray-500"
+      }`}
     >
       {label}
     </span>
@@ -93,7 +95,12 @@ const MenuBar = ({
   <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 flex justify-around items-center gap-4 h-16 rounded-2xl shadow-lg z-10 px-6 hidden sm:flex">
     {Object.entries(icons).map(([id, icon]) => {
       const key = id as RouteKey;
-      const count = key === "alerts" ? alertCount : key === "inbox" ? inboxCount : undefined;
+      const count =
+        key === "alerts"
+          ? alertCount
+          : key === "inbox"
+            ? inboxCount
+            : undefined;
       return (
         <NavButton
           key={id}
@@ -124,7 +131,12 @@ const MobileFooter = ({
   <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20">
     {Object.entries(icons).map(([id, icon]) => {
       const key = id as RouteKey;
-      const count = key === "alerts" ? alertCount : key === "inbox" ? inboxCount : undefined;
+      const count =
+        key === "alerts"
+          ? alertCount
+          : key === "inbox"
+            ? inboxCount
+            : undefined;
       return (
         <button
           key={id}
@@ -139,8 +151,9 @@ const MobileFooter = ({
             <img
               src={icon}
               alt={id}
-              className={`w-6 h-6 transition-all ${active === key ? "opacity-100 scale-110" : "opacity-70"
-                }`}
+              className={`w-6 h-6 transition-all ${
+                active === key ? "opacity-100 scale-110" : "opacity-70"
+              }`}
             />
             {count !== undefined && count > 0 && (
               <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -149,8 +162,9 @@ const MobileFooter = ({
             )}
           </div>
           <span
-            className={`text-[11px] font-medium ${active === key ? "text-[var(--dark-def)]" : "text-gray-500"
-              }`}
+            className={`text-[11px] font-medium ${
+              active === key ? "text-[var(--dark-def)]" : "text-gray-500"
+            }`}
           >
             {id.charAt(0).toUpperCase() + id.slice(1)}
           </span>
@@ -193,7 +207,10 @@ export default function ResponsiveMenu() {
   const unreadAlertCount = alerts.filter((a) => !a.is_read).length;
 
   // Count unread inbox messages
-  const unreadInboxCount = chatRooms.reduce((sum, room) => sum + (room.total_unread || 0), 0);
+  const unreadInboxCount = chatRooms.reduce(
+    (sum, room) => sum + (room.total_unread || 0),
+    0,
+  );
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -217,8 +234,18 @@ export default function ResponsiveMenu() {
   };
 
   return isMobile ? (
-    <MobileFooter active={active} onClick={handleClick} alertCount={unreadAlertCount} inboxCount={unreadInboxCount} />
+    <MobileFooter
+      active={active}
+      onClick={handleClick}
+      alertCount={unreadAlertCount}
+      inboxCount={unreadInboxCount}
+    />
   ) : (
-    <MenuBar active={active} onClick={handleClick} alertCount={unreadAlertCount} inboxCount={unreadInboxCount} />
+    <MenuBar
+      active={active}
+      onClick={handleClick}
+      alertCount={unreadAlertCount}
+      inboxCount={unreadInboxCount}
+    />
   );
 }

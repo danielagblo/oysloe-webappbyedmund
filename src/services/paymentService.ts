@@ -45,7 +45,9 @@ export const paystackWebhook = async (body: unknown): Promise<void> => {
  * For debugging you can POST { reference } to the webhook endpoint
  * so the server performs the verify/update logic immediately.
  */
-export const verifyPaystackTransaction = async (reference: string): Promise<any> => {
+export const verifyPaystackTransaction = async (
+  reference: string,
+): Promise<any> => {
   // Some backends expect the Paystack webhook payload shape (data.reference)
   // Send both to maximize compatibility: { reference, data: { reference } }
   const payload = { reference, data: { reference } };

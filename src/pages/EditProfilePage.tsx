@@ -119,12 +119,13 @@ const EditProfilePage = () => {
   };
 
   const getFileLabel = (file?: File | null, path?: string) => {
-    if (file && file.name) return file.name.length > 24 ? file.name.slice(0, 21) + '...' : file.name;
+    if (file && file.name)
+      return file.name.length > 24 ? file.name.slice(0, 21) + "..." : file.name;
     if (path) {
-      const name = path.split('/').pop();
-      if (name) return name.length > 24 ? name.slice(0, 21) + '...' : name;
+      const name = path.split("/").pop();
+      if (name) return name.length > 24 ? name.slice(0, 21) + "..." : name;
     }
-    return 'Upload';
+    return "Upload";
   };
 
   // const stripAssetPath = (val?: string) => {
@@ -157,7 +158,7 @@ const EditProfilePage = () => {
 
     if (data && (data.status === "PENDING" || data.status === "APPROVED")) {
       toast.warning(
-        `You already have a${data.status === "APPROVED" ? "n " : " "}${data.status.toLowerCase()} delete request.`
+        `You already have a${data.status === "APPROVED" ? "n " : " "}${data.status.toLowerCase()} delete request.`,
       );
       return;
     }
@@ -238,7 +239,10 @@ const EditProfilePage = () => {
                   alt="Profile"
                   className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100 cursor-pointer"
                   onClick={() => {
-                    setImageModalSrc(buildMediaUrl(selectedUser?.profileImage) || avatarPlaceholder);
+                    setImageModalSrc(
+                      buildMediaUrl(selectedUser?.profileImage) ||
+                        avatarPlaceholder,
+                    );
                     setImageModalAlt("Profile Image");
                     setImageModalOpen(true);
                   }}
@@ -278,7 +282,10 @@ const EditProfilePage = () => {
                   alt="Business Logo"
                   className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100 cursor-pointer"
                   onClick={() => {
-                    setImageModalSrc(buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder);
+                    setImageModalSrc(
+                      buildMediaUrl(selectedUser?.businessLogo) ||
+                        logoPlaceholder,
+                    );
                     setImageModalAlt("Business Logo");
                     setImageModalOpen(true);
                   }}
@@ -405,12 +412,16 @@ const EditProfilePage = () => {
                 <div className="flex flex-col items-center">
                   <img
                     src={
-                      buildMediaUrl(selectedUser?.idFrontImage) || idFrontPlaceholder
+                      buildMediaUrl(selectedUser?.idFrontImage) ||
+                      idFrontPlaceholder
                     }
                     alt="ID Front"
                     className="w-full max-w-[200px] h-auto rounded-md object-cover bg-gray-100 mb-2 cursor-pointer"
                     onClick={() => {
-                      setImageModalSrc(buildMediaUrl(selectedUser?.idFrontImage) || idFrontPlaceholder);
+                      setImageModalSrc(
+                        buildMediaUrl(selectedUser?.idFrontImage) ||
+                          idFrontPlaceholder,
+                      );
                       setImageModalAlt("ID Front");
                       setImageModalOpen(true);
                     }}
@@ -428,7 +439,10 @@ const EditProfilePage = () => {
                           const f = e.target.files?.[0] ?? null;
                           if (f) {
                             setIdFrontFile(f);
-                            setSelectedUser((p) => ({ ...p, idFrontImage: URL.createObjectURL(f) }));
+                            setSelectedUser((p) => ({
+                              ...p,
+                              idFrontImage: URL.createObjectURL(f),
+                            }));
                           }
                         }}
                       />
@@ -445,12 +459,16 @@ const EditProfilePage = () => {
                 <div className="flex flex-col items-center">
                   <img
                     src={
-                      buildMediaUrl(selectedUser?.idBackImage) || idBackPlaceholder
+                      buildMediaUrl(selectedUser?.idBackImage) ||
+                      idBackPlaceholder
                     }
                     alt="ID Back"
                     className="w-full max-w-[200px] h-auto rounded-md object-cover bg-gray-100 mb-2 cursor-pointer"
                     onClick={() => {
-                      setImageModalSrc(buildMediaUrl(selectedUser?.idBackImage) || idBackPlaceholder);
+                      setImageModalSrc(
+                        buildMediaUrl(selectedUser?.idBackImage) ||
+                          idBackPlaceholder,
+                      );
                       setImageModalAlt("ID Back");
                       setImageModalOpen(true);
                     }}
@@ -468,7 +486,10 @@ const EditProfilePage = () => {
                           const f = e.target.files?.[0] ?? null;
                           if (f) {
                             setIdBackFile(f);
-                            setSelectedUser((p) => ({ ...p, idBackImage: URL.createObjectURL(f) }));
+                            setSelectedUser((p) => ({
+                              ...p,
+                              idBackImage: URL.createObjectURL(f),
+                            }));
                           }
                         }}
                       />
@@ -566,26 +587,48 @@ const EditProfilePage = () => {
                       setIsSaving(true);
                       try {
                         // If files were selected, send multipart/form-data to backend
-                        if (avatarFile || logoFile || idFrontFile || idBackFile) {
+                        if (
+                          avatarFile ||
+                          logoFile ||
+                          idFrontFile ||
+                          idBackFile
+                        ) {
                           const form = new FormData();
                           if (avatarFile) form.append("avatar", avatarFile);
                           if (logoFile) form.append("business_logo", logoFile);
-                          if (idFrontFile) form.append("id_front_page", idFrontFile);
-                          if (idBackFile) form.append("id_back_page", idBackFile);
+                          if (idFrontFile)
+                            form.append("id_front_page", idFrontFile);
+                          if (idBackFile)
+                            form.append("id_back_page", idBackFile);
                           // other fields
                           form.append("name", selectedUser?.name ?? "");
                           form.append("email", selectedUser?.email ?? "");
-                          form.append("phone", selectedUser?.phonePrimary ?? "");
+                          form.append(
+                            "phone",
+                            selectedUser?.phonePrimary ?? "",
+                          );
                           if (selectedUser?.phoneSecondary)
-                            form.append("second_number", selectedUser.phoneSecondary);
+                            form.append(
+                              "second_number",
+                              selectedUser.phoneSecondary,
+                            );
                           if (selectedUser?.nationalId)
                             form.append("id_number", selectedUser.nationalId);
                           if ((selectedUser as any)?.address)
-                            form.append("address", (selectedUser as any).address);
+                            form.append(
+                              "address",
+                              (selectedUser as any).address,
+                            );
                           if (selectedUser?.businessName)
-                            form.append("business_name", selectedUser.businessName);
+                            form.append(
+                              "business_name",
+                              selectedUser.businessName,
+                            );
                           if (selectedUser?.accountName)
-                            form.append("account_name", selectedUser.accountName);
+                            form.append(
+                              "account_name",
+                              selectedUser.accountName,
+                            );
                           if (selectedUser?.accountNumber)
                             form.append(
                               "account_number",
@@ -687,7 +730,6 @@ const EditProfilePage = () => {
 
       {accountDeletionRequested && (
         <div className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center ">
-
           {!deleteConfirmation ? (
             <div className="bg-white flex justify-center items-center flex-col p-10 px-6 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
               <h2 className="text-lg w-[80%] text-center">
@@ -716,7 +758,6 @@ const EditProfilePage = () => {
             </div>
           ) : (
             <div className="bg-white flex justify-center items-center flex-col p-10 lg:px-20 gap-10 rounded-xl lg:w-1/2 max-lg:w-fit min-h-1/2 mx-4">
-
               <h3 className="text-xl font-semibold">
                 Why do you want to delete your account?
               </h3>
@@ -749,8 +790,7 @@ const EditProfilePage = () => {
                 </button>
               </div>
             </div>
-          )
-          }
+          )}
         </div>
       )}
     </div>

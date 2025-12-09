@@ -17,7 +17,14 @@ type ChatInputProps = {
   onAttach?: () => void;
 };
 
-function ChatInput({ value, onValueChange, onKeyDown, onSend, disabled, onAttach }: ChatInputProps) {
+function ChatInput({
+  value,
+  onValueChange,
+  onKeyDown,
+  onSend,
+  disabled,
+  onAttach,
+}: ChatInputProps) {
   return (
     <div className="relative flex gap-2 w-full">
       <input
@@ -36,11 +43,15 @@ function ChatInput({ value, onValueChange, onKeyDown, onSend, disabled, onAttach
         aria-label="Send"
         disabled={disabled}
         style={{ border: "1px solid var(--div-border)" }}
-        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <img src="/send.svg" alt="Send" className="w-6 h-6" />
       </button>
-      <button onClick={() => onAttach?.()} className="absolute bottom-3 left-3" type="button">
+      <button
+        onClick={() => onAttach?.()}
+        className="absolute bottom-3 left-3"
+        type="button"
+      >
         <img src="/image.png" alt="Attach" className="w-5 h-auto" />
       </button>
     </div>
@@ -53,12 +64,22 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [isValidRoom, setIsValidRoom] = useState<boolean | null>(null); // null = unknown/loading
 
   // use the websocket hook (we call connectToRoom after validation)
-  const { messages, sendMessage, addLocalMessage, isRoomConnected, connectToRoom, markAsRead } = useWsChat();
+  const {
+    messages,
+    sendMessage,
+    addLocalMessage,
+    isRoomConnected,
+    connectToRoom,
+    markAsRead,
+  } = useWsChat();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [currentUser, setCurrentUser] = useState<{ id?: number; name?: string } | null>(null);
+  const [currentUser, setCurrentUser] = useState<{
+    id?: number;
+    name?: string;
+  } | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
@@ -172,7 +193,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (!validatedRoomId) return;
     if (!isRoomConnected(validatedRoomId)) return;
     if (readMarkedRef.current[validatedRoomId]) return;
-    console.debug("LiveChat: room connected, marking as read", { room: validatedRoomId });
+    console.debug("LiveChat: room connected, marking as read", {
+      room: validatedRoomId,
+    });
     void markAsRead(String(validatedRoomId));
     readMarkedRef.current[validatedRoomId] = true;
   }, [validatedRoomId, isRoomConnected, markAsRead, messages]);
@@ -184,7 +207,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     console.debug(
       "LiveChat: messages for room",
       validatedRoomId,
-      roomMsgs.map((m) => ({ id: m.id, is_read: (m as unknown as { is_read?: boolean }).is_read, __read_by_me: (m as unknown as { __read_by_me?: boolean }).__read_by_me }))
+      roomMsgs.map((m) => ({
+        id: m.id,
+        is_read: (m as unknown as { is_read?: boolean }).is_read,
+        __read_by_me: (m as unknown as { __read_by_me?: boolean }).__read_by_me,
+      })),
     );
   }, [messages, validatedRoomId]);
 
@@ -219,7 +246,12 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (roomMsgs.length === 0) return;
 
     // Find any incoming messages not authored by current user and not marked read
-    const hasUnread = roomMsgs.some((m) => m.sender?.id !== currentUser.id && !(m as unknown as { is_read?: boolean; read_at?: string }).is_read && !(m as unknown as { is_read?: boolean; read_at?: string }).read_at);
+    const hasUnread = roomMsgs.some(
+      (m) =>
+        m.sender?.id !== currentUser.id &&
+        !(m as unknown as { is_read?: boolean; read_at?: string }).is_read &&
+        !(m as unknown as { is_read?: boolean; read_at?: string }).read_at,
+    );
     if (!hasUnread) return;
 
     // Tell the hook to mark the room as read (hook will optimistically update local state and call backend)
@@ -228,19 +260,31 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   // Debug: show websocket connection status
   useEffect(() => {
-    const connected = validatedRoomId ? isRoomConnected(validatedRoomId) : false;
-    console.log("WebSocket connected:", connected, "validatedRoomId:", validatedRoomId, "isValidRoom:", isValidRoom);
+    const connected = validatedRoomId
+      ? isRoomConnected(validatedRoomId)
+      : false;
+    console.log(
+      "WebSocket connected:",
+      connected,
+      "validatedRoomId:",
+      validatedRoomId,
+      "isValidRoom:",
+      isValidRoom,
+    );
   }, [isRoomConnected, validatedRoomId, isValidRoom, messages]);
-
 
   if (!caseId) return null;
 
   if (isValidRoom === false) {
     return (
       <div className="p-4">
-        <p className="text-sm text-red-600">Chat room not found. Please use an existing chatroom ID.</p>
+        <p className="text-sm text-red-600">
+          Chat room not found. Please use an existing chatroom ID.
+        </p>
         <div className="mt-2">
-          <button onClick={onClose} className="px-3 py-1 border rounded">Close</button>
+          <button onClick={onClose} className="px-3 py-1 border rounded">
+            Close
+          </button>
         </div>
       </div>
     );
@@ -249,11 +293,16 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const handleSend = async () => {
     // Only allow sending to validated, existing rooms
     if (isValidRoom !== true) {
-      console.warn("Refusing to send: room is not validated or unknown", { isValidRoom, caseId });
+      console.warn("Refusing to send: room is not validated or unknown", {
+        isValidRoom,
+        caseId,
+      });
       return;
     }
     if (!validatedRoomId) {
-      console.warn("Refusing to send: missing validatedRoomId", { validatedRoomId });
+      console.warn("Refusing to send: missing validatedRoomId", {
+        validatedRoomId,
+      });
       return;
     }
 
@@ -309,7 +358,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     };
     (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
     (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
-    (optimistic as unknown as Record<string, unknown>).image_url = URL.createObjectURL(file);
+    (optimistic as unknown as Record<string, unknown>).image_url =
+      URL.createObjectURL(file);
     addLocalMessage(String(caseId), optimistic);
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -323,17 +373,16 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
-
-
-
-
   return (
     <div className="flex h-full border-gray-100 ">
       <div className="relative rounded-2xl bg-white px-4 py-3 h-full w-full flex flex-col">
         <button className="absolute right-1 block sm:hidden" onClick={onClose}>
           <img src="/close.svg" alt="" className="p-2" />
         </button>
-        <div ref={containerRef} className="flex-1 p-3 overflow-y-auto space-y-6">
+        <div
+          ref={containerRef}
+          className="flex-1 p-3 overflow-y-auto space-y-6"
+        >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
           {(messages[validatedRoomId ?? ""] || []).map((msg) => {
@@ -342,20 +391,42 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
             // Determine image source from common fields or from content if it's a data URL or an image URL
             const asAny = msg as unknown as Record<string, unknown>;
-            const content = typeof asAny.content === "string" ? String(asAny.content) : "";
-            const explicitImage = (asAny.image_url ?? asAny.file_url ?? asAny.image) as string | undefined | null;
+            const content =
+              typeof asAny.content === "string" ? String(asAny.content) : "";
+            const explicitImage = (asAny.image_url ??
+              asAny.file_url ??
+              asAny.image) as string | undefined | null;
             const isDataUrl = content.startsWith("data:image/");
-            const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-            const maybeImageSrc = explicitImage || (isDataUrl || looksLikeImageUrl ? content : null);
+            const looksLikeImageUrl =
+              /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
+            const maybeImageSrc =
+              explicitImage ||
+              (isDataUrl || looksLikeImageUrl ? content : null);
 
             return (
-              <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
-                <div className={`flex flex-col items-${isMine ? "end" : "start"}`}>
+              <div
+                key={msg.id}
+                className={isMine ? "flex justify-end" : "flex justify-start"}
+              >
+                <div
+                  className={`flex flex-col items-${isMine ? "end" : "start"}`}
+                >
                   <div className="inline-flex items-center  z-20 -mb-2 gap-2">
-                    {!isMine && <img src="/face.svg" alt="User" className="w-8 h-8 rounded-full" />}
-                    <p className="text-sm inline">{msg.sender?.name ?? (isMine ? currentUser?.name ?? "Me" : "User")}</p>
+                    {!isMine && (
+                      <img
+                        src="/face.svg"
+                        alt="User"
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
+                    <p className="text-sm inline">
+                      {msg.sender?.name ??
+                        (isMine ? (currentUser?.name ?? "Me") : "User")}
+                    </p>
                   </div>
-                  <div className={`border border-gray-200 p-3 rounded-xl max-w-[70%] wrap-break-word ${isMine ? "bg-green-100 rounded-tr-none text-black" : "rounded-tl-none"}`}>
+                  <div
+                    className={`border border-gray-200 p-3 rounded-xl max-w-[70%] wrap-break-word ${isMine ? "bg-green-100 rounded-tr-none text-black" : "rounded-tl-none"}`}
+                  >
                     {maybeImageSrc ? (
                       <div className="flex flex-col">
                         <img
@@ -365,12 +436,30 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                           onClick={() => openImage(String(maybeImageSrc))}
                           role="button"
                         />
-                        <div className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}>
+                        <div
+                          className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}
+                        >
                           <span className="inline-flex items-center gap-1">
-                            <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
+                            <span>
+                              {formatTime(
+                                (msg as unknown as { created_at?: string })
+                                  .created_at ?? null,
+                              )}
+                            </span>
                             {isMine && delivery && (
-                              <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                              <svg
+                                className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M20 6L9 17l-5-5"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                             )}
                           </span>
@@ -379,12 +468,30 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                     ) : (
                       <div>
                         <p className="text-sm">{msg.content}</p>
-                        <div className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}>
+                        <div
+                          className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}
+                        >
                           <span className="inline-flex items-center gap-1">
-                            <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
+                            <span>
+                              {formatTime(
+                                (msg as unknown as { created_at?: string })
+                                  .created_at ?? null,
+                              )}
+                            </span>
                             {isMine && delivery && (
-                              <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                              <svg
+                                className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M20 6L9 17l-5-5"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
                               </svg>
                             )}
                           </span>
@@ -396,10 +503,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               </div>
             );
           })}
-
         </div>
         <div className="flex items-center gap-2">
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={() => void handleFileChange()} />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={() => void handleFileChange()}
+          />
           <ChatInput
             value={input}
             onValueChange={(v) => setInput(v)}
@@ -423,8 +535,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             role="dialog"
             aria-modal="true"
           >
-            <div className="max-w-[90%] max-h-[90%]" onClick={(e) => e.stopPropagation()}>
-              <img src={lightboxSrc} alt="preview" className="w-full h-full object-contain rounded" />
+            <div
+              className="max-w-[90%] max-h-[90%]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={lightboxSrc}
+                alt="preview"
+                className="w-full h-full object-contain rounded"
+              />
             </div>
             <button
               onClick={closeLightbox}

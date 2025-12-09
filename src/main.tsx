@@ -4,7 +4,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
-import Toaster from './components/Toaster';
+import Toaster from "./components/Toaster";
 import "./index.css";
 import { queryClient } from "./queryClient";
 import { OnlineStatusProvider } from "./context/ConnectivityStatusContext.tsx";
@@ -14,11 +14,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <OnlineStatusProvider>
-      <BrowserRouter>
-        <App />
-        <Toaster />
-        <OfflineModal />
-      </BrowserRouter>
+        <BrowserRouter>
+          <App />
+          <Toaster />
+          <OfflineModal />
+        </BrowserRouter>
       </OnlineStatusProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

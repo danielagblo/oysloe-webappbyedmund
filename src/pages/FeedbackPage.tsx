@@ -10,7 +10,6 @@ const FeedbackPage = () => {
   const [noRating, setNoRating] = useState(false);
   const [noReviewMessage, setNoReviewMessage] = useState(false);
 
-
   useFeedbacks();
   const create = useCreateFeedback();
 
@@ -43,7 +42,6 @@ const FeedbackPage = () => {
     }
   };
 
-
   return (
     <div className="flex justify-between h-screen w-screen items-center gap-2 lg:overflow-hidden">
       <div className="flex flex-col lg:flex-row w-full md:py-3 h-full  justify-start gap-4 max-sm:overflow-y-hidden">
@@ -53,7 +51,9 @@ const FeedbackPage = () => {
               <h2 className="text-2xl lg:text-[2.5vw] fontsize-20 text-gray-700 max-sm:font-medium max-sm:pt-15">
                 Feedback
               </h2>
-              <p className="text-gray-500 text-xl lg:text-[1.2vw]">Help us improve on our app</p>
+              <p className="text-gray-500 text-xl lg:text-[1.2vw]">
+                Help us improve on our app
+              </p>
 
               <div className="my-4 text-5xl lg:text-[4.5vw]">
                 {Array.from({ length: 5 }).map((_, i) => {
@@ -91,8 +91,14 @@ const FeedbackPage = () => {
           </button>
 
           {noRating && <p className="text-red-600">Please choose a rating.</p>}
-          {noReviewMessage && <p className="text-red-600">Please enter a review message.</p>}
-          {sent && <p className="text-green-600">Thank you. Your feedback has been sent!</p>}
+          {noReviewMessage && (
+            <p className="text-red-600">Please enter a review message.</p>
+          )}
+          {sent && (
+            <p className="text-green-600">
+              Thank you. Your feedback has been sent!
+            </p>
+          )}
         </div>
       </div>
     </div>

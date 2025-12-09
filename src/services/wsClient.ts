@@ -22,13 +22,17 @@ export class WebSocketClient {
   connect() {
     // Browser WebSocket cannot set custom headers; use query param for token
     const sep = this.url.includes("?") ? "&" : "?";
-    const urlWithToken = this.token ? `${this.url}${sep}token=${encodeURIComponent(this.token)}` : this.url;
+    const urlWithToken = this.token
+      ? `${this.url}${sep}token=${encodeURIComponent(this.token)}`
+      : this.url;
 
     console.log("WebSocketClient.connect: opening", { urlWithToken });
     try {
       this.ws = new WebSocket(urlWithToken);
     } catch (err) {
-      console.warn("WebSocketClient.connect: constructor threw", err, { urlWithToken });
+      console.warn("WebSocketClient.connect: constructor threw", err, {
+        urlWithToken,
+      });
       throw err;
     }
 
@@ -37,7 +41,11 @@ export class WebSocketClient {
       this.handlers.onOpen?.(ev);
     };
     this.ws.onclose = (ev) => {
-      console.log("WebSocketClient.onclose", { code: ev?.code, reason: ev?.reason, urlWithToken });
+      console.log("WebSocketClient.onclose", {
+        code: ev?.code,
+        reason: ev?.reason,
+        urlWithToken,
+      });
       this.handlers.onClose?.(ev);
       if (this.shouldReconnect) {
         setTimeout(() => this.connect(), this.reconnectInterval);

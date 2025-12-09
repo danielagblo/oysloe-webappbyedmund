@@ -33,7 +33,7 @@ const AdsPage = () => {
     if (p.is_taken) return "Taken";
     if (p.status === "ACTIVE") return "Active";
     if (p.status === "PENDING") return "Pending";
-    if (p.status === "SUSPENDED") return "Suspended"
+    if (p.status === "SUSPENDED") return "Suspended";
     return "Other";
   };
 
@@ -44,14 +44,15 @@ const AdsPage = () => {
       <div className="w-full flex flex-col h-full lg:max-h-[97vh] items-center gap-2 relative lg:overflow-auto no-scrollbar">
         <div className="md:bg-white w-full mt-3 px-4 pt-4 rounded-2xl">
           <div className="hidden sm:flex justify-around items-center px-4 max-sm:pb-2">
-            {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
+            {["Active", "Pending", "Taken", "Suspended"].map((status) => (
               <div
                 key={status}
                 onClick={() => setActiveTab(status)}
                 className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors 
-                  ${activeTab === status
-                    ? "border-(--dark-def)"
-                    : "border-transparent hover:border-gray-300"
+                  ${
+                    activeTab === status
+                      ? "border-(--dark-def)"
+                      : "border-transparent hover:border-gray-300"
                   }`}
               >
                 <img
@@ -60,7 +61,10 @@ const AdsPage = () => {
                   className="w-10 h-auto hidden md:block bg-[#f3f4f6] rounded-full p-2.5"
                 />
                 <div>
-                  <h2>{products.filter((ad) => mapToLabel(ad) === status).length} Ads</h2>
+                  <h2>
+                    {products.filter((ad) => mapToLabel(ad) === status).length}{" "}
+                    Ads
+                  </h2>
                   <p className="text-xs">{status}</p>
                 </div>
               </div>
@@ -74,16 +78,18 @@ const AdsPage = () => {
                 onChange={(e) => setActiveTab(e.target.value)}
                 className="w-3/4 border border-gray-400 rounded-xl p-2 px-3 text-sm focus:outline-none focus:ring-transparent"
               >
-                {['Active', 'Pending', 'Taken', 'Suspended'].map((status) => (
+                {["Active", "Pending", "Taken", "Suspended"].map((status) => (
                   <option key={status} value={status}>
-                    {status} ({products.filter((ad) => mapToLabel(ad) === status).length})
+                    {status} (
+                    {products.filter((ad) => mapToLabel(ad) === status).length})
                   </option>
                 ))}
               </select>
 
               <div className="w-full text-center my-2">
                 <h2 className="text-lg font-semibold">
-                  {products.filter((ad) => mapToLabel(ad) === activeTab).length} Ads
+                  {products.filter((ad) => mapToLabel(ad) === activeTab).length}{" "}
+                  Ads
                 </h2>
                 <p className="text-sm text-gray-500">{activeTab}</p>
               </div>
@@ -92,16 +98,19 @@ const AdsPage = () => {
         </div>
 
         <div className="mt-27 sm:mt-0 w-full grid grid-cols-2 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2">
-          {filteredAds.length < 1
-            ? <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
+          {filteredAds.length < 1 ? (
+            <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
               <img
                 src="/nothing-to-show.png"
                 alt="Nothing to show here"
                 className="h-40 lg:h-50 w-auto"
               />
-              <p className="text-xl text-(--dark-def)">No {activeTab} ads to show.</p>
+              <p className="text-xl text-(--dark-def)">
+                No {activeTab} ads to show.
+              </p>
             </div>
-            : filteredAds.map((ad) => (
+          ) : (
+            filteredAds.map((ad) => (
               <div
                 key={ad.id}
                 className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
@@ -109,7 +118,12 @@ const AdsPage = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <img
                     className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
-                    src={ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src || "/no-image.jpeg"}
+                    src={
+                      ad.image ||
+                      (ad.images?.[0] as any)?.url ||
+                      (ad.images?.[0] as any)?.src ||
+                      "/no-image.jpeg"
+                    }
                     alt={ad.name}
                   />
                   <button
@@ -121,15 +135,21 @@ const AdsPage = () => {
                 </div>
                 <div className="mt-2">
                   <div className="w-4/5">
-                    <p onClick={() => console.log(ad)} className="font-medium truncate">{ad.name}</p>
+                    <p
+                      onClick={() => console.log(ad)}
+                      className="font-medium truncate"
+                    >
+                      {ad.name}
+                    </p>
                   </div>
                   <p className="text-xs text-gray-600">
                     {formatMoney(ad.price)}
-                    {ad.type?.toUpperCase() === 'RENT' && ' per month'}
+                    {ad.type?.toUpperCase() === "RENT" && " per month"}
                   </p>
                 </div>
               </div>
-            ))}
+            ))
+          )}
           <div className="h-20 w-full" />
         </div>
 
@@ -148,11 +168,12 @@ const AdsPage = () => {
                 <p className="text-sm text-gray-600">Price shown to users:</p>
                 <p className="text-lg font-semibold text-gray-800">
                   {formatMoney(selectedAd.price)}
-                  {selectedAd.type?.toUpperCase() === 'RENT' && ' per month'}
+                  {selectedAd.type?.toUpperCase() === "RENT" && " per month"}
                 </p>
               </div>
 
-              {mapToLabel(selectedAd) === "Suspended" || mapToLabel(selectedAd) === "Other" ? (
+              {mapToLabel(selectedAd) === "Suspended" ||
+              mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
                     <button
@@ -174,7 +195,8 @@ const AdsPage = () => {
                           toast.success("Ad deleted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -246,7 +268,8 @@ const AdsPage = () => {
                           toast.success("Ad deleted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -262,11 +285,14 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40"
                       onClick={async () => {
                         try {
-                          await confirmMarkTakenMutation.mutateAsync({ id: selectedAd.id });
+                          await confirmMarkTakenMutation.mutateAsync({
+                            id: selectedAd.id,
+                          });
                           toast.success("Marked as taken");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -291,7 +317,8 @@ const AdsPage = () => {
                           toast.success("Ad deleted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -312,21 +339,33 @@ const AdsPage = () => {
                             pid: selectedAd.pid ?? `ad_${Date.now()}`,
                             name: selectedAd.name ?? "",
                             image:
-                              selectedAd.image || (selectedAd.images?.[0] as any)?.url || (selectedAd.images?.[0] as any)?.src || "",
+                              selectedAd.image ||
+                              (selectedAd.images?.[0] as any)?.url ||
+                              (selectedAd.images?.[0] as any)?.src ||
+                              "",
                             type: selectedAd.type ?? "SALE",
                             status: selectedAd.status ?? "ACTIVE",
                             is_taken: selectedAd.is_taken ?? true,
-                            description: selectedAd.description ?? selectedAd.desc ?? "",
+                            description:
+                              selectedAd.description ?? selectedAd.desc ?? "",
                             price: String(selectedAd.price ?? ""),
                             duration: selectedAd.duration ?? "",
-                            category: Number(selectedAd.category ?? selectedAd.category_id ?? 0),
+                            category: Number(
+                              selectedAd.category ??
+                                selectedAd.category_id ??
+                                0,
+                            ),
                           };
 
-                          await repostMutation.mutateAsync({ id: selectedAd.id, body: payload });
+                          await repostMutation.mutateAsync({
+                            id: selectedAd.id,
+                            body: payload,
+                          });
                           toast.success("Ad reposted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -351,7 +390,8 @@ const AdsPage = () => {
                           toast.success("Ad deleted");
                           setSelectedAd(null);
                         } catch (err: unknown) {
-                          const msg = err instanceof Error ? err.message : String(err);
+                          const msg =
+                            err instanceof Error ? err.message : String(err);
                           toast.error(msg);
                         }
                       }}
@@ -369,13 +409,23 @@ const AdsPage = () => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="relative max-lg:w-screen max-lg:h-screen max-lg:bg-white lg:bg-transparent rounded-xl w-[90%] max-sm:w-screen lg:max-w-[85vw] lg:h-fit overflow-auto no-scrollbar">
             <button
-              onClick={() => { setShowEditModal(false); setEditingAdId(null); }}
+              onClick={() => {
+                setShowEditModal(false);
+                setEditingAdId(null);
+              }}
               className="fixed top-0 right-3 text-6xl text-white max-sm:text-(--dark-def) z-200 rotate-45"
             >
               +
             </button>
             {/* <p className="sticky top-0 right-2 bg-white font-semibold pl-8 pt-4 -mb-6 pb-2">Edit Ad</p> */}
-            <PostAdForm editId={editingAdId ?? null} onClose={() => { setShowEditModal(false); setEditingAdId(null); }} embedded />
+            <PostAdForm
+              editId={editingAdId ?? null}
+              onClose={() => {
+                setShowEditModal(false);
+                setEditingAdId(null);
+              }}
+              embedded
+            />
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import "../App.css";
 import Button from "../components/Button";
 import CopyButton from "../components/CopyButton";
@@ -50,7 +50,9 @@ const ReferPage = () => {
 
   // normalize level string
   const profileLevelTyped = (profile?.level || "") as Level | "";
-  const profileLevel = String(profileLevelTyped || "").trim().toLowerCase();
+  const profileLevel = String(profileLevelTyped || "")
+    .trim()
+    .toLowerCase();
 
   // compute percent progress and the follow-up text
   let displayPercent = 0;
@@ -99,7 +101,7 @@ const ReferPage = () => {
   let goldPercent = Math.round(
     ((points - THRESHOLDS.gold) /
       Math.max(1, THRESHOLDS.diamond - THRESHOLDS.gold)) *
-    100,
+      100,
   );
   if (!isFinite(goldPercent) || goldPercent < 0) goldPercent = 0;
   if (goldPercent > 100) goldPercent = 100;
@@ -352,10 +354,10 @@ const ReferPage = () => {
       try {
         await redeem();
         // refresh profile so UI updates; call refetchProfile if available
-        if (typeof refetchProfile === 'function') await refetchProfile();
+        if (typeof refetchProfile === "function") await refetchProfile();
         toast.success(`Redeemed GH₵${redeemableGhc.toLocaleString()}`);
       } catch {
-        toast.error('Redeem failed. Please try again.');
+        toast.error("Redeem failed. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -395,10 +397,10 @@ const ReferPage = () => {
       if (!code) return;
       try {
         await apply(code);
-        toast.success('Coupon applied successfully');
+        toast.success("Coupon applied successfully");
         setCode("");
       } catch {
-        toast.error('Failed to apply coupon');
+        toast.error("Failed to apply coupon");
       }
     };
 

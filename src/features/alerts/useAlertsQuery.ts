@@ -32,8 +32,10 @@ export function useAlertsQuery() {
       if (previousAlerts) {
         queryClient.setQueryData(["alerts"], (old: Alert[]) =>
           old.map((alert) =>
-            alert.id === alertId ? { ...alert, is_read: !alert.is_read } : alert
-          )
+            alert.id === alertId
+              ? { ...alert, is_read: !alert.is_read }
+              : alert,
+          ),
         );
       }
 
@@ -42,7 +44,7 @@ export function useAlertsQuery() {
     onError: (
       _err,
       _alertId,
-      context: { previousAlerts?: Alert[] } | undefined
+      context: { previousAlerts?: Alert[] } | undefined,
     ) => {
       if (context?.previousAlerts) {
         queryClient.setQueryData(["alerts"], context.previousAlerts);
@@ -65,7 +67,7 @@ export function useAlertsQuery() {
 
       if (previousAlerts) {
         queryClient.setQueryData(["alerts"], (old: Alert[]) =>
-          old.filter((alert) => alert.id !== alertId)
+          old.filter((alert) => alert.id !== alertId),
         );
       }
 
@@ -74,7 +76,7 @@ export function useAlertsQuery() {
     onError: (
       _err,
       _alertId,
-      context: { previousAlerts?: Alert[] } | undefined
+      context: { previousAlerts?: Alert[] } | undefined,
     ) => {
       if (context?.previousAlerts) {
         queryClient.setQueryData(["alerts"], context.previousAlerts);
@@ -97,7 +99,7 @@ export function useAlertsQuery() {
 
       if (previousAlerts) {
         queryClient.setQueryData(["alerts"], (old: Alert[]) =>
-          old.map((alert) => ({ ...alert, is_read: true }))
+          old.map((alert) => ({ ...alert, is_read: true })),
         );
       }
 
@@ -106,7 +108,7 @@ export function useAlertsQuery() {
     onError: (
       _err,
       _variables,
-      context: { previousAlerts?: Alert[] } | undefined
+      context: { previousAlerts?: Alert[] } | undefined,
     ) => {
       if (context?.previousAlerts) {
         queryClient.setQueryData(["alerts"], context.previousAlerts);
@@ -122,7 +124,7 @@ export function useAlertsQuery() {
   const deleteAllMutation = useMutation({
     mutationFn: async () => {
       await Promise.all(
-        alerts.map((alert) => apiClient.delete(`/alerts/${alert.id}/delete/`))
+        alerts.map((alert) => apiClient.delete(`/alerts/${alert.id}/delete/`)),
       );
     },
     onMutate: async () => {
@@ -138,7 +140,7 @@ export function useAlertsQuery() {
     onError: (
       _err,
       _variables,
-      context: { previousAlerts?: Alert[] } | undefined
+      context: { previousAlerts?: Alert[] } | undefined,
     ) => {
       if (context?.previousAlerts) {
         queryClient.setQueryData(["alerts"], context.previousAlerts);

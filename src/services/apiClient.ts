@@ -23,7 +23,9 @@ async function request<T>(
   const maybeBody = options.body as any;
   const isFormData =
     (typeof FormData !== "undefined" && options.body instanceof FormData) ||
-    (maybeBody && typeof maybeBody.append === "function" && typeof maybeBody.get === "function");
+    (maybeBody &&
+      typeof maybeBody.append === "function" &&
+      typeof maybeBody.get === "function");
   const headers = { ...(options.headers ?? {}) } as Record<string, string>;
   if (!isFormData) headers["Content-Type"] = "application/json";
 
@@ -91,7 +93,9 @@ async function request<T>(
         else if (typeof parsed.error === "string") friendly = parsed.error;
         else if (Array.isArray((parsed as any).errors)) {
           const errs = (parsed as any).errors;
-          friendly = errs.map((e: any) => (typeof e === "string" ? e : JSON.stringify(e))).join("; ");
+          friendly = errs
+            .map((e: any) => (typeof e === "string" ? e : JSON.stringify(e)))
+            .join("; ");
         } else {
           // fallback: if object contains simple string values, join them
           const parts: string[] = [];

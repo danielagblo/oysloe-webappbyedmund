@@ -91,15 +91,24 @@ export default function SupportAndCases({
     }, []);
 
     if (!rooms) return <p className="text-sm text-gray-500">Loading chats…</p>;
-    if (rooms.length === 0) return <p className="text-sm text-gray-500">No recent chats</p>;
+    if (rooms.length === 0)
+      return <p className="text-sm text-gray-500">No recent chats</p>;
 
     return (
       <div className="flex flex-col gap-2 mb-3">
         {rooms.map((r) => {
-          const lastMessage = r.messages && r.messages.length ? r.messages[r.messages.length - 1] : null;
-          const lastContent = lastMessage && typeof (lastMessage as any).content === "string" ? String((lastMessage as any).content) : "";
+          const lastMessage =
+            r.messages && r.messages.length
+              ? r.messages[r.messages.length - 1]
+              : null;
+          const lastContent =
+            lastMessage && typeof (lastMessage as any).content === "string"
+              ? String((lastMessage as any).content)
+              : "";
           // If the last message content is a data URL (base64 image), show a friendly label instead
-          const previewText = lastContent.startsWith("data:") ? "picture" : lastContent;
+          const previewText = lastContent.startsWith("data:")
+            ? "picture"
+            : lastContent;
 
           return (
             <button
@@ -117,7 +126,11 @@ export default function SupportAndCases({
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">{r.name}</p>
-                  <span className="text-xs text-gray-400">{r.messages?.length ? `${Math.max(0, r.messages!.length - 1)}m` : ""}</span>
+                  <span className="text-xs text-gray-400">
+                    {r.messages?.length
+                      ? `${Math.max(0, r.messages!.length - 1)}m`
+                      : ""}
+                  </span>
                 </div>
                 <p className="text-xs text-gray-500 truncate">{previewText}</p>
               </div>

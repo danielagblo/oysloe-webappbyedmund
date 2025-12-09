@@ -17,7 +17,9 @@ export const getAlerts = async (params?: {
   if (params?.search) qs.append("search", params.search);
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  const result = await apiClient.get<Alert[]>(`${endpoints.alerts.list()}${query}`);
+  const result = await apiClient.get<Alert[]>(
+    `${endpoints.alerts.list()}${query}`,
+  );
   return result || [];
 };
 

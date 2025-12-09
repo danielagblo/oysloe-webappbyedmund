@@ -131,29 +131,31 @@ export default function DropdownPopup({
               <div className="flex flex-col max-h-[60vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
                 {Array.isArray(options)
                   ? options.map((opt, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleMainSelect(opt)}
-                      className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== options.length - 1
-                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                        : ""
+                      <button
+                        key={i}
+                        onClick={() => handleMainSelect(opt)}
+                        className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
+                          i !== options.length - 1
+                            ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                            : ""
                         }`}
-                    >
-                      {opt}
-                    </button>
-                  ))
+                      >
+                        {opt}
+                      </button>
+                    ))
                   : Object.keys(options).map((main, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleMainSelect(main)}
-                      className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== Object.keys(options).length - 1
-                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                        : ""
+                      <button
+                        key={i}
+                        onClick={() => handleMainSelect(main)}
+                        className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
+                          i !== Object.keys(options).length - 1
+                            ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                            : ""
                         }`}
-                    >
-                      {main}
-                    </button>
-                  ))}
+                      >
+                        {main}
+                      </button>
+                    ))}
               </div>
             </div>
           )}
@@ -205,10 +207,11 @@ export default function DropdownPopup({
                   <button
                     key={i}
                     onClick={() => handleSubSelect(opt)}
-                    className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${i !== submenuOptions.length - 1
-                      ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                      : ""
-                      }`}
+                    className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
+                      i !== submenuOptions.length - 1
+                        ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                        : ""
+                    }`}
                   >
                     {opt}
                   </button>

@@ -15,7 +15,8 @@ export const getFeatures = async (params?: {
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
   const resp = await apiClient.get<any>(`${endpoints.features.list()}${query}`);
-  if (!Array.isArray(resp) && resp && Array.isArray(resp.results)) return resp.results as Feature[];
+  if (!Array.isArray(resp) && resp && Array.isArray(resp.results))
+    return resp.results as Feature[];
   return (resp as Feature[]) || [];
 };
 
@@ -50,11 +51,15 @@ export const getPossibleFeatureValues = async (params?: {
   subcategory?: number;
 }): Promise<Record<number, string[]>> => {
   const qs = new URLSearchParams();
-  if (typeof params?.feature === "number") qs.append("feature", String(params.feature));
-  if (typeof params?.subcategory === "number") qs.append("subcategory", String(params.subcategory));
+  if (typeof params?.feature === "number")
+    qs.append("feature", String(params.feature));
+  if (typeof params?.subcategory === "number")
+    qs.append("subcategory", String(params.subcategory));
 
   const query = qs.toString() ? `?${qs.toString()}` : "";
-  return apiClient.get<Record<number, string[]>>(`${endpoints.possibleFeatureValues.list()}${query}`);
+  return apiClient.get<Record<number, string[]>>(
+    `${endpoints.possibleFeatureValues.list()}${query}`,
+  );
 };
 
 export default {
