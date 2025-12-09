@@ -1124,41 +1124,42 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
               </div>
             )}
 
-            {showSuccess && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
-                  <div className="w-48 h-48 flex items-center justify-center">
-                    <img src={submittedGif} alt="Submitted" />
-                  </div>
 
-                  <h2 className="text-2xl font-semibold mt-4 text-[var(--dark-def)]">
-                    Submitted!
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-8">
-                    Your ad has been posted successfully.
-                  </p>
-
-                  <div className="flex gap-3 w-full">
-                    <button
-                      onClick={() => {
-                        setShowSuccess(false);
-                        resetForm();
-                      }}
-                      className="w-full py-3 rounded-xl bg-[var(--dark-def)] text-white hover:bg-[var(--div-active)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] active:scale-98 transition"
-                    >
-                      Post New
-                    </button>
-                    <button
-                      onClick={() => setShowSuccess(false)}
-                      className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
-                    >
-                      Close
-                    </button>
-                  </div>
-                </div>
+          </div>
+        )}
+        
+        {showSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
+              <div className="w-48 h-48 flex items-center justify-center">
+                <img src={submittedGif} alt="Submitted" />
               </div>
-            )}
 
+              <h2 className="text-2xl font-semibold mt-4 text-[var(--dark-def)]">
+                Submitted!
+              </h2>
+              <p className="text-sm text-gray-500 mb-8">
+                Your ad has been posted successfully.
+              </p>
+
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => {
+                    setShowSuccess(false);
+                    resetForm();
+                  }}
+                  className="w-full py-3 rounded-xl bg-[var(--dark-def)] text-white hover:bg-[var(--div-active)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] active:scale-98 transition"
+                >
+                  Post New
+                </button>
+                <button
+                  onClick={() => setShowSuccess(false)}
+                  className="w-full border border-gray-300 py-3 rounded-xl font-medium hover:bg-gray-100 transition"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         )}
         {showSaveModal && (
