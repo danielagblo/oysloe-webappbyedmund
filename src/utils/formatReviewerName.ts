@@ -5,7 +5,10 @@
  * @param maxLength - Maximum length before truncation (default: 20)
  * @returns Formatted name like "John D." or "Jane Smith" if single name
  */
-export function formatReviewerName(fullName: string | undefined, maxLength: number = 20): string {
+export function formatReviewerName(
+  fullName: string | undefined,
+  maxLength: number = 20,
+): string {
   if (!fullName || !fullName.trim()) {
     return "User";
   }
@@ -15,7 +18,9 @@ export function formatReviewerName(fullName: string | undefined, maxLength: numb
 
   if (parts.length === 1) {
     // Single name - just truncate if needed
-    return trimmed.length > maxLength ? trimmed.substring(0, maxLength - 1) + "." : trimmed;
+    return trimmed.length > maxLength
+      ? trimmed.substring(0, maxLength - 1) + "."
+      : trimmed;
   }
 
   // Multiple names - first name + last initial
@@ -24,5 +29,7 @@ export function formatReviewerName(fullName: string | undefined, maxLength: numb
   const formatted = `${firstName} ${lastName.charAt(0).toUpperCase()}.`;
 
   // Truncate if the formatted result is too long
-  return formatted.length > maxLength ? formatted.substring(0, maxLength - 1) + "." : formatted;
+  return formatted.length > maxLength
+    ? formatted.substring(0, maxLength - 1) + "."
+    : formatted;
 }

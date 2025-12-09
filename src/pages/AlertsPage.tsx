@@ -24,7 +24,13 @@ type AlertRowProps = {
   onDelete: () => void;
 };
 
-const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: AlertRowProps) => {
+const AlertRow = ({
+  alert,
+  onDragStart,
+  onDragEnd,
+  onMarkRead,
+  onDelete,
+}: AlertRowProps) => {
   const [dragOffset, setDragOffset] = useState(0);
   const [showActions, setShowActions] = useState(false);
 
@@ -100,7 +106,7 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
     setShowActions(false);
     setDragOffset(0);
   };
-  
+
   return (
     <div className="relative rounded-lg overflow-hidden group">
       {/* Action buttons - Always in DOM but behind content */}
@@ -110,10 +116,11 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
             onClick={handleMarkRead}
             disabled={!showActions}
             title="Mark as read"
-            className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${showActions
-              ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
-              : "bg-blue-300 cursor-not-allowed"
-              }`}
+            className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${
+              showActions
+                ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                : "bg-blue-300 cursor-not-allowed"
+            }`}
           >
             <Mail size={20} className="text-white" />
           </button>
@@ -122,10 +129,11 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
           onClick={handleDelete}
           disabled={!showActions}
           title="Delete alert"
-          className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${showActions
-            ? "bg-red-500 hover:bg-red-600 cursor-pointer"
-            : "bg-red-300 cursor-not-allowed"
-            }`}
+          className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${
+            showActions
+              ? "bg-red-500 hover:bg-red-600 cursor-pointer"
+              : "bg-red-300 cursor-not-allowed"
+          }`}
         >
           <Trash2 size={20} className="text-white" />
         </button>
@@ -135,8 +143,9 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
       <div
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className={`flex items-start gap-3 w-full relative bg-white p-3 transition-all ${showActions ? "cursor-default" : "cursor-grab active:cursor-grabbing"
-          } hover:bg-gray-50`}
+        className={`flex items-start gap-3 w-full relative bg-white p-3 transition-all ${
+          showActions ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+        } hover:bg-gray-50`}
         style={{
           transform: `translateX(-${dragOffset}px)`,
           zIndex: 10,
@@ -147,7 +156,9 @@ const AlertRow = ({ alert, onDragStart, onDragEnd, onMarkRead, onDelete }: Alert
           alt="alert source"
           className="w-10 h-10 object-cover rounded-full shrink-0"
         />
-        <div className={`flex flex-col flex-1 ${alert.is_read ? "opacity-50" : ""}`}>
+        <div
+          className={`flex flex-col flex-1 ${alert.is_read ? "opacity-50" : ""}`}
+        >
           <span className="text-xs text-gray-400">
             {timeAgo(alert.created_at)}
           </span>
@@ -169,7 +180,10 @@ interface AlertsPanelProps {
   setShowMobileMenu: (show: boolean) => void;
 }
 
-const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) => {
+const AlertsPanel = ({
+  showMobileMenu,
+  setShowMobileMenu,
+}: AlertsPanelProps) => {
   const {
     alerts,
     loading,
@@ -214,7 +228,11 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
 
     alertsList.forEach((alert) => {
       const alertDate = new Date(alert.created_at);
-      const alertDay = new Date(alertDate.getFullYear(), alertDate.getMonth(), alertDate.getDate());
+      const alertDay = new Date(
+        alertDate.getFullYear(),
+        alertDate.getMonth(),
+        alertDate.getDate(),
+      );
 
       if (alertDay.getTime() === today.getTime()) {
         groups.today.push(alert);
@@ -249,7 +267,11 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 onClick={() => setShowMenu(!showMenu)}
                 className="p-2 hover:bg-gray-100 rounded-full transition"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                 </svg>
               </button>
@@ -314,7 +336,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 {/* Today */}
                 {groupedAlerts.today.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Today</h3>
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                      Today
+                    </h3>
                     <div className="space-y-2">
                       {groupedAlerts.today.map((alert) => (
                         <AlertRow
@@ -334,7 +358,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 {/* Yesterday */}
                 {groupedAlerts.yesterday.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Yesterday</h3>
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                      Yesterday
+                    </h3>
                     <div className="space-y-2">
                       {groupedAlerts.yesterday.map((alert) => (
                         <AlertRow
@@ -354,7 +380,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 {/* This week */}
                 {groupedAlerts.thisWeek.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">This week</h3>
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                      This week
+                    </h3>
                     <div className="space-y-2">
                       {groupedAlerts.thisWeek.map((alert) => (
                         <AlertRow
@@ -374,7 +402,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 {/* Older */}
                 {groupedAlerts.older.length > 0 && (
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Older</h3>
+                    <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                      Older
+                    </h3>
                     <div className="space-y-2">
                       {groupedAlerts.older.map((alert) => (
                         <AlertRow
@@ -397,7 +427,6 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
 
         {/* Mobile alerts */}
         <div className="flex lg:hidden flex-col w-screen md:w-screen p-4 bg-white h-[87vh] overflow-y-auto no-scrollbar relative">
-
           {loading ? (
             <div className="flex flex-col gap-2 p-2 w-screen justify-center items-center">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -406,7 +435,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                   className="flex items-center gap-3 p-2 h-15 rounded-lg bg-gray-100 w-full animate-pulse"
                 >
                   <div className="w-8 h-8 rounded-full bg-gray-300 shrink-0" />
-                  <span className="font-semibold text-gray-600 text-sm h-full mt-7">Loading...</span>
+                  <span className="font-semibold text-gray-600 text-sm h-full mt-7">
+                    Loading...
+                  </span>
                 </div>
               ))}
             </div>
@@ -425,7 +456,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
               {/* Today */}
               {groupedAlerts.today.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Today</h3>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                    Today
+                  </h3>
                   <div className="space-y-2">
                     {groupedAlerts.today.map((alert) => (
                       <AlertRow
@@ -445,7 +478,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
               {/* Yesterday */}
               {groupedAlerts.yesterday.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Yesterday</h3>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                    Yesterday
+                  </h3>
                   <div className="space-y-2">
                     {groupedAlerts.yesterday.map((alert) => (
                       <AlertRow
@@ -465,7 +500,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
               {/* This week */}
               {groupedAlerts.thisWeek.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">This week</h3>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                    This week
+                  </h3>
                   <div className="space-y-2">
                     {groupedAlerts.thisWeek.map((alert) => (
                       <AlertRow
@@ -485,7 +522,9 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
               {/* Older */}
               {groupedAlerts.older.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">Older</h3>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-3 text-center">
+                    Older
+                  </h3>
                   <div className="space-y-2">
                     {groupedAlerts.older.map((alert) => (
                       <AlertRow
@@ -522,8 +561,18 @@ const AlertsPanel = ({ showMobileMenu, setShowMobileMenu }: AlertsPanelProps) =>
                 onClick={() => setShowMobileMenu(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>

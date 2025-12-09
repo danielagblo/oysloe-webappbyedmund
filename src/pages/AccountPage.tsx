@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 import EditProfilePage from "./EditProfilePage";
 

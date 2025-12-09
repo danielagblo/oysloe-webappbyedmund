@@ -117,7 +117,10 @@ export const confirmMarkProductAsTaken = async (
     const idx = mockProducts.findIndex((p) => p.id === +id);
     if (idx === -1) throw new Error("Mock product not found");
     mockProducts[idx].is_taken = true;
-    console.log("Mock confirmMarkProductAsTaken (marked taken):", mockProducts[idx]);
+    console.log(
+      "Mock confirmMarkProductAsTaken (marked taken):",
+      mockProducts[idx],
+    );
     return mockProducts[idx];
   }
 
@@ -138,7 +141,8 @@ export const repostProduct = async (
     const idx = mockProducts.findIndex((p) => p.id === +id);
     if (idx === -1) throw new Error("Mock product not found");
     const original = mockProducts[idx];
-    if (!original.is_taken) throw new Error("Original product must be marked taken to repost");
+    if (!original.is_taken)
+      throw new Error("Original product must be marked taken to repost");
 
     // shallow clone core fields, images and features; do not carry likes/favourites/reports
     const clone: any = {
@@ -194,7 +198,9 @@ export const reportProduct = async (
 // ---------------------
 // GET PRODUCT REPORTS / COUNT
 // ---------------------
-export const getProductReports = async (id: number | string): Promise<unknown> => {
+export const getProductReports = async (
+  id: number | string,
+): Promise<unknown> => {
   if (useMocks) {
     // No stored reports in mock; return empty array
     return [];
@@ -210,7 +216,12 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
   // Normalize to an array of items
   let items: unknown[] = [];
   if (Array.isArray(resp)) items = resp as unknown[];
-  else if (resp && typeof resp === "object" && Array.isArray((resp as any).results)) items = (resp as any).results;
+  else if (
+    resp &&
+    typeof resp === "object" &&
+    Array.isArray((resp as any).results)
+  )
+    items = (resp as any).results;
 
   // Filter items whose `product` field matches the requested id. The
   // `product` property may be a number, or an object with an `id` field.
@@ -220,7 +231,8 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
     const prod = (it as any).product;
     if (prod == null) return false;
     if (typeof prod === "number") return prod === pid;
-    if (typeof prod === "object" && typeof prod.id === "number") return prod.id === pid;
+    if (typeof prod === "object" && typeof prod.id === "number")
+      return prod.id === pid;
     return false;
   });
 
@@ -230,7 +242,6 @@ export const getProductReports = async (id: number | string): Promise<unknown> =
 export const getProductReportCount = async (productId: number | string) => {
   return apiClient.get<number>(endpoints.productReports.detail(productId));
 };
-
 
 // ---------------------
 // SET STATUS
@@ -253,7 +264,9 @@ export const setProductStatus = async (
 // ---------------------
 // RELATED PRODUCTS
 // ---------------------
-export const getRelatedProducts = async (productId?: number): Promise<Product[]> => {
+export const getRelatedProducts = async (
+  productId?: number,
+): Promise<Product[]> => {
   if (useMocks) return [...mockProducts];
 
   const qs = new URLSearchParams();
@@ -268,15 +281,17 @@ export const getRelatedProducts = async (productId?: number): Promise<Product[]>
 // ---------------------
 export const getFavourites = async (): Promise<Product[]> => {
   if (useMocks) {
-    return mockProducts.filter(p => Boolean((p as any).favourited_by_user));
+    return mockProducts.filter((p) => Boolean((p as any).favourited_by_user));
   }
 
   return apiClient.get<Product[]>(endpoints.products.favouritesList());
 };
 
-export const toggleFavourite = async (id: number | string): Promise<Product> => {
+export const toggleFavourite = async (
+  id: number | string,
+): Promise<Product> => {
   if (useMocks) {
-    const idx = mockProducts.findIndex(p => p.id === +id);
+    const idx = mockProducts.findIndex((p) => p.id === +id);
     if (idx === -1) throw new Error("Mock product not found");
     // toggle favourited flag
     const curr = (mockProducts[idx] as any).favourited_by_user;
@@ -287,17 +302,21 @@ export const toggleFavourite = async (id: number | string): Promise<Product> => 
 };
 
 // LIST PRODUCTS FOR OWNER
-export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> => {
+export const getProductsForOwner = async (
+  ownerId?: number,
+): Promise<Product[]> => {
   // allow ownerId === 0 in case that's a valid id; only bail on null/undefined
   if (ownerId == null) return [];
   // First try server-side filtering via query param: /products/?owner=<id>
   try {
-    const resp = await apiClient.get<unknown>(`${endpoints.products.list}?owner=${ownerId}`);
+    const resp = await apiClient.get<unknown>(
+      `${endpoints.products.list}?owner=${ownerId}`,
+    );
     const list = Array.isArray(resp)
       ? (resp as unknown[])
       : resp && typeof resp === "object" && Array.isArray((resp as any).results)
-      ? (resp as any).results
-      : [];
+        ? (resp as any).results
+        : [];
     if (list.length > 0) {
       // Defensive: ensure returned items are actually owned by ownerId (server may return mixed shapes)
       const owned = list.filter((p: unknown) => {
@@ -306,7 +325,8 @@ export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> 
         const o = pi.owner;
         if (o == null) return false;
         if (typeof o === "number") return o === ownerId;
-        if (typeof o === "object" && typeof (o as any).id === "number") return (o as any).id === ownerId;
+        if (typeof o === "object" && typeof (o as any).id === "number")
+          return (o as any).id === ownerId;
         return false;
       });
       if (owned.length > 0) return owned as Product[];
@@ -334,14 +354,17 @@ export const getProductsForOwner = async (ownerId?: number): Promise<Product[]> 
 export const createProductFromAd = async (metadata: any) => {
   // Map purpose -> ProductType
   const mapType = (p?: string) => {
-    if (!p) return ("SALE") as const;
-    if (p.toLowerCase() === "sale") return ("SALE") as const;
-    if (p.toLowerCase() === "rent") return ("RENT") as const;
-    return ("PAYLATER") as const;
+    if (!p) return "SALE" as const;
+    if (p.toLowerCase() === "sale") return "SALE" as const;
+    if (p.toLowerCase() === "rent") return "RENT" as const;
+    return "PAYLATER" as const;
   };
 
   const price =
-    metadata.pricing?.monthly?.value ?? metadata.pricing?.weekly?.value ?? metadata.pricing?.daily?.value ?? 0;
+    metadata.pricing?.monthly?.value ??
+    metadata.pricing?.weekly?.value ??
+    metadata.pricing?.daily?.value ??
+    0;
 
   const categoryId = Number(metadata.category as unknown as string) || 0;
 
@@ -353,10 +376,16 @@ export const createProductFromAd = async (metadata: any) => {
     is_taken: false,
     description: `Posted via app on ${new Date(metadata.createdAt).toLocaleString()}`,
     price: price as unknown as string | number,
-    duration: metadata.pricing?.monthly?.duration ?? metadata.pricing?.weekly?.duration ?? metadata.pricing?.daily?.duration ?? "",
+    duration:
+      metadata.pricing?.monthly?.duration ??
+      metadata.pricing?.weekly?.duration ??
+      metadata.pricing?.daily?.duration ??
+      "",
     category: categoryId,
     // note: some backends accept subcategory; include if provided in metadata
-    ...(metadata.subcategory ? { subcategory: Number(metadata.subcategory) } : {}),
+    ...(metadata.subcategory
+      ? { subcategory: Number(metadata.subcategory) }
+      : {}),
     // include simple location string from ad metadata when present
     ...(metadata.location ? { location: metadata.location } : {}),
   };
@@ -374,7 +403,8 @@ export const createProductFromAd = async (metadata: any) => {
         const byteString = atob(b64);
         const ab = new ArrayBuffer(byteString.length);
         const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        for (let i = 0; i < byteString.length; i++)
+          ia[i] = byteString.charCodeAt(i);
         const blob = new Blob([ab], { type: mime });
         const ext = mime.split("/")[1] || "jpg";
         const name = `${defaultName}-${Date.now()}.${ext}`;
@@ -395,8 +425,6 @@ export const createProductFromAd = async (metadata: any) => {
   };
 
   const imgs = Array.isArray(metadata.images) ? metadata.images : [];
-
-  
 
   // If there is at least one image, send the first image as part of
   // the product creation request (so it populates the product "image"
@@ -464,7 +492,10 @@ export const createProductFromAd = async (metadata: any) => {
       } catch (e) {
         // If multipart create fails, fall back to JSON create so we at
         // least create the product and can upload images afterwards.
-        console.warn("Multipart product create failed, falling back to JSON create:", e);
+        console.warn(
+          "Multipart product create failed, falling back to JSON create:",
+          e,
+        );
         return await createProduct(payload);
       }
     }
@@ -480,11 +511,16 @@ export const createProductFromAd = async (metadata: any) => {
   // token with the create request (owner null). Surface a helpful error
   // instead of continuing to upload images/features to an unauthenticated product.
   const ownerObj = (created as any).owner;
-  const ownerId = ownerObj && (typeof ownerObj === "object") ? Number(ownerObj.id) : null;
+  const ownerId =
+    ownerObj && typeof ownerObj === "object" ? Number(ownerObj.id) : null;
   if (!ownerId) {
-     
-    console.error("Product created without owner. Aborting attachments. Created:", created);
-    throw new Error("Product was created but owner is null. Ensure the Authorization token is sent with the product creation request.");
+    console.error(
+      "Product created without owner. Aborting attachments. Created:",
+      created,
+    );
+    throw new Error(
+      "Product was created but owner is null. Ensure the Authorization token is sent with the product creation request.",
+    );
   }
 
   if (imgs.length > 0) {
@@ -529,7 +565,11 @@ export const createProductFromAd = async (metadata: any) => {
 
           await apiClient.post(endpoints.productImages.create(), fd);
         } catch (err) {
-          console.error("productImages upload failed for", { product: created.id, file: fileObj.name }, err);
+          console.error(
+            "productImages upload failed for",
+            { product: created.id, file: fileObj.name },
+            err,
+          );
           throw err;
         }
       } catch (e) {
@@ -540,7 +580,10 @@ export const createProductFromAd = async (metadata: any) => {
   }
 
   // Attach product features from explicit feature definitions (metadata.featureValues)
-  if (Array.isArray((metadata as any).featureValues) && (metadata as any).featureValues.length > 0) {
+  if (
+    Array.isArray((metadata as any).featureValues) &&
+    (metadata as any).featureValues.length > 0
+  ) {
     for (const fv of (metadata as any).featureValues) {
       try {
         // fv shape: { feature: number, value: string }
@@ -550,12 +593,22 @@ export const createProductFromAd = async (metadata: any) => {
           value: String(fv.value ?? ""),
         };
         try {
-          await apiClient.post(endpoints.productFeatures.create(), payloadFeatureById);
+          await apiClient.post(
+            endpoints.productFeatures.create(),
+            payloadFeatureById,
+          );
         } catch (err) {
-          console.error("product-features (by id) failed", payloadFeatureById, err);
+          console.error(
+            "product-features (by id) failed",
+            payloadFeatureById,
+            err,
+          );
           // Try an alternative payload key in case backend expects `feature_id`
           try {
-            const alt = { ...payloadFeatureById, feature_id: payloadFeatureById.feature } as { [k: string]: unknown };
+            const alt = {
+              ...payloadFeatureById,
+              feature_id: payloadFeatureById.feature,
+            } as { [k: string]: unknown };
             delete (alt as { [k: string]: unknown }).feature;
             await apiClient.post(endpoints.productFeatures.create(), alt);
           } catch (err2) {
@@ -572,13 +625,17 @@ export const createProductFromAd = async (metadata: any) => {
   // Free-text `keyFeatures` are skipped because the backend requires an explicit
   // `feature` id for product-feature attachments. Use the UI to attach
   // existing features (feature id + value) — those are handled above.
-  if (Array.isArray((metadata as any).keyFeatures) && (metadata as any).keyFeatures.length > 0) {
-    console.warn("Skipping free-text keyFeatures upload: backend requires feature id. Convert UI to select existing features instead.");
+  if (
+    Array.isArray((metadata as any).keyFeatures) &&
+    (metadata as any).keyFeatures.length > 0
+  ) {
+    console.warn(
+      "Skipping free-text keyFeatures upload: backend requires feature id. Convert UI to select existing features instead.",
+    );
   }
 
   return created;
 };
- 
 
 export default {
   getProducts,

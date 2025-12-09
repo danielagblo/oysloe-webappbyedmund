@@ -10,7 +10,10 @@ export default function ProfileStats() {
   let name = (user as UserProfile)?.name;
   // break names into single entities by the space ok
   const nameParts = name?.split(" ") || [];
-  name = nameParts.length > 1 ? (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "") : nameParts[0];
+  name =
+    nameParts.length > 1
+      ? (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "")
+      : nameParts[0];
 
   // mini components
   const Profile = () => (
@@ -23,7 +26,7 @@ export default function ProfileStats() {
         />
       </div>
       <h2 className="text-xl font-medium mb-1 md:text-[2vw]">
-        {loading || error ? "User" : (name !== " ") ? name : "User"}
+        {loading || error ? "User" : name !== " " ? name : "User"}
       </h2>
       <div className="flex flex-col justify-start w-full">
         <div>
@@ -57,7 +60,8 @@ export default function ProfileStats() {
         {(() => {
           // referral_points is an absolute points value. Show progress
           // toward the Gold threshold for the summary bar (gold start).
-          const points = Number((user as UserProfile)?.referral_points ?? 0) || 0;
+          const points =
+            Number((user as UserProfile)?.referral_points ?? 0) || 0;
           const DIAMOND = LEVELS.diamondTop;
           let percent = Math.round((points / Math.max(1, DIAMOND)) * 100);
           if (!isFinite(percent) || percent < 0) percent = 0;

@@ -1,7 +1,7 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { toast } from 'sonner';
+import { toast } from "sonner";
 import submittedGif from "../assets/Submitted.gif";
 import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
@@ -10,9 +10,16 @@ import useLocations from "../features/locations/useLocations";
 import { usePatchProduct, useProduct } from "../features/products/useProducts";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import useLocationSelection from "../hooks/useLocationSelection";
-import { getFeature, getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import {
+  getFeature,
+  getFeatures,
+  getPossibleFeatureValues,
+} from "../services/featureService";
 import { createProductImage } from "../services/productImageService";
-import { getSubcategories, getSubcategory } from "../services/subcategoryService";
+import {
+  getSubcategories,
+  getSubcategory,
+} from "../services/subcategoryService";
 import type { AdMetadata } from "../types/AdMetaData";
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
@@ -30,7 +37,11 @@ interface PostAdFormProps {
   embedded?: boolean;
 }
 
-export default function PostAdForm({ editId: propEditId, onClose, embedded = false }: PostAdFormProps) {
+export default function PostAdForm({
+  editId: propEditId,
+  onClose,
+  embedded = false,
+}: PostAdFormProps) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileStep, setMobileStep] = useState("images");
 
@@ -46,8 +57,11 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
   const [category, setCategory] = useState("Select Product Category");
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [subcategoryId, setSubcategoryId] = useState<number | "">("");
-  const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
-  const { categories: fetchedCategories = [], loading: categoriesLoading } = useCategories();
+  const [subcategories, setSubcategories] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const { categories: fetchedCategories = [], loading: categoriesLoading } =
+    useCategories();
   const [title, setTitle] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
   const [duration] = useState<string>("Duration (days)");
@@ -56,13 +70,19 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
   const [price, setPrice] = useState<number | "">("");
   const [keyFeatures, setKeyFeatures] = useState<string[]>(["", ""]);
   // attachedFeatures: list of selections where user picks an existing feature and provides a value
-  const [attachedFeatures] = useState<Array<{ feature?: number; value: string }>>([
-    { feature: undefined, value: "" },
-  ]);
+  const [attachedFeatures] = useState<
+    Array<{ feature?: number; value: string }>
+  >([{ feature: undefined, value: "" }]);
   // creation of catalog features is disabled for regular users; we only fetch existing definitions
-  const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
-  const [featureValues, setFeatureValues] = useState<Record<number, string>>({});
-  const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
+  const [featureDefinitions, setFeatureDefinitions] = useState<
+    Array<{ id: number; name: string }>
+  >([]);
+  const [featureValues, setFeatureValues] = useState<Record<number, string>>(
+    {},
+  );
+  const [possibleFeatureValues, setPossibleFeatureValues] = useState<
+    Record<number, string[]>
+  >({});
 
   // Fetch subcategories whenever categoryId changes
   useEffect(() => {
@@ -70,21 +90,33 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
     (async () => {
       try {
         if (typeof categoryId === "number" && !isNaN(categoryId)) {
-          let subs = await getSubcategories({ category: categoryId }) as any;
+          let subs = (await getSubcategories({ category: categoryId })) as any;
           if (!mounted) return;
           // DEV: inspect raw response to help debug why subcategories might be empty
           if (import.meta.env.DEV) {
             try {
-              console.debug("Raw subcategories response for category", categoryId, subs);
-            } catch { void 0; }
+              console.debug(
+                "Raw subcategories response for category",
+                categoryId,
+                subs,
+              );
+            } catch {
+              void 0;
+            }
           }
           // Some APIs return { results: [...] } while others return an array directly.
-          if (!Array.isArray(subs) && subs && Array.isArray(subs.results)) subs = subs.results;
-          const mapped = (subs || []).map((s: any) => ({ id: s.id, name: s.name ?? s.title ?? s.display_name ?? s.label ?? "" }));
+          if (!Array.isArray(subs) && subs && Array.isArray(subs.results))
+            subs = subs.results;
+          const mapped = (subs || []).map((s: any) => ({
+            id: s.id,
+            name: s.name ?? s.title ?? s.display_name ?? s.label ?? "",
+          }));
           if (import.meta.env.DEV) {
             try {
               console.debug("Mapped subcategories:", mapped);
-            } catch { void 0; }
+            } catch {
+              void 0;
+            }
           }
           setSubcategories(mapped);
         } else {
@@ -107,14 +139,29 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
     (async () => {
       try {
         if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
-          if (import.meta.env.DEV) console.debug("Fetching feature definitions for subcategory:", subcategoryId);
-          let features = await getFeatures({ subcategory: subcategoryId }) as any;
+          if (import.meta.env.DEV)
+            console.debug(
+              "Fetching feature definitions for subcategory:",
+              subcategoryId,
+            );
+          let features = (await getFeatures({
+            subcategory: subcategoryId,
+          })) as any;
           if (!mounted) return;
           // Some backends return { results: [...] }
-          if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
+          if (
+            !Array.isArray(features) &&
+            features &&
+            Array.isArray(features.results)
+          )
+            features = features.results;
           // map to minimal definition shape used by this component
-          const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
-          if (import.meta.env.DEV) console.debug("Fetched feature definitions:", defs);
+          const defs = (features || []).map((f: any) => ({
+            id: Number(f.id),
+            name: String(f.name ?? f.display_name ?? f.title ?? ""),
+          }));
+          if (import.meta.env.DEV)
+            console.debug("Fetched feature definitions:", defs);
           setFeatureDefinitions(defs);
         } else {
           setFeatureDefinitions([]);
@@ -125,7 +172,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       }
     })();
 
-    return () => { mounted = false };
+    return () => {
+      mounted = false;
+    };
   }, [subcategoryId]);
 
   // Fetch possible values for feature definitions when they change
@@ -136,21 +185,30 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       try {
         if (import.meta.env.DEV) {
           try {
-            console.debug("Attempting to fetch possible feature values for featureDefinitions:", featureDefinitions.map(f => f.id));
-          } catch (e) { void e; }
+            console.debug(
+              "Attempting to fetch possible feature values for featureDefinitions:",
+              featureDefinitions.map((f) => f.id),
+            );
+          } catch (e) {
+            void e;
+          }
         }
 
         const perFeaturePromises = (featureDefinitions || []).map((fd) =>
           getPossibleFeatureValues({ feature: fd.id })
             .then((res) => ({ fid: fd.id, res }))
             .catch((err) => {
-              if (import.meta.env.DEV) console.debug(`Failed fetch for feature ${fd.id}`, err);
-              return ({ fid: fd.id, res: null });
+              if (import.meta.env.DEV)
+                console.debug(`Failed fetch for feature ${fd.id}`, err);
+              return { fid: fd.id, res: null };
             }),
         );
 
         if (perFeaturePromises.length === 0) {
-          if (import.meta.env.DEV) console.debug("No feature definitions to fetch possible values for.");
+          if (import.meta.env.DEV)
+            console.debug(
+              "No feature definitions to fetch possible values for.",
+            );
           if (mounted) setPossibleFeatureValues({});
           return;
         }
@@ -160,7 +218,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         if (import.meta.env.DEV) {
           try {
             console.debug("Raw possible-values responses:", perFeatureResults);
-          } catch (e) { void e; }
+          } catch (e) {
+            void e;
+          }
         }
 
         const normalized: Record<number, string[]> = {};
@@ -171,8 +231,13 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
         if (import.meta.env.DEV) {
           try {
-            console.debug("Normalized possibleFeatureValues to be set:", normalized);
-          } catch (e) { void e; }
+            console.debug(
+              "Normalized possibleFeatureValues to be set:",
+              normalized,
+            );
+          } catch (e) {
+            void e;
+          }
         }
 
         if (mounted) setPossibleFeatureValues(normalized);
@@ -186,7 +251,6 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       mounted = false;
     };
   }, [featureDefinitions]);
-
 
   // DEV: log feature definitions when they change so UI debugging is easier
   useEffect(() => {
@@ -216,35 +280,46 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
     (async () => {
       const toFetch = attachedFeatures
-        .map(a => a.feature)
-        .filter((f): f is number => typeof f === "number" && !(f in possibleFeatureValues));
+        .map((a) => a.feature)
+        .filter(
+          (f): f is number =>
+            typeof f === "number" && !(f in possibleFeatureValues),
+        );
 
       if (import.meta.env.DEV) {
         try {
           console.debug("attachedFeatures triggered; toFetch:", toFetch);
-        } catch (e) { void e; }
+        } catch (e) {
+          void e;
+        }
       }
 
       if (toFetch.length === 0) {
-        if (import.meta.env.DEV) console.debug("No attached features require fetching possible values.");
+        if (import.meta.env.DEV)
+          console.debug(
+            "No attached features require fetching possible values.",
+          );
         return;
       }
 
       const responses = await Promise.all(
-        toFetch.map(fid =>
+        toFetch.map((fid) =>
           getPossibleFeatureValues({ feature: fid })
-            .then(res => ({ fid, res }))
+            .then((res) => ({ fid, res }))
             .catch((err) => {
-              if (import.meta.env.DEV) console.debug(`Failed fetch for attached feature ${fid}`, err);
-              return ({ fid, res: null });
-            })
-        )
+              if (import.meta.env.DEV)
+                console.debug(`Failed fetch for attached feature ${fid}`, err);
+              return { fid, res: null };
+            }),
+        ),
       );
 
       if (import.meta.env.DEV) {
         try {
           console.debug("Responses for attached feature fetches:", responses);
-        } catch (e) { void e; }
+        } catch (e) {
+          void e;
+        }
       }
 
       if (!mounted) return;
@@ -258,21 +333,31 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
       if (import.meta.env.DEV) {
         try {
-          console.debug("PossibleFeatureValues after merging attached responses:", next);
-        } catch (e) { void e; }
+          console.debug(
+            "PossibleFeatureValues after merging attached responses:",
+            next,
+          );
+        } catch (e) {
+          void e;
+        }
       }
 
       setPossibleFeatureValues(next);
     })();
 
-    return () => { mounted = false };
+    return () => {
+      mounted = false;
+    };
   }, [attachedFeatures, possibleFeatureValues]);
-
 
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const { locations: allLocations = [], groupedLocations = {}, loading: locationsLoading } = useLocations();
+  const {
+    locations: allLocations = [],
+    groupedLocations = {},
+    loading: locationsLoading,
+  } = useLocations();
 
   // use our centralised hook to manage location selection and saved locations
   const {
@@ -309,27 +394,38 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         console.debug("[Edit Prefill] existingProduct:", existingProduct);
         console.debug("[Edit Prefill] fetchedCategories:", fetchedCategories);
         console.debug("[Edit Prefill] current subcategories:", subcategories);
-        console.debug("[Edit Prefill] groupedLocations keys:", Object.keys(groupedLocations || {}));
-      } catch (e) { void e; }
+        console.debug(
+          "[Edit Prefill] groupedLocations keys:",
+          Object.keys(groupedLocations || {}),
+        );
+      } catch (e) {
+        void e;
+      }
     }
 
     try {
       setTitle(existingProduct.name ?? "");
-      setPrice(typeof existingProduct.price === "number" ? existingProduct.price : Number(existingProduct.price ?? "") || "");
+      setPrice(
+        typeof existingProduct.price === "number"
+          ? existingProduct.price
+          : Number(existingProduct.price ?? "") || "",
+      );
 
       // category: accept object or id
       try {
         const prodCatRaw = (existingProduct as any).category ?? null;
         let prodCatId = null as number | null;
         if (prodCatRaw != null) {
-          if (typeof prodCatRaw === 'object' && prodCatRaw !== null) {
+          if (typeof prodCatRaw === "object" && prodCatRaw !== null) {
             prodCatId = Number(prodCatRaw.id ?? prodCatRaw.value ?? null);
           } else {
             prodCatId = Number(prodCatRaw);
           }
         }
         if (prodCatId && !isNaN(prodCatId)) {
-          const cat = fetchedCategories.find((c) => Number(c.id) === Number(prodCatId));
+          const cat = fetchedCategories.find(
+            (c) => Number(c.id) === Number(prodCatId),
+          );
           if (cat) {
             setCategory(cat.name);
             setCategoryId(Number(cat.id));
@@ -337,13 +433,24 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
             setCategoryId(prodCatId);
           }
         }
-      } catch { void 0; }
+      } catch {
+        void 0;
+      }
 
       // subcategory: handle multiple shapes/keys
       try {
-        const prodSubRaw = (existingProduct as any).subcategory ?? (existingProduct as any).subcategory_id ?? (existingProduct as any).sub_category ?? (existingProduct as any).subCategory ?? null;
+        const prodSubRaw =
+          (existingProduct as any).subcategory ??
+          (existingProduct as any).subcategory_id ??
+          (existingProduct as any).sub_category ??
+          (existingProduct as any).subCategory ??
+          null;
         if (prodSubRaw != null) {
-          if (typeof prodSubRaw === 'object' && prodSubRaw !== null && typeof prodSubRaw.id !== 'undefined') {
+          if (
+            typeof prodSubRaw === "object" &&
+            prodSubRaw !== null &&
+            typeof prodSubRaw.id !== "undefined"
+          ) {
             setSubcategoryId(Number(prodSubRaw.id));
           } else if (!isNaN(Number(prodSubRaw))) {
             setSubcategoryId(Number(prodSubRaw));
@@ -352,7 +459,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
             // store on a temporary attribute via closure (handled in next effect)
           }
         }
-      } catch { void 0; }
+      } catch {
+        void 0;
+      }
 
       // type -> purpose mapping
       if (existingProduct.type === "SALE") setPurpose("Sale");
@@ -360,10 +469,13 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       else setPurpose("Pay Later");
 
       // images
-      const imgs = Array.isArray((existingProduct as any).images) ? (existingProduct as any).images : [];
+      const imgs = Array.isArray((existingProduct as any).images)
+        ? (existingProduct as any).images
+        : [];
       const mapped: UploadedImage[] = imgs.map((im: any, i: number) => ({
         id: i + 1,
-        url: (im && (im.url || im.image || im.src || im.path)) || String(im || ""),
+        url:
+          (im && (im.url || im.image || im.src || im.path)) || String(im || ""),
         file: undefined,
         hasFile: false,
       }));
@@ -373,27 +485,52 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         const topImage = (existingProduct as any).image;
         if (topImage && typeof topImage === "string") {
           const normalizedTop = String(topImage).trim();
-          const already = mapped.find((m: UploadedImage) => String(m.url).trim() === normalizedTop);
-          if (!already) mapped.unshift({ id: mapped.length + 1, url: normalizedTop, file: undefined, hasFile: false });
+          const already = mapped.find(
+            (m: UploadedImage) => String(m.url).trim() === normalizedTop,
+          );
+          if (!already)
+            mapped.unshift({
+              id: mapped.length + 1,
+              url: normalizedTop,
+              file: undefined,
+              hasFile: false,
+            });
         }
-      } catch { void 0; }
+      } catch {
+        void 0;
+      }
 
       if (mapped.length > 0) setUploadedImages(mapped);
 
       // product features
       try {
-        const pfs = Array.isArray((existingProduct as any).product_features) ? (existingProduct as any).product_features : [];
+        const pfs = Array.isArray((existingProduct as any).product_features)
+          ? (existingProduct as any).product_features
+          : [];
         if (pfs.length > 0) {
           const fv: Record<number, string> = {};
           pfs.forEach((pf: any) => {
             if (!pf) return;
             let fid = NaN;
-            if (typeof pf.feature === 'number') fid = Number(pf.feature);
-            else if (pf.feature && typeof pf.feature === 'object' && (pf.feature.id || pf.feature_id)) fid = Number(pf.feature.id ?? pf.feature.feature_id ?? pf.feature_id);
-            else if (typeof pf.feature_id === 'number' || typeof pf.feature_id === 'string') fid = Number(pf.feature_id);
-            if (!isNaN(fid) && typeof pf.value !== 'undefined') fv[fid] = String(pf.value ?? '');
+            if (typeof pf.feature === "number") fid = Number(pf.feature);
+            else if (
+              pf.feature &&
+              typeof pf.feature === "object" &&
+              (pf.feature.id || pf.feature_id)
+            )
+              fid = Number(
+                pf.feature.id ?? pf.feature.feature_id ?? pf.feature_id,
+              );
+            else if (
+              typeof pf.feature_id === "number" ||
+              typeof pf.feature_id === "string"
+            )
+              fid = Number(pf.feature_id);
+            if (!isNaN(fid) && typeof pf.value !== "undefined")
+              fv[fid] = String(pf.value ?? "");
           });
-          if (Object.keys(fv).length > 0) setFeatureValues((prev) => ({ ...prev, ...fv }));
+          if (Object.keys(fv).length > 0)
+            setFeatureValues((prev) => ({ ...prev, ...fv }));
 
           // If the product already includes product_features with nested feature objects,
           // derive feature definitions from them so we can fetch possible values immediately
@@ -404,7 +541,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                 const f = pf && pf.feature ? pf.feature : null;
                 if (!f) return null;
                 const id = Number(f.id ?? f.feature_id ?? null);
-                const name = String(f.name ?? f.display_name ?? f.title ?? f.label ?? "").trim();
+                const name = String(
+                  f.name ?? f.display_name ?? f.title ?? f.label ?? "",
+                ).trim();
                 if (isNaN(id)) return null;
                 return { id, name };
               })
@@ -431,63 +570,111 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
             // when the product includes feature objects but not explicit
             // subcategory/category fields.
             try {
-              if ((subcategoryId === "" || subcategoryId == null) && defs.length > 0) {
+              if (
+                (subcategoryId === "" || subcategoryId == null) &&
+                defs.length > 0
+              ) {
                 (async () => {
-                  const fids = defs.map((d: any) => Number(d.id)).filter((n: number) => !isNaN(n));
+                  const fids = defs
+                    .map((d: any) => Number(d.id))
+                    .filter((n: number) => !isNaN(n));
                   if (fids.length > 0) {
-                    const details = await Promise.allSettled(fids.map((fid: number) => getFeature(fid)));
+                    const details = await Promise.allSettled(
+                      fids.map((fid: number) => getFeature(fid)),
+                    );
                     for (const r of details) {
                       if (r.status === "fulfilled") {
                         const feat = r.value as any;
-                        const possibleSub = feat?.subcategory ?? feat?.subcategory_id ?? feat?.sub_category ?? feat?.category ?? null;
+                        const possibleSub =
+                          feat?.subcategory ??
+                          feat?.subcategory_id ??
+                          feat?.sub_category ??
+                          feat?.category ??
+                          null;
                         let subId = null as number | null;
                         if (possibleSub != null) {
-                          if (typeof possibleSub === "object" && possibleSub?.id) subId = Number(possibleSub.id);
-                          else if (!isNaN(Number(possibleSub))) subId = Number(possibleSub);
+                          if (
+                            typeof possibleSub === "object" &&
+                            possibleSub?.id
+                          )
+                            subId = Number(possibleSub.id);
+                          else if (!isNaN(Number(possibleSub)))
+                            subId = Number(possibleSub);
                         }
                         if (subId && !isNaN(subId)) {
                           setSubcategoryId(Number(subId));
                           // fetch subcategory to determine its category and set categoryId
                           try {
                             const sub = await getSubcategory(Number(subId));
-                            const catRaw = (sub as any)?.category ?? (sub as any)?.category_id ?? null;
+                            const catRaw =
+                              (sub as any)?.category ??
+                              (sub as any)?.category_id ??
+                              null;
                             let catId = null as number | null;
                             if (catRaw != null) {
-                              if (typeof catRaw === "object" && catRaw?.id) catId = Number(catRaw.id);
-                              else if (!isNaN(Number(catRaw))) catId = Number(catRaw);
+                              if (typeof catRaw === "object" && catRaw?.id)
+                                catId = Number(catRaw.id);
+                              else if (!isNaN(Number(catRaw)))
+                                catId = Number(catRaw);
                             }
                             if (catId && !isNaN(catId)) {
                               setCategoryId(Number(catId));
-                              const cat = fetchedCategories.find((c) => Number(c.id) === Number(catId));
+                              const cat = fetchedCategories.find(
+                                (c) => Number(c.id) === Number(catId),
+                              );
                               if (cat) setCategory(cat.name);
                             }
-                          } catch { void 0; }
+                          } catch {
+                            void 0;
+                          }
                           break;
                         }
                       }
                     }
                   }
-                })().catch(() => { /* ignore errors */ });
+                })().catch(() => {
+                  /* ignore errors */
+                });
               }
-            } catch { void 0; }
-          } catch { void 0; }
+            } catch {
+              void 0;
+            }
+          } catch {
+            void 0;
+          }
         }
-      } catch { void 0; }
+      } catch {
+        void 0;
+      }
 
       // location
       try {
-        const loc = (existingProduct as any).location ?? (existingProduct as any).place ?? null;
+        const loc =
+          (existingProduct as any).location ??
+          (existingProduct as any).place ??
+          null;
         if (loc) {
-          if (typeof loc === 'string') {
+          if (typeof loc === "string") {
             // try to parse "Place, Region" or "Region - Place"
             selectPlace(String(loc));
-          } else if (typeof loc === 'object') {
-            const place = String(loc.name || loc.place || loc.title || '').trim();
-            const region = String(loc.region || loc.state || loc.area || '').trim();
-            if (place) applySavedLocation({ label: region ? `${place}, ${region}` : place, region, place });
+          } else if (typeof loc === "object") {
+            const place = String(
+              loc.name || loc.place || loc.title || "",
+            ).trim();
+            const region = String(
+              loc.region || loc.state || loc.area || "",
+            ).trim();
+            if (place)
+              applySavedLocation({
+                label: region ? `${place}, ${region}` : place,
+                region,
+                place,
+              });
           }
         }
-      } catch { void 0; }
+      } catch {
+        void 0;
+      }
     } catch (e) {
       void e;
     }
@@ -496,18 +683,37 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
   // Ensure subcategory is applied when subcategories for the selected category are available
   useEffect(() => {
     if (!existingProduct) return;
-    const prodSubRaw = (existingProduct as any).subcategory ?? (existingProduct as any).subcategory_id ?? (existingProduct as any).sub_category ?? (existingProduct as any).subCategory ?? null;
+    const prodSubRaw =
+      (existingProduct as any).subcategory ??
+      (existingProduct as any).subcategory_id ??
+      (existingProduct as any).sub_category ??
+      (existingProduct as any).subCategory ??
+      null;
     if (!prodSubRaw) return;
     try {
-      const candidateId = typeof prodSubRaw === 'object' && prodSubRaw !== null && typeof prodSubRaw.id !== 'undefined' ? Number(prodSubRaw.id) : Number(prodSubRaw);
-      if (!isNaN(candidateId) && subcategories.find((s) => Number(s.id) === candidateId)) {
+      const candidateId =
+        typeof prodSubRaw === "object" &&
+        prodSubRaw !== null &&
+        typeof prodSubRaw.id !== "undefined"
+          ? Number(prodSubRaw.id)
+          : Number(prodSubRaw);
+      if (
+        !isNaN(candidateId) &&
+        subcategories.find((s) => Number(s.id) === candidateId)
+      ) {
         setSubcategoryId(candidateId);
         return;
       }
       // try matching by name
-      const name = String((typeof prodSubRaw === 'object' ? (prodSubRaw.name ?? prodSubRaw.title ?? '') : prodSubRaw) || '').trim();
+      const name = String(
+        (typeof prodSubRaw === "object"
+          ? (prodSubRaw.name ?? prodSubRaw.title ?? "")
+          : prodSubRaw) || "",
+      ).trim();
       if (name) {
-        const matched = subcategories.find((s) => String(s.name).trim().toLowerCase() === name.toLowerCase());
+        const matched = subcategories.find(
+          (s) => String(s.name).trim().toLowerCase() === name.toLowerCase(),
+        );
         if (matched) setSubcategoryId(Number(matched.id));
       }
     } catch {
@@ -542,7 +748,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
     const v = e.target.value;
     if (v.includes("-")) return;
     if (v === "") {
-      setPrice("")
+      setPrice("");
       return;
     }
     if (!/^[0-9.]*$/.test(v)) return;
@@ -573,7 +779,6 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
 
   // The canonical `locationDetails` is provided by the `useLocationSelection` hook
 
-
   async function handleSave(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (isSubmitting) return;
@@ -593,19 +798,21 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       return;
     }
 
-
     // merge explicit feature values from both the fetched definitions map
     // and the user-attached selections into a single array for the API
     const explicitFeatureValues = [
       ...(featureValues && Object.keys(featureValues).length > 0
         ? Object.entries(featureValues)
-          .map(([k, v]) => ({ feature: Number(k), value: v }))
-          .filter((f) => f.value && String(f.value).trim() !== "")
+            .map(([k, v]) => ({ feature: Number(k), value: v }))
+            .filter((f) => f.value && String(f.value).trim() !== "")
         : []),
       ...(attachedFeatures && Array.isArray(attachedFeatures)
         ? attachedFeatures
-          .filter((a) => a.feature != null && String(a.value).trim() !== "")
-          .map((a) => ({ feature: Number(a.feature), value: String(a.value) }))
+            .filter((a) => a.feature != null && String(a.value).trim() !== "")
+            .map((a) => ({
+              feature: Number(a.feature),
+              value: String(a.value),
+            }))
         : []),
     ];
 
@@ -626,11 +833,13 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       category: String(categoryId ?? ""),
       purpose,
       // If the user didn't pick a duration, send a safe default of "0"
-      duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+      duration:
+        duration && duration !== "Duration (days)" ? String(duration) : "0",
       // Provide `pricing` shape so `createProductFromAd` can read duration/value
       pricing: {
         monthly: {
-          duration: duration && duration !== "Duration (days)" ? String(duration) : "0",
+          duration:
+            duration && duration !== "Duration (days)" ? String(duration) : "0",
           value: price !== "" ? Number(price) : 0,
         },
       },
@@ -640,17 +849,42 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         try {
           if (!locationDetails) return {};
           const found = allLocations.find((l: any) => {
-            const regionMatch = String(l.region || "").trim().toLowerCase() === String(locationDetails.region || "").trim().toLowerCase();
-            const placeMatch = String(l.name || l.place || "").trim().toLowerCase() === String(locationDetails.place || "").trim().toLowerCase();
+            const regionMatch =
+              String(l.region || "")
+                .trim()
+                .toLowerCase() ===
+              String(locationDetails.region || "")
+                .trim()
+                .toLowerCase();
+            const placeMatch =
+              String(l.name || l.place || "")
+                .trim()
+                .toLowerCase() ===
+              String(locationDetails.place || "")
+                .trim()
+                .toLowerCase();
             return regionMatch && placeMatch;
           });
-          if (found && (typeof found.id === "number" || typeof found.id === "string")) {
+          if (
+            found &&
+            (typeof found.id === "number" || typeof found.id === "string")
+          ) {
             return { location: Number(found.id) };
           }
           // fallback to legacy shape (region + place) so server can handle it
-          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+          return {
+            location: {
+              region: (locationDetails?.region as Region) || null,
+              name: locationDetails?.place ?? "Unknown",
+            } as LocationPayload,
+          };
         } catch (e) {
-          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+          return {
+            location: {
+              region: (locationDetails?.region as Region) || null,
+              name: locationDetails?.place ?? "Unknown",
+            } as LocationPayload,
+          };
         }
       })(),
       images: uploadedImages.map((img) => ({
@@ -662,13 +896,19 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       })),
       createdAt: new Date().toISOString(),
       ...(price !== "" ? { price } : {}),
-      ...(subcategoryId !== "" && subcategoryId != null ? { subcategory: String(subcategoryId) } : {}),
+      ...(subcategoryId !== "" && subcategoryId != null
+        ? { subcategory: String(subcategoryId) }
+        : {}),
       // include keyFeatures if user added any (filter out empty strings)
-      ...(keyFeatures && Array.isArray(keyFeatures) && keyFeatures.filter((k) => k.trim() !== "").length > 0
+      ...(keyFeatures &&
+      Array.isArray(keyFeatures) &&
+      keyFeatures.filter((k) => k.trim() !== "").length > 0
         ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
         : {}),
       // include merged explicit feature values (from fetched defs and user attachments)
-      ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
+      ...(explicitFeatureValues.length > 0
+        ? { featureValues: explicitFeatureValues }
+        : {}),
     };
 
     console.log("Ad metadata (JSON):", metadata);
@@ -676,7 +916,16 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
     // Debug: log uploadedImages details to help diagnose missing files
     if (import.meta.env.DEV) {
       try {
-        console.debug("Uploaded images summary:", uploadedImages.map((u) => ({ id: u.id, hasFile: !!u.file, fileName: u.file ? (u.file as File).name : null, fileType: u.file ? (u.file as File).type : null, url: u.url })));
+        console.debug(
+          "Uploaded images summary:",
+          uploadedImages.map((u) => ({
+            id: u.id,
+            hasFile: !!u.file,
+            fileName: u.file ? (u.file as File).name : null,
+            fileType: u.file ? (u.file as File).type : null,
+            url: u.url,
+          })),
+        );
       } catch (e) {
         void e;
       }
@@ -693,21 +942,31 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
           price: metadata.price ?? metadata.pricing?.monthly?.value ?? 0,
           category: Number(metadata.category) || undefined,
           duration: metadata.duration ?? undefined,
-          type: purpose === "Sale" ? "SALE" : purpose === "Rent" ? "RENT" : "PAY LATER",
+          type:
+            purpose === "Sale"
+              ? "SALE"
+              : purpose === "Rent"
+                ? "RENT"
+                : "PAY LATER",
         };
 
         // Check if we have actual File objects to upload
-        const newFiles = uploadedImages.filter((img) => img.file instanceof File);
+        const newFiles = uploadedImages.filter(
+          (img) => img.file instanceof File,
+        );
 
         // First, update the product metadata
-        const result = await patchMutation.mutateAsync({ id: effectiveEditId, body: patchBody });
+        const result = await patchMutation.mutateAsync({
+          id: effectiveEditId,
+          body: patchBody,
+        });
 
         // Then, upload any new images to the productImages endpoint
         if (newFiles.length > 0) {
           const imageUploadPromises = newFiles.map(async (img) => {
             const formData = new FormData();
-            formData.append('image', img.file as File);
-            formData.append('product', String(effectiveEditId));
+            formData.append("image", img.file as File);
+            formData.append("product", String(effectiveEditId));
 
             return createProductImage(formData as any);
           });
@@ -718,7 +977,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         toast.success("Ad updated successfully");
         console.log("Patch response:", result);
         setShowSuccess(true);
-        if (embedded && typeof onClose === 'function') {
+        if (embedded && typeof onClose === "function") {
           // close after small delay so the success toast is visible
           setTimeout(() => onClose(), 700);
         }
@@ -729,7 +988,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
         const serverMessage = (result as { message?: string })?.message;
         toast.success(serverMessage ?? "Ad saved successfully!");
         setShowSuccess(true);
-        if (embedded && typeof onClose === 'function') {
+        if (embedded && typeof onClose === "function") {
           setTimeout(() => onClose(), 700);
         }
       }
@@ -749,7 +1008,8 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
             const parsed = JSON.parse(jsonMatch[1]);
             if (parsed && typeof parsed === "object") {
               if (typeof parsed.detail === "string") friendly = parsed.detail;
-              else if (typeof parsed.message === "string") friendly = parsed.message;
+              else if (typeof parsed.message === "string")
+                friendly = parsed.message;
             }
           } catch (e) {
             // not JSON — ignore
@@ -763,16 +1023,20 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
               const parsed = JSON.parse(curly[1]);
               if (parsed && typeof parsed === "object") {
                 if (typeof parsed.detail === "string") friendly = parsed.detail;
-                else if (typeof parsed.message === "string") friendly = parsed.message;
+                else if (typeof parsed.message === "string")
+                  friendly = parsed.message;
               }
-            } catch (e) { void e; }
+            } catch (e) {
+              void e;
+            }
           } else {
             // final fallback: show the entire error text
             if (raw && raw.trim()) friendly = raw;
           }
         }
 
-        if (import.meta.env.DEV) console.debug("Parsed server error message:", friendly);
+        if (import.meta.env.DEV)
+          console.debug("Parsed server error message:", friendly);
       } catch (e) {
         void e;
       }
@@ -782,7 +1046,6 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       setIsSubmitting(false);
     }
   }
-
 
   const reorder = (
     list: UploadedImage[],
@@ -815,7 +1078,13 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
       type="submit"
       className={`w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]`}
     >
-      {isSubmitting ? (effectiveEditId ? "Updating..." : "Saving...") : (effectiveEditId ? "Update" : "Save")}
+      {isSubmitting
+        ? effectiveEditId
+          ? "Updating..."
+          : "Saving..."
+        : effectiveEditId
+          ? "Update"
+          : "Save"}
     </button>
   );
 
@@ -838,16 +1107,27 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                     const match = fetchedCategories.find((c) => c.name === opt);
                     setCategory(opt);
                     setCategoryId(match ? Number(match.id) : null);
-                    console.log("category chosen:", opt, "id:", match?.id ?? null);
+                    console.log(
+                      "category chosen:",
+                      opt,
+                      "id:",
+                      match?.id ?? null,
+                    );
                   }}
-                  title={categoriesLoading ? "Loading categories..." : "Select Category"}
+                  title={
+                    categoriesLoading
+                      ? "Loading categories..."
+                      : "Select Category"
+                  }
                 />
                 <div className="mt-2">
                   <label className="block mb-1">Subcategory (optional)</label>
                   <DropdownPopup
                     triggerLabel={
-                      subcategoryId && subcategories.find((s) => s.id === subcategoryId)
-                        ? subcategories.find((s) => s.id === subcategoryId)!.name
+                      subcategoryId &&
+                      subcategories.find((s) => s.id === subcategoryId)
+                        ? subcategories.find((s) => s.id === subcategoryId)!
+                            .name
                         : "Select subcategory"
                     }
                     options={subcategories.map((s) => s.name)}
@@ -905,7 +1185,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                 ))}
               </div>
               {purpose === "Rent" && (
-                <p className="text-xs text-gray-600 mt-2 italic">💡 Price will display as "per month" when users view your ad</p>
+                <p className="text-xs text-gray-600 mt-2 italic">
+                  💡 Price will display as "per month" when users view your ad
+                </p>
               )}
             </div>
 
@@ -915,10 +1197,14 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                   triggerLabel={regionLabel ?? "Ad Area Location"}
                   options={groupedLocations}
                   onSelect={(opt) => {
-                    selectPlace(opt)
+                    selectPlace(opt);
                   }}
                   supportsSubmenu
-                  title={locationsLoading ? "Loading locations..." : "Select Region / Place"}
+                  title={
+                    locationsLoading
+                      ? "Loading locations..."
+                      : "Select Region / Place"
+                  }
                 />
               </div>
 
@@ -969,14 +1255,18 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
               <div className="flex flex-col gap-2">
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
-                    <label className="block mb-1 font-medium">Features for selected subcategory</label>
+                    <label className="block mb-1 font-medium">
+                      Features for selected subcategory
+                    </label>
 
                     <div className="flex flex-col gap-2">
                       {featureDefinitions.map((fd) => {
                         const values = possibleFeatureValues[fd.id] ?? [];
                         return (
-                          <div key={`def-${fd.id}`} className="flex items-center gap-2">
-
+                          <div
+                            key={`def-${fd.id}`}
+                            className="flex items-center gap-2"
+                          >
                             <div className="w-1/3 text-sm">{fd.name}</div>
                             {values && values.length > 0 ? (
                               <div className="flex-1">
@@ -984,7 +1274,12 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                                   list={`feature-values-${fd.id}`}
                                   placeholder={`Select or type ${fd.name}`}
                                   value={featureValues[fd.id] ?? ""}
-                                  onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                  onChange={(e) =>
+                                    setFeatureValues((prev) => ({
+                                      ...prev,
+                                      [fd.id]: e.target.value,
+                                    }))
+                                  }
                                   className="w-full p-3 border rounded-xl border-[var(--div-border)]"
                                 />
                                 <datalist id={`feature-values-${fd.id}`}>
@@ -998,7 +1293,12 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                                 type="text"
                                 placeholder={`Value for ${fd.name}`}
                                 value={featureValues[fd.id] ?? ""}
-                                onChange={(e) => setFeatureValues((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                                onChange={(e) =>
+                                  setFeatureValues((prev) => ({
+                                    ...prev,
+                                    [fd.id]: e.target.value,
+                                  }))
+                                }
                                 className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
                               />
                             )}
@@ -1149,11 +1449,9 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
                 <SaveBtn />
               </div>
             )}
-
-
           </div>
         )}
-        
+
         {showSuccess && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">

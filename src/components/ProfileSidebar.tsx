@@ -69,10 +69,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 <button
                   type="button"
                   onClick={() => handleSelect(item.key)}
-                  className={`text-left py-[2vh] px-2 pl-3 flex items-center gap-3 w-full cursor-pointer transition-all ${isActive
-                    ? "border-r-[0.425vw] border-(--dark-def) bg-gray-50"
-                    : "hover:bg-gray-100"
-                    }`}
+                  className={`text-left py-[2vh] px-2 pl-3 flex items-center gap-3 w-full cursor-pointer transition-all ${
+                    isActive
+                      ? "border-r-[0.425vw] border-(--dark-def) bg-gray-50"
+                      : "hover:bg-gray-100"
+                  }`}
                 >
                   {item.icon && (
                     <img
@@ -81,7 +82,12 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                       className="h-auto shrink-0 w-[2vw]"
                     />
                   )}
-                  <span className="text-[1.25vw] whitespace-nowrap overflow-hidden text-ellipsis" title={item.label}>{item.label}</span>
+                  <span
+                    className="text-[1.25vw] whitespace-nowrap overflow-hidden text-ellipsis"
+                    title={item.label}
+                  >
+                    {item.label}
+                  </span>
                 </button>
               </Tooltip>
             );
@@ -96,9 +102,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               onClick={() => setLogout(true)}
             >
               <img src="/logout.svg" alt="Logout" className="w-[2vw] h-auto" />
-              <span 
+              <span
                 className={`text-left text-[1.25vw] flex items-center justify-center gap-3 w-full cursor-pointer transition            `}
-              >Logout</span>
+              >
+                Logout
+              </span>
             </button>
           </Tooltip>
         </div>
@@ -137,10 +145,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                     <button
                       key={item.key}
                       onClick={() => handleSelect(item.key)}
-                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${isActive
-                        ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
-                        : "hover:bg-gray-100"
-                        }`}
+                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${
+                        isActive
+                          ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
+                          : "hover:bg-gray-100"
+                      }`}
                     >
                       {item.icon && (
                         <img
@@ -186,16 +195,24 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
               <button
                 onClick={handleLogout}
-                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending" ? "opacity-60 pointer-events-none" : "hover:bg-red-200/40"
-                  }`}
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${
+                  logoutMutation.status === "pending"
+                    ? "opacity-60 pointer-events-none"
+                    : "hover:bg-red-200/40"
+                }`}
                 disabled={logoutMutation.status === "pending"}
               >
-                {logoutMutation.status === "pending" ? "Logging out..." : "Logout"}
+                {logoutMutation.status === "pending"
+                  ? "Logging out..."
+                  : "Logout"}
               </button>
               <button
                 onClick={() => setLogout(false)}
-                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending" ? "opacity-60 pointer-events-none" : "hover:bg-green-200/40"
-                  }`}
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${
+                  logoutMutation.status === "pending"
+                    ? "opacity-60 pointer-events-none"
+                    : "hover:bg-green-200/40"
+                }`}
                 disabled={logoutMutation.status === "pending"}
               >
                 Cancel

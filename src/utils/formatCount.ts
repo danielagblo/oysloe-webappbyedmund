@@ -1,4 +1,4 @@
-export function formatCount(n : number | string | null | undefined) : string {
+export function formatCount(n: number | string | null | undefined): string {
   if (n == null || isNaN(Number(n))) return "0";
 
   n = Number(n);

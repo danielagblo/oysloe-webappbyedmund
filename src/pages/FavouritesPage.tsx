@@ -8,8 +8,13 @@ import { useNavigate } from "react-router-dom";
 const FavouritesPage = () => {
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
-  const { data: favourites = [], isLoading, isError, toggleFavourite } = useFavourites();
-  const navigate = useNavigate(); 
+  const {
+    data: favourites = [],
+    isLoading,
+    isError,
+    toggleFavourite,
+  } = useFavourites();
+  const navigate = useNavigate();
 
   return (
     <div className="text-[var(--dark-def)] flex justify-between h-screen w-screen items-center bg-transparent lg:overflow-hidden">
@@ -43,17 +48,23 @@ const FavouritesPage = () => {
 
         <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2">
           {isLoading ? (
-            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">Loading favourites...</p>
+            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">
+              Loading favourites...
+            </p>
           ) : isError ? (
-            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">Failed to load favourites.</p>
+            <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">
+              Failed to load favourites.
+            </p>
           ) : favourites.length === 0 ? (
             <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
-              <img 
-                src="/nothing-to-show.png" 
-                alt="Nothing to show here" 
+              <img
+                src="/nothing-to-show.png"
+                alt="Nothing to show here"
                 className="h-40 lg:h-50 w-auto"
               />
-              <p className="text-xl text-(--dark-def)">You have no favourited ads.</p>
+              <p className="text-xl text-(--dark-def)">
+                You have no favourited ads.
+              </p>
             </div>
           ) : (
             favourites.map((ad, index) => (
@@ -64,8 +75,8 @@ const FavouritesPage = () => {
                 <div className="flex flex-row justify-between items-center mb-2">
                   <img
                     className="bg-gray-200 h-20 w-auto rounded-lg object-cover max-w-40 min-w-20"
-                    src={(ad).image ?? "/no-image.jpeg"}
-                    alt={(ad).name ?? "Favourite"}
+                    src={ad.image ?? "/no-image.jpeg"}
+                    alt={ad.name ?? "Favourite"}
                   />
                   <p
                     className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-[var(--div-active)] px-4 rounded-full pb-2"
@@ -78,7 +89,9 @@ const FavouritesPage = () => {
                   <div className="w-4/5">
                     <p className="font-medium truncate">{ad.name}</p>
                   </div>
-                  <p className="text-xs text-gray-600">{formatMoney(ad.price)}</p>
+                  <p className="text-xs text-gray-600">
+                    {formatMoney(ad.price)}
+                  </p>
                 </div>
               </div>
             ))
@@ -96,15 +109,15 @@ const FavouritesPage = () => {
                 +
               </button>
               <div className="mt-6 text-center text-gray-600 flex flex-col gap-1.5 sm:flex-row sm:justify-center items-center">
-                <button 
+                <button
                   className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 max-sm:w-4/5"
                   onClick={() => navigate("/ads/" + (selectedAd as any).id)}
                 >
                   Open
                 </button>
-                <button 
+                <button
                   className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40   max-sm:w-4/5"
-                  onClick={()=> {
+                  onClick={() => {
                     toggleFavourite.mutate((selectedAd as any).id);
                     setSelectedAd(null);
                   }}

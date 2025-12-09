@@ -13,7 +13,9 @@ const PrivacyPage = () => {
         `}
       >
         <div className="flex lg:pt-15 px-5 flex-col justify-start gap-2 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
-          <h3 className="text-2xl max-lg:pt-15">{policy?.title ?? "Privacy Policy"}</h3>
+          <h3 className="text-2xl max-lg:pt-15">
+            {policy?.title ?? "Privacy Policy"}
+          </h3>
           <p className="text-sm text-gray-500">{policy?.date ?? ""}</p>
           {isLoading && <p className="mt-4">Loading...</p>}
           {isError && (
@@ -22,7 +24,9 @@ const PrivacyPage = () => {
           {!isLoading && policy && (
             <div
               className="prose max-w-none mt-4 text-sm text-left pb-20"
-              dangerouslySetInnerHTML={{ __html: (policy.body).split('\n').join('<br/>') }}
+              dangerouslySetInnerHTML={{
+                __html: policy.body.split("\n").join("<br/>"),
+              }}
             />
           )}
         </div>

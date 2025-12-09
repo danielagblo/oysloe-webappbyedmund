@@ -31,13 +31,20 @@ export type Message = {
 // Chatroom helpers
 export const resolveChatroomId = async (params?: Record<string, unknown>) => {
   // Some backends expect the user id as a path parameter (e.g. /chatroomid/19/)
-  if (params && Object.prototype.hasOwnProperty.call(params, "user_id") && params.user_id != null) {
+  if (
+    params &&
+    Object.prototype.hasOwnProperty.call(params, "user_id") &&
+    params.user_id != null
+  ) {
     const uid = encodeURIComponent(String((params as any).user_id));
-    return apiClient.get<{ room_id: string }>(endpoints.chat.resolveChatroomId() + `${uid}/`);
+    return apiClient.get<{ room_id: string }>(
+      endpoints.chat.resolveChatroomId() + `${uid}/`,
+    );
   }
 
   return apiClient.get<{ room_id: string }>(
-    endpoints.chat.resolveChatroomId() + (params ? `?${new URLSearchParams(params as any).toString()}` : "")
+    endpoints.chat.resolveChatroomId() +
+      (params ? `?${new URLSearchParams(params as any).toString()}` : ""),
   );
 };
 
@@ -50,7 +57,9 @@ export const getChatRoom = async (id: number | string): Promise<ChatRoom> =>
 export const markChatRoomRead = async (id: number | string) =>
   apiClient.post(endpoints.chat.chatroomMarkRead(id), {});
 
-export const getChatRoomMessages = async (id: number | string): Promise<Message[]> =>
+export const getChatRoomMessages = async (
+  id: number | string,
+): Promise<Message[]> =>
   apiClient.get<Message[]>(endpoints.chat.chatroomMessages(id));
 
 // Create a chatroom. Payload depends on backend; send minimal object and allow caller to include participants or initial message.
@@ -58,14 +67,17 @@ export const createChatRoom = async (body: Record<string, unknown>) =>
   apiClient.post<ChatRoom>(endpoints.chat.chatrooms(), body);
 
 // Messages
-export const listMessages = async (): Promise<Message[]> => apiClient.get<Message[]>(endpoints.chat.messages());
+export const listMessages = async (): Promise<Message[]> =>
+  apiClient.get<Message[]>(endpoints.chat.messages());
 
 export const getMessage = async (id: number | string): Promise<Message> =>
   apiClient.get<Message>(endpoints.chat.messageDetail(id));
 
 // Send message to chatroom via REST fallback
-export const sendMessageToRoom = async (roomId: number | string, body: { content: string; extra?: Record<string, unknown> }) =>
-  apiClient.post(endpoints.chat.chatroomSend(roomId), body);
+export const sendMessageToRoom = async (
+  roomId: number | string,
+  body: { content: string; extra?: Record<string, unknown> },
+) => apiClient.post(endpoints.chat.chatroomSend(roomId), body);
 
 export default {
   resolveChatroomId,

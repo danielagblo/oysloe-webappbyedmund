@@ -18,7 +18,8 @@ export const getSubcategories = async (params?: {
     `${endpoints.subcategories.list()}${query}`,
   );
   // Normalise paginated { results: [...] } responses to an array
-  if (!Array.isArray(resp) && resp && Array.isArray(resp.results)) return resp.results as Subcategory[];
+  if (!Array.isArray(resp) && resp && Array.isArray(resp.results))
+    return resp.results as Subcategory[];
   return (resp as Subcategory[]) || [];
 };
 

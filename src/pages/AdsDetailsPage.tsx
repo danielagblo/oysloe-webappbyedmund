@@ -9,7 +9,13 @@ import RatingReviews from "../components/RatingsReviews";
 import ReportModal from "../components/ReportModal";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
-import { useMarkProductAsTaken, useOwnerProducts, useProduct, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
+import {
+  useMarkProductAsTaken,
+  useOwnerProducts,
+  useProduct,
+  useRelatedProducts,
+  useReportProduct,
+} from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import useUserProfile from "../features/userProfile/useUserProfile";
@@ -39,8 +45,10 @@ const AdsDetailsPage = () => {
   const { reviews: reviews = [] } = useReviews();
   const { data: userSubscriptions = [] } = useUserSubscriptions();
 
-  const activeUserSubscription = (userSubscriptions as any[]).find((us) => us?.is_active) || null;
-  const subscriptionMultiplierRaw = activeUserSubscription?.subscription?.multiplier ?? null;
+  const activeUserSubscription =
+    (userSubscriptions as any[]).find((us) => us?.is_active) || null;
+  const subscriptionMultiplierRaw =
+    activeUserSubscription?.subscription?.multiplier ?? null;
   const multiplierLabel = (() => {
     if (subscriptionMultiplierRaw == null) return null;
     const n = Number(subscriptionMultiplierRaw);
@@ -59,17 +67,23 @@ const AdsDetailsPage = () => {
   const markTaken = useMarkProductAsTaken();
 
   useEffect(() => {
-    const favFromProduct = Boolean((currentAdDataFromQuery as Product)?.favourited_by_user);
-    const favFromList = favourites.some((p) => p.id === (currentAdDataFromQuery)?.id);
+    const favFromProduct = Boolean(
+      (currentAdDataFromQuery as Product)?.favourited_by_user,
+    );
+    const favFromList = favourites.some(
+      (p) => p.id === currentAdDataFromQuery?.id,
+    );
     setIsFavourited(Boolean(favFromProduct || favFromList));
   }, [currentAdDataFromQuery, favourites]);
 
   const handleToggleFavourite = () => {
-    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || null;
+    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || null;
     if (!pid) return;
     // prevent duplicate rapid clicks while a mutation is in-flight
     if (toggleFavourite.status === "pending") {
-      console.debug("handleToggleFavourite: mutation already in-flight", { pid });
+      console.debug("handleToggleFavourite: mutation already in-flight", {
+        pid,
+      });
       return;
     }
     console.debug("handleToggleFavourite: toggling", { pid, at: Date.now() });
@@ -78,24 +92,25 @@ const AdsDetailsPage = () => {
   };
 
   const handleMarkAsTaken = () => {
-    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
+    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pid) return;
 
     toast.promise(
       Promise.resolve().then(() => {
         // assemble a full product payload to match backend schema expectations
-        const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const src =
+          currentAdDataFromQuery || adDataFromState || currentAdData || {};
         const payload = {
-          pid: (src)?.pid ?? `pid_${pid}`,
-          name: (src)?.name ?? "",
-          image: src?.image ?? (src?.images?.[0]?.image ?? ""),
-          type: (src)?.type ?? ("SALE" as const),
-          status: (src)?.status ?? ("ACTIVE" as const),
+          pid: src?.pid ?? `pid_${pid}`,
+          name: src?.name ?? "",
+          image: src?.image ?? src?.images?.[0]?.image ?? "",
+          type: src?.type ?? ("SALE" as const),
+          status: src?.status ?? ("ACTIVE" as const),
           is_taken: true,
-          description: (src)?.description ?? "",
-          price: (src)?.price ?? 0,
-          duration: (src)?.duration ?? "",
-          category: (src)?.category ?? (src)?.category_id ?? 0,
+          description: src?.description ?? "",
+          price: src?.price ?? 0,
+          duration: src?.duration ?? "",
+          category: src?.category ?? src?.category_id ?? 0,
         } as Record<string, unknown>;
 
         // call mutation with full payload so server receives the expected schema
@@ -105,12 +120,12 @@ const AdsDetailsPage = () => {
         loading: "Sending alert to owner to mark ad as taken...",
         success: "Alert sent to owner to mark ad as taken!",
         error: "Failed to send alert to owner to mark ad as taken",
-      }
+      },
     );
   };
 
   const handleReportAd = () => {
-    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
+    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pid) return;
     // open modal to collect a message from the reporter
     setIsReportModalOpen(true);
@@ -121,21 +136,22 @@ const AdsDetailsPage = () => {
   const [reportMessage, setReportMessage] = useState("");
 
   const submitReport = async () => {
-    const pid = (currentAdDataFromQuery)?.id || (adDataFromState)?.id || numericId;
+    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pid) return;
 
-    const src = currentAdDataFromQuery || adDataFromState || currentAdData || {};
+    const src =
+      currentAdDataFromQuery || adDataFromState || currentAdData || {};
     const payload = {
-      pid: (src)?.pid ?? `pid_${pid}`,
-      name: (src)?.name ?? "",
-      image: (src)?.image ?? (src?.images?.[0]?.image ?? ""),
-      type: (src)?.type ?? ("SALE" as const),
-      status: (src)?.status ?? ("ACTIVE" as const),
-      is_taken: Boolean((src)?.is_taken),
-      description: (src)?.description ?? "",
-      price: (src)?.price ?? 0,
-      duration: (src)?.duration ?? "",
-      category: (src)?.category ?? (src)?.category_id ?? 0,
+      pid: src?.pid ?? `pid_${pid}`,
+      name: src?.name ?? "",
+      image: src?.image ?? src?.images?.[0]?.image ?? "",
+      type: src?.type ?? ("SALE" as const),
+      status: src?.status ?? ("ACTIVE" as const),
+      is_taken: Boolean(src?.is_taken),
+      description: src?.description ?? "",
+      price: src?.price ?? 0,
+      duration: src?.duration ?? "",
+      category: src?.category ?? src?.category_id ?? 0,
       // include the reporter's message
       message: reportMessage,
     } as Record<string, unknown>;
@@ -145,8 +161,11 @@ const AdsDetailsPage = () => {
       const mutatePromise = (reportProduct as any).mutateAsync
         ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
         : new Promise((resolve, reject) => {
-          reportProduct.mutate({ id: pid, body: payload }, { onSuccess: resolve, onError: reject });
-        });
+            reportProduct.mutate(
+              { id: pid, body: payload },
+              { onSuccess: resolve, onError: reject },
+            );
+          });
 
       await toast.promise(mutatePromise, {
         loading: "Reporting ad...",
@@ -164,52 +183,70 @@ const AdsDetailsPage = () => {
 
   // Determine a candidate owner id early so hooks can be called unconditionally
   const ownerIdCandidate =
-    adDataFromState?.owner?.id ?? currentAdDataFromQuery?.owner?.id ?? undefined;
+    adDataFromState?.owner?.id ??
+    currentAdDataFromQuery?.owner?.id ??
+    undefined;
 
   // fetch seller's products from backend via hook (call unconditionally)
-  const ownerProductsQuery = useOwnerProducts(ownerIdCandidate as number | undefined);
+  const ownerProductsQuery = useOwnerProducts(
+    ownerIdCandidate as number | undefined,
+  );
   const sellerProducts = ownerProductsQuery.data ?? [];
 
   // fetch related products (for Similar Ads section)
-  const { data: relatedProducts = [] } = useRelatedProducts(numericId ?? undefined);
+  const { data: relatedProducts = [] } = useRelatedProducts(
+    numericId ?? undefined,
+  );
   const reportProduct = useReportProduct();
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
-    mutationFn: async ({ id, body }: { id: number; body?: any }) => likeReview(id, body),
+    mutationFn: async ({ id, body }: { id: number; body?: any }) =>
+      likeReview(id, body),
     onMutate: async ({ id }) => {
       // Optimistically update the specific product's reviews
-      const allReviews = queryClient.getQueryData(["reviews", { product: numericId }]) as Review[] | undefined;
+      const allReviews = queryClient.getQueryData([
+        "reviews",
+        { product: numericId },
+      ]) as Review[] | undefined;
       if (allReviews) {
         const updated = allReviews.map((review: Review) =>
-          review.id === id ? { ...review, liked: !review.liked } : review
+          review.id === id ? { ...review, liked: !review.liked } : review,
         );
         queryClient.setQueryData(["reviews", { product: numericId }], updated);
       }
     },
     onSuccess: async (data: any) => {
       console.log("Like mutation success, server returned:", data);
-      
+
       // Update individual review cache
       queryClient.setQueryData(["review", data.id], data);
-      
+
       // Update the product-specific reviews list with server response
-      const allReviews = queryClient.getQueryData(["reviews", { product: numericId }]) as Review[] | undefined;
+      const allReviews = queryClient.getQueryData([
+        "reviews",
+        { product: numericId },
+      ]) as Review[] | undefined;
       if (allReviews) {
         const updated = allReviews.map((review: Review) =>
-          review.id === data.id ? { ...review, ...data } : review
+          review.id === data.id ? { ...review, ...data } : review,
         );
         queryClient.setQueryData(["reviews", { product: numericId }], updated);
       }
-      
+
       // Invalidate only this product's reviews to ensure sync with server
-      await queryClient.invalidateQueries({ queryKey: ["reviews", { product: numericId }] });
-      
+      await queryClient.invalidateQueries({
+        queryKey: ["reviews", { product: numericId }],
+      });
+
       toast.success(data.liked ? "Review liked!" : "Review unliked!");
     },
     onError: (err: unknown) => {
       // Refetch only this product's reviews to restore correct state on error
-      queryClient.invalidateQueries({ queryKey: ["reviews", { product: numericId }] });
-      const message = err instanceof Error ? err.message : "Failed to like review";
+      queryClient.invalidateQueries({
+        queryKey: ["reviews", { product: numericId }],
+      });
+      const message =
+        err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
   });
@@ -218,7 +255,6 @@ const AdsDetailsPage = () => {
   const [showCaller1, setShowCaller1] = useState(false);
   const [showCaller2, setShowCaller2] = useState(false);
   const [quickChatInput, setQuickChatInput] = useState("");
-
 
   // Filter reviews for this specific product (memoized to prevent unnecessary recalculation)
   const thisProductsReviews = useMemo(() => {
@@ -277,7 +313,8 @@ const AdsDetailsPage = () => {
     if (!isPictureModalOpen) return;
     const onKey = (ev: KeyboardEvent) => {
       if (ev.key === "Escape") setIsPictureModalOpen(false);
-      if (ev.key === "ArrowLeft") setPictureModalIndex((i) => Math.max(0, i - 1));
+      if (ev.key === "ArrowLeft")
+        setPictureModalIndex((i) => Math.max(0, i - 1));
       if (ev.key === "ArrowRight") setPictureModalIndex((i) => i + 1);
     };
     window.addEventListener("keydown", onKey);
@@ -286,7 +323,6 @@ const AdsDetailsPage = () => {
 
   // derived image list and count (safe, uses currentAdData later)
   // we'll compute the concrete array after currentAdData is available
-
 
   if (!id || numericId === null)
     return (
@@ -297,14 +333,15 @@ const AdsDetailsPage = () => {
   if (adError)
     return (
       <p className="h-screen w-screen m-0 flex flex-col items-center justify-center">
-        <span className="text-8xl font-bold text-gray-400 animate-pulse">404</span>
+        <span className="text-8xl font-bold text-gray-400 animate-pulse">
+          404
+        </span>
         <span>There was an error loading this ad</span>
         <span className="text-3xl">(┬┬﹏┬┬)</span>
       </p>
     );
 
-  const currentAdData =
-    adDataFromState || currentAdDataFromQuery;
+  const currentAdData = adDataFromState || currentAdDataFromQuery;
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as an array of objects, a paginated object, or a single `image` string.
@@ -315,7 +352,9 @@ const AdsDetailsPage = () => {
 
     const addFromArray = (arr: any[]) =>
       arr
-        .map((it: any) => (typeof it === "string" ? it : it?.image ?? it?.url ?? null))
+        .map((it: any) =>
+          typeof it === "string" ? it : (it?.image ?? it?.url ?? null),
+        )
         .filter(Boolean) as string[];
 
     let list: string[] = [];
@@ -347,11 +386,19 @@ const AdsDetailsPage = () => {
 
   const imageCount = pageImages.length;
 
-
   // derive owner contact numbers (prefer canonical fields)
-  const owner = (currentAdData?.owner || currentAdDataFromQuery?.owner || adDataFromState?.owner);
-  const callerNumber1: string | null = owner?.phone || owner?.phone_number || owner?.primary_phone || null;
-  const callerNumber2: string | null = owner?.second_number || owner?.phone2 || owner?.secondary_phone || owner?.alt_phone || null;
+  const owner =
+    currentAdData?.owner ||
+    currentAdDataFromQuery?.owner ||
+    adDataFromState?.owner;
+  const callerNumber1: string | null =
+    owner?.phone || owner?.phone_number || owner?.primary_phone || null;
+  const callerNumber2: string | null =
+    owner?.second_number ||
+    owner?.phone2 ||
+    owner?.secondary_phone ||
+    owner?.alt_phone ||
+    null;
   const toggleCaller1 = () => setShowCaller1((s) => !s);
   const toggleCaller2 = () => setShowCaller2((s) => !s);
 
@@ -370,7 +417,8 @@ const AdsDetailsPage = () => {
       };
       const res = await resolveChatroomId(params as any);
       // resolveChatroomId returns { room_id: string } or similar
-      const roomKey = (res as any)?.room_id || String((res as any)?.room || (res as any)?.id);
+      const roomKey =
+        (res as any)?.room_id || String((res as any)?.room || (res as any)?.id);
 
       // optimistic local message
       const tempId = `tmp_${Date.now()}`;
@@ -431,7 +479,6 @@ const AdsDetailsPage = () => {
     }
   };
 
-
   // mini components
   const MobileHeader = () => (
     <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) fixed top-0 z-50">
@@ -440,7 +487,9 @@ const AdsDetailsPage = () => {
         <span className="text-sm">Back</span>
       </button>
       <h2 className="text-sm font-medium some-gray] rounded-2xl py-1 px-2">
-        {imageCount > 0 ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}` : `0/0`}
+        {imageCount > 0
+          ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}`
+          : `0/0`}
       </h2>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
@@ -492,7 +541,9 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">{String(currentAdData?.total_reports)}</h2>
+        <h2 className="text-base md:text-[1.125vw]">
+          {String(currentAdData?.total_reports)}
+        </h2>
       </div>
       <div className="flex items-center gap-2">
         <img
@@ -500,12 +551,16 @@ const AdsDetailsPage = () => {
           alt=""
           className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">{currentAdData?.total_favourites}</h2>
+        <h2 className="text-base md:text-[1.125vw]">
+          {currentAdData?.total_favourites}
+        </h2>
       </div>
       {/* Image count (desktop) - mirrors mobile header */}
       <div className="flex items-center gap-2">
         <h2 className="text-sm font-medium">
-          {imageCount > 0 ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}` : `0/0`}
+          {imageCount > 0
+            ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}`
+            : `0/0`}
         </h2>
       </div>
       <div className="flex gap-2 ml-auto items-center">
@@ -546,8 +601,8 @@ const AdsDetailsPage = () => {
     currentIndex: number;
   }) => {
     const galleryImages = useMemo(
-      () => images.length > 0 ? images : ["/no-image.jpeg"],
-      [images]
+      () => (images.length > 0 ? images : ["/no-image.jpeg"]),
+      [images],
     );
     const max = galleryImages.length;
     const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -555,7 +610,8 @@ const AdsDetailsPage = () => {
 
     const checkScroll = () => {
       if (galleryScrollRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = galleryScrollRef.current;
+        const { scrollLeft, scrollWidth, clientWidth } =
+          galleryScrollRef.current;
         setCanScrollLeft(scrollLeft > 0);
         setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
       }
@@ -569,7 +625,7 @@ const AdsDetailsPage = () => {
     const prevImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
       if (galleryScrollRef.current) {
-        galleryScrollRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+        galleryScrollRef.current.scrollBy({ left: -500, behavior: "smooth" });
         setTimeout(checkScroll, 300);
       }
     };
@@ -577,7 +633,7 @@ const AdsDetailsPage = () => {
     const nextImage = (e?: React.MouseEvent) => {
       e?.stopPropagation();
       if (galleryScrollRef.current) {
-        galleryScrollRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+        galleryScrollRef.current.scrollBy({ left: 500, behavior: "smooth" });
         setTimeout(checkScroll, 300);
       }
     };
@@ -587,17 +643,18 @@ const AdsDetailsPage = () => {
       if (galleryScrollRef.current) {
         // deltaX for trackpad horizontal scrolling, deltaY for vertical scrolling
         const scrollAmount = Math.abs(e.deltaX) > 0 ? e.deltaX : e.deltaY;
-        galleryScrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        galleryScrollRef.current.scrollBy({
+          left: scrollAmount,
+          behavior: "smooth",
+        });
         setTimeout(checkScroll, 300);
       }
     };
 
     const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
 
-
     return (
       <div className="w-full flex justify-center my-4 sm:mb-8">
-
         {/* DESKTOP: show 3 side-by-side square images (carousel) */}
         <div className="hidden sm:flex w-full h-fit gap-4 items-stretch relative">
           {canScrollLeft && (
@@ -613,7 +670,7 @@ const AdsDetailsPage = () => {
           <div
             ref={galleryScrollRef}
             className="flex gap-4 px-4 max-w-screen mx-auto items-center overflow-x-auto overflow-y-hidden scroll-smooth no-scrollbar"
-            style={{ scrollBehavior: 'smooth', width: '95%' }}
+            style={{ scrollBehavior: "smooth", width: "95%" }}
             onWheel={handleWheel}
             onScroll={checkScroll}
           >
@@ -634,7 +691,11 @@ const AdsDetailsPage = () => {
                     style={{ backgroundImage: `url(${src})` }}
                   />
                   {/* Main image on top */}
-                  <img src={src} alt={`Image ${i + 1}`} className="object-cover w-full h-full relative z-10" />
+                  <img
+                    src={src}
+                    alt={`Image ${i + 1}`}
+                    className="object-cover w-full h-full relative z-10"
+                  />
                 </div>
               );
             })}
@@ -663,17 +724,36 @@ const AdsDetailsPage = () => {
             style={{ backgroundImage: `url(${getMainImage()})` }}
           />
           {/* Main image on top - shrunk hitbox to avoid side zones */}
-          <div className="absolute inset-0 w-[40%] left-[30%] z-30 cursor-zoom-in" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
-          <img src={getMainImage()} alt="Ad main" className="object-contain w-full h-full relative z-10" />
+          <div
+            className="absolute inset-0 w-[40%] left-[30%] z-30 cursor-zoom-in"
+            onClick={() => {
+              setPictureModalIndex(galleryIndex);
+              setIsPictureModalOpen(true);
+            }}
+          />
+          <img
+            src={getMainImage()}
+            alt="Ad main"
+            className="object-contain w-full h-full relative z-10"
+          />
           {/* Left side: navigate to previous image (with looping) */}
-          <div onClick={() => { setGalleryIndex((idx) => (idx - 1 + imageCount) % imageCount); }} className="absolute top-0 left-0 w-[30%] h-full z-20" />
+          <div
+            onClick={() => {
+              setGalleryIndex((idx) => (idx - 1 + imageCount) % imageCount);
+            }}
+            className="absolute top-0 left-0 w-[30%] h-full z-20"
+          />
           {/* Right side: navigate to next image (with looping) */}
-          <div onClick={() => { setGalleryIndex((idx) => (idx + 1) % imageCount); }} className="absolute top-0 right-0 w-[30%] h-full z-20" />
+          <div
+            onClick={() => {
+              setGalleryIndex((idx) => (idx + 1) % imageCount);
+            }}
+            className="absolute top-0 right-0 w-[30%] h-full z-20"
+          />
         </div>
       </div>
     );
   };
-
 
   const PictureModal = () => {
     if (!isPictureModalOpen) return null;
@@ -702,7 +782,10 @@ const AdsDetailsPage = () => {
     // keyboard handling is registered at top-level useEffect when modal is open
 
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70" onClick={close}>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        onClick={close}
+      >
         <div
           className="relative max-w-4xl w-[95%] sm:w-[80%] bg-transparent p-4 max-h-[90vh] overflow-auto no-scrollbar flex flex-col items-center justify-center"
           onClick={(e) => e.stopPropagation()}
@@ -737,7 +820,9 @@ const AdsDetailsPage = () => {
             {/* Blurred background image */}
             <div
               className="absolute inset-0 bg-cover bg-center blur-md opacity-40 rounded"
-              style={{ backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})` }}
+              style={{
+                backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})`,
+              }}
             />
             {/* Main image on top */}
             <img
@@ -768,7 +853,11 @@ const AdsDetailsPage = () => {
                 onClick={() => setPictureModalIndex(i)}
                 className={`shrink-0 w-20 h-20 overflow-hidden rounded ${i === pictureModalIndex ? "ring-2 ring-white" : ""}`}
               >
-                <img src={s} alt={`thumb ${i + 1}`} className="object-cover w-full h-full" />
+                <img
+                  src={s}
+                  alt={`thumb ${i + 1}`}
+                  className="object-cover w-full h-full"
+                />
               </button>
             ))}
           </div>
@@ -794,13 +883,16 @@ const AdsDetailsPage = () => {
         <h2 className="text-2xl md:text-[2vw] font-medium">
           {currentAdData?.name || "Untitled Product"}
         </h2>
-        {((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken) && (
-          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">Taken</span>
+        {((currentAdData as any)?.is_taken ||
+          (currentAdDataFromQuery as any)?.is_taken) && (
+          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
+            Taken
+          </span>
         )}
       </div>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price
-          ? `${formatMoney(currentAdData?.price)}${currentAdData?.type?.toLowerCase() === 'rent' ? ' per month' : ''}`
+          ? `${formatMoney(currentAdData?.price)}${currentAdData?.type?.toLowerCase() === "rent" ? " per month" : ""}`
           : "Please Contact the Seller for the Price of this Product"}
       </h2>
     </div>
@@ -846,12 +938,12 @@ const AdsDetailsPage = () => {
   );
 
   const ActionButtons = ({
-    onMarkTaken = () => { },
-    onReportAd = () => { },
-    onCaller1 = () => { },
-    onCaller2 = () => { },
-    onMakeOffer = () => { },
-    onFavorite = () => { },
+    onMarkTaken = () => {},
+    onReportAd = () => {},
+    onCaller1 = () => {},
+    onCaller2 = () => {},
+    onMakeOffer = () => {},
+    onFavorite = () => {},
     isFavourited = false,
     // new props for caller UI
     caller1,
@@ -877,11 +969,14 @@ const AdsDetailsPage = () => {
     toggleCaller2?: () => void;
     favouritePending?: boolean;
   }) => {
-    const isTaken = Boolean((currentAdData as any)?.is_taken || (currentAdDataFromQuery as any)?.is_taken);
+    const isTaken = Boolean(
+      (currentAdData as any)?.is_taken ||
+      (currentAdDataFromQuery as any)?.is_taken,
+    );
     const [showOffer, setShowOffer] = useState(false);
     const [offerInput, setOfferInput] = useState<string>("");
     const actions: Record<string, () => void> = {
-      "Mark as taken": isTaken ? () => { } : (onMarkTaken || (() => { })),
+      "Mark as taken": isTaken ? () => {} : onMarkTaken || (() => {}),
       "Report Ad": onReportAd,
       "Caller 1": onCaller1,
       "Caller 2": onCaller2,
@@ -898,7 +993,9 @@ const AdsDetailsPage = () => {
               ["flag.svg", "Report Ad"],
               ["outgoing call.svg", "Caller 1"],
               // only include Caller 2 when a second number is available
-              ...(caller2 ? ([["outgoing call.svg", "Caller 2"]] as [string, string][]) : []),
+              ...(caller2
+                ? ([["outgoing call.svg", "Caller 2"]] as [string, string][])
+                : []),
               ["Make an offer.svg", "Make Offer"],
               ["favorited.svg", "Favorites"],
             ];
@@ -907,20 +1004,21 @@ const AdsDetailsPage = () => {
                 <button
                   key={label}
                   className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                  ${actions[label]
+                  ${
+                    actions[label]
                       ? "cursor-pointer hover:scale-95 active:scale-105"
                       : "cursor-not-allowed"
-                    }
+                  }
                 `}
                   onClick={(e) => {
                     e.stopPropagation();
                     // special handling for caller buttons to toggle tooltip
                     if (label === "Caller 1") {
-                      (toggleCaller1 || (() => { }))();
+                      (toggleCaller1 || (() => {}))();
                       return;
                     }
                     if (label === "Caller 2") {
-                      (toggleCaller2 || (() => { }))();
+                      (toggleCaller2 || (() => {}))();
                       return;
                     }
                     if (label === "Make Offer") {
@@ -938,18 +1036,26 @@ const AdsDetailsPage = () => {
                   {label === "Favorites" ? (
                     <>
                       <img
-                        src={isFavourited ? "/favorited.svg" : "/heart-outline.svg"}
+                        src={
+                          isFavourited ? "/favorited.svg" : "/heart-outline.svg"
+                        }
                         alt=""
                         className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
                       />
-                      <p className="whitespace-nowrap">{isFavourited ? "Liked" : "Like"}</p>
+                      <p className="whitespace-nowrap">
+                        {isFavourited ? "Liked" : "Like"}
+                      </p>
                     </>
                   ) : (
                     <>
                       {/* show Taken label instead of Mark as taken when product is already taken */}
                       {label === "Mark as taken" && isTaken ? (
                         <>
-                          <img src="/check.svg" alt="" className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]" />
+                          <img
+                            src="/check.svg"
+                            alt=""
+                            className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
+                          />
                           <p className="whitespace-nowrap">Taken</p>
                         </>
                       ) : (
@@ -967,21 +1073,35 @@ const AdsDetailsPage = () => {
                 </button>
 
                 {/* caller tooltip */}
-                {label === "Caller 1" && (showC1 && caller1) && (
+                {label === "Caller 1" && showC1 && caller1 && (
                   <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-8">
                       <div className="font-semibold flex items-center gap-2">
-                        <img src="/outgoing call.svg" alt="" className="w-4 lg:w-[1.5vw] h-auto" />
-                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Caller 1</span>
+                        <img
+                          src="/outgoing call.svg"
+                          alt=""
+                          className="w-4 lg:w-[1.5vw] h-auto"
+                        />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">
+                          Caller 1
+                        </span>
                       </div>
                       <a
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2 text-sm sm:text-base lg:text-[1.2vw]"
-                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        style={{
+                          color: "var(--dark-def)",
+                          textDecoration: "none",
+                        }}
                       >
-                        <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
-                        <span className="border border-gray-200 px-2.5 py-1.5"> {caller1}</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          Call
+                        </span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          {" "}
+                          {caller1}
+                        </span>
                       </a>
                     </div>
                   </div>
@@ -992,26 +1112,34 @@ const AdsDetailsPage = () => {
                   <div className="absolute z-50 mt-2 p-4 lg:pb-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-fit overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:min-w-96 sm:w-fit">
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-xs font-semibold">
-                        <img src="/Make an offer.svg" alt="" className="w-4 h-auto lg:w-[1.5vw]" />
-                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">Make Offer</span>
+                        <img
+                          src="/Make an offer.svg"
+                          alt=""
+                          className="w-4 h-auto lg:w-[1.5vw]"
+                        />
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">
+                          Make Offer
+                        </span>
                       </div>
                       <div className="w-full flex flex-col gap-2">
                         {/* offer option buttons: no border */}
                         <div className="flex gap-2">
-                          {['~5% cut', '~10% cut', '~15% cut', '~20% cut'].map((opt) => (
-                            <button
-                              key={opt}
-                              type="button"
-                              className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
-                              onClick={(ev) => {
-                                ev.stopPropagation();
-                                // set the input value when an option is clicked
-                                setOfferInput(`${opt} off on overall price`);
-                              }}
-                            >
-                              {opt}
-                            </button>
-                          ))}
+                          {["~5% cut", "~10% cut", "~15% cut", "~20% cut"].map(
+                            (opt) => (
+                              <button
+                                key={opt}
+                                type="button"
+                                className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  // set the input value when an option is clicked
+                                  setOfferInput(`${opt} off on overall price`);
+                                }}
+                              >
+                                {opt}
+                              </button>
+                            ),
+                          )}
                         </div>
                         {/* input + send button */}
                         <div className="flex gap-2 mt-1">
@@ -1027,13 +1155,18 @@ const AdsDetailsPage = () => {
                             className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
                             onClick={async (ev) => {
                               ev.stopPropagation();
-                              if (!offerInput || offerInput.trim().length === 0) return;
+                              if (!offerInput || offerInput.trim().length === 0)
+                                return;
                               // send offer as chat message and open inbox
                               await openChatWithOwnerAndSend(offerInput.trim());
                               setShowOffer(false);
                             }}
                           >
-                            <img src="/send.svg" alt="Send" className="w-8 h-8" />
+                            <img
+                              src="/send.svg"
+                              alt="Send"
+                              className="w-8 h-8"
+                            />
                           </button>
                         </div>
                       </div>
@@ -1041,18 +1174,31 @@ const AdsDetailsPage = () => {
                   </div>
                 )}
 
-                {label === "Caller 2" && (showC2 && caller2) && (
+                {label === "Caller 2" && showC2 && caller2 && (
                   <div className="absolute z-50 mt-2 p-3 bg-white border rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
                     <div className="flex flex-col items-center gap-3">
-                      <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                      <img
+                        src="/outgoing call.svg"
+                        alt=""
+                        className="w-4 h-auto"
+                      />
                       <span className="text-[9px]">Caller 2</span>
                       <a
                         href={`tel:${caller2}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2"
-                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        style={{
+                          color: "var(--dark-def)",
+                          textDecoration: "none",
+                        }}
                       >
-                        <span className="border border-gray-200 px-2 py-1">Call</span><span className="border border-gray-200 px-2 py-1"> {caller2}</span>
+                        <span className="border border-gray-200 px-2 py-1">
+                          Call
+                        </span>
+                        <span className="border border-gray-200 px-2 py-1">
+                          {" "}
+                          {caller2}
+                        </span>
                       </a>
                     </div>
                   </div>
@@ -1067,14 +1213,14 @@ const AdsDetailsPage = () => {
 
   const CommentsSection = () => {
     return (
-      <div className="p-6 w-full rounded-lg -ml-4 sm:ml-0 lg:p-0">
+      <div className="lg:p-2 w-full rounded-lg lg:p-0">
         <h2 className="text-2xl font-medium sm:hidden inline">
           Seller Reviews
         </h2>
         <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">
           Comments
         </h2>
-        <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
+        <div className="mt-5 lg:-ml-4 w-full flex-col gap-3">
           {thisProductsReviews.length === 0 && (
             <p className="md:text-[1.2vw]">
               No <span className="max-sm:hidden">comments</span>
@@ -1136,7 +1282,9 @@ const AdsDetailsPage = () => {
                       <h3>{review?.liked ? "Unlike" : "Like"}</h3>
                     </div>
                   </button>
-                  <span className="text-sm md:text-[1vw]">{review.likes_count ?? 0}</span>
+                  <span className="text-sm md:text-[1vw]">
+                    {review.likes_count ?? 0}
+                  </span>
                 </div>
               </div>
               <p className="text-gray-700 text-sm md:text-[1.123vw] md:mt-3">
@@ -1147,13 +1295,21 @@ const AdsDetailsPage = () => {
         </div>
         <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
           <button
-            onClick={() => navigate("/reviews", { state: { productId: currentAdData?.id ?? numericId } })}
+            onClick={() =>
+              navigate("/reviews", {
+                state: { productId: currentAdData?.id ?? numericId },
+              })
+            }
             className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Make Review
           </button>
           <button
-            onClick={() => navigate("/reviews", { state: { productId: currentAdData?.id ?? numericId } })}
+            onClick={() =>
+              navigate("/reviews", {
+                state: { productId: currentAdData?.id ?? numericId },
+              })
+            }
             className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Show reviews
@@ -1206,11 +1362,7 @@ const AdsDetailsPage = () => {
               setQuickChatInput("");
             }}
           >
-            <img
-              src="/send.svg"
-              alt="Send"
-              className="w-6 h-6"
-            />
+            <img src="/send.svg" alt="Send" className="w-6 h-6" />
           </button>
         </div>
         <div className="mt-4 space-y-2 text-[10px] inline-flex flex-wrap gap-2 text-gray-600">
@@ -1256,22 +1408,34 @@ const AdsDetailsPage = () => {
         </div>
         <div>
           <h2 className="text-sm text-gray-500 md:text-[1vw]">
-            {currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}
+            {currentAdData?.created_at
+              ? new Date(currentAdData.created_at).toLocaleString(undefined, {
+                  month: "short",
+                  year: "numeric",
+                })
+              : ""}
           </h2>
-          <h3 className="font-semibold md:text-[1.2vw]">{owner?.name ?? "Seller"}</h3>
-          <h3 className="text-sm text-gray-600 md:text-[1vw]">Total Ads: {sellerProducts.length}</h3>
+          <h3 className="font-semibold md:text-[1.2vw]">
+            {owner?.name ?? "Seller"}
+          </h3>
+          <h3 className="text-sm text-gray-600 md:text-[1vw]">
+            Total Ads: {sellerProducts.length}
+          </h3>
         </div>
       </div>
       {/* store name */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between px-2 mb-6">
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
-          <h4 className="text-xl md:text-[1.5vw]">{currentAdData?.owner?.name ?? "Seller"}</h4>
+          <h4 className="text-xl md:text-[1.5vw]">
+            {currentAdData?.owner?.name ?? "Seller"}
+          </h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
             <span className="text-[10px] md:text-[0.9vw] text-green-800">
               {(() => {
                 // prefer level from product owner if available (use owner only)
-                const ownerLevel = (owner as unknown as { level?: string })?.level as string | undefined;
+                const ownerLevel = (owner as unknown as { level?: string })
+                  ?.level as string | undefined;
                 if (ownerLevel) return ownerLevel;
                 return "High level";
               })()}
@@ -1287,53 +1451,63 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-center mb-4 w-full">
         <div className="pt-4 overflow-x-hidden w-full">
           <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4">
-            <button 
+            <button
               className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
               onClick={() => {
                 if (sellerCarouselRef.current) {
-                  sellerCarouselRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+                  sellerCarouselRef.current.scrollBy({
+                    left: -500,
+                    behavior: "smooth",
+                  });
                 }
               }}
               aria-label="Scroll seller products left"
             >
               <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
             </button>
-            <div 
+            <div
               ref={sellerCarouselRef}
               className="flex gap-2 overflow-x-auto flex-1 no-scrollbar p-"
             >
               {sellerProducts && sellerProducts.length > 0 ? (
-                sellerProducts.slice(0, 6).map((p) => (
-                  (!p.is_taken && p.status === "ACTIVE") && (
-                    <img
-                      key={p.id}
-                      src={p.image || "/no-image.jpeg"}
-                      alt={p.name || "Seller product"}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        navigate(`/ads/${p.id}`, { state: { adData: p } });
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                sellerProducts.slice(0, 6).map(
+                  (p) =>
+                    !p.is_taken &&
+                    p.status === "ACTIVE" && (
+                      <img
+                        key={p.id}
+                        src={p.image || "/no-image.jpeg"}
+                        alt={p.name || "Seller product"}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => {
                           navigate(`/ads/${p.id}`, { state: { adData: p } });
-                        }
-                      }}
-                      className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
-                    />
-                  ))
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            navigate(`/ads/${p.id}`, { state: { adData: p } });
+                          }
+                        }}
+                        className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
+                      />
+                    ),
                 )
               ) : (
                 <>
-                  <p className="text-gray-500 md:text-[1vw] w-full text-center">No other ads from this seller.</p>
+                  <p className="text-gray-500 md:text-[1vw] w-full text-center">
+                    No other ads from this seller.
+                  </p>
                 </>
               )}
             </div>
-            <button 
+            <button
               className="absolute right-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
               onClick={() => {
                 if (sellerCarouselRef.current) {
-                  sellerCarouselRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+                  sellerCarouselRef.current.scrollBy({
+                    left: 500,
+                    behavior: "smooth",
+                  });
                 }
               }}
               aria-label="Scroll seller products right"
@@ -1347,15 +1521,36 @@ const AdsDetailsPage = () => {
       {/* profile bit mobile*/}
       <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
         <div className="relative">
-          <img src={currentAdData?.owner?.avatar || "/userPfp2.jpg"} alt="" className="w-15 h-15 rounded-full" />
-          {(currentAdData?.owner?.is_verified || currentAdData?.owner?.verified || currentAdData?.owner?.verified_at) && (
-            <img src="/verified.svg" alt="Verified" className="absolute -bottom-1 -right-2 w-8 h-8" />
+          <img
+            src={currentAdData?.owner?.avatar || "/userPfp2.jpg"}
+            alt=""
+            className="w-15 h-15 rounded-full"
+          />
+          {(currentAdData?.owner?.is_verified ||
+            currentAdData?.owner?.verified ||
+            currentAdData?.owner?.verified_at) && (
+            <img
+              src="/verified.svg"
+              alt="Verified"
+              className="absolute -bottom-1 -right-2 w-8 h-8"
+            />
           )}
         </div>
         <div>
-          <h2 className="text-sm text-gray-500">{currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}</h2>
-          <h3 className="font-semibold">{currentAdData?.owner?.name ?? "Seller"}</h3>
-          <h3 className="text-sm text-gray-600">Total Ads: {sellerProducts.length || 0}</h3>
+          <h2 className="text-sm text-gray-500">
+            {currentAdData?.created_at
+              ? new Date(currentAdData.created_at).toLocaleString(undefined, {
+                  month: "short",
+                  year: "numeric",
+                })
+              : ""}
+          </h2>
+          <h3 className="font-semibold">
+            {currentAdData?.owner?.name ?? "Seller"}
+          </h3>
+          <h3 className="text-sm text-gray-600">
+            Total Ads: {sellerProducts.length || 0}
+          </h3>
         </div>
       </div>
     </div>
@@ -1368,45 +1563,55 @@ const AdsDetailsPage = () => {
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
         {
-        (relatedProducts && relatedProducts.length > 0) 
-        ? relatedProducts.map(ad =>
-          !ad.is_taken && (
-            <Link
-              key={ad.id}
-              to={`/ads/${ad.id}`}
-              state={{ adData: ad }}
-              className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-            >
-              <img
-                src={ad.image || "/no-image.jpeg"}
-                alt={ad.name.slice(0, 10)}
-                className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
-              />
-              <div className="flex items-center gap-1 px-2 py-1">
-                <img
-                  src="/location.svg"
-                  alt=""
-                  className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
-                />
-                <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                  {ad.location?.name || "Unknown"}
-                </p>
-              </div>
-              <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-                {ad.name}
-              </p>
-              <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-                {formatMoney(ad.price, "GHS")}
-              </p>
-            </Link>
-          ))
-        : <div className="flex items-center flex-col justify-center w-full gap-2">
-            <img src="/nothing-to-show.png" className="w-25 h-25" alt="nothing to show" />
-            <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">No similar ads to show.</p>
-       
-          </div>   
-           }   
-</div>
+        (() => {
+          const availableAds = relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
+          return availableAds.length > 0 ? (
+            availableAds.map(
+              (ad) => (
+                <Link
+                  key={ad.id}
+                  to={`/ads/${ad.id}`}
+                  state={{ adData: ad }}
+                  className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                >
+                  <img
+                    src={ad.image || "/no-image.jpeg"}
+                    alt={ad.name.slice(0, 10)}
+                    className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
+                  />
+                  <div className="flex items-center gap-1 px-2 py-1">
+                    <img
+                      src="/location.svg"
+                      alt=""
+                      className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                    />
+                    <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
+                      {ad.location?.name || "Unknown"}
+                    </p>
+                  </div>
+                  <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
+                    {ad.name}
+                  </p>
+                  <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
+                    {formatMoney(ad.price, "GHS")}
+                  </p>
+                </Link>
+              )
+            )
+          ) : (
+          <div className="flex items-center flex-col justify-center w-full gap-2">
+            <img
+              src="/nothing-to-show.png"
+              className="w-25 h-25"
+              alt="nothing to show"
+            />
+            <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">
+              No similar ads to show.
+            </p>
+          </div>
+        );
+        })()}
+      </div>
     </div>
   );
 
@@ -1438,7 +1643,6 @@ const AdsDetailsPage = () => {
           {/* MAIN CONTENT */}
           <div className="flex flex-col gap-4 w-full">
             <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
-
               {/* mobile layout */}
               <div className="sm:hidden flex w-full justify-between ad-details-page">
                 <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px] pt-7">

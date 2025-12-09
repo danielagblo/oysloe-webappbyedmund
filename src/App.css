@@ -282,7 +282,7 @@ body {
 }
 
 .loading-dots::after {
-  content: '';
+  content: "";
   display: inline-block;
   width: 1ch;
   animation: dots 1s steps(3, end) infinite;
@@ -292,19 +292,19 @@ body {
 
 @keyframes dots {
   0% {
-    content: ' ';
+    content: " ";
   }
 
   33% {
-    content: '. ';
+    content: ". ";
   }
 
   66% {
-    content: '. . ';
+    content: ". . ";
   }
 
   100% {
-    content: '. . .';
+    content: ". . .";
   }
 }
 
@@ -371,12 +371,12 @@ body {
   width: 8px;
 }
 
-.round input[type="checkbox"]:checked+label {
+.round input[type="checkbox"]:checked + label {
   background-color: #374957;
   /* green fill when checked */
   border-color: #4f5961;
 }
 
-.round input[type="checkbox"]:checked+label:after {
+.round input[type="checkbox"]:checked + label:after {
   opacity: 1;
 }

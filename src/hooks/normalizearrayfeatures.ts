@@ -43,5 +43,5 @@ const normalizePossibleFeatureValues = (raw: any, fid?: number): string[] => {
   }
 
   return [];
-}
+};
 export default normalizePossibleFeatureValues;

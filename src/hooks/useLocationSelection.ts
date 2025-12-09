@@ -8,7 +8,9 @@ const STORAGE_KEY = "oysloe.savedLocations";
 /**
  * groupedLocations: Record<region, string[]>
  */
-export default function useLocationSelection(groupedLocations: Record<string, string[]> = {}) {
+export default function useLocationSelection(
+  groupedLocations: Record<string, string[]> = {},
+) {
   // UI label for dropdown (place name) or null before selection
   const [regionLabel, setRegionLabel] = useState<string | null>(null);
 
@@ -57,7 +59,11 @@ export default function useLocationSelection(groupedLocations: Record<string, st
       const places = groupedLocations[region] ?? [];
       if (!Array.isArray(places)) continue;
       for (const p of places) {
-        if (String(p || "").trim().toLowerCase() === target) {
+        if (
+          String(p || "")
+            .trim()
+            .toLowerCase() === target
+        ) {
           return { region, place: String(p) };
         }
       }
@@ -73,12 +79,30 @@ export default function useLocationSelection(groupedLocations: Record<string, st
 
     const tryMatch = (a: string, b: string) => {
       // check if b is a known region and contains a as a place
-      const regionKey = Object.keys(groupedLocations).find(r => String(r || "").trim().toLowerCase() === b.trim().toLowerCase());
+      const regionKey = Object.keys(groupedLocations).find(
+        (r) =>
+          String(r || "")
+            .trim()
+            .toLowerCase() === b.trim().toLowerCase(),
+      );
       if (regionKey) {
         const places = groupedLocations[regionKey] ?? [];
-        if (Array.isArray(places) && places.find(p => String(p || "").trim().toLowerCase() === a.trim().toLowerCase())) {
+        if (
+          Array.isArray(places) &&
+          places.find(
+            (p) =>
+              String(p || "")
+                .trim()
+                .toLowerCase() === a.trim().toLowerCase(),
+          )
+        ) {
           // return canonical forms
-          const matchedPlace = places.find(p => String(p || "").trim().toLowerCase() === a.trim().toLowerCase()) as string;
+          const matchedPlace = places.find(
+            (p) =>
+              String(p || "")
+                .trim()
+                .toLowerCase() === a.trim().toLowerCase(),
+          ) as string;
           return { region: regionKey, place: String(matchedPlace) };
         }
       }
@@ -87,7 +111,7 @@ export default function useLocationSelection(groupedLocations: Record<string, st
 
     // common separators: " - ", ","
     if (raw.includes(" - ")) {
-      const parts = raw.split(" - ").map(s => s.trim());
+      const parts = raw.split(" - ").map((s) => s.trim());
       if (parts.length >= 2) {
         // try both orders
         const a = tryMatch(parts[0], parts[1]) || tryMatch(parts[1], parts[0]);
@@ -98,7 +122,7 @@ export default function useLocationSelection(groupedLocations: Record<string, st
     }
 
     if (raw.includes(",")) {
-      const parts = raw.split(",").map(s => s.trim());
+      const parts = raw.split(",").map((s) => s.trim());
       if (parts.length >= 2) {
         const a = tryMatch(parts[0], parts[1]) || tryMatch(parts[1], parts[0]);
         if (a) return a;
@@ -115,7 +139,9 @@ export default function useLocationSelection(groupedLocations: Record<string, st
   const selectPlace = (opt: string) => {
     const parsed = parseOptionString(opt);
     // UI label shows place (and region for clarity)
-    const label = parsed.region ? `${parsed.place}, ${parsed.region}` : parsed.place;
+    const label = parsed.region
+      ? `${parsed.place}, ${parsed.region}`
+      : parsed.place;
     setRegionLabel(label || null);
     setLocationDetails({ region: parsed.region, place: parsed.place });
     setShowSaveLocationModal(true);
@@ -132,10 +158,23 @@ export default function useLocationSelection(groupedLocations: Record<string, st
   const saveCurrentLocation = () => {
     if (!locationDetails) return false;
 
-    const label = newLocationName.trim() !== "" ? newLocationName.trim() : locationDetails.place;
+    const label =
+      newLocationName.trim() !== ""
+        ? newLocationName.trim()
+        : locationDetails.place;
     setSavedLocations((prev) => {
-      if (prev.some((p) => p.place === locationDetails.place && p.region === locationDetails.region)) return prev;
-      return [...prev, { label, region: locationDetails.region, place: locationDetails.place }];
+      if (
+        prev.some(
+          (p) =>
+            p.place === locationDetails.place &&
+            p.region === locationDetails.region,
+        )
+      )
+        return prev;
+      return [
+        ...prev,
+        { label, region: locationDetails.region, place: locationDetails.place },
+      ];
     });
 
     // cleanup modal

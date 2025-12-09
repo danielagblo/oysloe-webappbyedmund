@@ -11,7 +11,10 @@ import "../App.css";
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
-import { getFeatures, getPossibleFeatureValues } from "../services/featureService";
+import {
+  getFeatures,
+  getPossibleFeatureValues,
+} from "../services/featureService";
 import { getSubcategories } from "../services/subcategoryService";
 import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
@@ -31,7 +34,7 @@ type HomePageHeaderProps = {
 // Hook to manage dynamic scroll fade effect
 const useScrollFade = (containerId: string) => {
   const [maskStyle, setMaskStyle] = useState<string>(
-    "linear-gradient(to right, black 100%)"
+    "linear-gradient(to right, black 100%)",
   );
 
   useEffect(() => {
@@ -54,13 +57,16 @@ const useScrollFade = (containerId: string) => {
       let gradient = "";
       if (atStart && !atEnd) {
         // Only fade on right
-        gradient = "linear-gradient(to right, black 0%, black 92%, transparent 100%)";
+        gradient =
+          "linear-gradient(to right, black 0%, black 92%, transparent 100%)";
       } else if (atEnd && !atStart) {
         // Only fade on left
-        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 100%)";
+        gradient =
+          "linear-gradient(to right, transparent 0%, black 8%, black 100%)";
       } else if (!atStart && !atEnd) {
         // Fade on both sides
-        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
+        gradient =
+          "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
       } else {
         // No fade needed (shouldn't happen but safety)
         gradient = "linear-gradient(to right, black 100%)";
@@ -116,30 +122,34 @@ export const HomePageHeader = ({
   return (
     <div
       ref={headerRef}
-      className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-        ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-        : "relative"
-        }`}
+      className={`w-full left-0 z-40 transition-all duration-300 ${
+        isSmallScreen && isCondensed
+          ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
+          : "relative"
+      }`}
     >
       <div
-        className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${isSmallScreen && isCondensed
-          ? "justify-between px-4 py-2 gap-3"
-          : "flex-col items-center justify-center gap-8 mt-30"
-          }`}
+        className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${
+          isSmallScreen && isCondensed
+            ? "justify-between px-4 py-2 gap-3"
+            : "flex-col items-center justify-center gap-8 mt-30"
+        }`}
       >
         <h2
-          className={`${isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[4vw]"
-            } font-medium text-(--dark-def) whitespace-nowrap`}
+          className={`${
+            isSmallScreen && isCondensed ? "text-lg" : "text-4xl sm:text-[4vw]"
+          } font-medium text-(--dark-def) whitespace-nowrap`}
         >
           Oysloe
         </h2>
 
         <div className="flex w-full px-200">
           <div
-            className={`relative flex items-center ${isSmallScreen && isCondensed
-              ? "justify-end flex-1"
-              : "justify-center w-full max-w-[520px]"
-              }`}
+            className={`relative flex items-center ${
+              isSmallScreen && isCondensed
+                ? "justify-end flex-1"
+                : "justify-center w-full max-w-[520px]"
+            }`}
           >
             <div className="rotating-bg" aria-hidden="true" />
             <div className="rotating-bg-inner" aria-hidden="true" />
@@ -150,10 +160,9 @@ export const HomePageHeader = ({
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
-                className={`search-input ${isSmallScreen && isCondensed
-                  ? ""
-                  : "text-2xl sm:text-2xl"
-                  } pl-4 pr-2 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
+                className={`search-input ${
+                  isSmallScreen && isCondensed ? "" : "text-2xl sm:text-2xl"
+                } pl-4 pr-2 py-3 h-12 sm:h-14 max-w-[70vw] rounded-full outline-0 bg-white text-center`}
               />
 
               <img
@@ -183,9 +192,15 @@ const HomePage = () => {
 
   // Filter states
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [selectedTimeframe, setSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">("anytime");
-  const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
-  const [timeframeSort, setTimeframeSort] = useState<"none" | "newest" | "oldest">("none");
+  const [selectedTimeframe, setSelectedTimeframe] = useState<
+    "newest" | "7days" | "30days" | "anytime"
+  >("anytime");
+  const [priceSort, setPriceSort] = useState<
+    "none" | "low-to-high" | "high-to-low"
+  >("none");
+  const [timeframeSort, setTimeframeSort] = useState<
+    "none" | "newest" | "oldest"
+  >("none");
   const [priceFilter, setPriceFilter] = useState<{
     mode: "none" | "below" | "above" | "between";
     below?: number;
@@ -193,15 +208,21 @@ const HomePage = () => {
     min?: number;
     max?: number;
   }>({ mode: "none" });
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | "">("");
-  const [selectedFeatures, setSelectedFeatures] = useState<Record<number, string>>({});
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<
+    number | ""
+  >("");
+  const [selectedFeatures, setSelectedFeatures] = useState<
+    Record<number, string>
+  >({});
 
   const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
     e.preventDefault();
     setIsAdLoading(true);
     // Small delay to ensure overlay renders
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     navigate(`/ads/${ad.id}`, { state: { adData: ad } });
     // Reset after navigation (component will unmount but just in case)
     setTimeout(() => setIsAdLoading(false), 500);
@@ -271,7 +292,9 @@ const HomePage = () => {
     if (selectedSubcategoryId !== null && selectedSubcategoryId !== "") {
       filtered = filtered.filter((p) => {
         // Check if product has product_features with matching subcategory
-        return p.product_features?.some((pf: any) => pf.feature?.subcategory === selectedSubcategoryId);
+        return p.product_features?.some(
+          (pf: any) => pf.feature?.subcategory === selectedSubcategoryId,
+        );
       });
     }
 
@@ -279,17 +302,23 @@ const HomePage = () => {
     if (Object.keys(selectedFeatures).length > 0) {
       filtered = filtered.filter((p) => {
         // All selected features must be present in the product with matching values
-        return Object.entries(selectedFeatures).every(([featureId, featureValue]) => {
-          const fId = Number(featureId);
-          return p.product_features?.some((pf: any) => pf.feature?.id === fId && pf.value === featureValue);
-        });
+        return Object.entries(selectedFeatures).every(
+          ([featureId, featureValue]) => {
+            const fId = Number(featureId);
+            return p.product_features?.some(
+              (pf: any) => pf.feature?.id === fId && pf.value === featureValue,
+            );
+          },
+        );
       });
     }
 
     // Apply location filter
     if (selectedLocation) {
       filtered = filtered.filter(
-        (p) => p.location?.name === selectedLocation || p.location?.region === selectedLocation
+        (p) =>
+          p.location?.name === selectedLocation ||
+          p.location?.region === selectedLocation,
       );
     }
 
@@ -319,14 +348,19 @@ const HomePage = () => {
     // Apply price filter
     if (priceFilter.mode !== "none") {
       filtered = filtered.filter((p) => {
-        const price = typeof p.price === "number" ? p.price : Number(p.price) || 0;
+        const price =
+          typeof p.price === "number" ? p.price : Number(p.price) || 0;
         if (priceFilter.mode === "below" && priceFilter.below !== undefined) {
           return price <= priceFilter.below;
         }
         if (priceFilter.mode === "above" && priceFilter.above !== undefined) {
           return price >= priceFilter.above;
         }
-        if (priceFilter.mode === "between" && priceFilter.min !== undefined && priceFilter.max !== undefined) {
+        if (
+          priceFilter.mode === "between" &&
+          priceFilter.min !== undefined &&
+          priceFilter.max !== undefined
+        ) {
           return price >= priceFilter.min && price <= priceFilter.max;
         }
         return true;
@@ -336,14 +370,18 @@ const HomePage = () => {
     // Apply price sort
     if (priceSort === "low-to-high") {
       filtered.sort((a, b) => {
-        const priceA = typeof a.price === "number" ? a.price : Number(a.price) || 0;
-        const priceB = typeof b.price === "number" ? b.price : Number(b.price) || 0;
+        const priceA =
+          typeof a.price === "number" ? a.price : Number(a.price) || 0;
+        const priceB =
+          typeof b.price === "number" ? b.price : Number(b.price) || 0;
         return priceA - priceB;
       });
     } else if (priceSort === "high-to-low") {
       filtered.sort((a, b) => {
-        const priceA = typeof a.price === "number" ? a.price : Number(a.price) || 0;
-        const priceB = typeof b.price === "number" ? b.price : Number(b.price) || 0;
+        const priceA =
+          typeof a.price === "number" ? a.price : Number(a.price) || 0;
+        const priceB =
+          typeof b.price === "number" ? b.price : Number(b.price) || 0;
         return priceB - priceA;
       });
     }
@@ -371,8 +409,8 @@ const HomePage = () => {
     new Set(
       products
         .flatMap((p) => [p.location?.name, p.location?.region])
-        .filter((loc): loc is string => !!loc)
-    )
+        .filter((loc): loc is string => !!loc),
+    ),
   ).sort();
 
   const handleArrowClick = (
@@ -466,34 +504,71 @@ const HomePage = () => {
     setSelectedFeatures: (features: Record<number, string>) => void;
   }) => {
     // Local states for batch apply pattern
-    const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
-    const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
-    const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
-    const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
-    const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
-    const [localSelectedLocation, setLocalSelectedLocation] = useState<string | null>(selectedLocation);
-    const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
-    const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
-    const [localTimeframeSort, setLocalTimeframeSort] = useState<"none" | "newest" | "oldest">(timeframeSort);
-    const [localSelectedCategoryId, setLocalSelectedCategoryId] = useState<number | null>(propSelectedCategoryId);
-    const [localSelectedSubcategoryId, setLocalSelectedSubcategoryId] = useState<number | "">(propSelectedSubcategoryId);
-    const [localSelectedFeatures, setLocalSelectedFeatures] = useState<Record<number, string>>(propSelectedFeatures);
+    const [localPriceMin, setLocalPriceMin] = useState<string>(
+      priceFilter.min?.toString() || "",
+    );
+    const [localPriceMax, setLocalPriceMax] = useState<string>(
+      priceFilter.max?.toString() || "",
+    );
+    const [localPriceBelow, setLocalPriceBelow] = useState<string>(
+      priceFilter.below?.toString() || "",
+    );
+    const [localPriceAbove, setLocalPriceAbove] = useState<string>(
+      priceFilter.above?.toString() || "",
+    );
+    const [localPriceMode, setLocalPriceMode] = useState<
+      "none" | "below" | "above" | "between"
+    >(priceFilter.mode);
+    const [localSelectedLocation, setLocalSelectedLocation] = useState<
+      string | null
+    >(selectedLocation);
+    const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<
+      "newest" | "7days" | "30days" | "anytime"
+    >(selectedTimeframe);
+    const [localPriceSort, setLocalPriceSort] = useState<
+      "none" | "low-to-high" | "high-to-low"
+    >(priceSort);
+    const [localTimeframeSort, setLocalTimeframeSort] = useState<
+      "none" | "newest" | "oldest"
+    >(timeframeSort);
+    const [localSelectedCategoryId, setLocalSelectedCategoryId] = useState<
+      number | null
+    >(propSelectedCategoryId);
+    const [localSelectedSubcategoryId, setLocalSelectedSubcategoryId] =
+      useState<number | "">(propSelectedSubcategoryId);
+    const [localSelectedFeatures, setLocalSelectedFeatures] =
+      useState<Record<number, string>>(propSelectedFeatures);
 
     // Subcategories and features state
-    const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
-    const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
-    const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
+    const [subcategories, setSubcategories] = useState<
+      Array<{ id: number; name: string }>
+    >([]);
+    const [featureDefinitions, setFeatureDefinitions] = useState<
+      Array<{ id: number; name: string }>
+    >([]);
+    const [possibleFeatureValues, setPossibleFeatureValues] = useState<
+      Record<number, string[]>
+    >({});
 
     // Fetch subcategories when category changes
     useEffect(() => {
       let mounted = true;
       (async () => {
         try {
-          if (typeof localSelectedCategoryId === "number" && !isNaN(localSelectedCategoryId)) {
-            let subs = await getSubcategories({ category: localSelectedCategoryId }) as any;
+          if (
+            typeof localSelectedCategoryId === "number" &&
+            !isNaN(localSelectedCategoryId)
+          ) {
+            let subs = (await getSubcategories({
+              category: localSelectedCategoryId,
+            })) as any;
             if (!mounted) return;
-            if (!Array.isArray(subs) && subs && Array.isArray(subs.results)) subs = subs.results;
-            const mapped = (subs || []).map((s: any) => ({ id: s.id, name: s.name ?? s.title ?? s.display_name ?? s.label ?? "" }));
+            if (!Array.isArray(subs) && subs && Array.isArray(subs.results))
+              subs = subs.results;
+            const mapped = (subs || []).map((s: any) => ({
+              id: s.id,
+              name: s.name ?? s.title ?? s.display_name ?? s.label ?? "",
+            }));
             setSubcategories(mapped);
           } else {
             setSubcategories([]);
@@ -514,22 +589,40 @@ const HomePage = () => {
 
       (async () => {
         try {
-          if (typeof localSelectedSubcategoryId === "number" && !isNaN(localSelectedSubcategoryId)) {
-            let features = await getFeatures({ subcategory: localSelectedSubcategoryId }) as any;
+          if (
+            typeof localSelectedSubcategoryId === "number" &&
+            !isNaN(localSelectedSubcategoryId)
+          ) {
+            let features = (await getFeatures({
+              subcategory: localSelectedSubcategoryId,
+            })) as any;
             if (!mounted) return;
-            if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
-            const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
+            if (
+              !Array.isArray(features) &&
+              features &&
+              Array.isArray(features.results)
+            )
+              features = features.results;
+            const defs = (features || []).map((f: any) => ({
+              id: Number(f.id),
+              name: String(f.name ?? f.display_name ?? f.title ?? ""),
+            }));
             setFeatureDefinitions(defs);
           } else {
             setFeatureDefinitions([]);
           }
         } catch (e) {
-          console.warn("Failed to fetch feature definitions for subcategory", e);
+          console.warn(
+            "Failed to fetch feature definitions for subcategory",
+            e,
+          );
           if (mounted) setFeatureDefinitions([]);
         }
       })();
 
-      return () => { mounted = false };
+      return () => {
+        mounted = false;
+      };
     }, [localSelectedSubcategoryId]);
 
     // Fetch possible feature values when feature definitions change
@@ -542,7 +635,7 @@ const HomePage = () => {
             getPossibleFeatureValues({ feature: fd.id })
               .then((res) => ({ fid: fd.id, res }))
               .catch(() => {
-                return ({ fid: fd.id, res: null });
+                return { fid: fd.id, res: null };
               }),
           );
 
@@ -585,8 +678,16 @@ const HomePage = () => {
         setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
       } else if (localPriceMode === "above" && localPriceAbove) {
         setPriceFilter({ mode: "above", above: Number(localPriceAbove) });
-      } else if (localPriceMode === "between" && localPriceMin && localPriceMax) {
-        setPriceFilter({ mode: "between", min: Number(localPriceMin), max: Number(localPriceMax) });
+      } else if (
+        localPriceMode === "between" &&
+        localPriceMin &&
+        localPriceMax
+      ) {
+        setPriceFilter({
+          mode: "between",
+          min: Number(localPriceMin),
+          max: Number(localPriceMax),
+        });
       } else {
         setPriceFilter({ mode: "none" });
       }
@@ -612,7 +713,6 @@ const HomePage = () => {
     return (
       <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
         <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] md:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
-
           <div className="absolute top-0 right-0 p-4 sm:p-6">
             <button onClick={closeFilterPopup} className="block mb-3">
               <svg
@@ -631,13 +731,24 @@ const HomePage = () => {
           </div>
 
           <div className="p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-semibold mb-6">Filter & Sort Ads</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold mb-6">
+              Filter & Sort Ads
+            </h2>
 
             {/* Category Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M3 3H9V9H3V3ZM11 3H17V9H11V3ZM3 11H9V17H3V11ZM11 11H17V17H11V11Z" fill="#374957" />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3 3H9V9H3V3ZM11 3H17V9H11V3ZM3 11H9V17H3V11ZM11 11H17V17H11V11Z"
+                    fill="#374957"
+                  />
                 </svg>
                 Category
               </h3>
@@ -664,8 +775,17 @@ const HomePage = () => {
             {localSelectedCategoryId !== null && subcategories.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 5H16V7H4V5ZM6 10H14V12H6V10ZM8 15H12V17H8V15Z" fill="#374957" />
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 5H16V7H4V5ZM6 10H14V12H6V10ZM8 15H12V17H8V15Z"
+                      fill="#374957"
+                    />
                   </svg>
                   Subcategory (Optional)
                 </h3>
@@ -692,22 +812,36 @@ const HomePage = () => {
             {featureDefinitions.length > 0 && (
               <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <img src="/circle-quarter-svgrepo-com.svg" alt="Features" className="h-5 w-5" />
+                  <img
+                    src="/circle-quarter-svgrepo-com.svg"
+                    alt="Features"
+                    className="h-5 w-5"
+                  />
                   Features
                 </h3>
                 <div className="flex flex-col gap-2">
                   {featureDefinitions.map((fd) => {
                     const values = possibleFeatureValues[fd.id] ?? [];
                     return (
-                      <div key={`def-${fd.id}`} className="flex items-center gap-2">
-                        <div className="w-1/3 text-sm font-medium">{fd.name}</div>
+                      <div
+                        key={`def-${fd.id}`}
+                        className="flex items-center gap-2"
+                      >
+                        <div className="w-1/3 text-sm font-medium">
+                          {fd.name}
+                        </div>
                         {values && values.length > 0 ? (
                           <div className="flex-1">
                             <input
                               list={`feature-values-${fd.id}`}
                               placeholder={`Select ${fd.name}`}
                               value={localSelectedFeatures[fd.id] ?? ""}
-                              onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                              onChange={(e) =>
+                                setLocalSelectedFeatures((prev) => ({
+                                  ...prev,
+                                  [fd.id]: e.target.value,
+                                }))
+                              }
                               className="w-full p-2 border rounded-lg border-(--div-border) text-sm"
                             />
                             <datalist id={`feature-values-${fd.id}`}>
@@ -721,7 +855,12 @@ const HomePage = () => {
                             type="text"
                             placeholder={`Value for ${fd.name}`}
                             value={localSelectedFeatures[fd.id] ?? ""}
-                            onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
+                            onChange={(e) =>
+                              setLocalSelectedFeatures((prev) => ({
+                                ...prev,
+                                [fd.id]: e.target.value,
+                              }))
+                            }
                             className="flex-1 p-2 border rounded-lg border-(--div-border) text-sm"
                           />
                         )}
@@ -740,7 +879,9 @@ const HomePage = () => {
               </h3>
               <select
                 value={localSelectedLocation || ""}
-                onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
+                onChange={(e) =>
+                  setLocalSelectedLocation(e.target.value || null)
+                }
                 className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
               >
                 <option value="">All Locations</option>
@@ -755,7 +896,11 @@ const HomePage = () => {
             {/* Timeframe Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <img src="/time-svgrepo-com.svg" alt="Timeframe" className="w-5 h-5" />
+                <img
+                  src="/time-svgrepo-com.svg"
+                  alt="Timeframe"
+                  className="w-5 h-5"
+                />
                 Timeframe
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -768,10 +913,11 @@ const HomePage = () => {
                   <button
                     key={option.value}
                     onClick={() => setLocalSelectedTimeframe(option.value)}
-                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localSelectedTimeframe === option.value
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                      localSelectedTimeframe === option.value
                         ? "bg-(--dark-def) text-white"
                         : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -782,7 +928,11 @@ const HomePage = () => {
             {/* Price Sort Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <img src="/price-tag-svgrepo-com.svg" alt="Price Sort" className="w-5 h-5" />
+                <img
+                  src="/price-tag-svgrepo-com.svg"
+                  alt="Price Sort"
+                  className="w-5 h-5"
+                />
                 Sort by Price
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -794,10 +944,11 @@ const HomePage = () => {
                   <button
                     key={option.value}
                     onClick={() => setLocalPriceSort(option.value)}
-                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localPriceSort === option.value
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                      localPriceSort === option.value
                         ? "bg-(--dark-def) text-white"
                         : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -808,7 +959,11 @@ const HomePage = () => {
             {/* Timeframe Sort Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <img src="/date-range-svgrepo-com.svg" alt="Timeframe Sort" className="w-5 h-5" />
+                <img
+                  src="/date-range-svgrepo-com.svg"
+                  alt="Timeframe Sort"
+                  className="w-5 h-5"
+                />
                 Sort by Date
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -820,10 +975,11 @@ const HomePage = () => {
                   <button
                     key={option.value}
                     onClick={() => setLocalTimeframeSort(option.value)}
-                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${localTimeframeSort === option.value
+                    className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                      localTimeframeSort === option.value
                         ? "bg-(--dark-def) text-white"
                         : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                      }`}
+                    }`}
                   >
                     {option.label}
                   </button>
@@ -834,16 +990,24 @@ const HomePage = () => {
             {/* Price Filter Section */}
             <div className="mb-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
+                <img
+                  src="/filter-svgrepo.svg"
+                  alt="Price Filter"
+                  className="w-5 h-5"
+                />
                 Filter by Price
-              </h3><div className="space-y-3">
+              </h3>
+              <div className="space-y-3">
                 {[
                   { value: "none" as const, label: "No Filter" },
                   { value: "below" as const, label: "Below a certain price" },
                   { value: "above" as const, label: "Above a certain price" },
                   { value: "between" as const, label: "Between two prices" },
                 ].map((option) => (
-                  <label key={option.value} className="flex items-center gap-2 cursor-pointer">
+                  <label
+                    key={option.value}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
                     <input
                       type="radio"
                       name="price-filter"
@@ -930,7 +1094,6 @@ const HomePage = () => {
     onCategoryClick: (name: string) => void;
   }) => {
     if (categoriesLoading) {
-
       return (
         <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
           <div
@@ -951,7 +1114,6 @@ const HomePage = () => {
               >
                 <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
                   <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 rounded-full bg-white" />
-
                 </div>
                 <h3 className="mt-2 truncate bg-gray-300 rounded-full w-3/5 text-left h-2.5" />
               </div>
@@ -961,8 +1123,10 @@ const HomePage = () => {
       );
     }
     if (categoriesError || !categories || categories.length === 0) {
-      if (categoriesError) console.log("Failed to load categories.", categoriesError);
-      if (!categories || categories.length === 0) console.log("No categories were found.");
+      if (categoriesError)
+        console.log("Failed to load categories.", categoriesError);
+      if (!categories || categories.length === 0)
+        console.log("No categories were found.");
 
       return (
         <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
@@ -990,30 +1154,34 @@ const HomePage = () => {
               "Property",
               "Services",
               "Vehicle",
-            ].slice(0, 10).map((category, ix) => (
-              <div
-                key={ix}
-                onClick={() => toast("Data is currently unavailable for " + category)}
-                className="
+            ]
+              .slice(0, 10)
+              .map((category, ix) => (
+                <div
+                  key={ix}
+                  onClick={() =>
+                    toast("Data is currently unavailable for " + category)
+                  }
+                  className="
                       flex flex-col items-center justify-center
                       w-[12vw] h-[12vw] min-h-[75px] min-w-[75px] 
                       bg-(--div-active) rounded-lg 
                       p-2 sm:p-3 cursor-pointer 
                       hover:bg-gray-300
                   "
-              >
-                <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
-                  <img
-                    src={`/${category.toLowerCase()}.png`}
-                    alt={category}
-                    className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
-                  />
+                >
+                  <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
+                    <img
+                      src={`/${category.toLowerCase()}.png`}
+                      alt={category}
+                      className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
+                    />
+                  </div>
+                  <h3 className="text-center  text-xs sm:text-[1.25vw] mt-1 truncate">
+                    {category}
+                  </h3>
                 </div>
-                <h3 className="text-center  text-xs sm:text-[1.25vw] mt-1 truncate">
-                  {category}
-                </h3>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
       );
@@ -1044,7 +1212,7 @@ const HomePage = () => {
                   navigate("/apply");
                   return;
                 }
-                onCategoryClick(category.name)
+                onCategoryClick(category.name);
               }}
               className="
                     flex flex-col items-center justify-center
@@ -1102,10 +1270,8 @@ const HomePage = () => {
 
     // Get price filter label
     const getPriceFilterLabel = () => {
-      if (priceFilter.mode === "below")
-        return `Below ₵${priceFilter.below}`;
-      if (priceFilter.mode === "above")
-        return `Above ₵${priceFilter.above}`;
+      if (priceFilter.mode === "below") return `Below ₵${priceFilter.below}`;
+      if (priceFilter.mode === "above") return `Above ₵${priceFilter.above}`;
       if (priceFilter.mode === "between")
         return `₵${priceFilter.min} - ₵${priceFilter.max}`;
       return null;
@@ -1192,11 +1358,7 @@ const HomePage = () => {
             className="bg-white flex-1 sm:flex-none min-w-[140px] max-w-[200px] px-3 sm:px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
           >
             {filter.label}
-            <img
-              src={filter.icon}
-              alt="Clear filter"
-              className="w-4 h-4"
-            />
+            <img src={filter.icon} alt="Clear filter" className="w-4 h-4" />
           </button>
         ))}
       </div>
@@ -1210,7 +1372,6 @@ const HomePage = () => {
     categories: (Category & { adsCount: number })[];
     total: number;
   }) => {
-
     if (categoriesLoading) {
       return (
         <div className="flex flex-col items-center mt-12">
@@ -1221,13 +1382,16 @@ const HomePage = () => {
     }
     if (categoriesError || !categories || categories.length === 0) {
       console.log("No categories available to be summarised.");
-      return <p className="text-xl py-17 text-center">Ad count summaries are currently unavailiable.</p>
+      return (
+        <p className="text-xl py-17 text-center">
+          Ad count summaries are currently unavailiable.
+        </p>
+      );
     }
 
     return (
       <div className=" text-(--dark-def) flex items-center justify-center w-full overflow-hidden my-12 lg:h-50 h-25">
         <div className="justify-center max-md:gap-2 items-center flex-nowrap grid grid-cols-5 sm:w-3/5 gap-2 max-sm:px-3">
-
           {categories
             .sort((a, b) => b.adsCount - a.adsCount)
             .filter((cat) => cat.adsCount > 0)
@@ -1263,7 +1427,7 @@ const HomePage = () => {
             })}
         </div>
       </div>
-    )
+    );
   };
 
   // Component for individual scrollable ad row with dynamic fade
@@ -1313,11 +1477,13 @@ const HomePage = () => {
         >
           {filteredProducts.length > 0 ? (
             <div className="flex gap-2 sm:gap-3 w-max">
-              {productsLoading
-                ? <Loader className={"h-40 my-0"} />
-                : filteredProducts.map(
+              {productsLoading ? (
+                <Loader className={"h-40 my-0"} />
+              ) : (
+                filteredProducts.map(
                   (ad) =>
-                    (ad.status === "ACTIVE" && !ad.is_taken) && (
+                    ad.status === "ACTIVE" &&
+                    !ad.is_taken && (
                       <Link
                         key={ad.id}
                         to={`/ads/${ad.id}`}
@@ -1337,7 +1503,9 @@ const HomePage = () => {
                             className="w-3 sm:w-5 h-3 sm:h-5"
                           />
                           <p className="text-[10px] sm:text-sm text-gray-500 truncate">
-                            {ad.location?.name ?? ad.location?.region ?? "Unknown"}
+                            {ad.location?.name ??
+                              ad.location?.region ??
+                              "Unknown"}
                           </p>
                         </div>
                         <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
@@ -1348,11 +1516,16 @@ const HomePage = () => {
                         </p>
                       </Link>
                     ),
-                )}
+                )
+              )}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center">
-              <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7" />
+              <img
+                src="/nothing-to-show.png"
+                alt="nothing to show"
+                className="h-7 w-7"
+              />
               <p className="px-2 text-sm text-gray-500">
                 No ads to show here...
               </p>
@@ -1374,7 +1547,7 @@ const HomePage = () => {
           />
           <p>No ad categories are available at this time.</p>
         </div>
-      )
+      );
     }
 
     // Filter out categories that have no filtered products
@@ -1394,7 +1567,7 @@ const HomePage = () => {
           />
           <p>No ads match your filters.</p>
         </div>
-      )
+      );
     }
 
     return categoriesWithAds.map((category) => (
@@ -1412,13 +1585,15 @@ const HomePage = () => {
 
     return (
       <div className="bg-(--div-active) w-full flex justify-center -mb-4">
-        <div
-          className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-45"
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-45">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((ad) => (
               <div key={ad.id} className="flex flex-col w-full overflow-hidden">
-                <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
+                <Link
+                  to={`/ads/${ad.id}`}
+                  state={{ adData: ad }}
+                  onClick={(e) => handleAdClick(ad, e)}
+                >
                   <img
                     src={ad.image || "/no-image.jpeg"}
                     alt={ad.name}
@@ -1441,7 +1616,11 @@ const HomePage = () => {
             ))
           ) : (
             <div className="flex flex-col items-center justify-center col-span-full">
-              <img src="/nothing-to-show.png" alt="nothing to show" className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]" />
+              <img
+                src="/nothing-to-show.png"
+                alt="nothing to show"
+                className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]"
+              />
               <p className="px-2 text-sm text-gray-500">
                 No ads to show here...
               </p>
@@ -1476,7 +1655,11 @@ const HomePage = () => {
         >
           {filteredResults.map((ad) => (
             <div key={ad.id} className="flex flex-col w-full overflow-hidden">
-              <Link to={`/ads/${ad.id}`} state={{ adData: ad }} onClick={(e) => handleAdClick(ad, e)}>
+              <Link
+                to={`/ads/${ad.id}`}
+                state={{ adData: ad }}
+                onClick={(e) => handleAdClick(ad, e)}
+              >
                 <img
                   src={ad.image || "/no-image.jpeg"}
                   alt={ad.name}
@@ -1515,18 +1698,24 @@ const HomePage = () => {
 
     return (
       <button onClick={handleFilterSettings} className={className}>
-        <div className={`bg-gray-100 lg:bg-white w-30 h-12 lg:w-[10vw] lg:h-[3.5vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
+        <div
+          className={`bg-gray-100 lg:bg-white w-30 h-12 lg:w-[10vw] lg:h-[3.5vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}
+        >
           {activeFiltersCount > 0 && (
             <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {activeFiltersCount}
             </div>
           )}
-          <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7 lg:w-[2.1vw] lg:h-[2.1vw]" />
+          <img
+            src="/filter-svgrepo.svg"
+            alt="Filter"
+            className="w-7 h-7 lg:w-[2.1vw] lg:h-[2.1vw]"
+          />
           <p className="text-sm lg:text-[1.25vw]">Filter</p>
         </div>
       </button>
     );
-  }
+  };
 
   return (
     <div className="flex flex-col items-center w-screen min-h-screen gap-6 sm:gap-12 overflow-x-hidden px-3 sm:px-4 min-w-[250px]">
@@ -1570,7 +1759,7 @@ const HomePage = () => {
             </div>
           </>
         )}
-        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center" >
+        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center">
           <FilterButton />
         </div>
         <MenuButton />

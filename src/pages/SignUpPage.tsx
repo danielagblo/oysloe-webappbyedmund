@@ -23,7 +23,11 @@ const SignInPage = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<
-    RegisterRequest & { confirmPassword: string; agreedToPrivacy: boolean; agreedToTerms: boolean }
+    RegisterRequest & {
+      confirmPassword: string;
+      agreedToPrivacy: boolean;
+      agreedToTerms: boolean;
+    }
   >({
     name: "",
     email: "",
@@ -38,7 +42,9 @@ const SignInPage = () => {
 
   // modal state for showing privacy policy / terms as a bottom sheet
   const [policyModalOpen, setPolicyModalOpen] = useState(false);
-  const [policyModalType, setPolicyModalType] = useState<"privacy" | "terms" | null>(null);
+  const [policyModalType, setPolicyModalType] = useState<
+    "privacy" | "terms" | null
+  >(null);
   // track whether user scrolled to end of policy content in modal
   const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -109,8 +115,12 @@ const SignInPage = () => {
 
     // Terms & conditions: require both privacy and terms to be accepted
     if (!(data.agreedToPrivacy && data.agreedToTerms)) {
-      console.log("You must agree to the Privacy Policy and Terms & Conditions");
-      toast.error("You must agree to the Privacy Policy and Terms & Conditions");
+      console.log(
+        "You must agree to the Privacy Policy and Terms & Conditions",
+      );
+      toast.error(
+        "You must agree to the Privacy Policy and Terms & Conditions",
+      );
       return;
     }
 
@@ -180,7 +190,9 @@ const SignInPage = () => {
           onClick={() => {
             try {
               localStorage.setItem("oysloe_guest", "true");
-            } catch {/*ignore*/ }
+            } catch {
+              /*ignore*/
+            }
             navigate("/");
           }}
           className="text-sm text-gray-500"
@@ -240,7 +252,7 @@ const SignInPage = () => {
                 className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
               />
               <p className="text-[10px] pb-2">
-                I have agreed to the {" "}
+                I have agreed to the{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -250,9 +262,8 @@ const SignInPage = () => {
                   className="text-black inline underline"
                 >
                   privacy policy
-                </button>
-                {" "}
-                and {" "}
+                </button>{" "}
+                and{" "}
                 <button
                   type="button"
                   onClick={() => {
@@ -262,13 +273,15 @@ const SignInPage = () => {
                   className="text-black inline underline"
                 >
                   terms & conditions
-                </button> {" "}
+                </button>{" "}
                 <label className="inline-flex items-center gap-2">
                   <div className="round">
                     <input
                       id="agree-checkbox"
                       type="checkbox"
-                      checked={formData.agreedToPrivacy && formData.agreedToTerms}
+                      checked={
+                        formData.agreedToPrivacy && formData.agreedToTerms
+                      }
                       readOnly
                     />
                     <label
@@ -276,8 +289,15 @@ const SignInPage = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         // If both policies already accepted, allow toggling off (clears both)
-                        if (formData.agreedToPrivacy && formData.agreedToTerms) {
-                          setFormData((p) => ({ ...p, agreedToPrivacy: false, agreedToTerms: false }));
+                        if (
+                          formData.agreedToPrivacy &&
+                          formData.agreedToTerms
+                        ) {
+                          setFormData((p) => ({
+                            ...p,
+                            agreedToPrivacy: false,
+                            agreedToTerms: false,
+                          }));
                           return;
                         }
 
@@ -358,93 +378,120 @@ const SignInPage = () => {
       )}
 
       {/* Bottom-sheet modal for Privacy Policy / Terms */}
-      {policyModalOpen && policyModalType && (() => {
-        const activeQuery = policyModalType === "privacy" ? privacyQuery : termsQuery;
-        const loading = activeQuery.isLoading || activeQuery.isFetching;
-        const raw = activeQuery.data as any;
-        const content = raw?.content || raw?.html || raw?.body || raw?.text || (typeof raw === 'string' ? raw : raw ? JSON.stringify(raw, null, 2) : null);
+      {policyModalOpen &&
+        policyModalType &&
+        (() => {
+          const activeQuery =
+            policyModalType === "privacy" ? privacyQuery : termsQuery;
+          const loading = activeQuery.isLoading || activeQuery.isFetching;
+          const raw = activeQuery.data as any;
+          const content =
+            raw?.content ||
+            raw?.html ||
+            raw?.body ||
+            raw?.text ||
+            (typeof raw === "string"
+              ? raw
+              : raw
+                ? JSON.stringify(raw, null, 2)
+                : null);
 
-        return (
-          <div className="fixed inset-0 z-50 flex items-end justify-center">
-            <div
-              className="absolute inset-0 bg-black/40"
-              onClick={() => setPolicyModalOpen(false)}
-            />
-            <div className="relative w-full max-w-3xl bg-white rounded-t-2xl p-4 max-h-[85vh] overflow-hidden">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold">
-                  {policyModalType === "privacy" ? "Privacy Policy" : "Terms & Conditions"}
-                </h3>
-                <button
-                  aria-label="Close"
-                  onClick={() => setPolicyModalOpen(false)}
-                  className="text-2xl leading-none px-2"
-                >
-                  ×
-                </button>
-              </div>
-
+          return (
+            <div className="fixed inset-0 z-50 flex items-end justify-center">
               <div
-                ref={contentRef}
-                onScroll={() => {
-                  const el = contentRef.current;
-                  if (!el) return;
-                  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
-                    setHasScrolledToEnd(true);
-                  }
-                }}
-                className="border-t pt-2 overflow-auto"
-                style={{ maxHeight: '72vh' }}
-              >
-                {loading ? (
-                  <div className="w-full py-8 text-center">Loading...</div>
-                ) : content ? (
-                  (/<[^>]+>/.test(content)) ? (
-                    <div
-                      className="prose max-w-full"
-                      dangerouslySetInnerHTML={{ __html: content }}
-                    />
-                  ) : (
-                    <pre className="whitespace-pre-wrap text-sm text-gray-700">{content}</pre>
-                  )
-                ) : (
-                  <div className="w-full py-8 text-center text-gray-600">No content available.</div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between gap-4 mt-3">
-                <div className="text-xs text-gray-500 invisible">Scroll to the end to enable confirmation</div>
-                <div>
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setPolicyModalOpen(false)}
+              />
+              <div className="relative w-full max-w-3xl bg-white rounded-t-2xl p-4 max-h-[85vh] overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold">
+                    {policyModalType === "privacy"
+                      ? "Privacy Policy"
+                      : "Terms & Conditions"}
+                  </h3>
                   <button
-                    type="button"
-                    disabled={!hasScrolledToEnd}
-                    onClick={() => {
-                      setFormData((p) => {
-                        const next =
-                          policyModalType === "privacy"
-                            ? { ...p, agreedToPrivacy: true }
-                            : { ...p, agreedToTerms: true };
-
-                        if (next.agreedToPrivacy && next.agreedToTerms) {
-                          toast.success("Thanks — you have accepted the privacy policy and terms.");
-                        } else {
-                          toast.success("Thanks — you have accepted the policy.");
-                        }
-
-                        return next;
-                      });
-                      setPolicyModalOpen(false);
-                    }}
-                    className={`px-4 py-2 rounded-lg ${hasScrolledToEnd ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}
+                    aria-label="Close"
+                    onClick={() => setPolicyModalOpen(false)}
+                    className="text-2xl leading-none px-2"
                   >
-                    I have read and accept
+                    ×
                   </button>
+                </div>
+
+                <div
+                  ref={contentRef}
+                  onScroll={() => {
+                    const el = contentRef.current;
+                    if (!el) return;
+                    if (
+                      el.scrollTop + el.clientHeight >=
+                      el.scrollHeight - 20
+                    ) {
+                      setHasScrolledToEnd(true);
+                    }
+                  }}
+                  className="border-t pt-2 overflow-auto"
+                  style={{ maxHeight: "72vh" }}
+                >
+                  {loading ? (
+                    <div className="w-full py-8 text-center">Loading...</div>
+                  ) : content ? (
+                    /<[^>]+>/.test(content) ? (
+                      <div
+                        className="prose max-w-full"
+                        dangerouslySetInnerHTML={{ __html: content }}
+                      />
+                    ) : (
+                      <pre className="whitespace-pre-wrap text-sm text-gray-700">
+                        {content}
+                      </pre>
+                    )
+                  ) : (
+                    <div className="w-full py-8 text-center text-gray-600">
+                      No content available.
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between gap-4 mt-3">
+                  <div className="text-xs text-gray-500 invisible">
+                    Scroll to the end to enable confirmation
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      disabled={!hasScrolledToEnd}
+                      onClick={() => {
+                        setFormData((p) => {
+                          const next =
+                            policyModalType === "privacy"
+                              ? { ...p, agreedToPrivacy: true }
+                              : { ...p, agreedToTerms: true };
+
+                          if (next.agreedToPrivacy && next.agreedToTerms) {
+                            toast.success(
+                              "Thanks — you have accepted the privacy policy and terms.",
+                            );
+                          } else {
+                            toast.success(
+                              "Thanks — you have accepted the policy.",
+                            );
+                          }
+
+                          return next;
+                        });
+                        setPolicyModalOpen(false);
+                      }}
+                      className={`px-4 py-2 rounded-lg ${hasScrolledToEnd ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
+                    >
+                      I have read and accept
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
     </div>
   );
 };

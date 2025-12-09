@@ -9,7 +9,11 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
-import { createReview, likeReview, patchReview } from "../services/reviewService";
+import {
+  createReview,
+  likeReview,
+  patchReview,
+} from "../services/reviewService";
 import type { Review, ReviewPayload } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
 
@@ -27,12 +31,24 @@ const ReviewPage = () => {
   // or /reviews?product=123
   type LocationState = { productId?: number; adData?: { id?: number } };
   const stateVal = (location.state || {}) as LocationState;
-  const stateProductId = typeof stateVal.productId === "number" ? stateVal.productId : typeof stateVal?.adData?.id === "number" ? stateVal.adData!.id : undefined;
+  const stateProductId =
+    typeof stateVal.productId === "number"
+      ? stateVal.productId
+      : typeof stateVal?.adData?.id === "number"
+        ? stateVal.adData!.id
+        : undefined;
   const queryProductRaw = new URLSearchParams(location.search).get("product");
   const queryProductId = queryProductRaw ? Number(queryProductRaw) : undefined;
-  const productId = typeof stateProductId === "number" ? stateProductId : typeof queryProductId === "number" && !Number.isNaN(queryProductId) ? queryProductId : undefined;
+  const productId =
+    typeof stateProductId === "number"
+      ? stateProductId
+      : typeof queryProductId === "number" && !Number.isNaN(queryProductId)
+        ? queryProductId
+        : undefined;
 
-  const { reviews, isLoading, refetch } = useReviews(productId ? { product: productId } : undefined);
+  const { reviews, isLoading, refetch } = useReviews(
+    productId ? { product: productId } : undefined,
+  );
   const queryClient = useQueryClient();
   const { profile: currentUserProfile } = useUserProfile();
 
@@ -64,7 +80,9 @@ const ReviewPage = () => {
       setSendSuccess(true);
       handleResetForm();
       // refresh reviews list for this product (or all reviews if no product)
-      const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+      const key: readonly unknown[] = productId
+        ? ["reviews", { product: productId }]
+        : ["reviews", {}];
       queryClient.invalidateQueries({ queryKey: key });
       refetch();
     },
@@ -101,12 +119,20 @@ const ReviewPage = () => {
     },
   });
   const likeMutation = useMutation({
-    mutationFn: async ({ id, body }: { id: number; body?: Record<string, unknown> }) => {
+    mutationFn: async ({
+      id,
+      body,
+    }: {
+      id: number;
+      body?: Record<string, unknown>;
+    }) => {
       return likeReview(id, body);
     },
     onSuccess: (data: Review) => {
       // update the single review cache and refresh list
-      const key: readonly unknown[] = productId ? ["reviews", { product: productId }] : ["reviews", {}];
+      const key: readonly unknown[] = productId
+        ? ["reviews", { product: productId }]
+        : ["reviews", {}];
       queryClient.setQueryData(["review", data.id], data);
       queryClient.invalidateQueries({ queryKey: key });
       refetch();
@@ -117,7 +143,9 @@ const ReviewPage = () => {
     },
   });
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
-  const displayedReviews = ratingFilter ? reviews.filter((r) => Math.round(r.rating) === ratingFilter) : reviews;
+  const displayedReviews = ratingFilter
+    ? reviews.filter((r) => Math.round(r.rating) === ratingFilter)
+    : reviews;
 
   // Auto-dismiss the success modal after a short timeout so it doesn't block the UI.
   useEffect(() => {
@@ -170,82 +198,100 @@ const ReviewPage = () => {
 
           {/* Comments */}
           <div className="space-y-4 mt-4">
-            {isLoading && <p className="text-center text-gray-500">Loading reviews...</p>}
+            {isLoading && (
+              <p className="text-center text-gray-500">Loading reviews...</p>
+            )}
             {!isLoading && reviews.length === 0 && (
               <p className="text-center text-gray-500">No reviews yet.</p>
             )}
-            {!isLoading && displayedReviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="pb-4 border-b border-gray-100 last:border-b-0"
-              >
-                <div className="flex items-center gap-3 justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={rev.user?.avatar || "/userPfp2.jpg"}
-                      alt=""
-                      className="w-10 h-10 rounded-lg"
-                    />
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-gray-400">{formatReviewDate(rev.created_at)}</p>
-                      <h3 className="font-semibold">
-                        {currentUserProfile?.id === rev.user?.id
-                          ? "You"
-                          : rev.user?.account_name || rev.user?.name || "User"}
-                      </h3>
-                      <div className="flex">
-                        {Array.from({ length: 5 }).map((_, j) => (
-                          <img
-                            key={j}
-                            src="/star.svg"
-                            alt=""
-                            className={`w-3 h-3 ${j < rev.rating ? "opacity-100" : "opacity-30"}`}
-                          />
-                        ))}
+            {!isLoading &&
+              displayedReviews.map((rev) => (
+                <div
+                  key={rev.id}
+                  className="pb-4 border-b border-gray-100 last:border-b-0"
+                >
+                  <div className="flex items-center gap-3 justify-between">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={rev.user?.avatar || "/userPfp2.jpg"}
+                        alt=""
+                        className="w-10 h-10 rounded-lg"
+                      />
+                      <div className="flex flex-col">
+                        <p className="text-[10px] text-gray-400">
+                          {formatReviewDate(rev.created_at)}
+                        </p>
+                        <h3 className="font-semibold">
+                          {currentUserProfile?.id === rev.user?.id
+                            ? "You"
+                            : rev.user?.account_name ||
+                              rev.user?.name ||
+                              "User"}
+                        </h3>
+                        <div className="flex">
+                          {Array.from({ length: 5 }).map((_, j) => (
+                            <img
+                              key={j}
+                              src="/star.svg"
+                              alt=""
+                              className={`w-3 h-3 ${j < rev.rating ? "opacity-100" : "opacity-30"}`}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {currentUserProfile?.id === rev.user?.id && (
+                    <div className="flex items-center gap-2">
+                      {currentUserProfile?.id === rev.user?.id && (
+                        <button
+                          onClick={() => handleOpenEditForm(rev.id)}
+                          className="text-gray-500 hover:text-gray-700 transition"
+                          aria-label="Edit review"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                      )}
                       <button
-                        onClick={() => handleOpenEditForm(rev.id)}
-                        className="text-gray-500 hover:text-gray-700 transition"
-                        aria-label="Edit review"
+                        onClick={() => {
+                          if (likeMutation.isPending) return;
+                          setAnimatingLikes((prev) =>
+                            new Set(prev).add(rev.id),
+                          );
+                          setTimeout(() => {
+                            setAnimatingLikes((prev) => {
+                              const next = new Set(prev);
+                              next.delete(rev.id);
+                              return next;
+                            });
+                          }, 300);
+                          likeMutation.mutate({ id: rev.id });
+                        }}
+                        className="flex items-center gap-1"
+                        aria-label={rev.liked ? "Unlike review" : "Like review"}
                       >
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (likeMutation.isPending) return;
-                        setAnimatingLikes((prev) => new Set(prev).add(rev.id));
-                        setTimeout(() => {
-                          setAnimatingLikes((prev) => {
-                            const next = new Set(prev);
-                            next.delete(rev.id);
-                            return next;
-                          });
-                        }, 300);
-                        likeMutation.mutate({ id: rev.id });
-                      }}
-                      className="flex items-center gap-1"
-                      aria-label={rev.liked ? "Unlike review" : "Like review"}
-                    >
-                      <img
-                        src="/like.svg"
-                        alt=""
-                        className={`w-4 h-4 transition-opacity ${animatingLikes.has(rev.id) ? "animate-like-heartbeat" : ""
+                        <img
+                          src="/like.svg"
+                          alt=""
+                          className={`w-4 h-4 transition-opacity ${
+                            animatingLikes.has(rev.id)
+                              ? "animate-like-heartbeat"
+                              : ""
                           } ${rev.liked ? "opacity-100" : "opacity-60"}`}
-                      />
-                    </button>
-                    <span className="text-xs text-gray-500">{rev.likes_count ?? 0}</span>
+                        />
+                      </button>
+                      <span className="text-xs text-gray-500">
+                        {rev.likes_count ?? 0}
+                      </span>
+                    </div>
                   </div>
+                  <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
                 </div>
-                <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
-              </div>
-            ))}
+              ))}
             <div className="h-8 bg-white" />
           </div>
         </div>
@@ -263,8 +309,9 @@ const ReviewPage = () => {
                 key={star}
                 src="/star.svg"
                 alt=""
-                className={`w-10 h-10 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
-                  }`}
+                className={`w-10 h-10 cursor-pointer transition ${
+                  star <= selectedStars ? "opacity-100" : "opacity-40"
+                }`}
                 onClick={() => setSelectedStars(star)}
               />
             ))}
@@ -300,10 +347,16 @@ const ReviewPage = () => {
                 // product is required by the API for product reviews
                 // guide the user to open reviews from a product page
                 // (AdsDetailsPage already navigates with productId)
-                alert("Product id missing. Open this page from a product to leave a review.");
+                alert(
+                  "Product id missing. Open this page from a product to leave a review.",
+                );
                 return;
               }
-              createMutation.mutate({ product: productId, rating: selectedStars, comment });
+              createMutation.mutate({
+                product: productId,
+                rating: selectedStars,
+                comment,
+              });
             }}
             className="text-lg flex items-center gap-2 p-3 px-8 bg-gray-100 rounded-lg hover:bg-gray-200 cursor-pointer transition"
           >
@@ -354,35 +407,46 @@ const ReviewPage = () => {
             ))}
           </div>
 
-          {!isLoading && displayedReviews.slice(0, 5).map((rev) => (
-            <div key={rev.id} className="pb-4 border-b border-gray-100">
-              <div className="flex items-center gap-3 justify-between">
-                <div className="flex items-center gap-3">
-                  <img src={rev.user?.avatar || "/userPfp2.jpg"} alt="" className="w-8 h-8 rounded-lg" />
-                  <div className="flex flex-col">
-                    <p className="text-[10px] text-gray-400">{new Date(rev.created_at).toLocaleDateString()}</p>
-                    <h3 className="font-semibold">
-                      {currentUserProfile?.id === rev.user?.id
-                        ? "You"
-                        : rev.user?.account_name || rev.user?.name || "User"}
-                    </h3>
+          {!isLoading &&
+            displayedReviews.slice(0, 5).map((rev) => (
+              <div key={rev.id} className="pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-3 justify-between">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={rev.user?.avatar || "/userPfp2.jpg"}
+                      alt=""
+                      className="w-8 h-8 rounded-lg"
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-[10px] text-gray-400">
+                        {new Date(rev.created_at).toLocaleDateString()}
+                      </p>
+                      <h3 className="font-semibold">
+                        {currentUserProfile?.id === rev.user?.id
+                          ? "You"
+                          : rev.user?.account_name || rev.user?.name || "User"}
+                      </h3>
+                    </div>
                   </div>
+                  {currentUserProfile?.id === rev.user?.id && (
+                    <button
+                      onClick={() => handleOpenEditForm(rev.id)}
+                      className="text-gray-500 hover:text-gray-700 transition"
+                      aria-label="Edit review"
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
-                {currentUserProfile?.id === rev.user?.id && (
-                  <button
-                    onClick={() => handleOpenEditForm(rev.id)}
-                    className="text-gray-500 hover:text-gray-700 transition"
-                    aria-label="Edit review"
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                    </svg>
-                  </button>
-                )}
+                <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
               </div>
-              <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* Floating Add Review Button */}
@@ -417,8 +481,9 @@ const ReviewPage = () => {
                     key={star}
                     src="/star.svg"
                     alt=""
-                    className={`w-7 h-7 cursor-pointer transition ${star <= selectedStars ? "opacity-100" : "opacity-40"
-                      }`}
+                    className={`w-7 h-7 cursor-pointer transition ${
+                      star <= selectedStars ? "opacity-100" : "opacity-40"
+                    }`}
                     onClick={() => setSelectedStars(star)}
                   />
                 ))}
@@ -434,10 +499,16 @@ const ReviewPage = () => {
                 onClick={() => {
                   if (selectedStars <= 0) return;
                   if (!productId) {
-                    alert("Product id missing. Open this page from a product to leave a review.");
+                    alert(
+                      "Product id missing. Open this page from a product to leave a review.",
+                    );
                     return;
                   }
-                  createMutation.mutate({ product: productId, rating: selectedStars, comment });
+                  createMutation.mutate({
+                    product: productId,
+                    rating: selectedStars,
+                    comment,
+                  });
                 }}
                 className="w-full p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
               >

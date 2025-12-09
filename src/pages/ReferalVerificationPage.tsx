@@ -15,7 +15,9 @@ const ReferalVerificationPage = () => {
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
 
-  const location = useLocation() as Location & { state?: { registerData?: RegisterRequest } };
+  const location = useLocation() as Location & {
+    state?: { registerData?: RegisterRequest };
+  };
   const navigate = useNavigate();
   const registerMutation = useRegister();
 
@@ -56,7 +58,7 @@ const ReferalVerificationPage = () => {
             ? (err as any).message
             : "Verification/registration failed. Please try again.";
       setError(errorMessage as string);
-      toast.error(error)
+      toast.error(error);
     }
   };
   const handleSkip = async () => {
@@ -81,9 +83,9 @@ const ReferalVerificationPage = () => {
             ? (err as any).message
             : "Verification/registration failed. Please try again.";
       setError(errorMessage as string);
-      toast.error(error)
+      toast.error(error);
     }
-  }
+  };
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
@@ -98,7 +100,10 @@ const ReferalVerificationPage = () => {
             />
             <div className="flex flex-col gap-5 w-full mt-5 justify-center items-center">
               <Button name="Verify" onClick={handleVerify} />
-              <button className="flex items-center justify-center bg-[#F9F9F9] px-5 py-3 rounded-full text-black gap-3" onClick={handleSkip}>
+              <button
+                className="flex items-center justify-center bg-[#F9F9F9] px-5 py-3 rounded-full text-black gap-3"
+                onClick={handleSkip}
+              >
                 <h2 className="">Skip</h2>
                 <img src="skip.svg" alt="Skip" className="h-3" />
               </button>

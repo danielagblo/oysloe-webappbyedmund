@@ -64,7 +64,10 @@ const LogInPage = () => {
             try {
               const parsed = JSON.parse(json) as any;
               const candidate =
-                parsed?.error_message || parsed?.message || parsed?.detail || parsed?.error;
+                parsed?.error_message ||
+                parsed?.message ||
+                parsed?.detail ||
+                parsed?.error;
               if (candidate) {
                 if (Array.isArray(candidate)) return candidate.join(" ").trim();
                 return String(candidate).trim();
@@ -101,7 +104,7 @@ const LogInPage = () => {
             onClick={() => {
               try {
                 localStorage.setItem("oysloe_guest", "true");
-              } catch { }
+              } catch {}
               navigate("/");
             }}
             className="text-sm text-gray-500"
@@ -159,7 +162,6 @@ const LogInPage = () => {
             <h2 className="text-black inline opacity-100"> Sign up</h2>
           </Link>
         </h2>
-
       </div>
       {isSmall ? (
         shouldShowOnboarding ? (

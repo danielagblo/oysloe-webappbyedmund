@@ -1,31 +1,31 @@
 import {
-    queryOptions,
-    useMutation,
-    useQuery,
-    useQueryClient,
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 
 import {
-    confirmMarkProductAsTaken,
-    createProduct,
-    deleteProduct,
-    getProduct,
-    getProductReportCount,
-    getProducts,
-    getProductsForOwner,
-    getRelatedProducts,
-    markProductAsTaken,
-    patchProduct,
-    reportProduct,
-    repostProduct,
-    setProductStatus,
-    updateProduct,
+  confirmMarkProductAsTaken,
+  createProduct,
+  deleteProduct,
+  getProduct,
+  getProductReportCount,
+  getProducts,
+  getProductsForOwner,
+  getRelatedProducts,
+  markProductAsTaken,
+  patchProduct,
+  reportProduct,
+  repostProduct,
+  setProductStatus,
+  updateProduct,
 } from "../../services/productService";
 
 import type {
-    Product,
-    ProductPayload,
-    ProductStatus,
+  Product,
+  ProductPayload,
+  ProductStatus,
 } from "../../types/Product";
 
 // query keys
@@ -215,7 +215,6 @@ export const useSetProductStatus = () => {
   });
 };
 
-
 // useProductsForOwner
 export const useOwnerProducts = (ownerId?: number | null) => {
   const queryKey = [...productKeys.all, "for-owner", ownerId] as const;
@@ -234,13 +233,21 @@ export const useReportProduct = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, body }: { id: number | string; body?: Record<string, unknown> }) => reportProduct(id, body),
+    mutationFn: ({
+      id,
+      body,
+    }: {
+      id: number | string;
+      body?: Record<string, unknown>;
+    }) => reportProduct(id, body),
     onSuccess: (_data, variables) => {
       // Invalidate product detail to refetch and get updated total_reports
       qc.invalidateQueries({ queryKey: productKeys.detail(variables.id) });
       qc.invalidateQueries({ queryKey: productKeys.all });
       // Also invalidate the report count query
-      qc.invalidateQueries({ queryKey: productKeys.reports(Number(variables.id)) });
+      qc.invalidateQueries({
+        queryKey: productKeys.reports(Number(variables.id)),
+      });
     },
   });
 };
@@ -250,8 +257,13 @@ export const useRepostProduct = () => {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, body }: { id: number | string; body?: Record<string, unknown> }) =>
-      repostProduct(id, body),
+    mutationFn: ({
+      id,
+      body,
+    }: {
+      id: number | string;
+      body?: Record<string, unknown>;
+    }) => repostProduct(id, body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: productKeys.all });
       qc.invalidateQueries({ queryKey: productKeys.lists() });

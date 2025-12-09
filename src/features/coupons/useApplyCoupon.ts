@@ -10,7 +10,7 @@ const QUERY_KEYS = {
 export function useApplyCoupon() {
   const qc = useQueryClient();
 
-  const mutation = useMutation<Coupon, Error,string>({
+  const mutation = useMutation<Coupon, Error, string>({
     mutationFn: async (code: string) => {
       // Find coupon by code
       const list = await getCoupons({ code });
@@ -26,7 +26,8 @@ export function useApplyCoupon() {
           code: coupon.code,
           description: (coupon as any).description ?? "",
           discount_type: (coupon as any).discount_type ?? "percent",
-          discount_value: (coupon as any).discount_value ?? (coupon as any).discount ?? 0,
+          discount_value:
+            (coupon as any).discount_value ?? (coupon as any).discount ?? 0,
           max_uses: (coupon as any).max_uses ?? undefined,
           per_user_limit: (coupon as any).per_user_limit ?? undefined,
           valid_from: (coupon as any).valid_from ?? undefined,
@@ -50,7 +51,7 @@ export function useApplyCoupon() {
   });
 
   return {
-      apply: mutation.mutateAsync,
+    apply: mutation.mutateAsync,
     isLoading: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error,

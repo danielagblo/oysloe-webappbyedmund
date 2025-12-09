@@ -59,7 +59,8 @@ export const endpoints = {
     patch: (id: number | string) => `/products/${id}/`,
     delete: (id: number | string) => `/products/${id}/`,
     markAsTaken: (id: number | string) => `/products/${id}/mark-as-taken/`,
-    confirmMarkAsTaken: (id: number | string) => `/products/${id}/confirm-mark-as-taken/`,
+    confirmMarkAsTaken: (id: number | string) =>
+      `/products/${id}/confirm-mark-as-taken/`,
     setStatus: (id: number | string) => `/products/${id}/set-status/`,
     repost: (id: number | string) => `/products/${id}/repost-ad/`,
     related: "/products/related/",
