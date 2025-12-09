@@ -579,7 +579,7 @@ const AdsDetailsPage = () => {
           <span className="text-xs">{currentAdData?.total_favourites}</span>
         </div>
         {multiplierLabel && (
-          <div className="ml-2 text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+          <div className="ml-2 text-black font-bold rounded-lg px-2 py-0.5 text-[10px] bg-green-300">
             {multiplierLabel}
           </div>
         )}
@@ -643,7 +643,7 @@ const AdsDetailsPage = () => {
       </div>
       <div className="flex gap-2 ml-auto items-center">
         {multiplierLabel && (
-          <div className="text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+          <div className="text-black font-bold rounded-lg px-2 py-0.5 text-xs bg-green-300">
             {multiplierLabel}
           </div>
         )}
