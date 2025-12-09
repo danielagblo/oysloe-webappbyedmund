@@ -92,7 +92,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   const handleClearAll = () => {
     setSelectedCategoryId(null);
     setSelectedLocation(null);
-    setSelectedTimeframe("anytime");
+    // setSelectedTimeframe("anytime");
     setPriceSort("none");
     setTimeframeSort("none");
     setPriceFilter({ mode: "none" });
