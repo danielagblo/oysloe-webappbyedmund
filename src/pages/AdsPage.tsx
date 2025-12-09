@@ -237,20 +237,6 @@ const AdsPage = () => {
                           <p className="break-words">{selectedAd.suspension_note}</p>
                         </div>
                       ) : null}
-
-                      <p>
-                        Your ad does not meet our acceptable ad posting
-                        requirements. We kindly advise you to consider the use of
-                        words when submitting an ad. Review and submit again.
-                        Click{" "}
-                        <a
-                          href="https://www.oysloe.com/terms"
-                          className="text-blue-600 underline"
-                        >
-                          www.oysloe.com/terms
-                        </a>
-                        .
-                      </p>
                     </div>
                   </div>
                 </div>
