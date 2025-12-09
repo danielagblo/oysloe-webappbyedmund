@@ -231,19 +231,28 @@ const AdsPage = () => {
                       <p className=" text-xs text-gray-700 ">Note</p>
                     </div>
 
-                    <p className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
-                      Your ad does not meet our acceptable ad posting
-                      requirements. We kindly advise you to consider the use of
-                      words when submitting an ad. Review and submit again.
-                      Click{" "}
-                      <a
-                        href="https://www.oysloe.com/terms"
-                        className="text-blue-600 underline"
-                      >
-                        www.oysloe.com/terms
-                      </a>
-                      .
-                    </p>
+                    <div className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
+                      {selectedAd.suspension_note ? (
+                        <div className="mb-3">
+                          <p className="font-medium">Suspension note:</p>
+                          <p className="break-words">{selectedAd.suspension_note}</p>
+                        </div>
+                      ) : null}
+
+                      <p>
+                        Your ad does not meet our acceptable ad posting
+                        requirements. We kindly advise you to consider the use of
+                        words when submitting an ad. Review and submit again.
+                        Click{" "}
+                        <a
+                          href="https://www.oysloe.com/terms"
+                          className="text-blue-600 underline"
+                        >
+                          www.oysloe.com/terms
+                        </a>
+                        .
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : mapToLabel(selectedAd) === "Pending" ? (

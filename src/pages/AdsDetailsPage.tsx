@@ -10,6 +10,7 @@ import ReportModal from "../components/ReportModal";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import {
+  productKeys,
   useMarkProductAsTaken,
   useOwnerProducts,
   useProduct,
@@ -42,8 +43,12 @@ const AdsDetailsPage = () => {
     error: adError,
   } = useProduct(numericId!);
   const { profile: currentUserProfile } = useUserProfile();
-  const { reviews: reviews = [] } = useReviews();
+  // Fetch reviews limited to this product so invalidations target
+  // the same query key used by the like mutation.
+  const { reviews: reviews = [] } = useReviews({ product: numericId ?? undefined });
   const { data: userSubscriptions = [] } = useUserSubscriptions();
+
+  const queryClient = useQueryClient();
 
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
@@ -76,9 +81,12 @@ const AdsDetailsPage = () => {
     setIsFavourited(Boolean(favFromProduct || favFromList));
   }, [currentAdDataFromQuery, favourites]);
 
-  const handleToggleFavourite = () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || null;
-    if (!pid) return;
+  const handleToggleFavourite = async () => {
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || null;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+
     // prevent duplicate rapid clicks while a mutation is in-flight
     if (toggleFavourite.status === "pending") {
       console.debug("handleToggleFavourite: mutation already in-flight", {
@@ -86,17 +94,43 @@ const AdsDetailsPage = () => {
       });
       return;
     }
+
     console.debug("handleToggleFavourite: toggling", { pid, at: Date.now() });
+    // optimistic UI
     setIsFavourited((s) => !s);
-    toggleFavourite.mutate(pid);
+
+    try {
+      if ((toggleFavourite as any).mutateAsync) {
+        await (toggleFavourite as any).mutateAsync(pid);
+      } else {
+        await new Promise((resolve, reject) =>
+          toggleFavourite.mutate(pid, { onSuccess: resolve, onError: reject }),
+        );
+      }
+    } catch (err) {
+      // rollback optimistic toggle on error
+      setIsFavourited((s) => !s);
+      console.warn("handleToggleFavourite failed", err);
+      toast.error("Failed to toggle favourite");
+    } finally {
+      // ensure product detail is refetched (normalize key to number)
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        // fallback: invalidate the generic products list
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
+    }
   };
 
-  const handleMarkAsTaken = () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
-    if (!pid) return;
+  const handleMarkAsTaken = async () => {
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
 
     toast.promise(
-      Promise.resolve().then(() => {
+      Promise.resolve().then(async () => {
         // assemble a full product payload to match backend schema expectations
         const src =
           currentAdDataFromQuery || adDataFromState || currentAdData || {};
@@ -114,7 +148,19 @@ const AdsDetailsPage = () => {
         } as Record<string, unknown>;
 
         // call mutation with full payload so server receives the expected schema
-        markTaken.mutate({ id: pid, body: payload });
+        if ((markTaken as any).mutateAsync) {
+          await (markTaken as any).mutateAsync({ id: pid, body: payload });
+        } else {
+          await new Promise((resolve, reject) =>
+            markTaken.mutate({ id: pid, body: payload }, { onSuccess: resolve, onError: reject }),
+          );
+        }
+        // ensure product detail refreshes
+        try {
+          queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+        } catch (e) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
       }),
       {
         loading: "Sending alert to owner to mark ad as taken...",
@@ -136,8 +182,10 @@ const AdsDetailsPage = () => {
   const [reportMessage, setReportMessage] = useState("");
 
   const submitReport = async () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
-    if (!pid) return;
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
 
     const src =
       currentAdDataFromQuery || adDataFromState || currentAdData || {};
@@ -175,6 +223,12 @@ const AdsDetailsPage = () => {
 
       setIsReportModalOpen(false);
       setReportMessage("");
+      // ensure UI updates: invalidate product detail so totals refresh
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
     } catch (err) {
       // toast.promise will already show the error; keep modal open for retry
       console.warn("submitReport failed", err);
@@ -198,55 +252,64 @@ const AdsDetailsPage = () => {
     numericId ?? undefined,
   );
   const reportProduct = useReportProduct();
-  const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body?: any }) =>
       likeReview(id, body),
     onMutate: async ({ id }) => {
-      // Optimistically update the specific product's reviews
-      const allReviews = queryClient.getQueryData([
-        "reviews",
-        { product: numericId },
-      ]) as Review[] | undefined;
-      if (allReviews) {
-        const updated = allReviews.map((review: Review) =>
-          review.id === id ? { ...review, liked: !review.liked } : review,
-        );
-        queryClient.setQueryData(["reviews", { product: numericId }], updated);
-      }
-    },
-    onSuccess: async (data: any) => {
-      console.log("Like mutation success, server returned:", data);
+      const queryKey = ["reviews", { product: numericId }];
+      // Snapshot previous reviews to allow rollback on error
+      const previousReviews = queryClient.getQueryData(queryKey) as Review[] | undefined;
 
-      // Update individual review cache
-      queryClient.setQueryData(["review", data.id], data);
-
-      // Update the product-specific reviews list with server response
-      const allReviews = queryClient.getQueryData([
-        "reviews",
-        { product: numericId },
-      ]) as Review[] | undefined;
-      if (allReviews) {
-        const updated = allReviews.map((review: Review) =>
-          review.id === data.id ? { ...review, ...data } : review,
-        );
-        queryClient.setQueryData(["reviews", { product: numericId }], updated);
+      if (previousReviews) {
+        // apply optimistic toggle and adjust likes_count
+        const updated = previousReviews.map((review: Review) => {
+          if (review.id !== id) return review;
+          const wasLiked = Boolean(review.liked);
+          const likes = typeof review.likes_count === "number" ? review.likes_count : 0;
+          return {
+            ...review,
+            liked: !wasLiked,
+            likes_count: wasLiked ? Math.max(0, likes - 1) : likes + 1,
+          } as Review;
+        });
+        queryClient.setQueryData(queryKey, updated);
       }
 
-      // Invalidate only this product's reviews to ensure sync with server
-      await queryClient.invalidateQueries({
-        queryKey: ["reviews", { product: numericId }],
-      });
-
-      toast.success(data.liked ? "Review liked!" : "Review unliked!");
+      return { previousReviews };
     },
-    onError: (err: unknown) => {
-      // Refetch only this product's reviews to restore correct state on error
-      queryClient.invalidateQueries({
-        queryKey: ["reviews", { product: numericId }],
-      });
-      const message =
-        err instanceof Error ? err.message : "Failed to like review";
+    onSuccess: async (data: any, variables: any) => {
+      // Prefer server response but fall back to variables.id
+      const revId = data?.id ?? variables?.id;
+      const prodId = data?.product?.id ?? numericId;
+      const reviewsKey = ["reviews", { product: prodId }];
+
+      // Merge server data into individual review and reviews list cache
+      if (revId != null) {
+        queryClient.setQueryData(["review", revId], { ...(data || {}), id: revId });
+      }
+
+      const allReviews = queryClient.getQueryData(reviewsKey) as Review[] | undefined;
+      if (allReviews) {
+        const updated = allReviews.map((review: Review) =>
+          review.id === revId ? { ...review, ...(data || {}), id: revId } : review,
+        );
+        queryClient.setQueryData(reviewsKey, updated);
+      }
+
+      // Do NOT immediately invalidate here — keep server response applied.
+      toast.success((data && data.liked) ? "Review liked!" : "Review unliked!");
+    },
+    onError: (err: unknown, context: any) => {
+      // Rollback optimistic update if we have a snapshot
+      const queryKey = ["reviews", { product: numericId }];
+      if (context?.previousReviews) {
+        queryClient.setQueryData(queryKey, context.previousReviews);
+      } else {
+        // fallback: invalidate to restore state from server
+        queryClient.invalidateQueries({ queryKey });
+      }
+
+      const message = err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
   });
@@ -341,7 +404,11 @@ const AdsDetailsPage = () => {
       </p>
     );
 
-  const currentAdData = adDataFromState || currentAdDataFromQuery;
+  // Prefer the server-fetched product data when available so that
+  // refetches/invalidations update the UI even if we navigated here
+  // with `location.state` containing a product snapshot.
+  const currentAdData =
+    currentAdDataFromQuery != null ? currentAdDataFromQuery : adDataFromState;
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as an array of objects, a paginated object, or a single `image` string.
@@ -1278,7 +1345,7 @@ const AdsDetailsPage = () => {
                         alt=""
                         className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${review?.liked ? "opacity-100" : "opacity-60"}`}
                       />
-                      <h3>{review?.liked ? "Unlike" : "Like"}</h3>
+                      <h3>{review?.liked ? "Liked" : "Like"}</h3>
                     </div>
                   </button>
                   <span className="text-sm md:text-[1vw]">
