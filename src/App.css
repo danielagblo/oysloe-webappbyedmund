@@ -110,6 +110,7 @@ body {
 
   .search-input::placeholder {
     text-align: center;
+    font-size: 12.5px;
   }
 }
 @media (min-width: 640px) {

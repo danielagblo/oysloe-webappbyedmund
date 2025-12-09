@@ -21,6 +21,7 @@ import type { ProductFeature } from "../types/ProductFeature";
 import type { Review } from "../types/Review";
 import { formatMoney } from "../utils/formatMoney";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import { formatReviewerName } from "../utils/formatReviewerName";
 
 const AdsDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -180,13 +181,40 @@ const AdsDetailsPage = () => {
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body?: any }) => likeReview(id, body),
-    onSuccess: (data: any) => {
-      // update single review cache and refresh reviews lists
+    onMutate: async ({ id }) => {
+      // Optimistically update reviews
+      const allReviews = queryClient.getQueryData(["reviews", {}]) as Review[] | undefined;
+      if (allReviews) {
+        const updated = allReviews.map((review: Review) =>
+          review.id === id ? { ...review, liked: !review.liked } : review
+        );
+        queryClient.setQueryData(["reviews", {}], updated);
+      }
+    },
+    onSuccess: async (data: any) => {
+      console.log("Like mutation success, server returned:", data);
+      
+      // Update caches with server response to ensure accuracy
       queryClient.setQueryData(["review", data.id], data);
-      queryClient.invalidateQueries({ queryKey: ["reviews"] });
-      toast.success("Review liked!");
+      
+      // Update the reviews list with the server response
+      const allReviews = queryClient.getQueryData(["reviews", {}]) as Review[] | undefined;
+      if (allReviews) {
+        const updated = allReviews.map((review: Review) =>
+          review.id === data.id ? { ...review, ...data } : review
+        );
+        queryClient.setQueryData(["reviews", {}], updated);
+      }
+      
+      // Force refetch to get the correct liked status from server
+      // The server's like endpoint may not return the updated liked status for the current user
+      await queryClient.invalidateQueries({ queryKey: ["reviews", {}] });
+      
+      toast.success(data.liked ? "Review liked!" : "Review unliked!");
     },
     onError: (err: unknown) => {
+      // Refetch to restore the correct state on error
+      queryClient.invalidateQueries({ queryKey: ["reviews", {}] });
       const message = err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
@@ -198,7 +226,7 @@ const AdsDetailsPage = () => {
   const [quickChatInput, setQuickChatInput] = useState("");
 
 
-  const productReviews = useMemo(() => {
+  const productReviews =  useMemo(() => {
     if (!reviews || reviews.length === 0) return [];
     return reviews.filter((r: Review) => r.product?.id === numericId);
   }, [reviews, numericId]);
@@ -1111,10 +1139,15 @@ const AdsDetailsPage = () => {
                     <p className="text-[10px] text-gray-500 md:text-[0.9vw]">
                       {formatReviewDate(review.created_at)}
                     </p>
-                    <h3 className="font-semibold md:text-[1.2vw]">
-                      {review.user.name || "User"}
+                    <h3 className="font-semibold text-[15px] md:text-[1.2vw] truncate">
+                      <span className="md:hidden">
+                        {formatReviewerName(review.user.name)}
+                      </span>
+                      <span className="hidden md:inline">
+                        {review.user.name || "User"}
+                      </span>
                     </h3>
-                    <div className="flex mb-2">
+                    <div className="flex mb-2 mt-1">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <p
                           key={i}
@@ -1142,16 +1175,16 @@ const AdsDetailsPage = () => {
                       likeMutation.mutate({ id: review.id });
                     }}
                     className="flex items-center gap-1 m-2 md:text-[1vw]"
-                    aria-label={review.liked ? "Unlike review" : "Like review"}
+                    aria-label={review?.liked ? "Unlike review" : "Like review"}
                   >
                     <div className="flex items-center gap-2 justify-center px-2 py-1 bg-white rounded-xl hover:bg-gray-100 transition cursor-pointer">
                       <img
                         src="/like.svg"
                         alt=""
                         className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
-                          } ${review.liked ? "opacity-100" : "opacity-60"}`}
+                          } ${review?.liked ? "opacity-100" : "opacity-60"}`}
                       />
-                      <h3>Like</h3>
+                      <h3>{review?.liked ? "Unlike" : "Like"}</h3>
                     </div>
                   </button>
                   <span className="text-sm md:text-[1vw]">{review.likes_count ?? 0}</span>
@@ -1369,7 +1402,9 @@ const AdsDetailsPage = () => {
       </h2>
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
-        {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) =>
+        {
+        (relatedProducts && relatedProducts.length > 0) 
+        ? relatedProducts.map(ad =>
           !ad.is_taken && (
             <Link
               key={ad.id}
@@ -1400,8 +1435,14 @@ const AdsDetailsPage = () => {
                 {formatMoney(ad.price, "GHS")}
               </p>
             </Link>
-          ))}
-      </div>
+          ))
+        : <div className="flex items-center flex-col justify-center w-full gap-2">
+            <img src="/nothing-to-show.png" className="w-25 h-25" alt="nothing to show" />
+            <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">No similar ads to show.</p>
+       
+          </div>   
+           }   
+</div>
     </div>
   );
 
@@ -1463,7 +1504,7 @@ const AdsDetailsPage = () => {
                 <div className="bg-white rounded-lg w-full">
                   <SellerInfo />
                   <div className="hidden md:block">
-                    <RatingReviews layout="row" />
+                    <RatingReviews layout="column" />
                   </div>
                   <div className="md:hidden">
                     <RatingReviews fullWidth rd={reviewDeconstruction} />
