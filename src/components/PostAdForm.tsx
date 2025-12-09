@@ -1050,7 +1050,7 @@ export default function PostAdForm({
     <button
       disabled={isSubmitting}
       type="submit"
-      className={`w-full lg:w-[80%] hover:bg-[var(--accent)] hover:border border-[var(--div-border)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer bg-[var(--dark-def)] text-white lg:text-[var(--dark-def)] lg:bg-[var(--div-active)]`}
+      className={`w-full lg:w-[80%] bg-gray-100 hover:bg-gray-200 text-[var(--dark-def)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer lg:bg-[var(--div-active)]`}
     >
       {isSubmitting
         ? effectiveEditId
@@ -1285,13 +1285,14 @@ export default function PostAdForm({
               </div>
               {isMobile && (
                 <div className=" w-full flex items-center justify-center -ml-4 max-sm:ml-0">
-                  <div className="w-[80%] flex flex-col gap-3 items-center justify-center">
+                  <div className="w-full flex flex-col gap-3 items-center justify-center">
                     <button
                       onClick={() => setMobileStep("images")}
                       type="button"
-                      className="mt-4 border w-full border-gray-300 rounded-xl py-3 font-medium hover:bg-gray-100 transition"
+                      className="flex items-center justify-center mt-4 border w-full border-gray-300 rounded-xl py-3 font-medium hover:bg-gray-100 transition"
                     >
-                      ← Back to Images
+                      <img src="/arrowleft.svg" alt="<" />
+                      <span>Back to Images</span>
                     </button>
                     <SaveBtn />
                   </div>
@@ -1410,7 +1411,7 @@ export default function PostAdForm({
                   <button
                     onClick={() => setMobileStep("form")}
                     type="button"
-                    className="fixed bottom-20 sm:bottom-25 w-full py-3.5 sm:py-7 bg-gray-100 text-[var(--dark-def)] text-sm hover:bg-gray-200 rounded-xl  transition"
+                    className="fixed bottom-20 sm:bottom-25 w-9/10 py-3.5 sm:py-7 bg-gray-100 text-[var(--dark-def)] text-sm hover:bg-gray-200 rounded-xl  transition"
                   >
                     Next
                   </button>
