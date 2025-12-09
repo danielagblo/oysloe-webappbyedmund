@@ -430,8 +430,13 @@ const AdsDetailsPage = () => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
-      if (diff > 0) handleNext();
-      else handlePrevious();
+      if (diff > 0) {
+        // Swipe left: go to next image (with looping)
+        setGalleryIndex((idx) => (idx + 1) % imageCount);
+      } else {
+        // Swipe right: go to previous image (with looping)
+        setGalleryIndex((idx) => (idx - 1 + imageCount) % imageCount);
+      }
       touchStartX.current = null;
     }
   };
@@ -439,7 +444,7 @@ const AdsDetailsPage = () => {
 
   // mini components
   const MobileHeader = () => (
-    <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) sticky top-0 z-50">
+    <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) fixed top-0 z-50">
       <button onClick={() => navigate(-1)} className="flex items-center gap-1">
         <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
         <span className="text-sm">Back</span>
@@ -562,16 +567,6 @@ const AdsDetailsPage = () => {
 
     const maxStart = Math.max(0, max - 3);
 
-    // Ensure the gallery window start index is always clamped so we show up to
-    // three images. If external code sets the index to a value that would
-    // produce fewer than three images at the left edge, move it left to the
-    // last valid start so users can navigate back.
-    useEffect(() => {
-      if (currentIndex > maxStart) {
-        setCurrentIndex(maxStart);
-      }
-    }, [currentIndex, maxStart, setCurrentIndex]);
-
     const checkScroll = () => {
       if (galleryScrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = galleryScrollRef.current;
@@ -681,10 +676,13 @@ const AdsDetailsPage = () => {
             className="absolute inset-0 bg-cover bg-center blur-md opacity-40"
             style={{ backgroundImage: `url(${getMainImage()})` }}
           />
-          {/* Main image on top */}
-          <img src={getMainImage()} alt="Ad main" className="object-contain w-full h-full cursor-zoom-in relative z-10" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
-          <div onClick={handlePrevious} className="absolute top-0 left-0 w-[30%] h-full z-20" />
-          <div onClick={handleNext} className="absolute top-0 right-0 w-[30%] h-full z-20" />
+          {/* Main image on top - shrunk hitbox to avoid side zones */}
+          <div className="absolute inset-0 w-[40%] left-[30%] z-30 cursor-zoom-in" onClick={() => { setPictureModalIndex(galleryIndex); setIsPictureModalOpen(true); }} />
+          <img src={getMainImage()} alt="Ad main" className="object-contain w-full h-full relative z-10" />
+          {/* Left side: navigate to previous image (with looping) */}
+          <div onClick={() => { setGalleryIndex((idx) => (idx - 1 + imageCount) % imageCount); }} className="absolute top-0 left-0 w-[30%] h-full z-20" />
+          {/* Right side: navigate to next image (with looping) */}
+          <div onClick={() => { setGalleryIndex((idx) => (idx + 1) % imageCount); }} className="absolute top-0 right-0 w-[30%] h-full z-20" />
         </div>
       </div>
     );
@@ -699,12 +697,12 @@ const AdsDetailsPage = () => {
     const prev = (e?: React.MouseEvent) => {
       e?.preventDefault();
       e?.stopPropagation();
-      setPictureModalIndex((i) => Math.max(0, i - 1));
+      setPictureModalIndex((i) => (i - 1 + max) % max);
     };
     const next = (e?: React.MouseEvent) => {
       e?.preventDefault();
       e?.stopPropagation();
-      setPictureModalIndex((i) => Math.min(max - 1, i + 1));
+      setPictureModalIndex((i) => (i + 1) % max);
     };
 
     const close = () => {
@@ -735,7 +733,7 @@ const AdsDetailsPage = () => {
             ✕
           </button>
 
-          {max > 1 && pictureModalIndex > 0 && (
+          {max > 1 && (
             <button
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
               onClick={(e) => {
@@ -763,7 +761,7 @@ const AdsDetailsPage = () => {
             />
           </div>
 
-          {max > 1 && pictureModalIndex < max - 1 && (
+          {max > 1 && (
             <button
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 z-20 hover:bg-gray-100"
               onClick={(e) => {
@@ -1412,7 +1410,7 @@ const AdsDetailsPage = () => {
       <AdLoadingOverlay isVisible={isAdLoading || adLoading || adsLoading} />
       <div
         style={{ color: "var(--dark-def)" }}
-        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
+        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 max-sm:pt-10 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
       >
         <MobileHeader />
 
