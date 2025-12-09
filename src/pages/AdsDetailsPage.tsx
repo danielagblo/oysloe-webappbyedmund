@@ -9,7 +9,7 @@ import RatingReviews from "../components/RatingsReviews";
 import ReportModal from "../components/ReportModal";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
-import { useMarkProductAsTaken, useOwnerProducts, useProduct, useProductReportCount, useProducts, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
+import { useMarkProductAsTaken, useOwnerProducts, useProduct, useRelatedProducts, useReportProduct } from "../features/products/useProducts";
 import useReviews from "../features/reviews/useReviews";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import useUserProfile from "../features/userProfile/useUserProfile";
@@ -35,7 +35,6 @@ const AdsDetailsPage = () => {
     isLoading: adLoading,
     error: adError,
   } = useProduct(numericId!);
-  const { data: ads = [], isLoading: adsLoading } = useProducts();
   const { profile: currentUserProfile } = useUserProfile();
   const { reviews: reviews = [] } = useReviews();
   const { data: userSubscriptions = [] } = useUserSubscriptions();
@@ -55,8 +54,6 @@ const AdsDetailsPage = () => {
   // Favourites hook and local state (declare early to obey hook rules)
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
-  const [animatingLikes, setAnimatingLikes] = useState<Set<number>>(new Set());
-  const [isAdLoading, setIsAdLoading] = useState(false);
 
   // mark-as-taken mutation (declare early)
   const markTaken = useMarkProductAsTaken();
@@ -167,8 +164,7 @@ const AdsDetailsPage = () => {
 
   // Determine a candidate owner id early so hooks can be called unconditionally
   const ownerIdCandidate =
-    adDataFromState?.owner?.id ?? currentAdDataFromQuery?.owner?.id ??
-    ads.find((a) => a.id === numericId)?.owner?.id ?? undefined;
+    adDataFromState?.owner?.id ?? currentAdDataFromQuery?.owner?.id ?? undefined;
 
   // fetch seller's products from backend via hook (call unconditionally)
   const ownerProductsQuery = useOwnerProducts(ownerIdCandidate as number | undefined);
@@ -177,44 +173,42 @@ const AdsDetailsPage = () => {
   // fetch related products (for Similar Ads section)
   const { data: relatedProducts = [] } = useRelatedProducts(numericId ?? undefined);
   const reportProduct = useReportProduct();
-  const { data: reportCount = 0 } = useProductReportCount(numericId ?? undefined);
   const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body?: any }) => likeReview(id, body),
     onMutate: async ({ id }) => {
-      // Optimistically update reviews
-      const allReviews = queryClient.getQueryData(["reviews", {}]) as Review[] | undefined;
+      // Optimistically update the specific product's reviews
+      const allReviews = queryClient.getQueryData(["reviews", { product: numericId }]) as Review[] | undefined;
       if (allReviews) {
         const updated = allReviews.map((review: Review) =>
           review.id === id ? { ...review, liked: !review.liked } : review
         );
-        queryClient.setQueryData(["reviews", {}], updated);
+        queryClient.setQueryData(["reviews", { product: numericId }], updated);
       }
     },
     onSuccess: async (data: any) => {
       console.log("Like mutation success, server returned:", data);
       
-      // Update caches with server response to ensure accuracy
+      // Update individual review cache
       queryClient.setQueryData(["review", data.id], data);
       
-      // Update the reviews list with the server response
-      const allReviews = queryClient.getQueryData(["reviews", {}]) as Review[] | undefined;
+      // Update the product-specific reviews list with server response
+      const allReviews = queryClient.getQueryData(["reviews", { product: numericId }]) as Review[] | undefined;
       if (allReviews) {
         const updated = allReviews.map((review: Review) =>
           review.id === data.id ? { ...review, ...data } : review
         );
-        queryClient.setQueryData(["reviews", {}], updated);
+        queryClient.setQueryData(["reviews", { product: numericId }], updated);
       }
       
-      // Force refetch to get the correct liked status from server
-      // The server's like endpoint may not return the updated liked status for the current user
-      await queryClient.invalidateQueries({ queryKey: ["reviews", {}] });
+      // Invalidate only this product's reviews to ensure sync with server
+      await queryClient.invalidateQueries({ queryKey: ["reviews", { product: numericId }] });
       
       toast.success(data.liked ? "Review liked!" : "Review unliked!");
     },
     onError: (err: unknown) => {
-      // Refetch to restore the correct state on error
-      queryClient.invalidateQueries({ queryKey: ["reviews", {}] });
+      // Refetch only this product's reviews to restore correct state on error
+      queryClient.invalidateQueries({ queryKey: ["reviews", { product: numericId }] });
       const message = err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
@@ -226,38 +220,39 @@ const AdsDetailsPage = () => {
   const [quickChatInput, setQuickChatInput] = useState("");
 
 
-  const productReviews =  useMemo(() => {
+  // Filter reviews for this specific product (memoized to prevent unnecessary recalculation)
+  const thisProductsReviews = useMemo(() => {
     if (!reviews || reviews.length === 0) return [];
-    return reviews.filter((r: Review) => r.product?.id === numericId);
+    return reviews.filter((review) => review?.product?.id === numericId);
   }, [reviews, numericId]);
 
-  const thisProductsReviews = reviews.filter(
-    (review) => review?.product.id === numericId,
-  );
-
-  const reviewDeconstruction = thisProductsReviews.reduce(
-    (acc, p) => {
-      const star = Math.round(p.rating) as 5 | 4 | 3 | 2 | 1;
-      return {
-        sum: acc.sum + p.rating,
-        count: acc.count + 1,
-        avg: (acc.sum + p.rating) / (acc.count + 1),
-        stars: {
-          ...acc.stars,
-          [star]: (acc.stars[star] || 0) + 1,
-        },
-      };
-    },
-    {
-      sum: 0,
-      count: 0,
-      avg: 0,
-      stars: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
-    },
-  );
+  // Calculate star rating statistics from product reviews (memoized)
+  const reviewDeconstruction = useMemo(() => {
+    return thisProductsReviews.reduce(
+      (acc, p) => {
+        const star = Math.round(p.rating) as 5 | 4 | 3 | 2 | 1;
+        return {
+          sum: acc.sum + p.rating,
+          count: acc.count + 1,
+          avg: (acc.sum + p.rating) / (acc.count + 1),
+          stars: {
+            ...acc.stars,
+            [star]: (acc.stars[star] || 0) + 1,
+          },
+        };
+      },
+      {
+        sum: 0,
+        count: 0,
+        avg: 0,
+        stars: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      },
+    );
+  }, [thisProductsReviews]);
 
   const touchStartX = useRef<number | null>(null);
   const galleryScrollRef = useRef<HTMLDivElement>(null);
+  const sellerCarouselRef = useRef<HTMLDivElement>(null);
 
   // Gallery state: keep hooks above any early returns so they're
   // invoked unconditionally on every render.
@@ -308,10 +303,8 @@ const AdsDetailsPage = () => {
       </p>
     );
 
-  const currentIndex = ads.findIndex((a) => a.id === numericId) ?? 0;
-  const totalAds = ads.length;
   const currentAdData =
-    adDataFromState || currentAdDataFromQuery || ads[currentIndex];
+    adDataFromState || currentAdDataFromQuery;
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as an array of objects, a paginated object, or a single `image` string.
@@ -362,12 +355,10 @@ const AdsDetailsPage = () => {
   const toggleCaller1 = () => setShowCaller1((s) => !s);
   const toggleCaller2 = () => setShowCaller2((s) => !s);
 
-  // const ownerId = currentAdData?.owner?.id ?? null;
-
   const openChatWithOwnerAndSend = async (text: string) => {
-    if (!owner || !owner.id) {
-      // fallback: just go to inbox
-      navigate("/inbox");
+    // Early validation: ensure owner exists with valid id
+    if (!owner?.id) {
+      toast.error("Unable to start chat: seller information not available");
       return;
     }
 
@@ -416,38 +407,9 @@ const AdsDetailsPage = () => {
       navigate("/inbox", { state: { openRoom: String(roomKey) } });
     } catch (err) {
       console.warn("AdsDetailsPage: createChatRoom/send failed", err);
+      toast.error("Failed to start chat. Please try again.");
       navigate("/inbox");
     }
-  };
-
-
-
-  const handlePrevious = async () => {
-    if (currentIndex > 0) {
-      const prevAd = ads[currentIndex - 1];
-      setIsAdLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      navigate(`/ads/${prevAd.id}`, { state: { adData: prevAd } });
-      setTimeout(() => setIsAdLoading(false), 500);
-    }
-  };
-
-  const handleNext = async () => {
-    if (currentIndex < totalAds - 1) {
-      const nextAd = ads[currentIndex + 1];
-      setIsAdLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 100));
-      navigate(`/ads/${nextAd.id}`, { state: { adData: nextAd } });
-      setTimeout(() => setIsAdLoading(false), 500);
-    }
-  };
-
-  const handleRelatedAdClick = async (ad: Product, e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsAdLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 100));
-    navigate(`/ads/${ad.id}`, { state: { adData: ad } });
-    setTimeout(() => setIsAdLoading(false), 500);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -553,8 +515,8 @@ const AdsDetailsPage = () => {
           </div>
         )}
         <button
-          onClick={handlePrevious}
           className="bg-gray-200 p-2 hidden rounded-full hover:bg-gray-300"
+          aria-label="Previous ad"
         >
           <img
             src="/arrowleft.svg"
@@ -563,8 +525,8 @@ const AdsDetailsPage = () => {
           />
         </button>
         <button
-          onClick={handleNext}
           className="bg-gray-200 p-2 hidden rounded-full hover:bg-gray-300"
+          aria-label="Next ad"
         >
           <img
             src="/arrowright.svg"
@@ -579,11 +541,9 @@ const AdsDetailsPage = () => {
   const ImageGallery = ({
     images,
     currentIndex,
-    setCurrentIndex,
   }: {
     images: string[];
     currentIndex: number;
-    setCurrentIndex: (n: number) => void;
   }) => {
     const galleryImages = useMemo(
       () => images.length > 0 ? images : ["/no-image.jpeg"],
@@ -592,8 +552,6 @@ const AdsDetailsPage = () => {
     const max = galleryImages.length;
     const [canScrollLeft, setCanScrollLeft] = useState(false);
     const [canScrollRight, setCanScrollRight] = useState(max > 3);
-
-    const maxStart = Math.max(0, max - 3);
 
     const checkScroll = () => {
       if (galleryScrollRef.current) {
@@ -1117,13 +1075,13 @@ const AdsDetailsPage = () => {
           Comments
         </h2>
         <div className="mt-5 -ml-4 w-[120%] sm:w-full flex flex-col gap-3">
-          {productReviews.length === 0 && (
+          {thisProductsReviews.length === 0 && (
             <p className="md:text-[1.2vw]">
               No <span className="max-sm:hidden">comments</span>
               <span className="sm:hidden">reviews</span> to show. Leave one?
             </p>
           )}
-          {productReviews.slice(0, 3).map((review: Review) => (
+          {thisProductsReviews.slice(0, 3).map((review: Review) => (
             <div
               key={review.id}
               className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
@@ -1164,14 +1122,6 @@ const AdsDetailsPage = () => {
                   <button
                     onClick={() => {
                       if (likeMutation.isPending) return;
-                      setAnimatingLikes((prev) => new Set(prev).add(review.id));
-                      setTimeout(() => {
-                        setAnimatingLikes((prev) => {
-                          const next = new Set(prev);
-                          next.delete(review.id);
-                          return next;
-                        });
-                      }, 600);
                       likeMutation.mutate({ id: review.id });
                     }}
                     className="flex items-center gap-1 m-2 md:text-[1vw]"
@@ -1181,8 +1131,7 @@ const AdsDetailsPage = () => {
                       <img
                         src="/like.svg"
                         alt=""
-                        className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${animatingLikes.has(review.id) ? "animate-like-heartbeat" : ""
-                          } ${review?.liked ? "opacity-100" : "opacity-60"}`}
+                        className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${review?.liked ? "opacity-100" : "opacity-60"}`}
                       />
                       <h3>{review?.liked ? "Unlike" : "Like"}</h3>
                     </div>
@@ -1230,6 +1179,9 @@ const AdsDetailsPage = () => {
             <button
               key={i}
               className="px-3 py-2 bg-(--div-active) sm:bg-white rounded text-xs md:text-[0.9vw] hover:bg-gray-100 whitespace-nowrap w-fit"
+              onClick={async () => {
+                await openChatWithOwnerAndSend(text);
+              }}
             >
               {text}
             </button>
@@ -1335,10 +1287,21 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-center mb-4 w-full">
         <div className="pt-4 overflow-x-hidden w-full">
           <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4">
-            <button className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
+            <button 
+              className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
+              onClick={() => {
+                if (sellerCarouselRef.current) {
+                  sellerCarouselRef.current.scrollBy({ left: -500, behavior: 'smooth' });
+                }
+              }}
+              aria-label="Scroll seller products left"
+            >
               <img src="/arrowleft.svg" alt="" className="w-4 h-4" />
             </button>
-            <div className="flex gap-2 overflow-x-auto flex-1 no-scrollbar p-">
+            <div 
+              ref={sellerCarouselRef}
+              className="flex gap-2 overflow-x-auto flex-1 no-scrollbar p-"
+            >
               {sellerProducts && sellerProducts.length > 0 ? (
                 sellerProducts.slice(0, 6).map((p) => (
                   (!p.is_taken && p.status === "ACTIVE") && (
@@ -1348,18 +1311,12 @@ const AdsDetailsPage = () => {
                       alt={p.name || "Seller product"}
                       role="button"
                       tabIndex={0}
-                      onClick={async () => {
-                        setIsAdLoading(true);
-                        await new Promise(resolve => setTimeout(resolve, 100));
+                      onClick={() => {
                         navigate(`/ads/${p.id}`, { state: { adData: p } });
-                        setTimeout(() => setIsAdLoading(false), 500);
                       }}
-                      onKeyDown={async (e) => {
+                      onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
-                          setIsAdLoading(true);
-                          await new Promise(resolve => setTimeout(resolve, 100));
                           navigate(`/ads/${p.id}`, { state: { adData: p } });
-                          setTimeout(() => setIsAdLoading(false), 500);
                         }
                       }}
                       className="bg-(--div-active) w-23 h-23 object-cover rounded shrink-0 cursor-pointer"
@@ -1372,7 +1329,15 @@ const AdsDetailsPage = () => {
                 </>
               )}
             </div>
-            <button className="absolute right-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300">
+            <button 
+              className="absolute right-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
+              onClick={() => {
+                if (sellerCarouselRef.current) {
+                  sellerCarouselRef.current.scrollBy({ left: 500, behavior: 'smooth' });
+                }
+              }}
+              aria-label="Scroll seller products right"
+            >
               <img src="/arrowright.svg" alt="" className="w-4 h-4" />
             </button>
           </div>
@@ -1390,7 +1355,7 @@ const AdsDetailsPage = () => {
         <div>
           <h2 className="text-sm text-gray-500">{currentAdData?.created_at ? new Date(currentAdData.created_at).toLocaleString(undefined, { month: 'short', year: 'numeric' }) : ""}</h2>
           <h3 className="font-semibold">{currentAdData?.owner?.name ?? "Seller"}</h3>
-          <h3 className="text-sm text-gray-600">Total Ads: {ads.filter(a => a.owner?.id === currentAdData?.owner?.id).length || 0}</h3>
+          <h3 className="text-sm text-gray-600">Total Ads: {sellerProducts.length || 0}</h3>
         </div>
       </div>
     </div>
@@ -1410,7 +1375,6 @@ const AdsDetailsPage = () => {
               key={ad.id}
               to={`/ads/${ad.id}`}
               state={{ adData: ad }}
-              onClick={(e) => handleRelatedAdClick(ad, e)}
               className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
             >
               <img
@@ -1448,7 +1412,7 @@ const AdsDetailsPage = () => {
 
   return (
     <div className="lg:pt-5">
-      <AdLoadingOverlay isVisible={isAdLoading || adLoading || adsLoading} />
+      <AdLoadingOverlay isVisible={adLoading} />
       <div
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 max-sm:pt-10 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
@@ -1457,7 +1421,7 @@ const AdsDetailsPage = () => {
 
         <div className="w-full md:p-6">
           <DesktopHeader />
-          <ImageGallery images={pageImages} currentIndex={galleryIndex} setCurrentIndex={setGalleryIndex} />
+          <ImageGallery images={pageImages} currentIndex={galleryIndex} />
           <PictureModal />
           <ReportModal
             isOpen={isReportModalOpen}
