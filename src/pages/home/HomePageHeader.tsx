@@ -35,10 +35,7 @@ const HomePageHeader = ({
     return (
         <div
             ref={headerRef}
-            className={`w-full left-0 z-40 transition-all duration-300 ${isSmallScreen && isCondensed
-                ? "fixed top-0 bg-white/90 backdrop-blur-sm shadow-sm"
-                : "relative"
-                }`}
+            className={`w-full left-0 transition-all duration-300`}
         >
             <div
                 className={`flex items-center max-sm:mt-7.5 transition-all duration-300 ${isSmallScreen && isCondensed
@@ -55,12 +52,12 @@ const HomePageHeader = ({
 
                 <div className="flex w-full px-200">
                     <div
-                        className={`relative flex items-center ${isSmallScreen && isCondensed
+                        className={`relative flex items-center z-0 ${isSmallScreen && isCondensed
                             ? "justify-end flex-1"
                             : "justify-center w-full max-w-[520px]"
                             }`}
                     >
-                        <div className="rotating-bg" aria-hidden="true" />
+                        <div className="rotating-bg z-0" aria-hidden="true" />
                         <div className="rotating-bg-inner" aria-hidden="true" />
 
                         <div className="relative flex">
@@ -77,7 +74,7 @@ const HomePageHeader = ({
 
                             <img
                                 src="/search.svg"
-                                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 w-5 h-5 z-10"
+                                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 w-5 h-5 z-[1]"
                             />
                         </div>
                     </div>

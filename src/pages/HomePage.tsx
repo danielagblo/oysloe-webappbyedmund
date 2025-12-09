@@ -281,13 +281,23 @@ const HomePage = () => {
           <FilterButton
             handleFilterSettings={handleFilterSettings}
             selectedCategoryId={selectedCategoryId}
+            setSelectedCategoryId={setSelectedCategoryId}
             selectedSubcategoryId={selectedSubcategoryId}
+            setSelectedSubcategoryId={setSelectedSubcategoryId}
             selectedFeatures={selectedFeatures}
+            setSelectedFeatures={setSelectedFeatures}
             selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
             selectedTimeframe={selectedTimeframe}
+            setSelectedTimeframe={setSelectedTimeframe}
             priceSort={priceSort}
+            setPriceSort={setPriceSort}
             timeframeSort={timeframeSort}
+            setTimeframeSort={setTimeframeSort}
             priceFilter={priceFilter}
+            setPriceFilter={setPriceFilter}
+            categories={categories}
+            uniqueLocations={uniqueLocations}
           />
         </div>
         <MenuButton />

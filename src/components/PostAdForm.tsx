@@ -1407,13 +1407,13 @@ export default function PostAdForm({
 
             {isMobile && (
               <>
-                <div className="w-full flex justify-center items-center lg:hidden">
+                <div className="w-full flex justify-center items-center lg:hidden px-3">
                   <button
                     onClick={() => setMobileStep("form")}
                     type="button"
-                    className="fixed bottom-17 sm:bottom-25 w-4/5 py-5 sm:py-7 bg-[var(--dark-def)] text-white rounded-xl hover:bg-[var(--accent)] hover:text-[var(--dark-def)] border hover:border-[var(--dark-def)] transition"
+                    className="fixed bottom-20 sm:bottom-25 w-full py-3.5 sm:py-7 bg-gray-100 text-[var(--dark-def)] text-sm hover:bg-gray-200 rounded-xl  transition"
                   >
-                    Next →
+                    Next
                   </button>
                 </div>
               </>
