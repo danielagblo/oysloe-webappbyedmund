@@ -138,7 +138,7 @@ const HomePage = () => {
       out = out.filter((p) => p.category === selectedCategoryId);
     }
     if (selectedSubcategoryId !== null && selectedSubcategoryId !== "") {
-      out = out.filter((p) => p.product_features.some((pf: any) => pf.feature?.subcategory === selectedSubcategoryId));
+      out = out.filter((p) => p.product_features.some((pf: { feature?: { subcategory?: string | number } }) => pf.feature?.subcategory === selectedSubcategoryId));
     }
 
     // Feature filtering (best effort - match string values)

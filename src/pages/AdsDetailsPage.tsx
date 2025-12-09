@@ -161,11 +161,11 @@ const AdsDetailsPage = () => {
       const mutatePromise = (reportProduct as any).mutateAsync
         ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
         : new Promise((resolve, reject) => {
-            reportProduct.mutate(
-              { id: pid, body: payload },
-              { onSuccess: resolve, onError: reject },
-            );
-          });
+          reportProduct.mutate(
+            { id: pid, body: payload },
+            { onSuccess: resolve, onError: reject },
+          );
+        });
 
       await toast.promise(mutatePromise, {
         loading: "Reporting ad...",
@@ -528,10 +528,10 @@ const AdsDetailsPage = () => {
           className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
         />
         <h2 className="text-base  md:text-[1.125vw]">
-          {currentAdData.average_rating ? currentAdData.average_rating : "0.0"}{" "}
-          &nbsp;&nbsp;&nbsp;{currentAdData.total_reviews || "No"} Review
-          {(currentAdData.total_reviews > 1 ||
-            currentAdData.total_reviews === 0) &&
+          {currentAdData?.average_rating ? currentAdData.average_rating : "0.0"}{" "}
+          &nbsp;&nbsp;&nbsp;{currentAdData?.total_reviews || "No"} Review
+          {(currentAdData?.total_reviews > 1 ||
+            currentAdData?.total_reviews === 0) &&
             "s"}
         </h2>
       </div>
@@ -734,7 +734,7 @@ const AdsDetailsPage = () => {
           <img
             src={getMainImage()}
             alt="Ad main"
-            className="object-contain w-full h-full relative z-10"
+            className="object-cover w-full h-full relative z-10"
           />
           {/* Left side: navigate to previous image (with looping) */}
           <div
@@ -885,10 +885,10 @@ const AdsDetailsPage = () => {
         </h2>
         {((currentAdData as any)?.is_taken ||
           (currentAdDataFromQuery as any)?.is_taken) && (
-          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
-            Taken
-          </span>
-        )}
+            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
+              Taken
+            </span>
+          )}
       </div>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price
@@ -938,12 +938,12 @@ const AdsDetailsPage = () => {
   );
 
   const ActionButtons = ({
-    onMarkTaken = () => {},
-    onReportAd = () => {},
-    onCaller1 = () => {},
-    onCaller2 = () => {},
-    onMakeOffer = () => {},
-    onFavorite = () => {},
+    onMarkTaken = () => { },
+    onReportAd = () => { },
+    onCaller1 = () => { },
+    onCaller2 = () => { },
+    onMakeOffer = () => { },
+    onFavorite = () => { },
     isFavourited = false,
     // new props for caller UI
     caller1,
@@ -976,7 +976,7 @@ const AdsDetailsPage = () => {
     const [showOffer, setShowOffer] = useState(false);
     const [offerInput, setOfferInput] = useState<string>("");
     const actions: Record<string, () => void> = {
-      "Mark as taken": isTaken ? () => {} : onMarkTaken || (() => {}),
+      "Mark as taken": isTaken ? () => { } : onMarkTaken || (() => { }),
       "Report Ad": onReportAd,
       "Caller 1": onCaller1,
       "Caller 2": onCaller2,
@@ -1004,21 +1004,20 @@ const AdsDetailsPage = () => {
                 <button
                   key={label}
                   className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                  ${
-                    actions[label]
+                  ${actions[label]
                       ? "cursor-pointer hover:scale-95 active:scale-105"
                       : "cursor-not-allowed"
-                  }
+                    }
                 `}
                   onClick={(e) => {
                     e.stopPropagation();
                     // special handling for caller buttons to toggle tooltip
                     if (label === "Caller 1") {
-                      (toggleCaller1 || (() => {}))();
+                      (toggleCaller1 || (() => { }))();
                       return;
                     }
                     if (label === "Caller 2") {
-                      (toggleCaller2 || (() => {}))();
+                      (toggleCaller2 || (() => { }))();
                       return;
                     }
                     if (label === "Make Offer") {
@@ -1410,9 +1409,9 @@ const AdsDetailsPage = () => {
           <h2 className="text-sm text-gray-500 md:text-[1vw]">
             {currentAdData?.created_at
               ? new Date(currentAdData.created_at).toLocaleString(undefined, {
-                  month: "short",
-                  year: "numeric",
-                })
+                month: "short",
+                year: "numeric",
+              })
               : ""}
           </h2>
           <h3 className="font-semibold md:text-[1.2vw]">
@@ -1529,20 +1528,20 @@ const AdsDetailsPage = () => {
           {(currentAdData?.owner?.is_verified ||
             currentAdData?.owner?.verified ||
             currentAdData?.owner?.verified_at) && (
-            <img
-              src="/verified.svg"
-              alt="Verified"
-              className="absolute -bottom-1 -right-2 w-8 h-8"
-            />
-          )}
+              <img
+                src="/verified.svg"
+                alt="Verified"
+                className="absolute -bottom-1 -right-2 w-8 h-8"
+              />
+            )}
         </div>
         <div>
           <h2 className="text-sm text-gray-500">
             {currentAdData?.created_at
               ? new Date(currentAdData.created_at).toLocaleString(undefined, {
-                  month: "short",
-                  year: "numeric",
-                })
+                month: "short",
+                year: "numeric",
+              })
               : ""}
           </h2>
           <h3 className="font-semibold">
@@ -1563,54 +1562,54 @@ const AdsDetailsPage = () => {
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
         {
-        (() => {
-          const availableAds = relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
-          return availableAds.length > 0 ? (
-            availableAds.map(
-              (ad) => (
-                <Link
-                  key={ad.id}
-                  to={`/ads/${ad.id}`}
-                  state={{ adData: ad }}
-                  className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
-                >
-                  <img
-                    src={ad.image || "/no-image.jpeg"}
-                    alt={ad.name.slice(0, 10)}
-                    className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
-                  />
-                  <div className="flex items-center gap-1 px-2 py-1">
+          (() => {
+            const availableAds = relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
+            return availableAds.length > 0 ? (
+              availableAds.map(
+                (ad) => (
+                  <Link
+                    key={ad.id}
+                    to={`/ads/${ad.id}`}
+                    state={{ adData: ad }}
+                    className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52"
+                  >
                     <img
-                      src="/location.svg"
-                      alt=""
-                      className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                      src={ad.image || "/no-image.jpeg"}
+                      alt={ad.name.slice(0, 10)}
+                      className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
                     />
-                    <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
-                      {ad.location?.name || "Unknown"}
+                    <div className="flex items-center gap-1 px-2 py-1">
+                      <img
+                        src="/location.svg"
+                        alt=""
+                        className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
+                      />
+                      <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">
+                        {ad.location?.name || "Unknown"}
+                      </p>
+                    </div>
+                    <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
+                      {ad.name}
                     </p>
-                  </div>
-                  <p className="px-2 text-[11px] sm:text-sm md:text-[1.2vw] line-clamp-1 text-gray-600">
-                    {ad.name}
-                  </p>
-                  <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
-                    {formatMoney(ad.price, "GHS")}
-                  </p>
-                </Link>
+                    <p className="px-2 text-[11px] sm:text-sm md:text-[1.125vw] font-medium text-gray-800">
+                      {formatMoney(ad.price, "GHS")}
+                    </p>
+                  </Link>
+                )
               )
-            )
-          ) : (
-          <div className="flex items-center flex-col justify-center w-full gap-2">
-            <img
-              src="/nothing-to-show.png"
-              className="w-25 h-25"
-              alt="nothing to show"
-            />
-            <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">
-              No similar ads to show.
-            </p>
-          </div>
-        );
-        })()}
+            ) : (
+              <div className="flex items-center flex-col justify-center w-full gap-2">
+                <img
+                  src="/nothing-to-show.png"
+                  className="w-25 h-25"
+                  alt="nothing to show"
+                />
+                <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">
+                  No similar ads to show.
+                </p>
+              </div>
+            );
+          })()}
       </div>
     </div>
   );
