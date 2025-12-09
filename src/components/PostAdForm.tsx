@@ -20,7 +20,6 @@ import {
   getSubcategories,
   getSubcategory,
 } from "../services/subcategoryService";
-import type { AdMetadata } from "../types/AdMetaData";
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
 
