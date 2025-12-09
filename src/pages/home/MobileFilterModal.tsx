@@ -37,7 +37,6 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   onClose,
   selectedCategoryId,
   setSelectedCategoryId,
-  selectedLocation,
   setSelectedLocation,
   selectedTimeframe,
   setSelectedTimeframe,
@@ -50,9 +49,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   selectedFeatures,
   setSelectedFeatures,
   categories,
-  uniqueLocations,
   allProducts = [],
-  applyFilters = (products) => products,
 }) => {
   const [currentPanel, setCurrentPanel] = useState<PanelType>("main");
   const [tempPriceRange, setTempPriceRange] = useState({
