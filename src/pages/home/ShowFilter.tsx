@@ -64,7 +64,6 @@ const ShowFilter = ({
 
     closeFilterPopup,
     categories,
-    uniqueLocations,
 }: Props) => {
     // Get locations from API hook
     const { groupedLocations: regionsData } = useLocations();
@@ -276,7 +275,7 @@ const ShowFilter = ({
                     </div>
 
                     {/* Subcategory Section - Only show if category selected */}
-                    {localSelectedCategoryId !== null && subcategories.length > 0 && (
+                    {localSelectedCategoryId !== null && (
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -284,60 +283,67 @@ const ShowFilter = ({
                                 </svg>
                                 Subcategory (Optional)
                             </h3>
-                            <div className="flex flex-col gap-2">
-                                {/* All Subcategories Option */}
-                                <button
-                                    onClick={() => {
-                                        const allSubIds = subcategories.map(s => s.id);
-                                        const allSelected = allSubIds.every(id => localSelectedSubcategoryIds.includes(id));
-                                        if (allSelected) {
-                                            setLocalSelectedSubcategoryIds([]);
-                                        } else {
-                                            setLocalSelectedSubcategoryIds(allSubIds);
-                                        }
-                                        setLocalSelectedFeatures({});
-                                    }}
-                                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                        subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
-                                            ? "bg-(--dark-def) text-white"
-                                            : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                                    }`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))}
-                                        onChange={() => {}}
-                                        className="mr-2 cursor-pointer"
-                                    />
-                                    All Subcategories
-                                </button>
-                                {subcategories.map((sub) => (
+                            {subcategories.length > 0 ? (
+                                <div className="flex flex-col gap-2">
+                                    {/* All Subcategories Option */}
                                     <button
-                                        key={sub.id}
                                         onClick={() => {
-                                            setLocalSelectedSubcategoryIds(
-                                                localSelectedSubcategoryIds.includes(sub.id)
-                                                    ? localSelectedSubcategoryIds.filter(id => id !== sub.id)
-                                                    : [...localSelectedSubcategoryIds, sub.id]
-                                            );
+                                            const allSubIds = subcategories.map(s => s.id);
+                                            const allSelected = allSubIds.every(id => localSelectedSubcategoryIds.includes(id));
+                                            if (allSelected) {
+                                                setLocalSelectedSubcategoryIds([]);
+                                            } else {
+                                                setLocalSelectedSubcategoryIds(allSubIds);
+                                            }
                                             setLocalSelectedFeatures({});
                                         }}
                                         className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                            localSelectedSubcategoryIds.includes(sub.id)
+                                            subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
                                                 ? "bg-(--dark-def) text-white"
                                                 : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
                                         }`}
                                     >
                                         <input
                                             type="checkbox"
-                                            checked={localSelectedSubcategoryIds.includes(sub.id)}
+                                            checked={subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))}
                                             onChange={() => {}}
                                             className="mr-2 cursor-pointer"
                                         />
-                                        {sub.name}
+                                        All Subcategories
                                     </button>
-                                ))}
-                            </div>
+                                    {subcategories.map((sub) => (
+                                        <button
+                                            key={sub.id}
+                                            onClick={() => {
+                                                setLocalSelectedSubcategoryIds(
+                                                    localSelectedSubcategoryIds.includes(sub.id)
+                                                        ? localSelectedSubcategoryIds.filter(id => id !== sub.id)
+                                                        : [...localSelectedSubcategoryIds, sub.id]
+                                                );
+                                                setLocalSelectedFeatures({});
+                                            }}
+                                            className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                                                localSelectedSubcategoryIds.includes(sub.id)
+                                                    ? "bg-(--dark-def) text-white"
+                                                    : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                                            }`}
+                                        >
+                                            <input
+                                                type="checkbox"
+                                                checked={localSelectedSubcategoryIds.includes(sub.id)}
+                                                onChange={() => {}}
+                                                className="mr-2 cursor-pointer"
+                                            />
+                                            {sub.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-8">
+                                    <img src="/nothing-to-show.png" alt="Nothing to show" className="w-20 h-20 mb-2" />
+                                    <span className="text-gray-600 text-sm">Nothing to show</span>
+                                </div>
+                            )}
                         </div>
                     )}
 
