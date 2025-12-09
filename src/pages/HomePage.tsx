@@ -158,9 +158,18 @@ const HomePage = () => {
 
     // Location
     if (selectedLocation) {
+      const selectedLocations = selectedLocation.split(",");
       out = out.filter((p) => {
         const loc = p.location?.name ?? p.location?.region ?? "";
-        return loc === selectedLocation;
+        return selectedLocations.some((sel) => {
+          // Check if it's "All - Region" format
+          if (sel.startsWith("All - ")) {
+            const region = sel.replace("All - ", "");
+            return p.location?.region === region;
+          }
+          // Otherwise check if it's an exact location name match
+          return loc === sel;
+        });
       });
     }
 
@@ -282,8 +291,6 @@ const HomePage = () => {
             handleFilterSettings={handleFilterSettings}
             selectedCategoryId={selectedCategoryId}
             setSelectedCategoryId={setSelectedCategoryId}
-            selectedSubcategoryId={selectedSubcategoryId}
-            setSelectedSubcategoryId={setSelectedSubcategoryId}
             selectedFeatures={selectedFeatures}
             setSelectedFeatures={setSelectedFeatures}
             selectedLocation={selectedLocation}

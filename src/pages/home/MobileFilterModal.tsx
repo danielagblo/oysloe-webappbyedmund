@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo } from "react";
 import { categoryOptions } from "../../data/categories";
+import useLocations from "../../features/locations/useLocations";
 
 interface Category {
   id: number;
@@ -21,13 +22,15 @@ interface MobileFilterModalProps {
   setTimeframeSort: (sort: "none" | "newest" | "oldest") => void;
   priceFilter: { mode: string };
   setPriceFilter: (filter: any) => void;
+  selectedFeatures: Record<number, string>;
+  setSelectedFeatures: (features: Record<number, string>) => void;
   categories: Category[];
   uniqueLocations: string[];
   allProducts?: any[];
   applyFilters?: (products: any[]) => any[];
 }
 
-type PanelType = "main" | "categories" | "locations" | "subcategories";
+type PanelType = "main" | "categories" | "regions" | "locations" | "subcategories";
 
 const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   isOpen,
@@ -36,12 +39,16 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   setSelectedCategoryId,
   selectedLocation,
   setSelectedLocation,
+  selectedTimeframe,
+  setSelectedTimeframe,
   priceSort,
   setPriceSort,
   timeframeSort,
   setTimeframeSort,
   priceFilter,
   setPriceFilter,
+  selectedFeatures,
+  setSelectedFeatures,
   categories,
   uniqueLocations,
   allProducts = [],
@@ -54,7 +61,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   });
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<string | null>(null);
+  const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState<string[]>([]);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.TouchEvent) => {
@@ -84,24 +93,57 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     ? categoryOptions[selectedCategory.name] || [] 
     : [];
 
-  // Calculate filtered count
-  const filteredProductsCount = useMemo(() => {
-    return applyFilters(allProducts).length;
-  }, [allProducts, applyFilters]);
+  // Get available features for selected subcategories
+  const availableFeatures = useMemo(() => {
+    if (!selectedSubcategoryIds || selectedSubcategoryIds.length === 0) return [];
+    
+    const featuresMap = new Map<number, Set<string>>();
+    allProducts.forEach((product: any) => {
+      if (!product.product_features) return;
+      product.product_features.forEach((pf: any) => {
+        if (pf.feature?.subcategory && selectedSubcategoryIds.includes(pf.feature.subcategory.toString())) {
+          const featureId = pf.feature.id;
+          if (!featuresMap.has(featureId)) {
+            featuresMap.set(featureId, new Set());
+          }
+          if (pf.value) {
+            featuresMap.get(featureId)?.add(pf.value);
+          }
+        }
+      });
+    });
+    
+    return Array.from(featuresMap.entries()).map(([id, values]) => ({
+      id,
+      values: Array.from(values).sort(),
+    }));
+  }, [selectedSubcategoryIds, allProducts]);
+  // Get regions and locations from the hook
+  const { groupedLocations: regionsData } = useLocations();
 
   const handleClearAll = () => {
     setSelectedCategoryId(null);
     setSelectedLocation(null);
+    setSelectedRegion(null);
+    setSelectedLocationIds([]);
     setSelectedTimeframe("anytime");
     setPriceSort("none");
     setTimeframeSort("none");
     setPriceFilter({ mode: "none" });
-    setSelectedSubcategoryId(null);
+    setSelectedSubcategoryIds([]);
+    setSelectedFeatures({});
     setTempPriceRange({ min: 0, max: 1000000 });
-    setCurrentPanel("main");
   };
 
   const handleViewAll = () => {
+    // Apply selected locations to parent state
+    if (selectedLocationIds.length > 0) {
+      // Store as comma-separated string to maintain single selectedLocation prop
+      setSelectedLocation(selectedLocationIds.join(","));
+    } else {
+      setSelectedLocation(null);
+    }
+    
     // Apply price filter if set
     if (tempPriceRange.min > 0 || tempPriceRange.max < 1000000) {
       setPriceFilter({
@@ -134,7 +176,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       {/* Bottom Sheet Modal */}
       <div
         ref={modalRef}
-        className={`fixed bottom-0 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[85vh] overflow-hidden flex flex-col ${
+        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[85vh] overflow-hidden flex flex-col ${
           isOpen 
             ? "translate-y-0 transition-transform duration-500 ease-out" 
             : "translate-y-full"
@@ -171,39 +213,97 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     <span className="text-sm text-gray-800 truncate max-w-[120px]">
                       {selectedCategoryName}
                     </span>
-                    <span className="text-gray-400 shrink-0">→</span>
+                    <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
                 <div className="border-t border-gray-200" />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-gray-700">Location</span>
                   <button
-                    onClick={() => setCurrentPanel("locations")}
+                    onClick={() => setCurrentPanel("regions")}
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                   >
                     <span className="text-sm text-gray-800 truncate max-w-[120px]">
-                      {selectedLocation || "Select Location"}
+                      {selectedLocationIds.length > 0 
+                        ? `${selectedLocationIds.length} selected` 
+                        : "Select Location"}
                     </span>
-                    <span className="text-gray-400 shrink-0">→</span>
+                    <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
               </div>
 
               {/* Subcategories Section - Show if category selected */}
               {selectedCategoryId && currentSubcategories.length > 0 && (
-                <div className="bg-white rounded-3xl p-4">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">Subcategories</h3>
-                  <button
-                    onClick={() => setCurrentPanel("subcategories")}
-                    className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 border border-gray-200"
-                  >
-                    <span className="text-sm text-gray-700">
-                      {selectedSubcategoryId ? currentSubcategories.find(s => s === selectedSubcategoryId) : "Select Subcategory"}
-                    </span>
-                    <span className="text-gray-400">→</span>
-                  </button>
+                <div className="bg-white rounded-3xl p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold text-gray-700">Subcategory</span>
+                    <button
+                      onClick={() => setCurrentPanel("subcategories")}
+                      className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    >
+                      <span className="text-sm text-gray-800 truncate max-w-[120px]">
+                        {selectedSubcategoryIds.length > 0 
+                          ? `${selectedSubcategoryIds.length} selected` 
+                          : "Select Subcategory"}
+                      </span>
+                      <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
+                    </button>
+                  </div>
+
+                  {/* Features Section - Show if subcategories selected */}
+                  {selectedSubcategoryIds.length > 0 && availableFeatures.length > 0 && (
+                    <>
+                      <div className="border-t border-gray-200" />
+                      <div className="space-y-2">
+                        {availableFeatures.map((feature) => (
+                          <select
+                            key={feature.id}
+                            value={selectedFeatures[feature.id] || ""}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setSelectedFeatures({
+                                  ...selectedFeatures,
+                                  [feature.id]: e.target.value,
+                                });
+                              } else {
+                                const updated = { ...selectedFeatures };
+                                delete updated[feature.id];
+                                setSelectedFeatures(updated);
+                              }
+                            }}
+                            className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2"
+                          >
+                            <option value="">Feature {feature.id}</option>
+                            {feature.values.map((value) => (
+                              <option key={value} value={value}>
+                                {value}
+                              </option>
+                            ))}
+                          </select>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
+
+              {/* Timeframe Filter Section */}
+              <div className="bg-white rounded-3xl p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-700">Posted</span>
+                  <select
+                    value={selectedTimeframe}
+                    onChange={(e) => setSelectedTimeframe(e.target.value as "newest" | "7days" | "30days" | "anytime")}
+                    className="text-sm border border-gray-300 rounded-lg px-2 py-1"
+                  >
+                    <option value="anytime">Anytime</option>
+                    <option value="newest">Newest</option>
+                    <option value="7days">Last 7 days</option>
+                    <option value="30days">Last 30 days</option>
+                  </select>
+                </div>
+              </div>
 
               {/* Price Section */}
               <div className="bg-white rounded-3xl p-4">
@@ -212,6 +312,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   <input
                     type="number"
                     placeholder="Min"
+                    min="0"
                     value={tempPriceRange.min}
                     onChange={(e) => setTempPriceRange({ ...tempPriceRange, min: Number(e.target.value) || 0 })}
                     className="min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -220,6 +321,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   <input
                     type="number"
                     placeholder="Max"
+                    min="0"
                     value={tempPriceRange.max}
                     onChange={(e) => setTempPriceRange({ ...tempPriceRange, max: Number(e.target.value) || 1000000 })}
                     className="min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
@@ -260,8 +362,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
 
           {/* Categories Panel */}
           {currentPanel === "categories" && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg p-4">
+            <div className="w-screen -mx-4">
+              <div className="bg-white p-4">
                 <button
                   onClick={() => setCurrentPanel("main")}
                   className="flex items-center gap-2 text-gray-600 mb-4 hover:text-gray-900"
@@ -269,33 +371,41 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   <span>←</span>
                   <span className="text-sm">Back</span>
                 </button>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => {
-                        setSelectedCategoryId(category.id);
-                        setCurrentPanel("main");
-                      }}
-                      className={`w-full flex items-center gap-3 p-3 rounded-lg transition ${
-                        selectedCategoryId === category.id
-                          ? "bg-blue-50 border border-blue-200"
-                          : "hover:bg-gray-100"
-                      }`}
-                    >
-                      <img
-                        src={getCategoryIcon(category.name)}
-                        alt={category.name}
-                        className="w-6 h-6 object-contain"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                <div>
+                  {categories.map((category, index) => (
+                    <div key={category.id}>
+                      <button
+                        onClick={() => {
+                          if (selectedCategoryId === category.id) {
+                            setSelectedCategoryId(null);
+                          } else {
+                            setSelectedCategoryId(category.id);
+                          }
+                          setCurrentPanel("main");
                         }}
-                      />
-                      <span className="flex-1 text-left text-gray-800 text-sm">{category.name}</span>
-                      {selectedCategoryId === category.id && (
-                        <span className="text-blue-600">✓</span>
+                        className={`w-full flex items-center gap-3 p-3 transition ${
+                          selectedCategoryId === category.id
+                            ? "bg-blue-50"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <img
+                          src={getCategoryIcon(category.name)}
+                          alt={category.name}
+                          className="w-6 h-6 object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                        <span className="flex-1 text-left text-gray-800 text-sm">{category.name}</span>
+                        {selectedCategoryId === category.id && (
+                          <span className="text-blue-600">✓</span>
+                        )}
+                      </button>
+                      {index < categories.length - 1 && (
+                        <div className="border-t border-gray-100" />
                       )}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -304,8 +414,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
 
           {/* Subcategories Panel */}
           {currentPanel === "subcategories" && currentSubcategories.length > 0 && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg p-4">
+            <div className="w-screen -mx-4">
+              <div className="bg-white p-4">
                 <button
                   onClick={() => setCurrentPanel("main")}
                   className="flex items-center gap-2 text-gray-600 mb-4 hover:text-gray-900"
@@ -313,35 +423,46 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   <span>←</span>
                   <span className="text-sm">Back to Main</span>
                 </button>
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Select Subcategories</h3>
-                <div className="space-y-2">
-                  {currentSubcategories.map((subcategory) => (
-                    <button
-                      key={subcategory}
-                      onClick={() => {
-                        setSelectedSubcategoryId(selectedSubcategoryId === subcategory ? null : subcategory);
-                      }}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg transition ${
-                        selectedSubcategoryId === subcategory
-                          ? "bg-blue-50 border border-blue-200"
-                          : "hover:bg-gray-100"
-                      }`}
-                    >
-                      <span className="text-gray-800 text-sm">{subcategory}</span>
-                      {selectedSubcategoryId === subcategory && (
-                        <span className="text-blue-600">✓</span>
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Select Subcategories</h3>
+                <div>
+                  {currentSubcategories.map((subcategory, index) => (
+                    <div key={subcategory}>
+                      <button
+                        onClick={() => {
+                          setSelectedSubcategoryIds(
+                            selectedSubcategoryIds.includes(subcategory)
+                              ? selectedSubcategoryIds.filter(s => s !== subcategory)
+                              : [...selectedSubcategoryIds, subcategory]
+                          );
+                        }}
+                        className={`w-full flex items-center gap-3 p-3 transition ${
+                          selectedSubcategoryIds.includes(subcategory)
+                            ? "bg-blue-50"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSubcategoryIds.includes(subcategory)}
+                          onChange={() => {}}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-gray-800 text-sm flex-1">{subcategory}</span>
+                      </button>
+                      {index < currentSubcategories.length - 1 && (
+                        <div className="border-t border-gray-100" />
                       )}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Locations Panel */}
-          {currentPanel === "locations" && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg p-4">
+          {/* Regions Panel */}
+          {currentPanel === "regions" && (
+            <div className="w-screen -mx-4">
+              <div className="bg-white p-4">
                 <button
                   onClick={() => setCurrentPanel("main")}
                   className="flex items-center gap-2 text-gray-600 mb-4 hover:text-gray-900"
@@ -349,25 +470,107 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   <span>←</span>
                   <span className="text-sm">Back</span>
                 </button>
-                <div className="space-y-2">
-                  {uniqueLocations.map((location) => (
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Select Region</h3>
+                <div>
+                  {Object.keys(regionsData).map((region, index) => (
+                    <div key={region}>
+                      <button
+                        onClick={() => {
+                          setSelectedRegion(region);
+                          setCurrentPanel("locations");
+                        }}
+                        className={`w-full flex items-center justify-between p-3 transition ${
+                          selectedRegion === region
+                            ? "bg-blue-50"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className="text-gray-800 text-sm">{region}</span>
+                        <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
+                      </button>
+                      {index < Object.keys(regionsData).length - 1 && (
+                        <div className="border-t border-gray-100" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Locations Panel */}
+          {currentPanel === "locations" && selectedRegion && (
+            <div className="w-screen -mx-4">
+              <div className="bg-white p-4">
+                <button
+                  onClick={() => {
+                    setCurrentPanel("regions");
+                    setSelectedRegion(null);
+                  }}
+                  className="flex items-center gap-2 text-gray-600 mb-4 hover:text-gray-900"
+                >
+                  <span>←</span>
+                  <span className="text-sm">Back</span>
+                </button>
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Select Locations in {selectedRegion}</h3>
+                <div>
+                  {/* All Locations Option */}
+                  <div>
                     <button
-                      key={location}
                       onClick={() => {
-                        setSelectedLocation(selectedLocation === location ? null : location);
-                        setCurrentPanel("main");
+                        const allLocationsKey = `All - ${selectedRegion}`;
+                        setSelectedLocationIds(
+                          selectedLocationIds.includes(allLocationsKey)
+                            ? selectedLocationIds.filter(id => id !== allLocationsKey && !regionsData[selectedRegion]?.includes(id))
+                            : [allLocationsKey, ...(regionsData[selectedRegion] || [])]
+                        );
                       }}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg transition ${
-                        selectedLocation === location
-                          ? "bg-blue-50 border border-blue-200"
-                          : "hover:bg-gray-100"
+                      className={`w-full flex items-center gap-3 p-3 transition ${
+                        selectedLocationIds.includes(`All - ${selectedRegion}`)
+                          ? "bg-blue-50"
+                          : "hover:bg-gray-50"
                       }`}
                     >
-                      <span className="text-gray-800 text-sm">{location}</span>
-                      {selectedLocation === location && (
-                        <span className="text-blue-600">✓</span>
-                      )}
+                      <input
+                        type="checkbox"
+                        checked={selectedLocationIds.includes(`All - ${selectedRegion}`)}
+                        onChange={() => {}}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      <span className="text-gray-800 text-sm font-semibold flex-1">All locations in {selectedRegion}</span>
                     </button>
+                    <div className="border-t border-gray-100" />
+                  </div>
+
+                  {/* Individual Locations */}
+                  {regionsData[selectedRegion]?.map((location, index) => (
+                    <div key={location}>
+                      <button
+                        onClick={() => {
+                          setSelectedLocationIds(
+                            selectedLocationIds.includes(location)
+                              ? selectedLocationIds.filter(id => id !== location)
+                              : [...selectedLocationIds, location]
+                          );
+                        }}
+                        className={`w-full flex items-center gap-3 p-3 transition ${
+                          selectedLocationIds.includes(location)
+                            ? "bg-blue-50"
+                            : "hover:bg-gray-50"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedLocationIds.includes(location)}
+                          onChange={() => {}}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-gray-800 text-sm flex-1">{location}</span>
+                      </button>
+                      {index < (regionsData[selectedRegion]?.length || 0) - 1 && (
+                        <div className="border-t border-gray-100" />
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -387,7 +590,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
             onClick={handleViewAll}
             className="flex-1 py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition"
           >
-            View all ({filteredProductsCount.toLocaleString()})
+            View all
           </button>
         </div>
       </div>

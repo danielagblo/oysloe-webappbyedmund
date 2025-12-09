@@ -12,8 +12,6 @@ type Props = {
     handleFilterSettings: () => void;
     selectedCategoryId: number | null;
     setSelectedCategoryId: (id: number | null) => void;
-    selectedSubcategoryId: number | "";
-    setSelectedSubcategoryId: (id: number | "") => void;
     selectedFeatures: Record<number, string>;
     setSelectedFeatures: (features: Record<number, string>) => void;
     selectedLocation: string | null;
@@ -47,6 +45,8 @@ const FilterButton = ({
     setTimeframeSort,
     priceFilter,
     setPriceFilter,
+    selectedFeatures,
+    setSelectedFeatures,
     categories,
     uniqueLocations,
     allProducts = [],
@@ -115,6 +115,8 @@ const FilterButton = ({
                 setTimeframeSort={setTimeframeSort}
                 priceFilter={priceFilter}
                 setPriceFilter={setPriceFilter}
+                selectedFeatures={selectedFeatures}
+                setSelectedFeatures={setSelectedFeatures}
                 categories={categories}
                 uniqueLocations={uniqueLocations}
                 allProducts={allProducts}

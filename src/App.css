@@ -112,6 +112,18 @@ body {
     text-align: center;
     font-size: 12.5px;
   }
+
+  .rotating-bg::before {
+    content: "";
+    position: absolute;
+    inset: -510%;
+    border-radius: 50%;
+    background: conic-gradient(#74ffa7, #374957, #74ffa7, #ff6b6b, #74ffa7);
+    animation: spin 3500ms linear infinite;
+    filter: blur(1px);
+    will-change: transform;
+    transform: translateZ(0);
+  }
 }
 @media (min-width: 640px) {
   .rotating-bg {
@@ -128,6 +140,17 @@ body {
 
   .search-input::placeholder {
     text-align: center;
+  }
+  .rotating-bg::before {
+    content: "";
+    position: absolute;
+    inset: -510%;
+    border-radius: 50%;
+    background: conic-gradient(#74ffa7, #374957, #74ffa7, #ff6b6b, #74ffa7);
+    animation: spin 3500ms linear infinite;
+    filter: blur(1px);
+    will-change: transform;
+    transform: translateZ(0);
   }
 }
 
