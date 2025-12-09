@@ -1672,10 +1672,10 @@ const AdsDetailsPage = () => {
                 <div className="bg-white rounded-lg w-full">
                   <SellerInfo />
                   <div className="hidden md:block">
-                    <RatingReviews layout="column" />
+                    <RatingReviews layout="row" />
                   </div>
                   <div className="md:hidden">
-                    <RatingReviews fullWidth rd={reviewDeconstruction} />
+                    <RatingReviews layout="row" fullWidth rd={reviewDeconstruction} />
                   </div>
                 </div>
 
