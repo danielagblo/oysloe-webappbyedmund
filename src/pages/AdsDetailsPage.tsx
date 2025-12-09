@@ -128,7 +128,8 @@ const AdsDetailsPage = () => {
     if (!pidRaw) return;
     const pid = Number(pidRaw);
     if (Number.isNaN(pid)) return;
-
+    // close any floating panels before taking action
+    setOpenPanel(null);
     toast.promise(
       Promise.resolve().then(async () => {
         // assemble a full product payload to match backend schema expectations
@@ -173,8 +174,11 @@ const AdsDetailsPage = () => {
   const handleReportAd = () => {
     const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pid) return;
+    // close any open floating panels when performing a direct action
+    setOpenPanel(null);
     // open modal to collect a message from the reporter
     setIsReportModalOpen(true);
+    setOpenPanel("report");
   };
 
   // Report modal state + message
@@ -229,6 +233,7 @@ const AdsDetailsPage = () => {
       } catch (e) {
         queryClient.invalidateQueries({ queryKey: ["products"] });
       }
+      setOpenPanel(null);
     } catch (err) {
       // toast.promise will already show the error; keep modal open for retry
       console.warn("submitReport failed", err);
@@ -314,9 +319,9 @@ const AdsDetailsPage = () => {
     },
   });
 
-  // Caller phone tooltip visibility (hook must be declared before any early returns)
-  const [showCaller1, setShowCaller1] = useState(false);
-  const [showCaller2, setShowCaller2] = useState(false);
+  // Single source of truth for which floating panel is open
+  // possible values: 'caller1' | 'caller2' | 'makeOffer' | 'report' | null
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const [quickChatInput, setQuickChatInput] = useState("");
 
   // Filter reviews for this specific product (memoized to prevent unnecessary recalculation)
@@ -466,8 +471,10 @@ const AdsDetailsPage = () => {
     owner?.secondary_phone ||
     owner?.alt_phone ||
     null;
-  const toggleCaller1 = () => setShowCaller1((s) => !s);
-  const toggleCaller2 = () => setShowCaller2((s) => !s);
+  const toggleCaller1 = () =>
+    setOpenPanel((p) => (p === "caller1" ? null : "caller1"));
+  const toggleCaller2 = () =>
+    setOpenPanel((p) => (p === "caller2" ? null : "caller2"));
 
   const openChatWithOwnerAndSend = async (text: string) => {
     // Early validation: ensure owner exists with valid id
@@ -1019,6 +1026,9 @@ const AdsDetailsPage = () => {
     showCaller2: showC2,
     toggleCaller1,
     toggleCaller2,
+    // control make-offer visibility from parent
+    showOffer: showOfferProp,
+    toggleOffer,
     favouritePending = false,
   }: {
     onMarkTaken?: () => void;
@@ -1034,13 +1044,15 @@ const AdsDetailsPage = () => {
     showCaller2?: boolean;
     toggleCaller1?: () => void;
     toggleCaller2?: () => void;
+    showOffer?: boolean;
+    toggleOffer?: () => void;
     favouritePending?: boolean;
   }) => {
     const isTaken = Boolean(
       (currentAdData as any)?.is_taken ||
       (currentAdDataFromQuery as any)?.is_taken,
     );
-    const [showOffer, setShowOffer] = useState(false);
+    const showOffer = Boolean(showOfferProp);
     const [offerInput, setOfferInput] = useState<string>("");
     const actions: Record<string, () => void> = {
       "Mark as taken": isTaken ? () => { } : onMarkTaken || (() => { }),
@@ -1088,7 +1100,7 @@ const AdsDetailsPage = () => {
                       return;
                     }
                     if (label === "Make Offer") {
-                      setShowOffer((s) => !s);
+                      (toggleOffer || (() => {}))();
                       return;
                     }
                     // otherwise perform action
@@ -1345,7 +1357,7 @@ const AdsDetailsPage = () => {
                         alt=""
                         className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${review?.liked ? "opacity-100" : "opacity-60"}`}
                       />
-                      <h3>{review?.liked ? "Liked" : "Like"}</h3>
+                      <h3>{review?.liked ? "Unlike" : "Like"}</h3>
                     </div>
                   </button>
                   <span className="text-sm md:text-[1vw]">
@@ -1701,6 +1713,7 @@ const AdsDetailsPage = () => {
             onClose={() => {
               setIsReportModalOpen(false);
               setReportMessage("");
+              setOpenPanel(null);
             }}
             onSubmit={submitReport}
           />
@@ -1728,10 +1741,12 @@ const AdsDetailsPage = () => {
                     favouritePending={toggleFavourite.status === "pending"}
                     caller1={callerNumber1}
                     caller2={callerNumber2}
-                    showCaller1={showCaller1}
-                    showCaller2={showCaller2}
+                    showCaller1={openPanel === "caller1"}
+                    showCaller2={openPanel === "caller2"}
                     toggleCaller1={toggleCaller1}
                     toggleCaller2={toggleCaller2}
+                    showOffer={openPanel === "makeOffer"}
+                    toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
                   />
                   <QuickChat />
                 </div>
@@ -1771,10 +1786,12 @@ const AdsDetailsPage = () => {
                         favouritePending={toggleFavourite.status === "pending"}
                         caller1={callerNumber1}
                         caller2={callerNumber2}
-                        showCaller1={showCaller1}
-                        showCaller2={showCaller2}
+                        showCaller1={openPanel === "caller1"}
+                        showCaller2={openPanel === "caller2"}
                         toggleCaller1={toggleCaller1}
                         toggleCaller2={toggleCaller2}
+                        showOffer={openPanel === "makeOffer"}
+                        toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
                       />
                       <QuickChat />
                     </div>

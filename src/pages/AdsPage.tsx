@@ -49,10 +49,9 @@ const AdsPage = () => {
                 key={status}
                 onClick={() => setActiveTab(status)}
                 className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors 
-                  ${
-                    activeTab === status
-                      ? "border-(--dark-def)"
-                      : "border-transparent hover:border-gray-300"
+                  ${activeTab === status
+                    ? "border-(--dark-def)"
+                    : "border-transparent hover:border-gray-300"
                   }`}
               >
                 <img
@@ -173,7 +172,7 @@ const AdsPage = () => {
               </div>
 
               {mapToLabel(selectedAd) === "Suspended" ||
-              mapToLabel(selectedAd) === "Other" ? (
+                mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
                     <button
@@ -361,8 +360,8 @@ const AdsPage = () => {
                             duration: selectedAd.duration ?? "",
                             category: Number(
                               selectedAd.category ??
-                                selectedAd.category_id ??
-                                0,
+                              selectedAd.category_id ??
+                              0,
                             ),
                           };
 

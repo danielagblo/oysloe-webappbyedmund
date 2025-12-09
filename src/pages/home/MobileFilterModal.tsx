@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { categoryOptions } from "../../data/categories";
 import useLocations from "../../features/locations/useLocations";
 
@@ -61,7 +61,6 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState<string[]>([]);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
-  const [viewingSubcategoriesForCategoryId, setViewingSubcategoriesForCategoryId] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.TouchEvent) => {
@@ -85,16 +84,16 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
   const selectedCategoryName = selectedCategory?.name || "Select Category";
-  
+
   // Get subcategories for selected category
-  const currentSubcategories = selectedCategory 
-    ? categoryOptions[selectedCategory.name] || [] 
+  const currentSubcategories = selectedCategory
+    ? categoryOptions[selectedCategory.name] || []
     : [];
 
   // Get available features for selected subcategories
   const availableFeatures = useMemo(() => {
     if (!selectedSubcategoryIds || selectedSubcategoryIds.length === 0) return [];
-    
+
     const featuresMap = new Map<number, Set<string>>();
     allProducts.forEach((product: any) => {
       if (!product.product_features) return;
@@ -110,7 +109,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
         }
       });
     });
-    
+
     return Array.from(featuresMap.entries()).map(([id, values]) => ({
       id,
       values: Array.from(values).sort(),
@@ -141,7 +140,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     } else {
       setSelectedLocation(null);
     }
-    
+
     // Apply price filter if set
     const minVal = typeof tempPriceRange.min === "number" ? tempPriceRange.min : 0;
     const maxVal = typeof tempPriceRange.max === "number" ? tempPriceRange.max : 1000000;
@@ -176,17 +175,16 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       {/* Bottom Sheet Modal */}
       <div
         ref={modalRef}
-        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[85vh] overflow-hidden flex flex-col ${
-          isOpen 
-            ? "translate-y-0 transition-transform duration-500 ease-out" 
+        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[85vh] overflow-hidden flex flex-col ${isOpen
+            ? "translate-y-0 transition-transform duration-500 ease-out"
             : "translate-y-full"
-        }`}
+          }`}
         style={{
           transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
         }}
       >
         {/* Header - White background with drag indicator */}
-        <div 
+        <div
           className="bg-white rounded-t-3xl p-4 flex flex-col items-center cursor-grab active:cursor-grabbing touch-none"
           onTouchStart={handleDragStart}
           onTouchMove={handleDragMove}
@@ -224,8 +222,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                   >
                     <span className="text-sm text-gray-800 truncate max-w-[120px]">
-                      {selectedLocationIds.length > 0 
-                        ? `${selectedLocationIds.length} selected` 
+                      {selectedLocationIds.length > 0
+                        ? `${selectedLocationIds.length} selected`
                         : "Select Location"}
                     </span>
                     <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
@@ -243,8 +241,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                       className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                     >
                       <span className="text-sm text-gray-800 truncate max-w-[120px]">
-                        {selectedSubcategoryIds.length > 0 
-                          ? `${selectedSubcategoryIds.length} selected` 
+                        {selectedSubcategoryIds.length > 0
+                          ? `${selectedSubcategoryIds.length} selected`
                           : "Select Subcategory"}
                       </span>
                       <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
@@ -430,16 +428,15 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                         setSelectedSubcategoryIds([...new Set([...selectedSubcategoryIds, ...currentSubcategories])]);
                       }
                     }}
-                    className={`w-full flex items-center gap-3 p-3 transition ${
-                      currentSubcategories.length > 0 && currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub))
+                    className={`w-full flex items-center gap-3 p-3 transition ${currentSubcategories.length > 0 && currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub))
                         ? "bg-blue-50"
                         : "hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     <input
                       type="checkbox"
                       checked={currentSubcategories.length > 0 && currentSubcategories.every(sub => selectedSubcategoryIds.includes(sub))}
-                      onChange={() => {}}
+                      onChange={() => { }}
                       className="w-4 h-4 cursor-pointer"
                     />
                     <span className="text-gray-800 text-sm flex-1 font-semibold">All Subcategories</span>
@@ -456,16 +453,15 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                               : [...selectedSubcategoryIds, subcategory]
                           );
                         }}
-                        className={`w-full flex items-center gap-3 p-3 transition ${
-                          selectedSubcategoryIds.includes(subcategory)
+                        className={`w-full flex items-center gap-3 p-3 transition ${selectedSubcategoryIds.includes(subcategory)
                             ? "bg-blue-50"
                             : "hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         <input
                           type="checkbox"
                           checked={selectedSubcategoryIds.includes(subcategory)}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           className="w-4 h-4 cursor-pointer"
                         />
                         <span className="text-gray-800 text-sm flex-1">{subcategory}</span>
@@ -539,11 +535,10 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           setSelectedRegion(region);
                           setCurrentPanel("locations");
                         }}
-                        className={`w-full flex items-center justify-between p-3 transition ${
-                          selectedRegion === region
+                        className={`w-full flex items-center justify-between p-3 transition ${selectedRegion === region
                             ? "bg-blue-50"
                             : "hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         <span className="text-gray-800 text-sm">{region}</span>
                         <img src="/arrowright.svg" alt="open" className="w-4 h-4 shrink-0" />
@@ -585,16 +580,15 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                             : [allLocationsKey, ...(regionsData[selectedRegion] || [])]
                         );
                       }}
-                      className={`w-full flex items-center gap-3 p-3 transition ${
-                        selectedLocationIds.includes(`All - ${selectedRegion}`)
+                      className={`w-full flex items-center gap-3 p-3 transition ${selectedLocationIds.includes(`All - ${selectedRegion}`)
                           ? "bg-blue-50"
                           : "hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedLocationIds.includes(`All - ${selectedRegion}`)}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         className="w-4 h-4 cursor-pointer"
                       />
                       <span className="text-gray-800 text-sm font-semibold flex-1">All locations in {selectedRegion}</span>
@@ -613,16 +607,15 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                               : [...selectedLocationIds, location]
                           );
                         }}
-                        className={`w-full flex items-center gap-3 p-3 transition ${
-                          selectedLocationIds.includes(location)
+                        className={`w-full flex items-center gap-3 p-3 transition ${selectedLocationIds.includes(location)
                             ? "bg-blue-50"
                             : "hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         <input
                           type="checkbox"
                           checked={selectedLocationIds.includes(location)}
-                          onChange={() => {}}
+                          onChange={() => { }}
                           className="w-4 h-4 cursor-pointer"
                         />
                         <span className="text-gray-800 text-sm flex-1">{location}</span>

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import useLocations from "../../features/locations/useLocations";
 import normalizePossibleFeatureValues from "../../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../../services/featureService";
 import { getSubcategories } from "../../services/subcategoryService";
-import useLocations from "../../features/locations/useLocations";
 import type { Category } from "../../types/Category";
 
 type Props = {
@@ -64,11 +64,10 @@ const ShowFilter = ({
 
     closeFilterPopup,
     categories,
-    uniqueLocations,
 }: Props) => {
     // Get locations from API hook
     const { groupedLocations: regionsData } = useLocations();
-    
+
     // Local states for batch apply pattern
     const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
     const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
@@ -122,7 +121,7 @@ const ShowFilter = ({
             try {
                 if (localSelectedSubcategoryIds.length > 0) {
                     const allFeaturesMap = new Map<number, string>();
-                    
+
                     for (const subId of localSelectedSubcategoryIds) {
                         let features = await getFeatures({ subcategory: subId }) as any;
                         if (!mounted) return;
@@ -131,7 +130,7 @@ const ShowFilter = ({
                             allFeaturesMap.set(Number(f.id), String(f.name ?? f.display_name ?? f.title ?? ""));
                         });
                     }
-                    
+
                     const defs = Array.from(allFeaturesMap.entries()).map(([id, name]) => ({ id, name }));
                     setFeatureDefinitions(defs);
                 } else {
@@ -261,7 +260,6 @@ const ShowFilter = ({
                             onChange={(e) => {
                                 const val = e.target.value;
                                 setLocalSelectedCategoryId(val ? Number(val) : null);
-                                setLocalSelectedSubcategoryId("");
                                 setLocalSelectedFeatures({});
                             }}
                             className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
@@ -297,16 +295,15 @@ const ShowFilter = ({
                                         }
                                         setLocalSelectedFeatures({});
                                     }}
-                                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                        subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
+                                    className={`w-full text-left px-4 py-3 rounded-lg transition ${subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
                                             ? "bg-(--dark-def) text-white"
                                             : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                                    }`}
+                                        }`}
                                 >
                                     <input
                                         type="checkbox"
                                         checked={subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))}
-                                        onChange={() => {}}
+                                        onChange={() => { }}
                                         className="mr-2 cursor-pointer"
                                     />
                                     All Subcategories
@@ -322,16 +319,15 @@ const ShowFilter = ({
                                             );
                                             setLocalSelectedFeatures({});
                                         }}
-                                        className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                            localSelectedSubcategoryIds.includes(sub.id)
+                                        className={`w-full text-left px-4 py-3 rounded-lg transition ${localSelectedSubcategoryIds.includes(sub.id)
                                                 ? "bg-(--dark-def) text-white"
                                                 : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                                        }`}
+                                            }`}
                                     >
                                         <input
                                             type="checkbox"
                                             checked={localSelectedSubcategoryIds.includes(sub.id)}
-                                            onChange={() => {}}
+                                            onChange={() => { }}
                                             className="mr-2 cursor-pointer"
                                         />
                                         {sub.name}
@@ -387,7 +383,7 @@ const ShowFilter = ({
 
                     {/* Location Section */}
                     <div className="mb-8">
-                        <div 
+                        <div
                             onClick={() => setLocationSectionOpen(!locationSectionOpen)}
                             className="cursor-pointer"
                         >
@@ -395,8 +391,8 @@ const ShowFilter = ({
                                 <img src="/location.svg" alt="Location" className="w-5 h-5" />
                                 <span className="flex-1">Location</span>
                                 <span className="text-sm font-normal text-gray-600">
-                                    {locationSectionOpen ? 
-                                        <img src="/arrowright.svg" alt="v" className="w-4 h-4 rotate-90" /> 
+                                    {locationSectionOpen ?
+                                        <img src="/arrowright.svg" alt="v" className="w-4 h-4 rotate-90" />
                                         : <img src="/arrowright.svg" alt=">" className="w-4 h-4" />
                                     }
                                 </span>
@@ -439,16 +435,15 @@ const ShowFilter = ({
                                                         setLocalSelectedLocationIds([...new Set([...localSelectedLocationIds, ...regionLocations])]);
                                                     }
                                                 }}
-                                                className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
-                                                    (regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))
+                                                className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${(regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))
                                                         ? "bg-(--dark-def) text-white"
                                                         : "bg-white hover:bg-gray-100"
-                                                }`}
+                                                    }`}
                                             >
                                                 <input
                                                     type="checkbox"
                                                     checked={(regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))}
-                                                    onChange={() => {}}
+                                                    onChange={() => { }}
                                                     className="cursor-pointer"
                                                 />
                                                 <span className="font-semibold">All locations in {selectedRegion}</span>
@@ -464,16 +459,15 @@ const ShowFilter = ({
                                                                 : [...localSelectedLocationIds, location]
                                                         );
                                                     }}
-                                                    className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
-                                                        localSelectedLocationIds.includes(location)
+                                                    className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${localSelectedLocationIds.includes(location)
                                                             ? "bg-(--dark-def) text-white"
                                                             : "bg-white hover:bg-gray-100"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         checked={localSelectedLocationIds.includes(location)}
-                                                        onChange={() => {}}
+                                                        onChange={() => { }}
                                                         className="cursor-pointer"
                                                     />
                                                     {location}
