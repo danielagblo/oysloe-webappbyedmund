@@ -1370,7 +1370,7 @@ const AdsDetailsPage = () => {
 
       <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
         {(relatedProducts && relatedProducts.length > 0 ? relatedProducts : ads).map((ad) =>
-          ad.is_taken && (
+          !ad.is_taken && (
             <Link
               key={ad.id}
               to={`/ads/${ad.id}`}
