@@ -263,7 +263,7 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<number | null>(null);
 
-  const { groupedLocations = {}, loading: locationsLoading } = useLocations();
+  const { locations: allLocations = [], groupedLocations = {}, loading: locationsLoading } = useLocations();
 
   // use our centralised hook to manage location selection and saved locations
   const {
@@ -625,8 +625,25 @@ export default function PostAdForm({ editId: propEditId, onClose, embedded = fal
           value: price !== "" ? Number(price) : 0,
         },
       },
-      // Always include a `location` object (AdMetadata expects this field); use safe defaults when no selection
-      location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload,
+      // Prefer to submit the canonical `location` id when available.
+      // Try to resolve the selected place+region back to the known locations list.
+      ...(function resolveLocation() {
+        try {
+          if (!locationDetails) return {};
+          const found = allLocations.find((l: any) => {
+            const regionMatch = String(l.region || "").trim().toLowerCase() === String(locationDetails.region || "").trim().toLowerCase();
+            const placeMatch = String(l.name || l.place || "").trim().toLowerCase() === String(locationDetails.place || "").trim().toLowerCase();
+            return regionMatch && placeMatch;
+          });
+          if (found && (typeof found.id === "number" || typeof found.id === "string")) {
+            return { location: Number(found.id) };
+          }
+          // fallback to legacy shape (region + place) so server can handle it
+          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+        } catch (e) {
+          return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+        }
+      })(),
       images: uploadedImages.map((img) => ({
         id: img.id,
         url: img.url,
