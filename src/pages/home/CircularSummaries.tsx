@@ -39,7 +39,7 @@ const CircularSummaries = ({ categories, total, categoriesLoading, categoriesErr
               return (
                 <div
                   key={category.id}
-                  className="relative flex-shrink-0 w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 flex items-center justify-center"
+                  className="relative flex-shrink-0 w-16 h-16 max-sm:min-h-[18vw] max-sm:min-w-[18vw] sm:w-24 sm:h-24 lg:w-32 lg:h-32 flex items-center justify-center"
                 >
                   <CircularProgressbar
                     value={percentage}
