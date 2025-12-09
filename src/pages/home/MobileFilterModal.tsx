@@ -56,8 +56,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
 }) => {
   const [currentPanel, setCurrentPanel] = useState<PanelType>("main");
   const [tempPriceRange, setTempPriceRange] = useState({
-    min: (priceFilter as any)?.min || 0,
-    max: (priceFilter as any)?.max || 1000000,
+    min: (priceFilter as any)?.min || "",
+    max: (priceFilter as any)?.max || "",
   });
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
@@ -132,7 +132,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     setPriceFilter({ mode: "none" });
     setSelectedSubcategoryIds([]);
     setSelectedFeatures({});
-    setTempPriceRange({ min: 0, max: 1000000 });
+    setTempPriceRange({ min: "", max: "" });
   };
 
   const handleViewAll = () => {
@@ -145,11 +145,13 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     }
     
     // Apply price filter if set
-    if (tempPriceRange.min > 0 || tempPriceRange.max < 1000000) {
+    const minVal = typeof tempPriceRange.min === "number" ? tempPriceRange.min : 0;
+    const maxVal = typeof tempPriceRange.max === "number" ? tempPriceRange.max : 1000000;
+    if (minVal > 0 || maxVal < 1000000) {
       setPriceFilter({
         mode: "between",
-        min: tempPriceRange.min,
-        max: tempPriceRange.max,
+        min: minVal,
+        max: maxVal,
       });
     }
     onClose();
@@ -314,7 +316,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     placeholder="Min"
                     min="0"
                     value={tempPriceRange.min}
-                    onChange={(e) => setTempPriceRange({ ...tempPriceRange, min: Number(e.target.value) || 0 })}
+                    onChange={(e) => setTempPriceRange({ ...tempPriceRange, min: e.target.value ? Number(e.target.value) : "" })}
                     className="min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   />
                   <span className="text-gray-400 font-light shrink-0">-</span>
@@ -323,7 +325,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     placeholder="Max"
                     min="0"
                     value={tempPriceRange.max}
-                    onChange={(e) => setTempPriceRange({ ...tempPriceRange, max: Number(e.target.value) || 1000000 })}
+                    onChange={(e) => setTempPriceRange({ ...tempPriceRange, max: e.target.value ? Number(e.target.value) : "" })}
                     className="min-w-0 flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   />
                 </div>
