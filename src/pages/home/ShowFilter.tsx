@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import normalizePossibleFeatureValues from "../../hooks/normalizearrayfeatures";
 import { getFeatures, getPossibleFeatureValues } from "../../services/featureService";
 import { getSubcategories } from "../../services/subcategoryService";
+import useLocations from "../../features/locations/useLocations";
 import type { Category } from "../../types/Category";
 
 type Props = {
@@ -65,24 +66,29 @@ const ShowFilter = ({
     categories,
     uniqueLocations,
 }: Props) => {
+    // Get locations from API hook
+    const { groupedLocations: regionsData } = useLocations();
+    
     // Local states for batch apply pattern
     const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
     const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
     const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
     const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
     const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
-    const [localSelectedLocation, setLocalSelectedLocation] = useState<string | null>(selectedLocation);
+    const [localSelectedLocationIds, setLocalSelectedLocationIds] = useState<string[]>(selectedLocation ? selectedLocation.split(",") : []);
     const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
     const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
     const [localTimeframeSort, setLocalTimeframeSort] = useState<"none" | "newest" | "oldest">(timeframeSort);
     const [localSelectedCategoryId, setLocalSelectedCategoryId] = useState<number | null>(propSelectedCategoryId);
-    const [localSelectedSubcategoryId, setLocalSelectedSubcategoryId] = useState<number | "">(propSelectedSubcategoryId);
+    const [localSelectedSubcategoryIds, setLocalSelectedSubcategoryIds] = useState<number[]>(propSelectedSubcategoryId ? [propSelectedSubcategoryId as number] : []);
     const [localSelectedFeatures, setLocalSelectedFeatures] = useState<Record<number, string>>(propSelectedFeatures);
+    const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
 
     // Subcategories and features state
     const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
     const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
     const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
+    const [locationSectionOpen, setLocationSectionOpen] = useState(localSelectedLocationIds.length === 0);
 
     // Fetch subcategories when category changes
     useEffect(() => {
@@ -108,29 +114,37 @@ const ShowFilter = ({
         };
     }, [localSelectedCategoryId]);
 
-    // Fetch features when subcategory changes
+    // Fetch features when subcategories change
     useEffect(() => {
         let mounted = true;
 
         (async () => {
             try {
-                if (typeof localSelectedSubcategoryId === "number" && !isNaN(localSelectedSubcategoryId)) {
-                    let features = await getFeatures({ subcategory: localSelectedSubcategoryId }) as any;
-                    if (!mounted) return;
-                    if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
-                    const defs = (features || []).map((f: any) => ({ id: Number(f.id), name: String(f.name ?? f.display_name ?? f.title ?? "") }));
+                if (localSelectedSubcategoryIds.length > 0) {
+                    const allFeaturesMap = new Map<number, string>();
+                    
+                    for (const subId of localSelectedSubcategoryIds) {
+                        let features = await getFeatures({ subcategory: subId }) as any;
+                        if (!mounted) return;
+                        if (!Array.isArray(features) && features && Array.isArray(features.results)) features = features.results;
+                        (features || []).forEach((f: any) => {
+                            allFeaturesMap.set(Number(f.id), String(f.name ?? f.display_name ?? f.title ?? ""));
+                        });
+                    }
+                    
+                    const defs = Array.from(allFeaturesMap.entries()).map(([id, name]) => ({ id, name }));
                     setFeatureDefinitions(defs);
                 } else {
                     setFeatureDefinitions([]);
                 }
             } catch (e) {
-                console.warn("Failed to fetch feature definitions for subcategory", e);
+                console.warn("Failed to fetch feature definitions for subcategories", e);
                 if (mounted) setFeatureDefinitions([]);
             }
         })();
 
         return () => { mounted = false };
-    }, [localSelectedSubcategoryId]);
+    }, [localSelectedSubcategoryIds]);
 
     // Fetch possible feature values when feature definitions change
     useEffect(() => {
@@ -174,9 +188,9 @@ const ShowFilter = ({
     const handleApplyFilters = () => {
         // Apply all local state changes to parent state at once
         propSetSelectedCategoryId(localSelectedCategoryId);
-        propSetSelectedSubcategoryId(localSelectedSubcategoryId);
+        propSetSelectedSubcategoryId(localSelectedSubcategoryIds.length > 0 ? localSelectedSubcategoryIds[0] : "");
         propSetSelectedFeatures(localSelectedFeatures);
-        setSelectedLocation(localSelectedLocation);
+        setSelectedLocation(localSelectedLocationIds.length > 0 ? localSelectedLocationIds.join(",") : null);
         setSelectedTimeframe(localSelectedTimeframe);
         setPriceSort(localPriceSort);
         setTimeframeSort(localTimeframeSort);
@@ -196,9 +210,10 @@ const ShowFilter = ({
 
     const handleClearAllFilters = () => {
         setLocalSelectedCategoryId(null);
-        setLocalSelectedSubcategoryId("");
+        setLocalSelectedSubcategoryIds([]);
         setLocalSelectedFeatures({});
-        setLocalSelectedLocation(null);
+        setLocalSelectedLocationIds([]);
+        setSelectedRegion(null);
         setLocalSelectedTimeframe("anytime");
         setLocalPriceSort("none");
         setLocalTimeframeSort("none");
@@ -269,22 +284,60 @@ const ShowFilter = ({
                                 </svg>
                                 Subcategory (Optional)
                             </h3>
-                            <select
-                                value={localSelectedSubcategoryId || ""}
-                                onChange={(e) => {
-                                    const val = e.target.value;
-                                    setLocalSelectedSubcategoryId(val ? Number(val) : "");
-                                    setLocalSelectedFeatures({});
-                                }}
-                                className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
-                            >
-                                <option value="">All Subcategories</option>
+                            <div className="flex flex-col gap-2">
+                                {/* All Subcategories Option */}
+                                <button
+                                    onClick={() => {
+                                        const allSubIds = subcategories.map(s => s.id);
+                                        const allSelected = allSubIds.every(id => localSelectedSubcategoryIds.includes(id));
+                                        if (allSelected) {
+                                            setLocalSelectedSubcategoryIds([]);
+                                        } else {
+                                            setLocalSelectedSubcategoryIds(allSubIds);
+                                        }
+                                        setLocalSelectedFeatures({});
+                                    }}
+                                    className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                                        subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
+                                            ? "bg-(--dark-def) text-white"
+                                            : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                                    }`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))}
+                                        onChange={() => {}}
+                                        className="mr-2 cursor-pointer"
+                                    />
+                                    All Subcategories
+                                </button>
                                 {subcategories.map((sub) => (
-                                    <option key={sub.id} value={sub.id}>
+                                    <button
+                                        key={sub.id}
+                                        onClick={() => {
+                                            setLocalSelectedSubcategoryIds(
+                                                localSelectedSubcategoryIds.includes(sub.id)
+                                                    ? localSelectedSubcategoryIds.filter(id => id !== sub.id)
+                                                    : [...localSelectedSubcategoryIds, sub.id]
+                                            );
+                                            setLocalSelectedFeatures({});
+                                        }}
+                                        className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                                            localSelectedSubcategoryIds.includes(sub.id)
+                                                ? "bg-(--dark-def) text-white"
+                                                : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                                        }`}
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={localSelectedSubcategoryIds.includes(sub.id)}
+                                            onChange={() => {}}
+                                            className="mr-2 cursor-pointer"
+                                        />
                                         {sub.name}
-                                    </option>
+                                    </button>
                                 ))}
-                            </select>
+                            </div>
                         </div>
                     )}
 
@@ -334,22 +387,127 @@ const ShowFilter = ({
 
                     {/* Location Section */}
                     <div className="mb-8">
-                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                            <img src="/location.svg" alt="Location" className="w-5 h-5" />
-                            Location
-                        </h3>
-                        <select
-                            value={localSelectedLocation || ""}
-                            onChange={(e) => setLocalSelectedLocation(e.target.value || null)}
-                            className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+                        <div 
+                            onClick={() => setLocationSectionOpen(!locationSectionOpen)}
+                            className="cursor-pointer"
                         >
-                            <option value="">All Locations</option>
-                            {uniqueLocations.map((loc) => (
-                                <option key={loc} value={loc}>
-                                    {loc}
-                                </option>
-                            ))}
-                        </select>
+                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 hover:opacity-80">
+                                <img src="/location.svg" alt="Location" className="w-5 h-5" />
+                                <span className="flex-1">Location</span>
+                                <span className="text-sm font-normal text-gray-600">
+                                    {locationSectionOpen ? 
+                                        <img src="/arrowright.svg" alt="v" className="w-4 h-4 rotate-90" /> 
+                                        : <img src="/arrowright.svg" alt=">" className="w-4 h-4" />
+                                    }
+                                </span>
+                            </h3>
+                        </div>
+
+                        {locationSectionOpen ? (
+                            <>
+                                <select
+                                    value={selectedRegion || ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setSelectedRegion(val || null);
+                                        if (!val) {
+                                            setLocalSelectedLocationIds([]);
+                                        }
+                                    }}
+                                    className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base mb-3"
+                                >
+                                    <option value="">Select a Region</option>
+                                    {Object.keys(regionsData).map((region) => (
+                                        <option key={region} value={region}>
+                                            {region}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                {selectedRegion && (
+                                    <div>
+                                        <h4 className="text-sm font-semibold text-gray-700 mb-2">Select Locations in {selectedRegion}</h4>
+                                        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                            {/* All locations option */}
+                                            <button
+                                                onClick={() => {
+                                                    const regionLocations = regionsData[selectedRegion] || [];
+                                                    const allSelected = regionLocations.every(loc => localSelectedLocationIds.includes(loc));
+                                                    if (allSelected) {
+                                                        setLocalSelectedLocationIds([]);
+                                                    } else {
+                                                        setLocalSelectedLocationIds([...new Set([...localSelectedLocationIds, ...regionLocations])]);
+                                                    }
+                                                }}
+                                                className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
+                                                    (regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))
+                                                        ? "bg-(--dark-def) text-white"
+                                                        : "bg-white hover:bg-gray-100"
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={(regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))}
+                                                    onChange={() => {}}
+                                                    className="cursor-pointer"
+                                                />
+                                                <span className="font-semibold">All locations in {selectedRegion}</span>
+                                            </button>
+                                            {/* Individual locations */}
+                                            {(regionsData[selectedRegion] || []).map((location) => (
+                                                <button
+                                                    key={location}
+                                                    onClick={() => {
+                                                        setLocalSelectedLocationIds(
+                                                            localSelectedLocationIds.includes(location)
+                                                                ? localSelectedLocationIds.filter(id => id !== location)
+                                                                : [...localSelectedLocationIds, location]
+                                                        );
+                                                    }}
+                                                    className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
+                                                        localSelectedLocationIds.includes(location)
+                                                            ? "bg-(--dark-def) text-white"
+                                                            : "bg-white hover:bg-gray-100"
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={localSelectedLocationIds.includes(location)}
+                                                        onChange={() => {}}
+                                                        className="cursor-pointer"
+                                                    />
+                                                    {location}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className="mt-3 flex gap-2 justify-end">
+                                            <button
+                                                onClick={() => {
+                                                    if (localSelectedLocationIds.length === 0) {
+                                                        const regionLocations = regionsData[selectedRegion] || [];
+                                                        setLocalSelectedLocationIds(regionLocations);
+                                                    }
+                                                    setLocationSectionOpen(false);
+                                                }}
+                                                className="py-2 px-6 bg-(--dark-def) text-white rounded-lg font-medium hover:opacity-90 w-fit transition text-base"
+                                            >
+                                                Done
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm">
+                                {localSelectedLocationIds.length > 0 && selectedRegion ? (
+                                    <span className="text-gray-700">
+                                        <span className="font-semibold">{localSelectedLocationIds.length}</span> location{localSelectedLocationIds.length !== 1 ? 's' : ''} in <span className="font-semibold">{selectedRegion}</span> selected
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-500 italic">No locations selected</span>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Timeframe Section */}
