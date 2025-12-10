@@ -77,9 +77,6 @@ const ShowFilter = ({
         priceFilter.mode === "below" ? priceFilter.below?.toString() || "" :
         priceFilter.mode === "between" ? priceFilter.max?.toString() || "" : ""
     );
-    const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
-    const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
-    const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
     const [localSelectedLocationIds, setLocalSelectedLocationIds] = useState<string[]>(selectedLocation ? selectedLocation.split(",") : []);
     const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">(selectedTimeframe);
     const [localPriceSort, setLocalPriceSort] = useState<"none" | "low-to-high" | "high-to-low">(priceSort);
@@ -100,7 +97,6 @@ const ShowFilter = ({
     const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
     const [featureDefinitions, setFeatureDefinitions] = useState<Array<{ id: number; name: string }>>([]);
     const [possibleFeatureValues, setPossibleFeatureValues] = useState<Record<number, string[]>>({});
-    const [locationSectionOpen, setLocationSectionOpen] = useState(localSelectedLocationIds.length === 0);
 
     // Fetch subcategories when category changes
     useEffect(() => {
