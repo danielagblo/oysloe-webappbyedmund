@@ -1807,7 +1807,7 @@ const AdsDetailsPage = () => {
         onClick={() => setIsSellerAdsModalOpen(false)}
       >
         <div
-          className="relative bg-white rounded-2xl p-6 shadow-lg max-h-[85vh] overflow-auto w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%]"
+          className="relative bg-white rounded-2xl p-6 shadow-lg max-sm:max-h-[75vh] max-h-[85vh] overflow-auto w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -1838,7 +1838,7 @@ const AdsDetailsPage = () => {
                     className="w-20 h-20 object-cover rounded-lg shrink-0"
                   />
                   <div className="flex flex-col justify-center flex-1 min-w-0">
-                    <h3 className="font-semibold text-sm md:text-base line-clamp-2">
+                    <h3 className="font-bold text-gray-400 text-sm md:text-base line-clamp-2">
                       {ad.name}
                     </h3>
                     <p className="text-gray-600 text-xs md:text-sm">
