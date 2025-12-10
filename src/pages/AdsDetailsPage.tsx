@@ -315,6 +315,7 @@ const AdsDetailsPage = () => {
   // possible values: 'caller1' | 'caller2' | 'makeOffer' | 'report' | null
   const [openPanel, setOpenPanel] = useState<string | null>(null);
   const [quickChatInput, setQuickChatInput] = useState("");
+  const [isSellerAdsModalOpen, setIsSellerAdsModalOpen] = useState(false);
 
   // Filter reviews for this specific product (memoized to prevent unnecessary recalculation)
   const thisProductsReviews = useMemo(() => {
@@ -590,7 +591,7 @@ const AdsDetailsPage = () => {
     </div>
   );
   const DesktopHeader = () => (
-    <div className="hidden sm:flex bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
+    <div className="hidden sm:flex sticky top-0 left-0 z-[200] mt-10 bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
         <img
           src="/location.svg"
@@ -1101,7 +1102,7 @@ const AdsDetailsPage = () => {
 
     return (
       <div>
-        <div className="flex flex-wrap gap-2 mb-1">
+        <div className="flex flex-wrap gap-2 mb-1 max-sm:grid max-sm:grid-cols-2">
           {(() => {
             const items: Array<[string, string]> = [
               ["mark as taken.svg", "Mark as taken"],
@@ -1118,9 +1119,9 @@ const AdsDetailsPage = () => {
               <div key={label} className="relative inline-block">
                 <button
                   key={label}
-                  className={`flex items-center gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
+                  className={`flex items-center max-sm:w-full gap-2 max-sm:py-6 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
                   ${actions[label]
-                      ? "cursor-pointer hover:scale-95 active:scale-105"
+                      ? "cursor-pointer hover:bg-gray-200 lg:hover:scale-95 active:scale-105"
                       : "cursor-not-allowed"
                     }
                 `}
@@ -1451,7 +1452,7 @@ const AdsDetailsPage = () => {
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
           <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
-        <div className="flex flex-wrap flex-row gap-2 mb-4 w-full text-gray-600 sm:text-(--dark-def) font-extralight justify-start">
+        <div className="flex flex-wrap max-sm:grid max-sm:grid-cols-2 flex-row gap-2 mb-4 w-full text-gray-600 sm:text-(--dark-def) font-extralight justify-start">
           {[
             "Is this Original?",
             "Do you have delivery options?",
@@ -1460,7 +1461,7 @@ const AdsDetailsPage = () => {
           ].map((text, i) => (
             <button
               key={i}
-              className="px-3 py-2 bg-(--div-active) sm:bg-white rounded text-xs md:text-[0.9vw] hover:bg-gray-100 whitespace-nowrap w-fit"
+              className="px-3 py-2 bg-(--div-active) sm:bg-white rounded text-[11px] md:text-[0.9vw] max-sm:w-full max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
               onClick={async () => {
                 await openChatWithOwnerAndSend(text);
               }}
@@ -1470,28 +1471,42 @@ const AdsDetailsPage = () => {
           ))}
         </div>
 
-        <div className="flex gap-2 w-full">
-          <input
-            type="text"
-            placeholder="Start a chat"
-            value={quickChatInput}
-            onChange={(e) => setQuickChatInput(e.target.value)}
-            style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 py-3 bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
-          />
+        <div className="flex gap-2 w-full items-center">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Start a chat"
+              value={quickChatInput}
+              onChange={(e) => setQuickChatInput(e.target.value)}
+              style={{ border: "1px solid var(--div-border)" }}
+              className="rounded-2xl px-3 py-3 bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
+            />
+            <img 
+              src="/send.svg" 
+              alt="Send" 
+              className="w-6 h-6 absolute top-3 right-2 cursor-pointer" 
+              role="button"
+              tabIndex={0}
+              onClick={async () => {
+                if (!quickChatInput || quickChatInput.trim().length === 0) return;
+                await openChatWithOwnerAndSend(quickChatInput.trim());
+                setQuickChatInput("");
+              }}
+            />
+          </div>
+
           <button
             style={{ border: "1px solid var(--div-border)" }}
-            className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white"
-            onClick={async () => {
-              if (!quickChatInput || quickChatInput.trim().length === 0) return;
-              await openChatWithOwnerAndSend(quickChatInput.trim());
-              setQuickChatInput("");
-            }}
+            className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white shrink-0"
           >
-            <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            <svg className="w-6 h-6" viewBox="0 0 25 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.998535 14.625C1.98883 33.1542 23.9842 30.6966 23.9924 14.6384" stroke="#374957" stroke-width="2"/>
+              <rect x="6.49268" y="0.5" width="11" height="20" rx="5.5" fill="#374957" stroke="#374957"/>
+              <rect x="10.4927" y="31.5" width="4" height="7" fill="#374957" stroke="#374957"/>
+            </svg>
           </button>
         </div>
-        <div className="mt-4 space-y-2 text-[10px] inline-flex flex-wrap gap-2 text-gray-600">
+        <div className="mt-4 whitespace-nowrap text-[10px] flex flex-nowrap gap-2 text-gray-600 justify-center items-center">
           <div className="flex items-center justify-end relative">
             <h4 className="bg-(--green) h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
               Chat is secured
@@ -1502,7 +1517,7 @@ const AdsDetailsPage = () => {
               className="bg-(--green) z-10 rounded-full w-6 h-6 p-1 absolute"
             />
           </div>
-          <div className="flex -mt-2 items-center gap-1 md:text-[0.8vw]">
+          <div className="flex items-center gap-1 md:text-[0.8vw]">
             <img
               src="/shield.svg"
               alt=""
@@ -1573,7 +1588,7 @@ const AdsDetailsPage = () => {
         </div>
       </div>
       {/* store name */}
-      <div className="flex items-center justify-between px-2 mb-6">
+      <div className="flex items-center justify-between px-2 md:mb-6">
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
           <h4 className="text-xl md:text-[1.5vw]">
             {currentAdData?.owner?.business_name ?? "Seller"}
@@ -1591,15 +1606,18 @@ const AdsDetailsPage = () => {
             </span>
           </div>
         </div>
-        <button className="px-2 py-1 rounded text-sm md:text-[1vw] bg-(--div-active)">
+        <button 
+          onClick={() => setIsSellerAdsModalOpen(true)}
+          className="px-2 py-1 whitespace-nowrap rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
+        >
           Seller Ads
         </button>
       </div>
 
       {/* product slideshow (keeps static visuals) */}
       <div className="flex items-center justify-center mb-4 w-full">
-        <div className="pt-4 overflow-x-hidden w-full">
-          <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4">
+        <div className="md:pt-4 overflow-x-hidden w-full">
+          <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4 max-sm:pt-0">
             <button
               className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
               onClick={() => {
@@ -1725,7 +1743,7 @@ const AdsDetailsPage = () => {
         Similar Ads
       </h2>
 
-      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start max-md:justify-center">
+      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
         {
           (() => {
             const availableAds = relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
@@ -1779,17 +1797,89 @@ const AdsDetailsPage = () => {
     </div>
   );
 
+  const SellerAdsModal = () => {
+    if (!isSellerAdsModalOpen) return null;
+    const sellerAdsToShow = sellerProducts?.filter((p) => !p.is_taken && p.status === "ACTIVE") ?? [];
+    
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+        onClick={() => setIsSellerAdsModalOpen(false)}
+      >
+        <div
+          className="relative bg-white rounded-2xl p-6 shadow-lg max-h-[85vh] overflow-auto w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+            onClick={() => setIsSellerAdsModalOpen(false)}
+            aria-label="Close seller ads modal"
+          >
+            ✕
+          </button>
+
+          <h2 className="text-xl md:text-2xl font-bold mb-4 pr-8">
+            {currentAdData?.owner?.business_name || owner?.name || "Seller"}'s Ads
+          </h2>
+
+          {sellerAdsToShow.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {sellerAdsToShow.map((ad) => (
+                <Link
+                  key={ad.id}
+                  to={`/ads/${ad.id}`}
+                  state={{ adData: ad }}
+                  onClick={() => setIsSellerAdsModalOpen(false)}
+                  className="flex gap-3 p-3 rounded-lg hover:bg-gray-100 transition cursor-pointer border border-gray-200"
+                >
+                  <img
+                    src={ad.image || "/no-image.jpeg"}
+                    alt={ad.name}
+                    className="w-20 h-20 object-cover rounded-lg shrink-0"
+                  />
+                  <div className="flex flex-col justify-center flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm md:text-base line-clamp-2">
+                      {ad.name}
+                    </h3>
+                    <p className="text-gray-600 text-xs md:text-sm">
+                      {(ad.location?.name || "") +  ((ad.location?.name && ad.location?.region) ? ", " : "") + (ad.location?.region || "") || "Unknown location"}
+                    </p>
+                    <p className="text-gray-800 font-semibold text-sm md:text-base mt-1">
+                      {ad.price ? `${formatMoney(ad.price)}${ad.type?.toLowerCase() === "rent" ? "/month" : ""}` : "Contact for price"}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <img
+                src="/nothing-to-show.png"
+                className="w-16 h-16"
+                alt="no ads"
+              />
+              <p className="text-gray-500 text-center">
+                This seller has no other active ads at the moment.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="lg:pt-5">
       <AdLoadingOverlay isVisible={adLoading} />
+      <SellerAdsModal />
       <div
         style={{ color: "var(--dark-def)" }}
-        className="flex flex-col items-center w-[calc(100%-0.2rem)] sm:w-full min-h-screen px-4 max-sm:pt-10 sm:px-12 gap-6 overflow-x-hidden bg-(--div-active) sm:bg-white"
+        className="flex flex-col items-center w-full sm:w-full min-h-screen px-0 max-sm:pt-10 sm:px-12 gap-6 sm:gap-2 bg-(--div-active) sm:bg-white"
       >
         <MobileHeader />
+        <DesktopHeader />
 
-        <div className="w-full md:p-6">
-          <DesktopHeader />
+        <div className="w-full">
           <ImageGallery images={pageImages} currentIndex={galleryIndex} />
           <PictureModal />
           <SellerImageModal />
@@ -1806,22 +1896,24 @@ const AdsDetailsPage = () => {
           />
           <TitleAndPrice />
 
-          {/* Description (standalone, shown above Ad Details) */}
-          {currentAdData?.description && (
-            <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-2xl py-3 px-4 w-full">
-              <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Description</h2>
-              <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
-                {String(currentAdData.description)}
-              </p>
-            </div>
-          )}
+          <div className="sm:pr-6">
+            {/* Description (standalone, shown above Ad Details) */}
+            {currentAdData?.description && (
+              <div className="bg-white sm:bg-(--div-active) my-4 sm:p-6 rounded-2xl py-3 px-4 w-full">
+                <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Description</h2>
+                <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
+                  {String(currentAdData.description)}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* MAIN CONTENT */}
           <div className="flex flex-col gap-4 w-full">
             <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
               {/* mobile layout */}
               <div className="sm:hidden flex w-full justify-between ad-details-page">
-                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px] pt-7">
+                <div className="flex flex-col space-y-6 w-fit px-4 md:w-1/2 mb-6 md:min-h-[250px] pt-7">
                   <AdDetails />
                 </div>
                 <div className="flex flex-col space-y-6 w-full md:w-1/2 pt-10">

@@ -260,7 +260,7 @@ const ShowFilter = ({
                             onChange={(e) => {
                                 const val = e.target.value;
                                 setLocalSelectedCategoryId(val ? Number(val) : null);
-                                setLocalSelectedSubcategoryId("");
+                                // setLocalSelectedSubcategoryId("");
                                 setLocalSelectedFeatures({});
                             }}
                             className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
