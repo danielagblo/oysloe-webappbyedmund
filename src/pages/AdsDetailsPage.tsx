@@ -1452,7 +1452,7 @@ const AdsDetailsPage = () => {
           <img src="/quick chat.svg" alt="" className="w-5 h-5" />
           <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
         </div>
-        <div className="flex flex-wrap max-sm:grid max-sm:grid-cols-2 flex-row gap-2 mb-4 w-full text-gray-600 sm:text-(--dark-def) font-extralight justify-start">
+        <div className="flex flex-wrap max-sm:grid max-sm:grid-cols-2 flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start">
           {[
             "Is this Original?",
             "Do you have delivery options?",
@@ -1461,7 +1461,7 @@ const AdsDetailsPage = () => {
           ].map((text, i) => (
             <button
               key={i}
-              className="px-3 py-2 bg-(--div-active) sm:bg-white rounded text-[11px] md:text-[0.9vw] max-sm:w-full max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+              className="px-1 py-2 bg-(--div-active) sm:bg-white rounded text-[11px] md:text-[0.9vw] max-sm:w-full max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
               onClick={async () => {
                 await openChatWithOwnerAndSend(text);
               }}
