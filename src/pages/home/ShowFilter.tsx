@@ -69,8 +69,14 @@ const ShowFilter = ({
     const { groupedLocations: regionsData } = useLocations();
     
     // Local states for batch apply pattern
-    const [localPriceMin, setLocalPriceMin] = useState<string>(priceFilter.min?.toString() || "");
-    const [localPriceMax, setLocalPriceMax] = useState<string>(priceFilter.max?.toString() || "");
+    const [localPriceMin, setLocalPriceMin] = useState<string>(
+        priceFilter.mode === "above" ? priceFilter.above?.toString() || "" :
+        priceFilter.mode === "between" ? priceFilter.min?.toString() || "" : ""
+    );
+    const [localPriceMax, setLocalPriceMax] = useState<string>(
+        priceFilter.mode === "below" ? priceFilter.below?.toString() || "" :
+        priceFilter.mode === "between" ? priceFilter.max?.toString() || "" : ""
+    );
     const [localPriceBelow, setLocalPriceBelow] = useState<string>(priceFilter.below?.toString() || "");
     const [localPriceAbove, setLocalPriceAbove] = useState<string>(priceFilter.above?.toString() || "");
     const [localPriceMode, setLocalPriceMode] = useState<"none" | "below" | "above" | "between">(priceFilter.mode);
@@ -82,6 +88,13 @@ const ShowFilter = ({
     const [localSelectedSubcategoryIds, setLocalSelectedSubcategoryIds] = useState<number[]>(propSelectedSubcategoryId ? [propSelectedSubcategoryId as number] : []);
     const [localSelectedFeatures, setLocalSelectedFeatures] = useState<Record<number, string>>(propSelectedFeatures);
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+    const [locationSearch, setLocationSearch] = useState<string>("");
+    const [showRegionSelector, setShowRegionSelector] = useState<boolean>(false);
+    const [pendingRegionSwitch, setPendingRegionSwitch] = useState<string | null>(null);
+    const [pendingCategorySwitch, setPendingCategorySwitch] = useState<number | null>(null);
+    const [showSubcategoryModal, setShowSubcategoryModal] = useState<boolean>(false);
+    const [subcategorySearch, setSubcategorySearch] = useState<string>("");
+    const [showFeaturesSection, setShowFeaturesSection] = useState<boolean>(true);
 
     // Subcategories and features state
     const [subcategories, setSubcategories] = useState<Array<{ id: number; name: string }>>([]);
@@ -194,12 +207,12 @@ const ShowFilter = ({
         setPriceSort(localPriceSort);
         setTimeframeSort(localTimeframeSort);
 
-        if (localPriceMode === "below" && localPriceBelow) {
-            setPriceFilter({ mode: "below", below: Number(localPriceBelow) });
-        } else if (localPriceMode === "above" && localPriceAbove) {
-            setPriceFilter({ mode: "above", above: Number(localPriceAbove) });
-        } else if (localPriceMode === "between" && localPriceMin && localPriceMax) {
+        if (localPriceMin && localPriceMax) {
             setPriceFilter({ mode: "between", min: Number(localPriceMin), max: Number(localPriceMax) });
+        } else if (localPriceMin) {
+            setPriceFilter({ mode: "above", above: Number(localPriceMin) });
+        } else if (localPriceMax) {
+            setPriceFilter({ mode: "below", below: Number(localPriceMax) });
         } else {
             setPriceFilter({ mode: "none" });
         }
@@ -213,14 +226,15 @@ const ShowFilter = ({
         setLocalSelectedFeatures({});
         setLocalSelectedLocationIds([]);
         setSelectedRegion(null);
+        setPendingRegionSwitch(null);
+        setPendingCategorySwitch(null);
+        setShowSubcategoryModal(false);
+        setSubcategorySearch("");
         setLocalSelectedTimeframe("anytime");
         setLocalPriceSort("none");
         setLocalTimeframeSort("none");
-        setLocalPriceMode("none");
         setLocalPriceMin("");
         setLocalPriceMax("");
-        setLocalPriceBelow("");
-        setLocalPriceAbove("");
     };
 
     return (
@@ -259,9 +273,20 @@ const ShowFilter = ({
                             value={localSelectedCategoryId || ""}
                             onChange={(e) => {
                                 const val = e.target.value;
-                                setLocalSelectedCategoryId(val ? Number(val) : null);
-                                // setLocalSelectedSubcategoryId("");
+                                const newCategoryId = val ? Number(val) : null;
+                                
+                                // Mark that user is switching categories if they had subcategories selected
+                                if (localSelectedSubcategoryIds.length > 0 && newCategoryId !== localSelectedCategoryId) {
+                                    setPendingCategorySwitch(localSelectedCategoryId);
+                                }
+                                
+                                setLocalSelectedCategoryId(newCategoryId);
                                 setLocalSelectedFeatures({});
+                                
+                                // Open subcategory modal if a category is selected
+                                if (newCategoryId !== null) {
+                                    setShowSubcategoryModal(true);
+                                }
                             }}
                             className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
                         >
@@ -274,7 +299,7 @@ const ShowFilter = ({
                         </select>
                     </div>
 
-                    {/* Subcategory Section - Only show if category selected */}
+                    {/* Subcategory Selector - Only show if category selected */}
                     {localSelectedCategoryId !== null && (
                         <div className="mb-8">
                             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -283,65 +308,128 @@ const ShowFilter = ({
                                 </svg>
                                 Subcategory (Optional)
                             </h3>
-                            {subcategories.length > 0 ? (
-                                <div className="flex flex-col gap-2">
-                                    {/* All Subcategories Option */}
-                                    <button
-                                        onClick={() => {
-                                            const allSubIds = subcategories.map(s => s.id);
-                                            const allSelected = allSubIds.every(id => localSelectedSubcategoryIds.includes(id));
-                                            if (allSelected) {
-                                                setLocalSelectedSubcategoryIds([]);
-                                            } else {
-                                                setLocalSelectedSubcategoryIds(allSubIds);
-                                            }
-                                            setLocalSelectedFeatures({});
-                                        }}
-                                        className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                            subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))
-                                                ? "bg-(--dark-def) text-white"
-                                                : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                                        }`}
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={subcategories.length > 0 && subcategories.map(s => s.id).every(id => localSelectedSubcategoryIds.includes(id))}
-                                            onChange={() => {}}
-                                            className="mr-2 cursor-pointer"
-                                        />
-                                        All Subcategories
-                                    </button>
-                                    {subcategories.map((sub) => (
-                                        <button
-                                            key={sub.id}
-                                            onClick={() => {
-                                                setLocalSelectedSubcategoryIds(
-                                                    localSelectedSubcategoryIds.includes(sub.id)
-                                                        ? localSelectedSubcategoryIds.filter(id => id !== sub.id)
-                                                        : [...localSelectedSubcategoryIds, sub.id]
-                                                );
-                                                setLocalSelectedFeatures({});
-                                            }}
-                                            className={`w-full text-left px-4 py-3 rounded-lg transition ${
-                                                localSelectedSubcategoryIds.includes(sub.id)
-                                                    ? "bg-(--dark-def) text-white"
-                                                    : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
-                                            }`}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                checked={localSelectedSubcategoryIds.includes(sub.id)}
-                                                onChange={() => {}}
-                                                className="mr-2 cursor-pointer"
-                                            />
-                                            {sub.name}
-                                        </button>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-8">
-                                    <img src="/nothing-to-show.png" alt="Nothing to show" className="w-20 h-20 mb-2" />
-                                    <span className="text-gray-600 text-sm">Nothing to show</span>
+                            <button
+                                onClick={() => setShowSubcategoryModal(true)}
+                                className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base text-left flex items-center justify-between bg-white hover:bg-gray-50"
+                            >
+                                <span className={localSelectedSubcategoryIds.length > 0 ? "text-gray-900" : "text-gray-500"}>
+                                    {localSelectedSubcategoryIds.length > 0 ? (
+                                        localSelectedSubcategoryIds.length === 1
+                                            ? subcategories.find(s => s.id === localSelectedSubcategoryIds[0])?.name
+                                            : `${localSelectedSubcategoryIds.length} subcategories selected`
+                                    ) : (
+                                        "All Subcategories"
+                                    )}
+                                </span>
+                                <img src="/arrowright.svg" alt=">" className="w-4 h-4 rotate-90" />
+                            </button>
+
+                            {/* Subcategory Modal */}
+                            {showSubcategoryModal && (
+                                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'transparent' }}>
+                                    <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
+                                        {/* Header */}
+                                        <div className="p-4 border-b border-gray-200">
+                                            <h4 className="font-semibold text-gray-900">
+                                                {subcategories.length > 0 ? "Select Subcategories" : "No Subcategories Available"}
+                                            </h4>
+                                        </div>
+
+                                        {subcategories.length > 0 ? (
+                                            <>
+                                                {/* Search bar */}
+                                                <div className="p-4 border-b border-gray-200">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search subcategories..."
+                                                        value={subcategorySearch}
+                                                        onChange={(e) => setSubcategorySearch(e.target.value)}
+                                                        className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                                                    />
+                                                </div>
+
+                                                {/* Subcategories list */}
+                                                <div className="flex-1 overflow-y-auto p-4">
+                                                    <div className="flex flex-col gap-2">
+                                                        {/* All subcategories option */}
+                                                        <label className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={subcategories.length > 0 && subcategories.every(s => localSelectedSubcategoryIds.includes(s.id))}
+                                                                onChange={() => {
+                                                                    // If switching categories and user starts selecting, clear old selections
+                                                                    if (pendingCategorySwitch && pendingCategorySwitch !== localSelectedCategoryId) {
+                                                                        const allIds = subcategories.map(s => s.id);
+                                                                        setLocalSelectedSubcategoryIds(allIds);
+                                                                        setPendingCategorySwitch(null);
+                                                                    } else {
+                                                                        // Normal toggle within same category
+                                                                        const allIds = subcategories.map(s => s.id);
+                                                                        const allSelected = allIds.every(id => localSelectedSubcategoryIds.includes(id));
+                                                                        if (allSelected) {
+                                                                            setLocalSelectedSubcategoryIds([]);
+                                                                        } else {
+                                                                            setLocalSelectedSubcategoryIds(allIds);
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="cursor-pointer"
+                                                            />
+                                                            <span className="font-semibold text-sm">All subcategories</span>
+                                                        </label>
+                                                        {/* Individual subcategories filtered by search */}
+                                                        {subcategories
+                                                            .sort((a, b) => a.name.localeCompare(b.name))
+                                                            .filter((sub) => 
+                                                                sub.name.toLowerCase().includes(subcategorySearch.toLowerCase())
+                                                            )
+                                                            .map((sub) => (
+                                                                <label key={sub.id} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={localSelectedSubcategoryIds.includes(sub.id)}
+                                                                        onChange={() => {
+                                                                            // If switching categories and user starts selecting, clear old selections
+                                                                            if (pendingCategorySwitch && pendingCategorySwitch !== localSelectedCategoryId) {
+                                                                                setLocalSelectedSubcategoryIds([sub.id]);
+                                                                                setPendingCategorySwitch(null);
+                                                                            } else {
+                                                                                // Normal toggle within same category
+                                                                                setLocalSelectedSubcategoryIds(
+                                                                                    localSelectedSubcategoryIds.includes(sub.id)
+                                                                                        ? localSelectedSubcategoryIds.filter(id => id !== sub.id)
+                                                                                        : [...localSelectedSubcategoryIds, sub.id]
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                        className="cursor-pointer"
+                                                                    />
+                                                                    <span className="text-sm">{sub.name}</span>
+                                                                </label>
+                                                            ))}
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex-1 flex items-center justify-center p-4">
+                                                <p className="text-gray-500 text-sm">This category has no subcategories</p>
+                                            </div>
+                                        )}
+
+                                        {/* Done button */}
+                                        <div className="p-4 border-t border-gray-200">
+                                            <button
+                                                onClick={() => {
+                                                    setShowSubcategoryModal(false);
+                                                    setSubcategorySearch("");
+                                                    setLocalSelectedFeatures({});
+                                                }}
+                                                className="w-full py-2 px-6 bg-(--dark-def) text-white rounded-lg font-medium hover:opacity-90 transition text-base"
+                                            >
+                                                Done
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -350,168 +438,250 @@ const ShowFilter = ({
                     {/* Features Section - Only show if features exist for selected subcategory */}
                     {featureDefinitions.length > 0 && (
                         <div className="mb-8">
-                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <button
+                                onClick={() => setShowFeaturesSection(!showFeaturesSection)}
+                                className="w-full flex items-center gap-2 text-lg font-semibold mb-3 hover:opacity-70 transition"
+                            >
                                 <img src="/circle-quarter-svgrepo-com.svg" alt="Features" className="h-5 w-5" />
                                 Features
-                            </h3>
-                            <div className="flex flex-col gap-2">
-                                {featureDefinitions.map((fd) => {
-                                    const values = possibleFeatureValues[fd.id] ?? [];
-                                    return (
-                                        <div key={`def-${fd.id}`} className="flex items-center gap-2">
-                                            <div className="w-1/3 text-sm font-medium">{fd.name}</div>
-                                            {values && values.length > 0 ? (
-                                                <div className="flex-1">
-                                                    <input
-                                                        list={`feature-values-${fd.id}`}
-                                                        placeholder={`Select ${fd.name}`}
-                                                        value={localSelectedFeatures[fd.id] ?? ""}
-                                                        onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                                                        className="w-full p-2 border rounded-lg border-(--div-border) text-sm"
-                                                    />
-                                                    <datalist id={`feature-values-${fd.id}`}>
-                                                        {values.map((v) => (
-                                                            <option key={v} value={v} />
-                                                        ))}
-                                                    </datalist>
-                                                </div>
-                                            ) : (
-                                                <input
-                                                    type="text"
-                                                    placeholder={`Value for ${fd.name}`}
+                                <img src="/arrowright.svg" alt="toggle" className={`w-4 h-4 ml-auto transition-transform ${showFeaturesSection ? 'rotate-90' : ''}`} />
+                            </button>
+                            {showFeaturesSection && (
+                                <div className="flex flex-col gap-3">
+                                    {featureDefinitions.map((fd) => {
+                                        const values = possibleFeatureValues[fd.id] ?? [];
+                                        return (
+                                            <div key={`def-${fd.id}`} className="flex items-center gap-3">
+                                                <label className="text-sm font-medium text-gray-700 w-1/3 flex-shrink-0">{fd.name}</label>
+                                                <select
                                                     value={localSelectedFeatures[fd.id] ?? ""}
                                                     onChange={(e) => setLocalSelectedFeatures((prev) => ({ ...prev, [fd.id]: e.target.value }))}
-                                                    className="flex-1 p-2 border rounded-lg border-(--div-border) text-sm"
-                                                />
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                                    className="flex-1 p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
+                                                >
+                                                    <option value="">Select {fd.name}</option>
+                                                    {values.map((v) => (
+                                                        <option key={v} value={v}>
+                                                            {v}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
                         </div>
                     )}
 
                     {/* Location Section */}
                     <div className="mb-8">
-                        <div 
-                            onClick={() => setLocationSectionOpen(!locationSectionOpen)}
-                            className="cursor-pointer"
-                        >
-                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 hover:opacity-80">
-                                <img src="/location.svg" alt="Location" className="w-5 h-5" />
-                                <span className="flex-1">Location</span>
-                                <span className="text-sm font-normal text-gray-600">
-                                    {locationSectionOpen ? 
-                                        <img src="/arrowright.svg" alt="v" className="w-4 h-4 rotate-90" /> 
-                                        : <img src="/arrowright.svg" alt=">" className="w-4 h-4" />
+                        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <img src="/location.svg" alt="Location" className="w-5 h-5" />
+                            Location
+                        </h3>
+                        <button
+                            onClick={() => {
+                                // If already have selections, go directly to that region's places
+                                if (localSelectedLocationIds.length > 0) {
+                                    const currentRegion = Object.keys(regionsData).find(r => 
+                                        (regionsData[r] || []).some(loc => localSelectedLocationIds.includes(loc))
+                                    );
+                                    if (currentRegion) {
+                                        setSelectedRegion(currentRegion);
                                     }
-                                </span>
-                            </h3>
-                        </div>
-
-                        {locationSectionOpen ? (
-                            <>
-                                <select
-                                    value={selectedRegion || ""}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        setSelectedRegion(val || null);
-                                        if (!val) {
-                                            setLocalSelectedLocationIds([]);
+                                } else {
+                                    // Otherwise ask for region first
+                                    setShowRegionSelector(true);
+                                }
+                            }}
+                            className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base text-left flex items-center justify-between bg-white hover:bg-gray-50"
+                        >
+                            <span>
+                                {localSelectedLocationIds.length > 0 ? (
+                                    (() => {
+                                        const selectedRegion = Object.keys(regionsData).find(r => (regionsData[r] || []).some(loc => localSelectedLocationIds.includes(loc)));
+                                        const regionLocations = selectedRegion ? (regionsData[selectedRegion] || []) : [];
+                                        const allSelected = regionLocations.length > 0 && regionLocations.every(loc => localSelectedLocationIds.includes(loc));
+                                        
+                                        if (allSelected) {
+                                            return selectedRegion;
+                                        } else if (localSelectedLocationIds.length === 1) {
+                                            return `${localSelectedLocationIds[0]}, ${selectedRegion}`;
+                                        } else {
+                                            return `${localSelectedLocationIds.length} places selected in ${selectedRegion}`;
                                         }
-                                    }}
-                                    className="w-full p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base mb-3"
-                                >
-                                    <option value="">Select a Region</option>
-                                    {Object.keys(regionsData).map((region) => (
-                                        <option key={region} value={region}>
-                                            {region}
-                                        </option>
-                                    ))}
-                                </select>
+                                    })()
+                                ) : (
+                                    "Select a Region"
+                                )}
+                            </span>
+                            <img src="/arrowright.svg" alt=">" className="w-4 h-4 rotate-90" />
+                        </button>
 
-                                {selectedRegion && (
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-gray-700 mb-2">Select Locations in {selectedRegion}</h4>
-                                        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
-                                            {/* All locations option */}
-                                            <button
-                                                onClick={() => {
-                                                    const regionLocations = regionsData[selectedRegion] || [];
-                                                    const allSelected = regionLocations.every(loc => localSelectedLocationIds.includes(loc));
-                                                    if (allSelected) {
-                                                        setLocalSelectedLocationIds([]);
-                                                    } else {
-                                                        setLocalSelectedLocationIds([...new Set([...localSelectedLocationIds, ...regionLocations])]);
-                                                    }
-                                                }}
-                                                className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
-                                                    (regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))
-                                                        ? "bg-(--dark-def) text-white"
-                                                        : "bg-white hover:bg-gray-100"
-                                                }`}
-                                            >
-                                                <input
-                                                    type="checkbox"
-                                                    checked={(regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))}
-                                                    onChange={() => {}}
-                                                    className="cursor-pointer"
-                                                />
-                                                <span className="font-semibold">All locations in {selectedRegion}</span>
-                                            </button>
-                                            {/* Individual locations */}
-                                            {(regionsData[selectedRegion] || []).map((location) => (
+                        {/* Region Selector Modal */}
+                        {showRegionSelector && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'transparent' }}>
+                                <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
+                                    {/* Header */}
+                                    <div className="p-4 border-b border-gray-200">
+                                        <h4 className="font-semibold text-gray-900">Select a Region</h4>
+                                    </div>
+
+                                    {/* Regions list */}
+                                    <div className="flex-1 overflow-y-auto p-4">
+                                        <div className="flex flex-col gap-2">
+                                            {Object.keys(regionsData).map((region) => (
                                                 <button
-                                                    key={location}
+                                                    key={region}
                                                     onClick={() => {
-                                                        setLocalSelectedLocationIds(
-                                                            localSelectedLocationIds.includes(location)
-                                                                ? localSelectedLocationIds.filter(id => id !== location)
-                                                                : [...localSelectedLocationIds, location]
+                                                        // Mark that user is switching regions, but don't clear selections yet
+                                                        const currentRegion = Object.keys(regionsData).find(r => 
+                                                            (regionsData[r] || []).some(loc => localSelectedLocationIds.includes(loc))
                                                         );
+                                                        if (currentRegion && currentRegion !== region && localSelectedLocationIds.length > 0) {
+                                                            setPendingRegionSwitch(currentRegion);
+                                                        }
+                                                        setSelectedRegion(region);
+                                                        setShowRegionSelector(false);
                                                     }}
-                                                    className={`w-full text-left px-3 py-2 rounded transition flex items-center gap-2 ${
-                                                        localSelectedLocationIds.includes(location)
-                                                            ? "bg-(--dark-def) text-white"
-                                                            : "bg-white hover:bg-gray-100"
-                                                    }`}
+                                                    className="text-left p-3 hover:bg-gray-100 rounded text-sm"
                                                 >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={localSelectedLocationIds.includes(location)}
-                                                        onChange={() => {}}
-                                                        className="cursor-pointer"
-                                                    />
-                                                    {location}
+                                                    {region}
                                                 </button>
                                             ))}
                                         </div>
-                                        <div className="mt-3 flex gap-2 justify-end">
-                                            <button
-                                                onClick={() => {
-                                                    if (localSelectedLocationIds.length === 0) {
-                                                        const regionLocations = regionsData[selectedRegion] || [];
-                                                        setLocalSelectedLocationIds(regionLocations);
-                                                    }
-                                                    setLocationSectionOpen(false);
-                                                }}
-                                                className="py-2 px-6 bg-(--dark-def) text-white rounded-lg font-medium hover:opacity-90 w-fit transition text-base"
-                                            >
-                                                Done
-                                            </button>
+                                    </div>
+
+                                    {/* Close button */}
+                                    <div className="p-4 border-t border-gray-200">
+                                        <button
+                                            onClick={() => setShowRegionSelector(false)}
+                                            className="w-full py-2 px-6 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition text-base"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Location Selection Modal */}
+                        {selectedRegion && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'transparent' }}>
+                                <div className="bg-white rounded-lg w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col shadow-lg">
+                                    {/* Header with back button */}
+                                    <div className="p-4 border-b border-gray-200 flex items-center gap-3">
+                                        <button
+                                            onClick={() => {
+                                                // Going back without selecting - don't clear anything
+                                                setSelectedRegion(null);
+                                                setLocationSearch("");
+                                                setPendingRegionSwitch(null);
+                                                setShowRegionSelector(true);
+                                            }}
+                                            className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium"
+                                        >
+                                            <img src="/arrowright.svg" alt="<" className="w-4 h-4 rotate-180" />
+                                            {selectedRegion}
+                                        </button>
+                                    </div>
+
+                                    {/* Search bar */}
+                                    <div className="p-4 border-b border-gray-200">
+                                        <input
+                                            type="text"
+                                            placeholder="Search locations..."
+                                            value={locationSearch}
+                                            onChange={(e) => {
+                                                setLocationSearch(e.target.value);
+                                                // If user is switching regions and starts interacting, clear old selections
+                                                if (pendingRegionSwitch && pendingRegionSwitch !== selectedRegion) {
+                                                    setLocalSelectedLocationIds([]);
+                                                    setPendingRegionSwitch(null);
+                                                }
+                                            }}
+                                            className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                                        />
+                                    </div>
+
+                                    {/* Locations list */}
+                                    <div className="flex-1 overflow-y-auto p-4">
+                                        <div className="flex flex-col gap-2">
+                                            {/* All locations option */}
+                                            <label className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={(regionsData[selectedRegion] || []).length > 0 && (regionsData[selectedRegion] || []).every(loc => localSelectedLocationIds.includes(loc))}
+                                                    onChange={() => {
+                                                        // If switching regions and user starts selecting, clear old selections
+                                                        if (pendingRegionSwitch && pendingRegionSwitch !== selectedRegion) {
+                                                            const regionLocations = regionsData[selectedRegion] || [];
+                                                            setLocalSelectedLocationIds(regionLocations);
+                                                            setPendingRegionSwitch(null);
+                                                        } else {
+                                                            // Normal toggle within same region
+                                                            const regionLocations = regionsData[selectedRegion] || [];
+                                                            const allSelected = regionLocations.every(loc => localSelectedLocationIds.includes(loc));
+                                                            if (allSelected) {
+                                                                setLocalSelectedLocationIds([]);
+                                                            } else {
+                                                                setLocalSelectedLocationIds(regionLocations);
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="cursor-pointer"
+                                                />
+                                                <span className="font-semibold text-sm">All locations</span>
+                                            </label>
+                                            {/* Individual locations filtered by search */}
+                                            {(regionsData[selectedRegion] || [])
+                                                .sort()
+                                                .filter((location) => 
+                                                    location.toLowerCase().includes(locationSearch.toLowerCase())
+                                                )
+                                                .map((location) => {
+                                                    return (
+                                                        <label key={location} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={localSelectedLocationIds.includes(location)}
+                                                                onChange={() => {
+                                                                    // If switching regions and user starts selecting, clear old selections
+                                                                    if (pendingRegionSwitch && pendingRegionSwitch !== selectedRegion) {
+                                                                        setLocalSelectedLocationIds([location]);
+                                                                        setPendingRegionSwitch(null);
+                                                                    } else {
+                                                                        // Normal toggle within same region
+                                                                        setLocalSelectedLocationIds(
+                                                                            localSelectedLocationIds.includes(location)
+                                                                                ? localSelectedLocationIds.filter(id => id !== location)
+                                                                                : [...localSelectedLocationIds, location]
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                className="cursor-pointer"
+                                                            />
+                                                            <span className="text-sm">{location}</span>
+                                                        </label>
+                                                    );
+                                                })}
                                         </div>
                                     </div>
-                                )}
-                            </>
-                        ) : (
-                            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm">
-                                {localSelectedLocationIds.length > 0 && selectedRegion ? (
-                                    <span className="text-gray-700">
-                                        <span className="font-semibold">{localSelectedLocationIds.length}</span> location{localSelectedLocationIds.length !== 1 ? 's' : ''} in <span className="font-semibold">{selectedRegion}</span> selected
-                                    </span>
-                                ) : (
-                                    <span className="text-gray-500 italic">No locations selected</span>
-                                )}
+
+                                    {/* Done button */}
+                                    <div className="p-4 border-t border-gray-200">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedRegion(null);
+                                                setLocationSearch("");
+                                                setPendingRegionSwitch(null);
+                                            }}
+                                            className="w-full py-2 px-6 bg-(--dark-def) text-white rounded-lg font-medium hover:opacity-90 transition text-base"
+                                        >
+                                            Done
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -600,69 +770,36 @@ const ShowFilter = ({
                         <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                             <img src="/filter-svgrepo.svg" alt="Price Filter" className="w-5 h-5" />
                             Filter by Price
-                        </h3><div className="space-y-3">
-                            {[
-                                { value: "none" as const, label: "No Filter" },
-                                { value: "below" as const, label: "Below a certain price" },
-                                { value: "above" as const, label: "Above a certain price" },
-                                { value: "between" as const, label: "Between two prices" },
-                            ].map((option) => (
-                                <label key={option.value} className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="price-filter"
-                                        checked={localPriceMode === option.value}
-                                        onChange={() => setLocalPriceMode(option.value)}
-                                        className="w-4 h-4 focus:ring-(--dark-def)"
-                                    />
-                                    <span className="text-sm sm:text-base">{option.label}</span>
-                                </label>
-                            ))}
-                        </div>
-
-                        {/* Price input fields */}
-                        {localPriceMode === "below" && (
-                            <div className="mt-3">
+                        </h3>
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 relative">
+                                {localPriceMin && (
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-lg font-medium pointer-events-none">₵</span>
+                                )}
                                 <input
                                     type="number"
-                                    placeholder="Max price"
-                                    value={localPriceBelow}
-                                    onChange={(e) => setLocalPriceBelow(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                                />
-                            </div>
-                        )}
-
-                        {localPriceMode === "above" && (
-                            <div className="mt-3">
-                                <input
-                                    type="number"
-                                    placeholder="Min price"
-                                    value={localPriceAbove}
-                                    onChange={(e) => setLocalPriceAbove(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                                />
-                            </div>
-                        )}
-
-                        {localPriceMode === "between" && (
-                            <div className="mt-3 space-y-2">
-                                <input
-                                    type="number"
-                                    placeholder="Min price"
+                                    placeholder="Min"
                                     value={localPriceMin}
                                     onChange={(e) => setLocalPriceMin(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="Max price"
-                                    value={localPriceMax}
-                                    onChange={(e) => setLocalPriceMax(e.target.value)}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                                    className="w-full p-3 sm:p-4 border border-(--div-border) rounded-lg text-base sm:text-lg"
+                                    style={{ paddingLeft: localPriceMin ? '1.75rem' : '1rem' }}
                                 />
                             </div>
-                        )}
+                            <span className="text-gray-400 text-2xl">-</span>
+                            <div className="flex-1 relative">
+                                {localPriceMax && (
+                                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 text-lg font-medium pointer-events-none">₵</span>
+                                )}
+                                <input
+                                    type="number"
+                                    placeholder="Max"
+                                    value={localPriceMax}
+                                    onChange={(e) => setLocalPriceMax(e.target.value)}
+                                    className="w-full p-3 sm:p-4 border border-(--div-border) rounded-lg text-base sm:text-lg"
+                                    style={{ paddingLeft: localPriceMax ? '1.75rem' : '1rem' }}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Action buttons */}
