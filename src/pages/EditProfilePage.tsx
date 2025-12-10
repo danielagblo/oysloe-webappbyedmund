@@ -516,14 +516,7 @@ const EditProfilePage = () => {
 
               {setupProgress === 100 ? (
                 <>
-                  <label>Business Name</label>
-                  <input
-                    name="businessName"
-                    readOnly={isReadonly}
-                    value={selectedUser?.businessName ?? ""}
-                    onChange={handleInputChange}
-                    className="focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50 w-full p-2 rounded border border-gray-200 mb-3 text-sm"
-                  />
+
                 </>
               ) : (
                 <div className="py-3 text-sm text-gray-600">
