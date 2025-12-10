@@ -33,10 +33,10 @@ export default function useLocationSelection(
         return parsed.map((s: string) => ({ label: s, region: "", place: s }));
       }
 
-      return parsed.map((p: any) => ({
+      return parsed.map((p: Record<string, unknown>) => ({
         label: typeof p.label === "string" ? p.label : String(p),
         region: typeof p.region === "string" ? p.region : "",
-        place: typeof p.place === "string" ? p.place : (p.label ?? ""),
+        place: typeof p.place === "string" ? p.place : String(p.label ?? ""),
       }));
     } catch {
       return [];
@@ -189,24 +189,25 @@ export default function useLocationSelection(
   const grouped = useMemo(() => groupedLocations || {}, [groupedLocations]);
 
   return useMemo(
-    () => ({
-      // data
-      regionLabel,
-      locationDetails,
-      savedLocations,
-      showSaveLocationModal,
-      newLocationName,
-      grouped,
+    () =>
+      ({
+        // data
+        regionLabel,
+        locationDetails,
+        savedLocations,
+        showSaveLocationModal,
+        newLocationName,
+        grouped,
 
-      // setters / actions
-      setNewLocationName,
-      selectPlace,
-      applySavedLocation,
-      saveCurrentLocation,
-      removeSavedLocation,
-      setShowSaveLocationModal,
-      reset,
-    }),
+        // setters / actions
+        setNewLocationName,
+        selectPlace,
+        applySavedLocation,
+        saveCurrentLocation,
+        removeSavedLocation,
+        setShowSaveLocationModal,
+        reset,
+      }) as const,
     [
       regionLabel,
       locationDetails,
@@ -220,5 +221,5 @@ export default function useLocationSelection(
       removeSavedLocation,
       reset,
     ],
-  ) as const;
+  );
 }
