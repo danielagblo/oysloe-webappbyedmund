@@ -23,19 +23,16 @@ const SelectACategory = ({ categories, onCategoryClick, categoriesLoading, categ
                         <div
                             key={i}
                             className="
-                  flex flex-col items-center justify-center
-                  w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
-                  bg-gray-200 rounded-lg 
-                  p-0 sm:p-3 cursor-progress animate-pulse
-                  max-sm:w-[20vw] max-sm:h-[20vw]
-                  max-sm:min-w-[75px] max-sm:min-h-[75px]
-                "
+                                flex flex-col items-center justify-center
+                                w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
+                                bg-(--div-active) rounded-lg 
+                                p-0 sm:p-3 cursor-progress animate-pulse
+                                max-sm:w-[20vw] max-sm:h-[20vw]
+                                max-sm:min-w-[75px] max-sm:min-h-[75px]
+                                "
                         >
-                            <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
-                                <div className="h-[45px] w-[45px] sm:h-20 sm:w-20 rounded-full bg-white" />
-
-                            </div>
-                            <h3 className="mt-2 truncate bg-gray-300 rounded-full w-3/5 text-left h-2.5" />
+                            <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-gray-200" />
+                            <div className="mt-2 h-3 w-3/5 bg-gray-300 rounded-full" />
                         </div>
                     ))}
                 </div>
@@ -50,13 +47,13 @@ const SelectACategory = ({ categories, onCategoryClick, categoriesLoading, categ
             <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
                 <div
                     className="
-              grid 
-              grid-cols-5 
-              gap-2 sm:gap-4 
-              place-items-center
-              justify-items-center
-              max-w-full
-          "
+                        grid 
+                        grid-cols-5 
+                        gap-2 sm:gap-4 
+                        place-items-center
+                        justify-items-center
+                        max-w-full
+                    "
                     style={{
                         gridAutoRows: "1fr",
                     }}
@@ -77,12 +74,12 @@ const SelectACategory = ({ categories, onCategoryClick, categoriesLoading, categ
                             key={ix}
                             onClick={() => toast("Data is currently unavailable for " + category)}
                             className="
-                      flex flex-col items-center justify-center
-                      w-[12vw] h-[12vw] min-h-[75px] min-w-[75px] 
-                      bg-(--div-active) rounded-lg 
-                      p-2 sm:p-3 cursor-pointer 
-                      hover:bg-gray-300
-                  "
+                                flex flex-col items-center justify-center
+                                w-[12vw] h-[12vw] min-h-[75px] min-w-[75px] 
+                                bg-(--div-active) rounded-lg 
+                                p-2 sm:p-3 cursor-pointer 
+                                hover:bg-gray-300
+                            "
                         >
                             <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
                                 <img
@@ -104,16 +101,16 @@ const SelectACategory = ({ categories, onCategoryClick, categoriesLoading, categ
         <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
             <div
                 className="
-            grid 
-            grid-cols-5 
-            gap-2 sm:gap-4 
-            place-items-center
-            justify-items-center
-            max-w-full w-full sm:max-w-4/5
+                    grid 
+                    grid-cols-5 
+                    gap-2 sm:gap-4 
+                    place-items-center
+                    justify-items-center
+                    max-w-full w-full sm:max-w-4/5
 
-            max-sm:flex max-sm:flex-wrap max-sm:w-screen
-            max-sm:items-center max-sm:justify-center
-        "
+                    max-sm:flex max-sm:flex-wrap max-sm:w-screen
+                    max-sm:items-center max-sm:justify-center
+                "
                 style={{
                     gridAutoRows: "1fr",
                 }}
@@ -129,15 +126,15 @@ const SelectACategory = ({ categories, onCategoryClick, categoriesLoading, categ
                             onCategoryClick(category.name)
                         }}
                         className="
-                  flex flex-col items-center justify-center
-                  w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
-                  bg-(--div-active) rounded-lg 
-                  p-0 sm:p-3 cursor-pointer 
-                  hover:bg-gray-300
+                            flex flex-col items-center justify-center
+                            w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
+                            bg-(--div-active) rounded-lg 
+                            p-0 sm:p-3 cursor-pointer 
+                            hover:bg-gray-300
 
-                  max-sm:w-[20vw] max-sm:h-[20vw]
-                  max-sm:min-w-[75px] max-sm:min-h-[75px]
-              "
+                            max-sm:w-[20vw] max-sm:h-[20vw]
+                            max-sm:min-w-[75px] max-sm:min-h-[75px]
+                        "
                     >
                         <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
                             <img
