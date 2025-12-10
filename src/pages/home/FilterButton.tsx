@@ -75,14 +75,14 @@ const FilterButton = ({
         <>
             {/* Mobile Filter Button */}
             <button onClick={handleMobileFilterClick} className={`${className} sm:hidden`}>
-                <div className={`bg-gray-100 w-30 h-12 rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
+                <div className={`bg-gray-100 w-25 h-12 rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}>
                     {activeFiltersCount > 0 && (
                         <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                             {activeFiltersCount}
                         </div>
                     )}
+                    <p className="text-base">Filter</p>
                     <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7" />
-                    <p className="text-sm">Filter</p>
                 </div>
             </button>
 
@@ -94,8 +94,8 @@ const FilterButton = ({
                             {activeFiltersCount}
                         </div>
                     )}
-                    <img src="/filter-svgrepo.svg" alt="Filter" className="w-[2.1vw] h-[2.1vw]" />
                     <p className="text-[1.25vw]">Filter</p>
+                    <img src="/filter-svgrepo.svg" alt="Filter" className="w-[2.1vw] h-[2.1vw]" />
                 </div>
             </button>
 
