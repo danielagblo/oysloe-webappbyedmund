@@ -23,7 +23,7 @@ export function formatCount(n: number | string | null | undefined): string {
     { value: 1e3, suffix: "K" },
   ];
 
-  for (let u of units) {
+  for (const u of units) {
     if (n >= u.value) {
       let formatted = (n / u.value).toFixed(1);
       formatted = formatted.replace(/\.0$/, "");

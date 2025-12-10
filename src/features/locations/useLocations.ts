@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import * as locationService from "../../services/locationService";
 import type { Location } from "../../types/Location";
 
@@ -13,11 +14,14 @@ export default function useLocations() {
   });
 
   // group by region => array of place names
-  const grouped: Record<string, string[]> = {};
-  (q.data ?? []).forEach((loc) => {
-    if (!grouped[loc.region]) grouped[loc.region] = [];
-    grouped[loc.region].push(loc.name);
-  });
+  const grouped = useMemo(() => {
+    const g: Record<string, string[]> = {};
+    (q.data ?? []).forEach((loc) => {
+      if (!g[loc.region]) g[loc.region] = [];
+      g[loc.region].push(loc.name);
+    });
+    return g;
+  }, [q.data]);
 
   return {
     locations: q.data ?? [],
