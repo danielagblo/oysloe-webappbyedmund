@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export type SavedLocation = { label: string; region: string; place: string };
 export type LocationDetails = { region: string; place: string } | null;
@@ -136,39 +136,30 @@ export default function useLocationSelection(
   };
 
   // user clicked a place from dropdown or typed a place we resolved:
-  const selectPlace = (opt: string) => {
+  const selectPlace = useCallback((opt: string) => {
     const parsed = parseOptionString(opt);
     // UI label shows place (and region for clarity)
-    const label = parsed.region
-      ? `${parsed.place}, ${parsed.region}`
-      : parsed.place;
+    const label = parsed.region ? `${parsed.place}, ${parsed.region}` : parsed.place;
     setRegionLabel(label || null);
     setLocationDetails({ region: parsed.region, place: parsed.place });
     setShowSaveLocationModal(true);
-  };
+  }, [groupedLocations]);
 
   // apply a saved location to the form (user clicked a saved shortcut)
-  const applySavedLocation = (loc: SavedLocation) => {
+  const applySavedLocation = useCallback((loc: SavedLocation) => {
     const label = loc.region ? `${loc.place}, ${loc.region}` : loc.place;
     setRegionLabel(label || null);
     setLocationDetails({ region: loc.region, place: loc.place });
-  };
+  }, []);
 
   // Save current selected place into savedLocations (called when user confirms the modal)
-  const saveCurrentLocation = () => {
+  const saveCurrentLocation = useCallback(() => {
     if (!locationDetails) return false;
 
-    const label =
-      newLocationName.trim() !== ""
-        ? newLocationName.trim()
-        : locationDetails.place;
+    const label = newLocationName.trim() !== "" ? newLocationName.trim() : locationDetails.place;
     setSavedLocations((prev) => {
       if (
-        prev.some(
-          (p) =>
-            p.place === locationDetails.place &&
-            p.region === locationDetails.region,
-        )
+        prev.some((p) => p.place === locationDetails.place && p.region === locationDetails.region)
       )
         return prev;
       return [
@@ -181,38 +172,53 @@ export default function useLocationSelection(
     setNewLocationName("");
     setShowSaveLocationModal(false);
     return true;
-  };
+  }, [locationDetails, newLocationName]);
 
-  const removeSavedLocation = (index: number) => {
+  const removeSavedLocation = useCallback((index: number) => {
     setSavedLocations((prev) => prev.filter((_, i) => i !== index));
-  };
+  }, []);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setRegionLabel(null);
     setLocationDetails(null);
     setShowSaveLocationModal(false);
     setNewLocationName("");
-  };
+  }, []);
 
   // expose groupedLocations as memo so callers can show options easily
   const grouped = useMemo(() => groupedLocations || {}, [groupedLocations]);
 
-  return {
-    // data
-    regionLabel,
-    locationDetails,
-    savedLocations,
-    showSaveLocationModal,
-    newLocationName,
-    grouped,
+  return useMemo(
+    () => ({
+      // data
+      regionLabel,
+      locationDetails,
+      savedLocations,
+      showSaveLocationModal,
+      newLocationName,
+      grouped,
 
-    // setters / actions
-    setNewLocationName,
-    selectPlace,
-    applySavedLocation,
-    saveCurrentLocation,
-    removeSavedLocation,
-    setShowSaveLocationModal,
-    reset,
-  } as const;
+      // setters / actions
+      setNewLocationName,
+      selectPlace,
+      applySavedLocation,
+      saveCurrentLocation,
+      removeSavedLocation,
+      setShowSaveLocationModal,
+      reset,
+    }),
+    [
+      regionLabel,
+      locationDetails,
+      savedLocations,
+      showSaveLocationModal,
+      newLocationName,
+      grouped,
+      selectPlace,
+      applySavedLocation,
+      saveCurrentLocation,
+      removeSavedLocation,
+      reset,
+    ],
+  ) as const;
 }

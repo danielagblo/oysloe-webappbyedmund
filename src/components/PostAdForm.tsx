@@ -740,10 +740,10 @@ export default function PostAdForm({
     } catch (e) {
       void e;
     }
-  // Intentionally omit `subcategoryId` to avoid retrigger loops from prefill logic.
-  // We include `setShowSaveLocationModal` so we can safely close the save modal
-  // when pre-filling a string location without showing the modal to the user.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Intentionally omit `subcategoryId` to avoid retrigger loops from prefill logic.
+    // We include `setShowSaveLocationModal` so we can safely close the save modal
+    // when pre-filling a string location without showing the modal to the user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingProduct, fetchedCategories, applySavedLocation, groupedLocations, selectPlace, subcategories, setShowSaveLocationModal]);
 
   // Infer subcategory from feature definitions (run once when defs appear and
@@ -1065,6 +1065,8 @@ export default function PostAdForm({
               : purpose === "Rent"
                 ? "RENT"
                 : "PAY LATER",
+          // Include location/location_id from the resolved location
+          ...locationResolution,
         };
 
         // Check if we have actual File objects to upload
