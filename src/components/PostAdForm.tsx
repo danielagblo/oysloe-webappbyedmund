@@ -23,6 +23,35 @@ import {
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup from "./DropDownPopup";
 
+// Module-level cache to persist possible-values requests across component
+// mounts. This prevents duplicate network calls when React StrictMode mounts
+// components twice during development or when the component unmounts/remounts.
+const possibleValuesGlobalCache = new Map<number, string[] | Promise<string[]>>();
+
+async function fetchPossibleValuesDedup(featureId: number) {
+  const cache = possibleValuesGlobalCache;
+  if (cache.has(featureId)) {
+    const v = cache.get(featureId)!;
+    if (v instanceof Promise) return v;
+    return Promise.resolve(v as string[]);
+  }
+
+  const p = (async () => {
+    try {
+      const raw = await getPossibleFeatureValues({ feature: featureId });
+      const normalized = normalizePossibleFeatureValues(raw, featureId);
+      cache.set(featureId, normalized);
+      return normalized;
+    } catch (e) {
+      cache.delete(featureId);
+      throw e;
+    }
+  })();
+
+  cache.set(featureId, p);
+  return p;
+}
+
 interface UploadedImage {
   id: number;
   url: string;
@@ -41,6 +70,8 @@ export default function PostAdForm({
   onClose,
   embedded = false,
 }: PostAdFormProps) {
+
+
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileStep, setMobileStep] = useState("images");
 
@@ -195,7 +226,7 @@ export default function PostAdForm({
         }
 
         const perFeaturePromises = (featureDefinitions || []).map((fd) =>
-          getPossibleFeatureValues({ feature: fd.id })
+          fetchPossibleValuesDedup(fd.id)
             .then((res) => ({ fid: fd.id, res }))
             .catch((err) => {
               if (import.meta.env.DEV)
@@ -304,7 +335,7 @@ export default function PostAdForm({
 
       const responses = await Promise.all(
         toFetch.map((fid) =>
-          getPossibleFeatureValues({ feature: fid })
+          fetchPossibleValuesDedup(fid)
             .then((res) => ({ fid, res }))
             .catch((err) => {
               if (import.meta.env.DEV)
@@ -405,9 +436,9 @@ export default function PostAdForm({
 
     try {
       setTitle(existingProduct.name ?? "");
-        setDescription(
-          (existingProduct as any).description ?? (existingProduct as any).desc ?? "",
-        );
+      setDescription(
+        (existingProduct as any).description ?? (existingProduct as any).desc ?? "",
+      );
       setPrice(
         typeof existingProduct.price === "number"
           ? existingProduct.price
@@ -659,7 +690,35 @@ export default function PostAdForm({
         if (loc) {
           if (typeof loc === "string") {
             // try to parse "Place, Region" or "Region - Place"
-            selectPlace(String(loc));
+            // Instead of calling `selectPlace` (which opens the save modal),
+            // parse the string and apply it directly with `applySavedLocation`
+            // to avoid blocking inputs during prefill.
+            const raw = String(loc || "").trim();
+            let place = raw;
+            let region = "";
+            if (raw.includes(",")) {
+              const parts = raw.split(",").map((s) => s.trim());
+              if (parts.length >= 2) {
+                place = parts[0];
+                region = parts.slice(1).join(", ");
+              }
+            } else if (raw.includes(" - ")) {
+              const parts = raw.split(" - ").map((s) => s.trim());
+              if (parts.length >= 2) {
+                // assume either "Place - Region" or "Region - Place";
+                // prefer treating first as place
+                place = parts[0];
+                region = parts.slice(1).join(" - ");
+              }
+            }
+
+            if (place) {
+              applySavedLocation({
+                label: region ? `${place}, ${region}` : place,
+                region,
+                place,
+              });
+            }
           } else if (typeof loc === "object") {
             const place = String(
               loc.name || loc.place || loc.title || "",
@@ -681,7 +740,84 @@ export default function PostAdForm({
     } catch (e) {
       void e;
     }
-  }, [existingProduct, fetchedCategories, applySavedLocation, groupedLocations, selectPlace, subcategories, subcategoryId]);
+  // Intentionally omit `subcategoryId` to avoid retrigger loops from prefill logic.
+  // We include `setShowSaveLocationModal` so we can safely close the save modal
+  // when pre-filling a string location without showing the modal to the user.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [existingProduct, fetchedCategories, applySavedLocation, groupedLocations, selectPlace, subcategories, setShowSaveLocationModal]);
+
+  // Infer subcategory from feature definitions (run once when defs appear and
+  // no subcategory is set). This is split out from the large prefill effect to
+  // avoid retriggering the prefill logic when we set `subcategoryId` here —
+  // setting that state previously caused the parent effect to re-run and
+  // produced repeated network requests for possible feature values.
+  const inferredSubcategoryRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (inferredSubcategoryRef.current) return;
+    if (!existingProduct) return;
+    if (subcategoryId !== "" && subcategoryId != null) return;
+    // if we already have derived feature definitions from the product features,
+    // try to infer a subcategory by inspecting each feature's details.
+    (async () => {
+      try {
+        const pfs = Array.isArray((existingProduct as any).product_features)
+          ? (existingProduct as any).product_features
+          : [];
+        const defs = pfs
+          .map((pf: any) => {
+            const f = pf && pf.feature ? pf.feature : null;
+            if (!f) return null;
+            const id = Number(f.id ?? f.feature_id ?? null);
+            if (isNaN(id)) return null;
+            return id;
+          })
+          .filter((d: any) => d !== null) as number[];
+
+        if (defs.length === 0) return;
+
+        const details = await Promise.allSettled(
+          defs.map((fid: number) => getFeature(fid)),
+        );
+
+        for (const r of details) {
+          if (r.status === "fulfilled") {
+            const feat = r.value as any;
+            const possibleSub =
+              feat?.subcategory ?? feat?.subcategory_id ?? feat?.sub_category ?? feat?.category ?? null;
+            let subId = null as number | null;
+            if (possibleSub != null) {
+              if (typeof possibleSub === "object" && possibleSub?.id)
+                subId = Number(possibleSub.id);
+              else if (!isNaN(Number(possibleSub))) subId = Number(possibleSub);
+            }
+            if (subId && !isNaN(subId)) {
+              setSubcategoryId(Number(subId));
+              try {
+                const sub = await getSubcategory(Number(subId));
+                const catRaw = (sub as any)?.category ?? (sub as any)?.category_id ?? null;
+                let catId = null as number | null;
+                if (catRaw != null) {
+                  if (typeof catRaw === "object" && catRaw?.id) catId = Number(catRaw.id);
+                  else if (!isNaN(Number(catRaw))) catId = Number(catRaw);
+                }
+                if (catId && !isNaN(catId)) {
+                  setCategoryId(Number(catId));
+                  const cat = fetchedCategories.find((c) => Number(c.id) === Number(catId));
+                  if (cat) setCategory(cat.name);
+                }
+              } catch {
+                void 0;
+              }
+              inferredSubcategoryRef.current = true;
+              break;
+            }
+          }
+        }
+      } catch {
+        void 0;
+      }
+    })();
+  }, [existingProduct, fetchedCategories, subcategoryId]);
 
   // Ensure subcategory is applied when subcategories for the selected category are available
   useEffect(() => {
@@ -1308,7 +1444,7 @@ export default function PostAdForm({
                       type="button"
                       className="flex items-center justify-center mt-4 border w-full border-gray-300 rounded-xl py-3 font-medium hover:bg-gray-100 transition"
                     >
-                      <img src="/arrowleft.svg" alt="<" />
+                      <img src="/arrowleft.svg" alt="<" loading="eager" />
                       <span>Back to Images</span>
                     </button>
                     <SaveBtn />
@@ -1444,7 +1580,7 @@ export default function PostAdForm({
           </div>
         )}
 
-        {showSuccess && (
+        {showSuccess && !embedded && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
               <div className="w-48 h-48 flex items-center justify-center">
@@ -1478,7 +1614,7 @@ export default function PostAdForm({
             </div>
           </div>
         )}
-        {showSaveModal && (
+        {showSaveModal && !embedded && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
               <h2 className="text-lg font-semibold text-[var(--dark-def)] mb-2">
