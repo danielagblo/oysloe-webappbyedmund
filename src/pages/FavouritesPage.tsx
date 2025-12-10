@@ -46,7 +46,7 @@ const FavouritesPage = () => {
           </div>
         </div>
 
-        <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row h-auto lg:flex-wrap gap-2">
+        <div className="w-full grid grid-cols-2 pt-20 md:pt-0 px-2 lg:px-0 lg:flex lg:flex-row max-lg:overflow-auto no-scrollbar max-lg:pb-20 h-auto lg:flex-wrap gap-2">
           {isLoading ? (
             <p className="text-center col-span-full h-full w-full flex justify-center items-center text-xl text-(--dark-def)">
               Loading favourites...
