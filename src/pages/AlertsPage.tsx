@@ -152,7 +152,7 @@ const AlertRow = ({
         }}
       >
         <img
-          src="/favicon.png"
+          src="/alien-svgrepo-com.png"
           alt="alert source"
           className="w-10 h-10 object-cover rounded-full shrink-0"
         />
