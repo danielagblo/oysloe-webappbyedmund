@@ -1576,7 +1576,7 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-between px-2 mb-6">
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
           <h4 className="text-xl md:text-[1.5vw]">
-            {currentAdData?.owner?.name ?? "Seller"}
+            {currentAdData?.owner?.business_name ?? "Seller"}
           </h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
@@ -1805,6 +1805,16 @@ const AdsDetailsPage = () => {
             onSubmit={submitReport}
           />
           <TitleAndPrice />
+
+          {/* Description (standalone, shown above Ad Details) */}
+          {currentAdData?.description && (
+            <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-2xl py-3 px-4 w-full">
+              <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Description</h2>
+              <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
+                {String(currentAdData.description)}
+              </p>
+            </div>
+          )}
 
           {/* MAIN CONTENT */}
           <div className="flex flex-col gap-4 w-full">

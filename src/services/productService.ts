@@ -374,7 +374,12 @@ export const createProductFromAd = async (metadata: any) => {
     type: mapType(metadata.purpose),
     status: "PENDING",
     is_taken: false,
-    description: `Posted via app on ${new Date(metadata.createdAt).toLocaleString()}`,
+    description:
+      typeof metadata.description === "string" && metadata.description.trim()
+        ? metadata.description.trim()
+        : typeof (metadata as any).desc === "string" && (metadata as any).desc.trim()
+        ? (metadata as any).desc.trim()
+        : `Posted via app on ${new Date(metadata.createdAt || Date.now()).toLocaleString()}`,
     price: price as unknown as string | number,
     duration:
       metadata.pricing?.monthly?.duration ??

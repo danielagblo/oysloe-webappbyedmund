@@ -62,6 +62,7 @@ export default function PostAdForm({
   const { categories: fetchedCategories = [], loading: categoriesLoading } =
     useCategories();
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [purpose, setPurpose] = useState<"Sale" | "Pay Later" | "Rent">("Sale");
   const [duration] = useState<string>("Duration (days)");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -404,6 +405,9 @@ export default function PostAdForm({
 
     try {
       setTitle(existingProduct.name ?? "");
+        setDescription(
+          (existingProduct as any).description ?? (existingProduct as any).desc ?? "",
+        );
       setPrice(
         typeof existingProduct.price === "number"
           ? existingProduct.price
@@ -848,6 +852,7 @@ export default function PostAdForm({
       // category: Number(categoryId ?? ""),
 
       title: title.trim(),
+      description: description.trim(),
       category: String(categoryId ?? ""),
       purpose,
       // If the user didn't pick a duration, send a safe default of "0"
@@ -914,6 +919,7 @@ export default function PostAdForm({
         // Patch existing product (partial update)
         const patchBody: Partial<any> = {
           name: metadata.title,
+          description: metadata.description,
           price: metadata.price ?? metadata.pricing?.monthly?.value ?? 0,
           category: Number(metadata.category) || undefined,
           duration: metadata.duration ?? undefined,
@@ -1035,6 +1041,7 @@ export default function PostAdForm({
 
   const resetForm = () => {
     setTitle("");
+    setDescription("");
     setCategory("Select Product Category");
     setCategoryId(null);
     setSubcategoryId("");
@@ -1283,6 +1290,15 @@ export default function PostAdForm({
                     </div>
                   </div>
                 )}
+                <div className="mt-4">
+                  <label className="block mb-1">Description</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe your product"
+                    className="w-full p-3 border rounded-xl border-[var(--div-border)] h-32 resize-none"
+                  />
+                </div>
               </div>
               {isMobile && (
                 <div className=" w-full flex items-center justify-center -ml-4 max-sm:ml-0">
