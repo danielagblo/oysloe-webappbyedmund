@@ -361,6 +361,9 @@ const AdsDetailsPage = () => {
   // Modal state for picture viewer
   const [isPictureModalOpen, setIsPictureModalOpen] = useState<boolean>(false);
   const [pictureModalIndex, setPictureModalIndex] = useState<number>(0);
+  // Seller image modal (open when clicking seller avatar/business logo)
+  const [isSellerModalOpen, setIsSellerModalOpen] = useState<boolean>(false);
+  const [sellerModalImage, setSellerModalImage] = useState<string | null>(null);
   // when modal closes, sync page gallery index
   useEffect(() => {
     if (!isPictureModalOpen) {
@@ -944,6 +947,35 @@ const AdsDetailsPage = () => {
     );
   };
 
+  const SellerImageModal = () => {
+    if (!isSellerModalOpen || !sellerModalImage) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        onClick={() => setIsSellerModalOpen(false)}
+      >
+        <div
+          className="relative max-w-3xl w-[95%] sm:w-[60%] bg-transparent p-4 max-h-[90vh] overflow-auto no-scrollbar flex flex-col items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1 z-30 hover:bg-black/60 transition"
+            onClick={() => setIsSellerModalOpen(false)}
+            aria-label="Close seller image"
+          >
+            ✕
+          </button>
+
+          <img
+            src={sellerModalImage}
+            alt="Seller"
+            className="max-h-[80vh] object-contain w-full rounded"
+          />
+        </div>
+      </div>
+    );
+  };
+
   // Report modal is rendered via the stable `ReportModal` component
   // (imported at top) to avoid remount/focus issues from parent rerenders.
 
@@ -1488,15 +1520,38 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={owner?.business_logo || owner?.avatar || "/userPfp2.jpg"}
+            src={owner?.avatar || owner?.business_logo || "/userPfp2.jpg"}
             alt={owner?.name || "Seller"}
-            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+              setIsSellerModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }
+            }}
+            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full cursor-pointer"
           />
-          {owner?.admin_verified && (
+          {/* show the business logo as the small overlay (if available) */}
+          {owner?.business_logo && (
             <img
-              src="/verified.svg"
-              alt="Verified"
-              className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw]"
+              src={owner?.business_logo}
+              alt={`${owner?.name || "Seller"} business logo`}
+              className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
+              onClick={() => {
+                setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+                  setIsSellerModalOpen(true);
+                }
+              }}
             />
           )}
         </div>
@@ -1616,19 +1671,34 @@ const AdsDetailsPage = () => {
       <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
         <div className="relative">
           <img
-            src={currentAdData?.owner?.business_logo || currentAdData?.owner?.avatar || "/userPfp2.jpg"}
-            alt=""
-            className="w-15 h-15 rounded-full"
+            src={currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg"}
+            alt={currentAdData?.owner?.name || "Seller"}
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+              setIsSellerModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }
+            }}
+            className="w-15 h-15 rounded-full cursor-pointer"
           />
-          {(currentAdData?.owner?.is_verified ||
-            currentAdData?.owner?.verified ||
-            currentAdData?.owner?.verified_at) && (
-              <img
-                src="/verified.svg"
-                alt="Verified"
-                className="absolute -bottom-1 -right-2 w-8 h-8"
-              />
-            )}
+          {/* show the business logo as the small overlay (if available) */}
+          {currentAdData?.owner?.business_logo && (
+            <img
+              src={currentAdData?.owner?.business_logo}
+              alt={`${currentAdData?.owner?.name || "Seller"} business logo`}
+              className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white cursor-pointer"
+              onClick={() => {
+                setSellerModalImage(currentAdData?.owner?.business_logo || currentAdData?.owner?.avatar || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }}
+            />
+          )}
         </div>
         <div>
           <h2 className="text-sm text-gray-500">
@@ -1722,6 +1792,7 @@ const AdsDetailsPage = () => {
           <DesktopHeader />
           <ImageGallery images={pageImages} currentIndex={galleryIndex} />
           <PictureModal />
+          <SellerImageModal />
           <ReportModal
             isOpen={isReportModalOpen}
             message={reportMessage}
