@@ -386,7 +386,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                         onClick={() => setCurrentPanel("subcategories")}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                       >
-                        <span className="text-sm text-gray-800 truncate max-w-[120px]">
+                        <span className="text-sm text-gray-800">
                           {selectedSubcategoryIds.length > 0 
                             ? `${selectedSubcategoryIds.length} selected` 
                             : "Select Subcategory"}
@@ -465,7 +465,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               {/* Timeframe Filter Section */}
               <div className="bg-white rounded-3xl p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-700">Posted</span>
+                  <span className="text-sm font-semibold text-gray-700">Timeframe</span>
                   <select
                     value={selectedTimeframe}
                     onChange={(e) => setSelectedTimeframe(e.target.value as "newest" | "7days" | "30days" | "anytime")}
