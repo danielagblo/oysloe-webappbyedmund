@@ -323,7 +323,7 @@ const ReferPage = () => {
           />
           <div>
             <h2 className="text-sm text-gray-400 md:text-[1.2vw]">They get</h2>
-            <h2 className="text-xs md:text-[1vw]">Discount coupon 10 points</h2>
+            <h2 className="text-xs md:text-[1vw]">Discount coupon 5 points</h2>
           </div>
         </div>
       </div>
