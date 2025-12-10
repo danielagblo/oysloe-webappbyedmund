@@ -182,6 +182,9 @@ export const endpoints = {
   redeem: {
     redeemPoints: () => "/redeem-points/",
   },
+  jobApplications: {
+    create: () => "/job-applications/",
+  },
   coupons: {
     list: (qs = "") => `/coupons/${qs}`,
     detail: (id: number) => `/coupons/${id}/`,
