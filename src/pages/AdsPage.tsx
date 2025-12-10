@@ -49,10 +49,9 @@ const AdsPage = () => {
                 key={status}
                 onClick={() => setActiveTab(status)}
                 className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors 
-                  ${
-                    activeTab === status
-                      ? "border-(--dark-def)"
-                      : "border-transparent hover:border-gray-300"
+                  ${activeTab === status
+                    ? "border-(--dark-def)"
+                    : "border-transparent hover:border-gray-300"
                   }`}
               >
                 <img
@@ -173,7 +172,7 @@ const AdsPage = () => {
               </div>
 
               {mapToLabel(selectedAd) === "Suspended" ||
-              mapToLabel(selectedAd) === "Other" ? (
+                mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
                     <button
@@ -231,19 +230,14 @@ const AdsPage = () => {
                       <p className=" text-xs text-gray-700 ">Note</p>
                     </div>
 
-                    <p className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
-                      Your ad does not meet our acceptable ad posting
-                      requirements. We kindly advise you to consider the use of
-                      words when submitting an ad. Review and submit again.
-                      Click{" "}
-                      <a
-                        href="https://www.oysloe.com/terms"
-                        className="text-blue-600 underline"
-                      >
-                        www.oysloe.com/terms
-                      </a>
-                      .
-                    </p>
+                    <div className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
+                      {selectedAd.suspension_note ? (
+                        <div className="mb-3">
+                          <p className="font-medium">Suspension note:</p>
+                          <p className="break-words">{selectedAd.suspension_note}</p>
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               ) : mapToLabel(selectedAd) === "Pending" ? (
@@ -352,8 +346,8 @@ const AdsPage = () => {
                             duration: selectedAd.duration ?? "",
                             category: Number(
                               selectedAd.category ??
-                                selectedAd.category_id ??
-                                0,
+                              selectedAd.category_id ??
+                              0,
                             ),
                           };
 

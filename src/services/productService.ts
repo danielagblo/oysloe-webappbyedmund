@@ -374,7 +374,12 @@ export const createProductFromAd = async (metadata: any) => {
     type: mapType(metadata.purpose),
     status: "PENDING",
     is_taken: false,
-    description: `Posted via app on ${new Date(metadata.createdAt).toLocaleString()}`,
+    description:
+      typeof metadata.description === "string" && metadata.description.trim()
+        ? metadata.description.trim()
+        : typeof (metadata as any).desc === "string" && (metadata as any).desc.trim()
+        ? (metadata as any).desc.trim()
+        : `Posted via app on ${new Date(metadata.createdAt || Date.now()).toLocaleString()}`,
     price: price as unknown as string | number,
     duration:
       metadata.pricing?.monthly?.duration ??
@@ -386,8 +391,13 @@ export const createProductFromAd = async (metadata: any) => {
     ...(metadata.subcategory
       ? { subcategory: Number(metadata.subcategory) }
       : {}),
-    // include simple location string from ad metadata when present
-    ...(metadata.location ? { location: metadata.location } : {}),
+    // Prefer `location_id` (integer) when provided by the ad metadata.
+    // Fall back to including the legacy `location` shape/string if present.
+    ...(metadata.location_id
+      ? { location_id: Number(metadata.location_id) }
+      : metadata.location
+      ? { location: metadata.location }
+      : {}),
   };
 
   // Helper: convert blob: URL to File by fetching it

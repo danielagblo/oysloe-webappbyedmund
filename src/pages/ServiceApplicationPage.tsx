@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProfileStats from "../components/ProfileStats";
-import MenuButton from "../components/MenuButton";
-import { useUserProfile } from "../features/userProfile/useUserProfile";
 import { toast } from "sonner";
+import MenuButton from "../components/MenuButton";
+import ProfileStats from "../components/ProfileStats";
+import { useUserProfile } from "../features/userProfile/useUserProfile";
+import { createJobApplication } from "../services/jobService";
 
 interface ApplicationFormData {
   name: string;
@@ -152,10 +153,35 @@ function ServiceApplicationPage() {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting application:", formData);
-    toast.success("Application submitted successfully!");
-    navigate("/");
+  const handleSubmit = async () => {
+    setIsSaving(true);
+    try {
+      // Build payload according to API schema
+      const payload: any = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        location: formData.location,
+        gender: formData.gender,
+        dob: formData.dateOfBirth,
+        cover_letter: formData.coverLetter,
+      };
+
+      if (formData.resume instanceof File) payload.resume = formData.resume;
+
+      await createJobApplication(payload);
+
+      toast.success("Application submitted successfully!");
+      // Clear saved draft on success
+      localStorage.removeItem("serviceApplicationDraft");
+      navigate("/");
+    } catch (err: any) {
+      console.error("Failed to submit application:", err);
+      const msg = err instanceof Error ? err.message : "Failed to submit application";
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const StepIndicator = () => (
@@ -166,13 +192,12 @@ function ServiceApplicationPage() {
           className="flex items-center gap-1 sm:gap-2 flex-1 sm:flex-none"
         >
           <div
-            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm ${
-              step === currentStep
+            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm ${step === currentStep
                 ? "bg-(--dark-def) text-white"
                 : step < currentStep
                   ? "bg-green-500 text-white"
                   : "bg-gray-300 text-gray-600"
-            }`}
+              }`}
           >
             {step < currentStep ? "✓" : step}
           </div>
@@ -216,9 +241,8 @@ function ServiceApplicationPage() {
             <button
               onClick={() => handleSaveDraft(false)}
               disabled={isSaving}
-              className={`px-3 sm:px-6 py-2 bg-(--dark-def) text-white rounded-lg text-xs sm:text-base font-medium transition-all whitespace-nowrap ${
-                isSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
-              }`}
+              className={`px-3 sm:px-6 py-2 bg-(--dark-def) text-white rounded-lg text-xs sm:text-base font-medium transition-all whitespace-nowrap ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+                }`}
             >
               {isSaving ? "Saving..." : "Save"}
             </button>
@@ -330,7 +354,6 @@ function ServiceApplicationPage() {
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
-                            <option value="other">Other</option>
                           </select>
                         </div>
                         <div>
@@ -580,9 +603,10 @@ function ServiceApplicationPage() {
                       </button>
                       <button
                         onClick={handleSubmit}
-                        className="px-6 sm:px-12 py-2.5 sm:py-3 bg-(--dark-def) text-white rounded-lg text-sm sm:text-base font-medium hover:opacity-90"
+                        disabled={isSaving}
+                        className={`px-6 sm:px-12 py-2.5 sm:py-3 bg-(--dark-def) text-white rounded-lg text-sm sm:text-base font-medium ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"}`}
                       >
-                        Submit
+                        {isSaving ? "Submitting..." : "Submit"}
                       </button>
                     </div>
                   </div>

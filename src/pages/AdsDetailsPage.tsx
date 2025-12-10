@@ -10,6 +10,7 @@ import ReportModal from "../components/ReportModal";
 import useWsChat from "../features/chat/useWsChat";
 import useFavourites from "../features/products/useFavourites";
 import {
+  productKeys,
   useMarkProductAsTaken,
   useOwnerProducts,
   useProduct,
@@ -42,19 +43,15 @@ const AdsDetailsPage = () => {
     error: adError,
   } = useProduct(numericId!);
   const { profile: currentUserProfile } = useUserProfile();
-  const { reviews: reviews = [] } = useReviews();
+  // Fetch reviews limited to this product so invalidations target
+  // the same query key used by the like mutation.
+  const { reviews: reviews = [] } = useReviews({ product: numericId ?? undefined });
   const { data: userSubscriptions = [] } = useUserSubscriptions();
+
+  const queryClient = useQueryClient();
 
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
-  const subscriptionMultiplierRaw =
-    activeUserSubscription?.subscription?.multiplier ?? null;
-  const multiplierLabel = (() => {
-    if (subscriptionMultiplierRaw == null) return null;
-    const n = Number(subscriptionMultiplierRaw);
-    if (!Number.isNaN(n)) return `x${n}`;
-    return String(subscriptionMultiplierRaw);
-  })();
 
   // chat hook (declare early before any conditional returns)
   const { sendMessage, addLocalMessage } = useWsChat();
@@ -76,9 +73,12 @@ const AdsDetailsPage = () => {
     setIsFavourited(Boolean(favFromProduct || favFromList));
   }, [currentAdDataFromQuery, favourites]);
 
-  const handleToggleFavourite = () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || null;
-    if (!pid) return;
+  const handleToggleFavourite = async () => {
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || null;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+
     // prevent duplicate rapid clicks while a mutation is in-flight
     if (toggleFavourite.status === "pending") {
       console.debug("handleToggleFavourite: mutation already in-flight", {
@@ -86,17 +86,44 @@ const AdsDetailsPage = () => {
       });
       return;
     }
+
     console.debug("handleToggleFavourite: toggling", { pid, at: Date.now() });
+    // optimistic UI
     setIsFavourited((s) => !s);
-    toggleFavourite.mutate(pid);
+
+    try {
+      if ((toggleFavourite as any).mutateAsync) {
+        await (toggleFavourite as any).mutateAsync(pid);
+      } else {
+        await new Promise((resolve, reject) =>
+          toggleFavourite.mutate(pid, { onSuccess: resolve, onError: reject }),
+        );
+      }
+    } catch (err) {
+      // rollback optimistic toggle on error
+      setIsFavourited((s) => !s);
+      console.warn("handleToggleFavourite failed", err);
+      toast.error("Failed to toggle favourite");
+    } finally {
+      // ensure product detail is refetched (normalize key to number)
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        // fallback: invalidate the generic products list
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
+    }
   };
 
-  const handleMarkAsTaken = () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
-    if (!pid) return;
-
+  const handleMarkAsTaken = async () => {
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+    // close any floating panels before taking action
+    setOpenPanel(null);
     toast.promise(
-      Promise.resolve().then(() => {
+      Promise.resolve().then(async () => {
         // assemble a full product payload to match backend schema expectations
         const src =
           currentAdDataFromQuery || adDataFromState || currentAdData || {};
@@ -114,7 +141,19 @@ const AdsDetailsPage = () => {
         } as Record<string, unknown>;
 
         // call mutation with full payload so server receives the expected schema
-        markTaken.mutate({ id: pid, body: payload });
+        if ((markTaken as any).mutateAsync) {
+          await (markTaken as any).mutateAsync({ id: pid, body: payload });
+        } else {
+          await new Promise((resolve, reject) =>
+            markTaken.mutate({ id: pid, body: payload }, { onSuccess: resolve, onError: reject }),
+          );
+        }
+        // ensure product detail refreshes
+        try {
+          queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+        } catch (e) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
       }),
       {
         loading: "Sending alert to owner to mark ad as taken...",
@@ -127,8 +166,11 @@ const AdsDetailsPage = () => {
   const handleReportAd = () => {
     const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pid) return;
+    // close any open floating panels when performing a direct action
+    setOpenPanel(null);
     // open modal to collect a message from the reporter
     setIsReportModalOpen(true);
+    setOpenPanel("report");
   };
 
   // Report modal state + message
@@ -136,8 +178,10 @@ const AdsDetailsPage = () => {
   const [reportMessage, setReportMessage] = useState("");
 
   const submitReport = async () => {
-    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
-    if (!pid) return;
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
 
     const src =
       currentAdDataFromQuery || adDataFromState || currentAdData || {};
@@ -175,6 +219,13 @@ const AdsDetailsPage = () => {
 
       setIsReportModalOpen(false);
       setReportMessage("");
+      // ensure UI updates: invalidate product detail so totals refresh
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
+      setOpenPanel(null);
     } catch (err) {
       // toast.promise will already show the error; keep modal open for retry
       console.warn("submitReport failed", err);
@@ -198,62 +249,71 @@ const AdsDetailsPage = () => {
     numericId ?? undefined,
   );
   const reportProduct = useReportProduct();
-  const queryClient = useQueryClient();
   const likeMutation = useMutation({
     mutationFn: async ({ id, body }: { id: number; body?: any }) =>
       likeReview(id, body),
     onMutate: async ({ id }) => {
-      // Optimistically update the specific product's reviews
-      const allReviews = queryClient.getQueryData([
-        "reviews",
-        { product: numericId },
-      ]) as Review[] | undefined;
-      if (allReviews) {
-        const updated = allReviews.map((review: Review) =>
-          review.id === id ? { ...review, liked: !review.liked } : review,
-        );
-        queryClient.setQueryData(["reviews", { product: numericId }], updated);
-      }
-    },
-    onSuccess: async (data: any) => {
-      console.log("Like mutation success, server returned:", data);
+      const queryKey = ["reviews", { product: numericId }];
+      // Snapshot previous reviews to allow rollback on error
+      const previousReviews = queryClient.getQueryData(queryKey) as Review[] | undefined;
 
-      // Update individual review cache
-      queryClient.setQueryData(["review", data.id], data);
-
-      // Update the product-specific reviews list with server response
-      const allReviews = queryClient.getQueryData([
-        "reviews",
-        { product: numericId },
-      ]) as Review[] | undefined;
-      if (allReviews) {
-        const updated = allReviews.map((review: Review) =>
-          review.id === data.id ? { ...review, ...data } : review,
-        );
-        queryClient.setQueryData(["reviews", { product: numericId }], updated);
+      if (previousReviews) {
+        // apply optimistic toggle and adjust likes_count
+        const updated = previousReviews.map((review: Review) => {
+          if (review.id !== id) return review;
+          const wasLiked = Boolean(review.liked);
+          const likes = typeof review.likes_count === "number" ? review.likes_count : 0;
+          return {
+            ...review,
+            liked: !wasLiked,
+            likes_count: wasLiked ? Math.max(0, likes - 1) : likes + 1,
+          } as Review;
+        });
+        queryClient.setQueryData(queryKey, updated);
       }
 
-      // Invalidate only this product's reviews to ensure sync with server
-      await queryClient.invalidateQueries({
-        queryKey: ["reviews", { product: numericId }],
-      });
-
-      toast.success(data.liked ? "Review liked!" : "Review unliked!");
+      return { previousReviews };
     },
-    onError: (err: unknown) => {
-      // Refetch only this product's reviews to restore correct state on error
-      queryClient.invalidateQueries({
-        queryKey: ["reviews", { product: numericId }],
-      });
-      const message =
-        err instanceof Error ? err.message : "Failed to like review";
+    onSuccess: async (data: any, variables: any) => {
+      // Prefer server response but fall back to variables.id
+      const revId = data?.id ?? variables?.id;
+      const prodId = data?.product?.id ?? numericId;
+      const reviewsKey = ["reviews", { product: prodId }];
+
+      // Merge server data into individual review and reviews list cache
+      if (revId != null) {
+        queryClient.setQueryData(["review", revId], { ...(data || {}), id: revId });
+      }
+
+      const allReviews = queryClient.getQueryData(reviewsKey) as Review[] | undefined;
+      if (allReviews) {
+        const updated = allReviews.map((review: Review) =>
+          review.id === revId ? { ...review, ...(data || {}), id: revId } : review,
+        );
+        queryClient.setQueryData(reviewsKey, updated);
+      }
+
+      // Do NOT immediately invalidate here — keep server response applied.
+      toast.success((data && data.liked) ? "Review liked!" : "Review unliked!");
+    },
+    onError: (err: unknown, context: any) => {
+      // Rollback optimistic update if we have a snapshot
+      const queryKey = ["reviews", { product: numericId }];
+      if (context?.previousReviews) {
+        queryClient.setQueryData(queryKey, context.previousReviews);
+      } else {
+        // fallback: invalidate to restore state from server
+        queryClient.invalidateQueries({ queryKey });
+      }
+
+      const message = err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
   });
 
-  // Caller phone tooltip visibility (hook must be declared before any early returns)
-  const [showCaller1, setShowCaller1] = useState(false);
-  const [showCaller2, setShowCaller2] = useState(false);
+  // Single source of truth for which floating panel is open
+  // possible values: 'caller1' | 'caller2' | 'makeOffer' | 'report' | null
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
   const [quickChatInput, setQuickChatInput] = useState("");
 
   // Filter reviews for this specific product (memoized to prevent unnecessary recalculation)
@@ -301,6 +361,9 @@ const AdsDetailsPage = () => {
   // Modal state for picture viewer
   const [isPictureModalOpen, setIsPictureModalOpen] = useState<boolean>(false);
   const [pictureModalIndex, setPictureModalIndex] = useState<number>(0);
+  // Seller image modal (open when clicking seller avatar/business logo)
+  const [isSellerModalOpen, setIsSellerModalOpen] = useState<boolean>(false);
+  const [sellerModalImage, setSellerModalImage] = useState<string | null>(null);
   // when modal closes, sync page gallery index
   useEffect(() => {
     if (!isPictureModalOpen) {
@@ -341,8 +404,24 @@ const AdsDetailsPage = () => {
       </p>
     );
 
-  const currentAdData = adDataFromState || currentAdDataFromQuery;
+  // Prefer the server-fetched product data when available so that
+  // refetches/invalidations update the UI even if we navigated here
+  // with `location.state` containing a product snapshot.
+  const currentAdData =
+    currentAdDataFromQuery != null ? currentAdDataFromQuery : adDataFromState;
   console.log("AdsDetailsPage: currentAdData", { currentAdData });
+  // Prefer multiplier from the product (owner's product) when present,
+  // otherwise fall back to the user's active subscription multiplier.
+  const subscriptionMultiplierRaw =
+    (currentAdData as any)?.multiplier ??
+    activeUserSubscription?.subscription?.multiplier ??
+    null;
+  const multiplierLabel = (() => {
+    if (subscriptionMultiplierRaw == null) return null;
+    const n = Number(subscriptionMultiplierRaw);
+    if (!Number.isNaN(n)) return `${n}x`;
+    return String(subscriptionMultiplierRaw);
+  })();
   // derive a simple list of image URLs for the gallery. Backend may
   // provide `images` as an array of objects, a paginated object, or a single `image` string.
   // Include the main `image` plus any entries from `images` and remove duplicates.
@@ -399,8 +478,10 @@ const AdsDetailsPage = () => {
     owner?.secondary_phone ||
     owner?.alt_phone ||
     null;
-  const toggleCaller1 = () => setShowCaller1((s) => !s);
-  const toggleCaller2 = () => setShowCaller2((s) => !s);
+  const toggleCaller1 = () =>
+    setOpenPanel((p) => (p === "caller1" ? null : "caller1"));
+  const toggleCaller2 = () =>
+    setOpenPanel((p) => (p === "caller2" ? null : "caller2"));
 
   const openChatWithOwnerAndSend = async (text: string) => {
     // Early validation: ensure owner exists with valid id
@@ -501,7 +582,7 @@ const AdsDetailsPage = () => {
           <span className="text-xs">{currentAdData?.total_favourites}</span>
         </div>
         {multiplierLabel && (
-          <div className="ml-2 text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+          <div className="ml-2 text-black font-bold rounded-lg px-2 py-0.5 text-[10px] bg-green-300">
             {multiplierLabel}
           </div>
         )}
@@ -565,7 +646,7 @@ const AdsDetailsPage = () => {
       </div>
       <div className="flex gap-2 ml-auto items-center">
         {multiplierLabel && (
-          <div className="text-white font-bold bg-green-500 rounded-lg px-3 py-1 text-sm">
+          <div className="text-black font-bold rounded-lg px-2 py-0.5 text-xs bg-green-300">
             {multiplierLabel}
           </div>
         )}
@@ -866,6 +947,35 @@ const AdsDetailsPage = () => {
     );
   };
 
+  const SellerImageModal = () => {
+    if (!isSellerModalOpen || !sellerModalImage) return null;
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+        onClick={() => setIsSellerModalOpen(false)}
+      >
+        <div
+          className="relative max-w-3xl w-[95%] sm:w-[60%] bg-transparent p-4 max-h-[90vh] overflow-auto no-scrollbar flex flex-col items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="absolute top-3 right-3 text-white bg-black/40 rounded-full p-1 z-30 hover:bg-black/60 transition"
+            onClick={() => setIsSellerModalOpen(false)}
+            aria-label="Close seller image"
+          >
+            ✕
+          </button>
+
+          <img
+            src={sellerModalImage}
+            alt="Seller"
+            className="max-h-[80vh] object-contain w-full rounded"
+          />
+        </div>
+      </div>
+    );
+  };
+
   // Report modal is rendered via the stable `ReportModal` component
   // (imported at top) to avoid remount/focus issues from parent rerenders.
 
@@ -952,6 +1062,9 @@ const AdsDetailsPage = () => {
     showCaller2: showC2,
     toggleCaller1,
     toggleCaller2,
+    // control make-offer visibility from parent
+    showOffer: showOfferProp,
+    toggleOffer,
     favouritePending = false,
   }: {
     onMarkTaken?: () => void;
@@ -967,13 +1080,15 @@ const AdsDetailsPage = () => {
     showCaller2?: boolean;
     toggleCaller1?: () => void;
     toggleCaller2?: () => void;
+    showOffer?: boolean;
+    toggleOffer?: () => void;
     favouritePending?: boolean;
   }) => {
     const isTaken = Boolean(
       (currentAdData as any)?.is_taken ||
       (currentAdDataFromQuery as any)?.is_taken,
     );
-    const [showOffer, setShowOffer] = useState(false);
+    const showOffer = Boolean(showOfferProp);
     const [offerInput, setOfferInput] = useState<string>("");
     const actions: Record<string, () => void> = {
       "Mark as taken": isTaken ? () => { } : onMarkTaken || (() => { }),
@@ -1021,7 +1136,7 @@ const AdsDetailsPage = () => {
                       return;
                     }
                     if (label === "Make Offer") {
-                      setShowOffer((s) => !s);
+                      (toggleOffer || (() => { }))();
                       return;
                     }
                     // otherwise perform action
@@ -1071,37 +1186,43 @@ const AdsDetailsPage = () => {
                   )}
                 </button>
 
-                {/* caller tooltip */}
+                {/* caller modal (centered like report modal) */}
                 {label === "Caller 1" && showC1 && caller1 && (
-                  <div className="absolute z-50 mt-2 p-3 bg-white rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
-                    <div className="flex flex-col items-center gap-8">
-                      <div className="font-semibold flex items-center gap-2">
-                        <img
-                          src="/outgoing call.svg"
-                          alt=""
-                          className="w-4 lg:w-[1.5vw] h-auto"
-                        />
-                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">
-                          Caller 1
-                        </span>
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                    onClick={() => setOpenPanel(null)}
+                  >
+                    <div
+                      className="bg-white rounded-2xl p-4 shadow-md text-sm w-72"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="font-semibold flex items-center gap-2">
+                          <img
+                            src="/outgoing call.svg"
+                            alt=""
+                            className="w-4 h-auto"
+                          />
+                          <span className="text-sm">Caller 1</span>
+                        </div>
+                        <a
+                          href={`tel:${caller1}`}
+                          onClick={(ev) => ev.stopPropagation()}
+                          className="font-normal flex items-center gap-2 text-sm"
+                          style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        >
+                          <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                          <span className="border border-gray-200 px-2.5 py-1.5">{caller1}</span>
+                        </a>
+                        <div className="w-full flex justify-end">
+                          <button
+                            onClick={() => setOpenPanel(null)}
+                            className="mt-2 px-3 py-1 rounded bg-gray-100"
+                          >
+                            Close
+                          </button>
+                        </div>
                       </div>
-                      <a
-                        href={`tel:${caller1}`}
-                        onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2 text-sm sm:text-base lg:text-[1.2vw]"
-                        style={{
-                          color: "var(--dark-def)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <span className="border border-gray-200 px-2.5 py-1.5">
-                          Call
-                        </span>
-                        <span className="border border-gray-200 px-2.5 py-1.5">
-                          {" "}
-                          {caller1}
-                        </span>
-                      </a>
                     </div>
                   </div>
                 )}
@@ -1154,11 +1275,11 @@ const AdsDetailsPage = () => {
                             className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
                             onClick={async (ev) => {
                               ev.stopPropagation();
-                              if (!offerInput || offerInput.trim().length === 0)
-                                return;
+                              if (!offerInput || offerInput.trim().length === 0) return;
                               // send offer as chat message and open inbox
                               await openChatWithOwnerAndSend(offerInput.trim());
-                              setShowOffer(false);
+                              // close the offer panel
+                              (toggleOffer || (() => { }))();
                             }}
                           >
                             <img
@@ -1174,31 +1295,37 @@ const AdsDetailsPage = () => {
                 )}
 
                 {label === "Caller 2" && showC2 && caller2 && (
-                  <div className="absolute z-50 mt-2 p-3 bg-white border rounded-2xl shadow-md text-sm w-64 h-30 sm:h-30 overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:w-72">
-                    <div className="flex flex-col items-center gap-3">
-                      <img
-                        src="/outgoing call.svg"
-                        alt=""
-                        className="w-4 h-auto"
-                      />
-                      <span className="text-[9px]">Caller 2</span>
-                      <a
-                        href={`tel:${caller2}`}
-                        onClick={(ev) => ev.stopPropagation()}
-                        className="font-normal flex items-center gap-2"
-                        style={{
-                          color: "var(--dark-def)",
-                          textDecoration: "none",
-                        }}
-                      >
-                        <span className="border border-gray-200 px-2 py-1">
-                          Call
-                        </span>
-                        <span className="border border-gray-200 px-2 py-1">
-                          {" "}
-                          {caller2}
-                        </span>
-                      </a>
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+                    onClick={() => setOpenPanel(null)}
+                  >
+                    <div
+                      className="bg-white rounded-2xl p-4 shadow-md text-sm w-72"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="font-semibold flex items-center gap-2">
+                          <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                          <span className="text-sm">Caller 2</span>
+                        </div>
+                        <a
+                          href={`tel:${caller2}`}
+                          onClick={(ev) => ev.stopPropagation()}
+                          className="font-normal flex items-center gap-2 text-sm"
+                          style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        >
+                          <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
+                          <span className="border border-gray-200 px-2.5 py-1.5">{caller2}</span>
+                        </a>
+                        <div className="w-full flex justify-end">
+                          <button
+                            onClick={() => setOpenPanel(null)}
+                            className="mt-2 px-3 py-1 rounded bg-gray-100"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1393,15 +1520,38 @@ const AdsDetailsPage = () => {
       <div className="hidden sm:flex flex-row gap-4 bg-(--div-active) px-4 py-7 rounded-2xl mb-5">
         <div className="relative">
           <img
-            src={owner?.avatar || "/userPfp2.jpg"}
+            src={owner?.avatar || owner?.business_logo || "/userPfp2.jpg"}
             alt={owner?.name || "Seller"}
-            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full"
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+              setIsSellerModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }
+            }}
+            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full cursor-pointer"
           />
-          {owner?.admin_verified && (
+          {/* show the business logo as the small overlay (if available) */}
+          {owner?.business_logo && (
             <img
-              src="/verified.svg"
-              alt="Verified"
-              className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw]"
+              src={owner?.business_logo}
+              alt={`${owner?.name || "Seller"} business logo`}
+              className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
+              onClick={() => {
+                setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+                  setIsSellerModalOpen(true);
+                }
+              }}
             />
           )}
         </div>
@@ -1426,7 +1576,7 @@ const AdsDetailsPage = () => {
       <div className="flex items-center justify-between px-2 mb-6">
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
           <h4 className="text-xl md:text-[1.5vw]">
-            {currentAdData?.owner?.name ?? "Seller"}
+            {currentAdData?.owner?.business_name ?? "Seller"}
           </h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
@@ -1521,19 +1671,34 @@ const AdsDetailsPage = () => {
       <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
         <div className="relative">
           <img
-            src={currentAdData?.owner?.avatar || "/userPfp2.jpg"}
-            alt=""
-            className="w-15 h-15 rounded-full"
+            src={currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg"}
+            alt={currentAdData?.owner?.name || "Seller"}
+            role="button"
+            tabIndex={0}
+            onClick={() => {
+              setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+              setIsSellerModalOpen(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }
+            }}
+            className="w-15 h-15 rounded-full cursor-pointer"
           />
-          {(currentAdData?.owner?.is_verified ||
-            currentAdData?.owner?.verified ||
-            currentAdData?.owner?.verified_at) && (
-              <img
-                src="/verified.svg"
-                alt="Verified"
-                className="absolute -bottom-1 -right-2 w-8 h-8"
-              />
-            )}
+          {/* show the business logo as the small overlay (if available) */}
+          {currentAdData?.owner?.business_logo && (
+            <img
+              src={currentAdData?.owner?.business_logo}
+              alt={`${currentAdData?.owner?.name || "Seller"} business logo`}
+              className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white cursor-pointer"
+              onClick={() => {
+                setSellerModalImage(currentAdData?.owner?.business_logo || currentAdData?.owner?.avatar || "/userPfp2.jpg");
+                setIsSellerModalOpen(true);
+              }}
+            />
+          )}
         </div>
         <div>
           <h2 className="text-sm text-gray-500">
@@ -1627,6 +1792,7 @@ const AdsDetailsPage = () => {
           <DesktopHeader />
           <ImageGallery images={pageImages} currentIndex={galleryIndex} />
           <PictureModal />
+          <SellerImageModal />
           <ReportModal
             isOpen={isReportModalOpen}
             message={reportMessage}
@@ -1634,10 +1800,21 @@ const AdsDetailsPage = () => {
             onClose={() => {
               setIsReportModalOpen(false);
               setReportMessage("");
+              setOpenPanel(null);
             }}
             onSubmit={submitReport}
           />
           <TitleAndPrice />
+
+          {/* Description (standalone, shown above Ad Details) */}
+          {currentAdData?.description && (
+            <div className="bg-white sm:bg-(--div-active) sm:p-6 rounded-2xl py-3 px-4 w-full">
+              <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Description</h2>
+              <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
+                {String(currentAdData.description)}
+              </p>
+            </div>
+          )}
 
           {/* MAIN CONTENT */}
           <div className="flex flex-col gap-4 w-full">
@@ -1661,10 +1838,12 @@ const AdsDetailsPage = () => {
                     favouritePending={toggleFavourite.status === "pending"}
                     caller1={callerNumber1}
                     caller2={callerNumber2}
-                    showCaller1={showCaller1}
-                    showCaller2={showCaller2}
+                    showCaller1={openPanel === "caller1"}
+                    showCaller2={openPanel === "caller2"}
                     toggleCaller1={toggleCaller1}
                     toggleCaller2={toggleCaller2}
+                    showOffer={openPanel === "makeOffer"}
+                    toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
                   />
                   <QuickChat />
                 </div>
@@ -1704,10 +1883,12 @@ const AdsDetailsPage = () => {
                         favouritePending={toggleFavourite.status === "pending"}
                         caller1={callerNumber1}
                         caller2={callerNumber2}
-                        showCaller1={showCaller1}
-                        showCaller2={showCaller2}
+                        showCaller1={openPanel === "caller1"}
+                        showCaller2={openPanel === "caller2"}
                         toggleCaller1={toggleCaller1}
                         toggleCaller2={toggleCaller2}
+                        showOffer={openPanel === "makeOffer"}
+                        toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
                       />
                       <QuickChat />
                     </div>
