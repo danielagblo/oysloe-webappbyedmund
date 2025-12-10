@@ -591,7 +591,7 @@ const AdsDetailsPage = () => {
     </div>
   );
   const DesktopHeader = () => (
-    <div className="hidden sm:flex sticky top-0 left-0 z-[200] mt-10 bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
+    <div className="hidden sm:flex sticky top-0 left-0 z-40 mt-10 bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
         <img
           src="/location.svg"
@@ -1807,7 +1807,7 @@ const AdsDetailsPage = () => {
         onClick={() => setIsSellerAdsModalOpen(false)}
       >
         <div
-          className="relative bg-white rounded-2xl p-6 shadow-lg max-sm:max-h-[75vh] max-h-[85vh] overflow-auto w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%]"
+          className="relative bg-white rounded-2xl p-6 shadow-lg max-sm:max-h-[75vh] max-h-[85vh] overflow-auto no-scrollbar w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%]"
           onClick={(e) => e.stopPropagation()}
         >
           <button
