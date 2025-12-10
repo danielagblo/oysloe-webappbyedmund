@@ -241,7 +241,7 @@ const EditProfilePage = () => {
                   onClick={() => {
                     setImageModalSrc(
                       buildMediaUrl(selectedUser?.profileImage) ||
-                        avatarPlaceholder,
+                      avatarPlaceholder,
                     );
                     setImageModalAlt("Profile Image");
                     setImageModalOpen(true);
@@ -284,7 +284,7 @@ const EditProfilePage = () => {
                   onClick={() => {
                     setImageModalSrc(
                       buildMediaUrl(selectedUser?.businessLogo) ||
-                        logoPlaceholder,
+                      logoPlaceholder,
                     );
                     setImageModalAlt("Business Logo");
                     setImageModalOpen(true);
@@ -349,6 +349,15 @@ const EditProfilePage = () => {
                 name="name"
                 readOnly={isReadonly}
                 value={selectedUser?.name ?? ""}
+                onChange={handleInputChange}
+                className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
+              />
+
+              <label className="text-xs text-gray-600">Business Name</label>
+              <input
+                name="businessName"
+                readOnly={isReadonly}
+                value={selectedUser?.businessName ?? ""}
                 onChange={handleInputChange}
                 className="w-full p-2 rounded border border-gray-200 mb-3 text-sm focus:outline-none read-only:cursor-not-allowed read-only:border-transparent read-only:bg-gray-50"
               />
@@ -420,7 +429,7 @@ const EditProfilePage = () => {
                     onClick={() => {
                       setImageModalSrc(
                         buildMediaUrl(selectedUser?.idFrontImage) ||
-                          idFrontPlaceholder,
+                        idFrontPlaceholder,
                       );
                       setImageModalAlt("ID Front");
                       setImageModalOpen(true);
@@ -467,7 +476,7 @@ const EditProfilePage = () => {
                     onClick={() => {
                       setImageModalSrc(
                         buildMediaUrl(selectedUser?.idBackImage) ||
-                          idBackPlaceholder,
+                        idBackPlaceholder,
                       );
                       setImageModalAlt("ID Back");
                       setImageModalOpen(true);
@@ -653,6 +662,35 @@ const EditProfilePage = () => {
                             endpoints.userProfile.userProfile,
                             form,
                           );
+                          // Ensure local profile cache is updated (some hooks expect
+                          // updateProfile to be called when profile changes). We
+                          // call updateProfile with the same JSON fields so the
+                          // client cache and UI reflect the new business name
+                          // immediately.
+                          try {
+                            const payloadForUpdate: any = {
+                              name: selectedUser?.name,
+                              email: selectedUser?.email,
+                              phone: selectedUser?.phonePrimary,
+                              second_number: selectedUser?.phoneSecondary,
+                              id_number: selectedUser?.nationalId,
+                              address: (selectedUser as any)?.address,
+                              business_name: selectedUser?.businessName,
+                              account_name: selectedUser?.accountName,
+                              account_number: selectedUser?.accountNumber,
+                              mobile_network: selectedUser?.mobileNetwork,
+                              preferred_notification_email: selectedUser?.email,
+                              preferred_notification_phone:
+                                selectedUser?.phonePrimary,
+                            };
+                            // updateProfile is safe to call for cache refresh;
+                            // ignore errors here since the primary upload already
+                            // succeeded.
+                            await updateProfile(payloadForUpdate);
+                          } catch (err) {
+                            // no-op; we don't want to block user on cache refresh
+                            console.warn("updateProfile cache refresh failed", err);
+                          }
                         } else {
                           // build JSON payload according to UserProfileUpdatePayload
                           // Do NOT include file fields when no File objects are selected —
