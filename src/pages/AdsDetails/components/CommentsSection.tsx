@@ -34,7 +34,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
         {thisProductsReviews.slice(0, 3).map((review: Review) => (
           <div
             key={review.id}
-            className="p-4 last:border-b-0 bg-(--div-active) rounded-lg w-full"
+            className="p-4 mb-2 last:border-b-0 bg-(--div-active) rounded-lg w-full"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
