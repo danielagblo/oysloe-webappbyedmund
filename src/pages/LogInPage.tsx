@@ -98,57 +98,66 @@ const LogInPage = () => {
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
-        <div className="w-full flex justify-end mb-4">
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                localStorage.setItem("oysloe_guest", "true");
-              } catch {}
-              navigate("/");
-            }}
-            className="text-sm text-gray-500"
-          >
-            Skip &gt;
-          </button>
-        </div>
+
         <div className="flex flex-col gap-5 items-center justify-center">
+          <div className="w-full flex mb-4 justify-center items-center">
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  localStorage.setItem("oysloe_guest", "true");
+                } catch {}
+                navigate("/");
+              }}
+              className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition"
+            >
+              Skip &nbsp;
+              <img className="inline h-4 w-4" src="/skip.svg" alt=">" />
+            </button>
+          </div>
           <h2 className="text-2xl">Welcome!</h2>
           <form className="relative" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-3">
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-position-[8px_center] bg-size-[18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-position-[8px_center] bg-size-[18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                />
+                <img 
+                  src="/mailbox-svgrepo-com.svg" 
+                  alt="Email"
+                  className="absolute left-2 top-3 h-5 w-5" 
+                />
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                />
+                <img 
+                  src="/Passwordkey.svg" 
+                  alt="Password"
+                  className="absolute left-2 top-3 h-5 w-5" 
+                />
+              </div>
             </div>
             <div className="flex flex-col gap-3 w-full mt-3">
               <Button
                 type="submit"
-                name={isLoading ? "Signing in..." : "Sign In"}
+                name={isLoading ? "Logging in..." : "Log In"}
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
                 disabled={isLoading}
               />
-              <button className="flex items-center justify-center bg-[#F9F9F9] px-3 py-2.5 w-full rounded-lg text-black gap-3">
-                <img
-                  src="https://toppng.com/uploads/preview/google-g-logo-icon-11609362962anodywxeaz.png"
-                  alt="Google Logo"
-                  className="h-5"
-                />
-                <h2 className="">Sign in with Google</h2>
-              </button>
             </div>
-            <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
+            <h6 className="text-[10px] sm:text-sm my-4 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
 
@@ -157,9 +166,9 @@ const LogInPage = () => {
           </form>
         </div>
         <h2 className="font-extralight mt-20">
-          Don't have an account ?
+          Don't have an account ? &nbsp;
           <Link to="/signUp">
-            <h2 className="text-black inline opacity-100"> Sign up</h2>
+            <h2 className="text-black inline opacity-100 hover:underline">Sign up</h2>
           </Link>
         </h2>
       </div>
@@ -168,7 +177,9 @@ const LogInPage = () => {
           <OnboardingScreen overlay onFinish={() => navigate("/login")} />
         ) : null
       ) : (
-        <OnboardingScreen />
+        <div className="lg:w-full lg:h-[90vh] lg:pr-5">
+          <OnboardingScreen />
+        </div>
       )}
     </div>
   );

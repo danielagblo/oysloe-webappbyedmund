@@ -62,11 +62,14 @@ const ResetPasswordWithPhonePage = ({
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">{page}</h2>
           <form className="w-3/5 relative">
-            <PhoneInput
-              phone={phone}
-              onChange={handlePhoneOnChange}
-              className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
-            />
+            <div className="relative">
+              <PhoneInput
+                phone={phone}
+                onChange={handlePhoneOnChange}
+                className="border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
+              />
+              <img src="/phone.svg" alt="phone" className="absolute top-4 left-2 h-6 w-6" />
+            </div>
             <p className="text-center font-extralight">
               We'll send a verification link to the number if it is in our
               system
@@ -83,9 +86,10 @@ const ResetPasswordWithPhonePage = ({
                 type="submit"
                 name={loading ? "Sending..." : "Submit"}
                 onClick={handleSubmit}
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
               />
             </div>
-            <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
+            <h6 className="text-[10px] my-4 sm:text-sm text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
               <OTPLogin />
@@ -93,9 +97,9 @@ const ResetPasswordWithPhonePage = ({
           </form>
         </div>
         <h2 className="font-extralight mt-20">
-          Don't have an account ?
+          Don't have an account ? &nbsp;
           <Link to="/signUp">
-            <h2 className="text-black inline opacity-100"> Sign up</h2>
+            <h2 className="text-black inline opacity-100 hover:underline transition">Sign up</h2>
           </Link>
         </h2>
       </div>
@@ -104,7 +108,9 @@ const ResetPasswordWithPhonePage = ({
           <OnboardingScreen overlay onFinish={() => navigate("/login")} />
         ) : null
       ) : (
-        <OnboardingScreen />
+        <div className="lg:w-full lg:h-[90vh] lg:pr-5">
+          <OnboardingScreen />
+        </div>
       )}
     </div>
   );

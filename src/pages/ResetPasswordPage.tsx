@@ -88,9 +88,9 @@ const ResetPasswordPage = () => {
           </form>
         </div>
         <h2 className="font-extralight mt-20">
-          Finished resetting your password ?
+          Finished resetting your password ? &nbsp;
           <Link to="/login">
-            <h2 className="text-black inline opacity-100"> Sign In</h2>
+            <h2 className="text-black inline opacity-100 hover:underline transition"> Sign In</h2>
           </Link>
         </h2>
       </div>

@@ -183,26 +183,27 @@ const SignInPage = () => {
   }, [policyModalOpen, policyModalType]);
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center relative">
-      <div className="absolute top-4 right-4 z-30">
-        <button
-          type="button"
-          onClick={() => {
-            try {
-              localStorage.setItem("oysloe_guest", "true");
-            } catch {
-              /*ignore*/
-            }
-            navigate("/");
-          }}
-          className="text-sm text-gray-500"
-        >
-          Skip &gt;
-        </button>
-      </div>
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 overflow-auto no-scrollbar h-full py-20">
+    <div className="lg:max-h-screen no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center justify-center relative">
+      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7">
         <div className=" flex flex-col gap-5 items-center justify-center">
-          <h2 className="text-2xl pt-10">Getting started</h2>
+          <div className="max-lg:absolute max-lg:top-4 max-lg:right-4 max-lg:z-30">
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  localStorage.setItem("oysloe_guest", "true");
+                } catch {
+                  /*ignore*/
+                }
+                navigate("/");
+              }}
+              className="text-sm text-gray-500 lg:mt-17.5 bg-(--div-active) rounded-full flex items-center gap-1 pl-3 px-2 py-1 hover:bg-gray-200 transition"
+            >
+              Skip &nbsp;
+              <img src="skip.svg" alt=">" className="inline h-4 w-4" />
+            </button>
+          </div>
+          <h2 className="text-2xl max-lg:pt-10">Getting started</h2>
           <form className="relative" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-3">
               <input
@@ -315,26 +316,12 @@ const SignInPage = () => {
 
                   {/* no text next to checkbox by design */}
                 </label>
-                {/* <label
-                  className="relative p-0 rounded-4xl cursor-pointer ml-2 -bottom-1 h-2 w-2 inline"
-                  htmlFor="custom-checkbox"
-                > */}
-                {/* <!-- Hidden default checkbox --> */}
-                {/* <input
-                    type="checkbox"
-                    name="agreedToTerms"
-                    checked={formData.agreedToTerms}
-                    onChange={handleInputChange}
-                    className="peer relative h-4 w-4 cursor-pointer appearance-none rounded-full border border-gray-400  checked:bg-[url(check.svg)] checked:bg-center checked:bg-no-repeat checked:bg-[length:18px_18px]"
-                    id="custom-checkbox"
-                    required
-                  /> */}
-                {/* </label> */}
               </p>
             </div>
             <div className="flex flex-col gap-3 w-full">
               <Button
                 type="submit"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
                 name={
                   registerMutation.status === "pending"
                     ? "Signing up..."
@@ -342,29 +329,18 @@ const SignInPage = () => {
                 }
                 disabled={registerMutation.status === "pending"}
               />
-              <button
-                type="button"
-                className="flex items-center justify-center bg-[#F9F9F9] px-3 py-2.5 w-full rounded-lg text-black gap-3"
-              >
-                <img
-                  src="https://toppng.com/uploads/preview/google-g-logo-icon-11609362962anodywxeaz.png"
-                  alt="Google Logo"
-                  className="h-5"
-                />
-                <h2 className="">Log in with Google</h2>
-              </button>
             </div>
-            <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
+            <h6 className="text-[10px] sm:text-sm my-4 text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
               <OTPLogin />
             </div>
           </form>
         </div>
-        <h2 className="font-extralight">
-          I have an account already ?
+        <h2 className="font-light mt-10">
+          I have an account already ? &nbsp;  
           <Link to="/login">
-            <h2 className="text-black inline opacity-100"> Login</h2>
+            <h2 className="text-black inline opacity-100 hover:underline transition">Login</h2>
           </Link>
         </h2>
       </div>
@@ -374,7 +350,9 @@ const SignInPage = () => {
           <OnboardingScreen overlay onFinish={() => navigate("/login")} />
         ) : null
       ) : (
-        <OnboardingScreen />
+        <div className="lg:w-full lg:h-[90vh] lg:pr-5">
+          <OnboardingScreen />
+        </div>
       )}
 
       {/* Bottom-sheet modal for Privacy Policy / Terms */}
@@ -397,12 +375,12 @@ const SignInPage = () => {
                 : null);
 
           return (
-            <div className="fixed inset-0 z-50 flex items-end justify-center">
+            <div className="fixed inset-0 z-50 flex items-center justify-center h-screen w-screen">
               <div
                 className="absolute inset-0 bg-black/40"
                 onClick={() => setPolicyModalOpen(false)}
               />
-              <div className="relative w-full max-w-3xl bg-white rounded-t-2xl p-4 max-h-[85vh] overflow-hidden">
+              <div className="relative w-full max-w-3xl bg-white rounded-2xl p-4 max-h-[85vh] overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold">
                     {policyModalType === "privacy"
@@ -430,7 +408,7 @@ const SignInPage = () => {
                       setHasScrolledToEnd(true);
                     }
                   }}
-                  className="border-t pt-2 overflow-auto"
+                  className="border-t pt-2 overflow-auto pb-12.5"
                   style={{ maxHeight: "72vh" }}
                 >
                   {loading ? (
@@ -453,7 +431,7 @@ const SignInPage = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between gap-4 mt-3">
+                <div className="flex items-center justify-between gap-4 mt-3 absolute bottom-2 right-10">
                   <div className="text-xs text-gray-500 invisible">
                     Scroll to the end to enable confirmation
                   </div>

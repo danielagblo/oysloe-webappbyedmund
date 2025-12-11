@@ -181,60 +181,68 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               )}
 
               {label === "Make Offer" && showOffer && (
-                <div className="absolute z-50 mt-2 p-4 lg:pb-4 bg-white rounded-2xl shadow-md text-sm w-80 h-50 sm:h-fit overflow-auto left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0 sm:min-w-96 sm:w-fit">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex items-center gap-2 text-xs font-semibold">
-                      <img
-                        src="/Make an offer.svg"
-                        alt=""
-                        className="w-4 h-auto lg:w-[1.5vw]"
-                      />
-                      <span className="text-xs sm:text-sm lg:text-[1.2vw]">
-                        Make Offer
-                      </span>
-                    </div>
-                    <div className="w-full flex flex-col gap-2">
-                      <div className="flex gap-2">
-                        {["~5% cut", "~10% cut", "~15% cut", "~20% cut"].map(
-                          (opt) => (
-                            <button
-                              key={opt}
-                              type="button"
-                              className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
-                              onClick={(ev) => {
-                                ev.stopPropagation();
-                                setOfferInput(`${opt} off on overall price`);
-                              }}
-                            >
-                              {opt}
-                            </button>
-                          ),
-                        )}
-                      </div>
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          type="text"
-                          value={offerInput}
-                          onChange={(e) => setOfferInput(e.target.value)}
-                          className="flex-1 px-3 py-2 rounded bg-white border border-gray-200 text-sm"
-                          onClick={(ev) => ev.stopPropagation()}
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 max-sm:p-4"
+                  onClick={() => (toggleOffer || (() => {}))()}
+                >
+                  <div
+                    className="bg-white rounded-2xl p-4 lg:pb-4 shadow-md text-sm w-full sm:w-80 h-auto sm:h-fit overflow-auto sm:min-w-96"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="flex items-center gap-2 text-xs font-semibold">
+                        <img
+                          src="/Make an offer.svg"
+                          alt=""
+                          className="w-4 h-auto lg:w-[1.5vw]"
                         />
-                        <button
-                          type="button"
-                          className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
-                          onClick={async (ev) => {
-                            ev.stopPropagation();
-                            if (!offerInput || offerInput.trim().length === 0) return;
-                            await openChatWithOwnerAndSend(offerInput.trim());
-                            (toggleOffer || (() => {}))();
-                          }}
-                        >
-                          <img
-                            src="/send.svg"
-                            alt="Send"
-                            className="w-8 h-8"
+                        <span className="text-xs sm:text-sm lg:text-[1.2vw]">
+                          Make Offer
+                        </span>
+                      </div>
+                      <div className="w-full flex flex-col gap-2">
+                        <div className="flex gap-2">
+                          {["~5% cut", "~10% cut", "~15% cut", "~20% cut"].map(
+                            (opt) => (
+                              <button
+                                key={opt}
+                                type="button"
+                                className="w-full text-center whitespace-nowrap py-2 rounded bg-(--div-active) text-xs sm:text-sm lg:text-[1.2vw] text-(--dark-def) font-medium focus:outline-none"
+                                onClick={(ev) => {
+                                  ev.stopPropagation();
+                                  setOfferInput(`${opt} off on overall price`);
+                                }}
+                              >
+                                {opt}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                        <div className="flex gap-2 mt-1">
+                          <input
+                            type="text"
+                            value={offerInput}
+                            onChange={(e) => setOfferInput(e.target.value)}
+                            className="flex-1 px-3 py-2 rounded bg-white border border-gray-200 text-sm"
+                            onClick={(ev) => ev.stopPropagation()}
                           />
-                        </button>
+                          <button
+                            type="button"
+                            className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
+                            onClick={async (ev) => {
+                              ev.stopPropagation();
+                              if (!offerInput || offerInput.trim().length === 0) return;
+                              await openChatWithOwnerAndSend(offerInput.trim());
+                              (toggleOffer || (() => {}))();
+                            }}
+                          >
+                            <img
+                              src="/send.svg"
+                              alt="Send"
+                              className="w-8 h-8"
+                            />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

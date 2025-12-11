@@ -13,7 +13,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
   const [visible, setVisible] = useState(true);
   const baseClass = overlay
     ? `fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#DEFEED] p-6 ${visible ? "opacity-100" : "opacity-0"} transition-opacity duration-300`
-    : "flex flex-col items-center justify-center h-screen bg-[#DEFEED] w-full";
+    : "flex flex-col items-center justify-center h-screen lg:h-[90vh] lg:rounded-4xl bg-[#DEFEED] w-full";
 
   const STORAGE_KEY = "oysloe_onboarding_seen";
 
@@ -47,17 +47,18 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Buyers and sellers undergo strict checks and verification to
               ensure authenticity and reliability
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 my-3">
               <span className="h-5 w-5 bg-black rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setClicked(1);
                 console.log(clicked);
               }}
-              className="px-3 py-1.5 h-4/5 w-1/2 bg-[#F9F9F9] text-black rounded-lg"
+              className="p-3 h-full w-1/2 bg-[#F9F9F9] hover:bg-[#F9F9F9]/80 transition cursor-pointer text-black rounded-lg"
             >
               Next
             </button>
@@ -74,17 +75,18 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Buyers and sellers undergo strict checks and verification to
               ensure authenticity and reliability
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 my-3">
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-black rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setClicked(2);
                 console.log(clicked);
               }}
-              className="px-3 py-1.5 h-4/5 w-1/2 bg-[#F9F9F9] text-black rounded-lg"
+              className="p-3 h-full w-1/2 bg-[#F9F9F9] hover:bg-[#F9F9F9]/80 transition cursor-pointer text-black rounded-lg"
             >
               Next
             </button>
@@ -101,17 +103,18 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Buyers and sellers undergo strict checks and verification to
               ensure authenticity and reliability
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 my-3">
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-black rounded-full inline-block mx-1"></span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setClicked(3);
                 console.log(clicked);
               }}
-              className="px-3 py-1.5 h-4/5 w-1/2 bg-[#F9F9F9] text-black rounded-lg"
+              className="p-3  h-full w-1/2 bg-[#F9F9F9] hover:bg-[#F9F9F9]/80 transition cursor-pointer text-black rounded-lg"
             >
               Get Started
             </button>
@@ -130,12 +133,13 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Buyers and sellers undergo strict checks and verification to
               ensure authenticity and reliability
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 my-3">
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-gray-400 rounded-full inline-block mx-1"></span>
               <span className="h-5 w-5 bg-black rounded-full inline-block mx-1"></span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setClicked(4);
                 console.log(clicked);
@@ -146,7 +150,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
                   setClicked(4);
                 }
               }}
-              className="px-3 py-1.5 h-4/5 w-1/2 bg-[#F9F9F9] text-black rounded-lg"
+              className="p-3 h-full w-1/2 bg-[#F9F9F9] hover:bg-[#F9F9F9]/80 transition cursor-pointer text-black rounded-lg"
             >
               Get Started
             </button>
