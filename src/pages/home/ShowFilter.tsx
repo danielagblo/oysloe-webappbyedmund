@@ -313,8 +313,10 @@ const ShowFilter = ({
                                         localSelectedSubcategoryIds.length === 1
                                             ? subcategories.find(s => s.id === localSelectedSubcategoryIds[0])?.name
                                             : `${localSelectedSubcategoryIds.length} subcategories selected`
-                                    ) : (
+                                    ) : localSelectedCategoryId !== null ? (
                                         "All Subcategories"
+                                    ) : (
+                                        "Select a Category First"
                                     )}
                                 </span>
                                 <img src="/arrowright.svg" alt=">" className="w-4 h-4 rotate-90" />
@@ -351,23 +353,10 @@ const ShowFilter = ({
                                                         <label className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-100 rounded">
                                                             <input
                                                                 type="checkbox"
-                                                                checked={subcategories.length > 0 && subcategories.every(s => localSelectedSubcategoryIds.includes(s.id))}
+                                                                checked={localSelectedSubcategoryIds.length === 0}
                                                                 onChange={() => {
-                                                                    // If switching categories and user starts selecting, clear old selections
-                                                                    if (pendingCategorySwitch && pendingCategorySwitch !== localSelectedCategoryId) {
-                                                                        const allIds = subcategories.map(s => s.id);
-                                                                        setLocalSelectedSubcategoryIds(allIds);
-                                                                        setPendingCategorySwitch(null);
-                                                                    } else {
-                                                                        // Normal toggle within same category
-                                                                        const allIds = subcategories.map(s => s.id);
-                                                                        const allSelected = allIds.every(id => localSelectedSubcategoryIds.includes(id));
-                                                                        if (allSelected) {
-                                                                            setLocalSelectedSubcategoryIds([]);
-                                                                        } else {
-                                                                            setLocalSelectedSubcategoryIds(allIds);
-                                                                        }
-                                                                    }
+                                                                    // Always set to empty array to represent "All"
+                                                                    setLocalSelectedSubcategoryIds([]);
                                                                 }}
                                                                 className="cursor-pointer"
                                                             />

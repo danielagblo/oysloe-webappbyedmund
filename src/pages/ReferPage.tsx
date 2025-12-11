@@ -454,7 +454,7 @@ const ReferPage = () => {
   };
   const Level = () => (
     <div className="h-full md:h-[93vh] lg:overflow-auto no-scrollbar w-full rounded-2xl flex flex-col gap-2">
-      <div className="bg-white w-full shadow-sm rounded-2xl p-6 flex flex-col justify-between items-center">
+      <div className="sm:bg-white w-full sm:shadow-sm sm:rounded-2xl sm:p-6 flex flex-col justify-between items-center">
         <LevelProgress
           silverPercent={silverPercent}
           goldPercent={goldPercent}
