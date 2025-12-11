@@ -186,7 +186,7 @@ const AdsPage = () => {
                     >
                       View Product
                     </button>
-                    <button
+                    {/* <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         // open edit modal instead of navigation
@@ -196,7 +196,7 @@ const AdsPage = () => {
                       }}
                     >
                       Edit Details
-                    </button>
+                    </button> */}
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40"
                       onClick={async () => {
@@ -405,7 +405,7 @@ const AdsPage = () => {
                     >
                       Repost Ad
                     </button>
-                    <button
+                    {/* <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         setSelectedAd(null);
@@ -414,7 +414,7 @@ const AdsPage = () => {
                       }}
                     >
                       Edit Details
-                    </button>
+                    </button> */}
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
                       onClick={async () => {
