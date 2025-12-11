@@ -215,41 +215,41 @@ const AdsPage = () => {
                     </button>
                   </div>
 
-                  <div className="relative flex items-start gap-2 mt-4">
-                    <div className="absolute left-0 -top-4.5 flex items-center gap-3">
-                      <div className="bg-red-200/60 rounded-full p-3">
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 15 18"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            opacity="0.5"
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
-                            d="M1.57851 0.606913C1.57851 0.271727 1.22514 0 0.789254 0C0.353365 0 0 0.271727 0 0.606913V16.7913C0 17.1264 0.353365 17.3982 0.789254 17.3982C1.22514 17.3982 1.57851 17.1264 1.57851 16.7913V10.1961V2.10397V0.606913Z"
-                            fill="#1C274C"
-                          />
-                          <path
-                            d="M9.00599 2.32544L8.57106 2.19166C6.92646 1.68579 5.12601 1.55868 3.3891 1.82581L1.57837 2.10429V10.1964L3.3891 9.91798C5.12601 9.65086 6.92646 9.77799 8.57106 10.2838C10.3533 10.832 12.3148 10.9344 14.177 10.5764L14.2823 10.5561C14.8991 10.4376 15.1915 9.89451 14.8645 9.47534L13.2222 7.37048C12.8628 6.90993 12.6831 6.67965 12.6405 6.42916C12.6228 6.32467 12.6228 6.21885 12.6405 6.11436C12.6831 5.86387 12.8628 5.63359 13.2222 5.17301L14.5676 3.44866C14.9197 2.99734 14.3865 2.44393 13.7225 2.57159C12.1557 2.87278 10.5055 2.78665 9.00599 2.32544Z"
-                            fill="#1C274C"
-                          />
-                        </svg>
+                  {selectedAd.suspension_note ? (
+                    <div className="relative flex items-start gap-2 mt-4">
+                      <div className="absolute left-0 -top-4.5 flex items-center gap-3">
+                        <div className="bg-red-200/60 rounded-full p-3">
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 15 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              opacity="0.5"
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M1.57851 0.606913C1.57851 0.271727 1.22514 0 0.789254 0C0.353365 0 0 0.271727 0 0.606913V16.7913C0 17.1264 0.353365 17.3982 0.789254 17.3982C1.22514 17.3982 1.57851 17.1264 1.57851 16.7913V10.1961V2.10397V0.606913Z"
+                              fill="#1C274C"
+                            />
+                            <path
+                              d="M9.00599 2.32544L8.57106 2.19166C6.92646 1.68579 5.12601 1.55868 3.3891 1.82581L1.57837 2.10429V10.1964L3.3891 9.91798C5.12601 9.65086 6.92646 9.77799 8.57106 10.2838C10.3533 10.832 12.3148 10.9344 14.177 10.5764L14.2823 10.5561C14.8991 10.4376 15.1915 9.89451 14.8645 9.47534L13.2222 7.37048C12.8628 6.90993 12.6831 6.67965 12.6405 6.42916C12.6228 6.32467 12.6228 6.21885 12.6405 6.11436C12.6831 5.86387 12.8628 5.63359 13.2222 5.17301L14.5676 3.44866C14.9197 2.99734 14.3865 2.44393 13.7225 2.57159C12.1557 2.87278 10.5055 2.78665 9.00599 2.32544Z"
+                              fill="#1C274C"
+                            />
+                          </svg>
+                        </div>
+                        <p className=" text-xs text-gray-700 ">Note</p>
                       </div>
-                      <p className=" text-xs text-gray-700 ">Note</p>
-                    </div>
 
-                    <div className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
-                      {selectedAd.suspension_note ? (
+                      <div className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
                         <div className="mb-3">
                           <p className="font-medium">Suspension note:</p>
                           <p className="break-words">{selectedAd.suspension_note}</p>
                         </div>
-                      ) : null}
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               ) : mapToLabel(selectedAd) === "Pending" ? (
                 <div className="flex flex-col gap-3 mt-6 font-medium">
