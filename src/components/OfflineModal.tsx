@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useOnline } from "../context/ConnectivityStatusContext";
+import LottieNoNetwork from "./LottieNoNetwork";
 
 const OfflineModal = () => {
   const isOnline = useOnline();
@@ -35,11 +36,12 @@ const OfflineModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white p-6 rounded-lg shadow-lg text-center px-15">
-        <img
+        {/* <img
           src="/no-internet.png"
           alt="No internet connection"
           className="mx-auto mb-4 w-40 h-40 lg:w-50 lg:h-50"
-        />
+        /> */}
+        <LottieNoNetwork />
         <h2 className="text-xl font-bold mb-2">No Internet Connection</h2>
         <p className="text-gray-600 mb-4">
           Please check your network settings.
