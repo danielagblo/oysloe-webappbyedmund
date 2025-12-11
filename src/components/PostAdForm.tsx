@@ -1288,7 +1288,11 @@ export default function PostAdForm({
             <div>
               <p className="mb-1">Declare ad purpose?</p>
               <div className="flex gap-3">
-                {(["Sale", "Pay Later", "Rent"] as const).map((option) => (
+                {(
+                  ["Sale", 
+                    // "Pay Later", 
+                    "Rent"
+                  ] as const).map((option) => (
                   <label
                     key={option}
                     className="relative flex items-center gap-1 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
