@@ -338,7 +338,8 @@ const AdsPage = () => {
                               (selectedAd.images?.[0] as any)?.src ||
                               "",
                             type: selectedAd.type ?? "SALE",
-                            status: selectedAd.status ?? "ACTIVE",
+                            // When reposting, always set status to PENDING
+                            status: "PENDING",
                             is_taken: selectedAd.is_taken ?? true,
                             description:
                               selectedAd.description ?? selectedAd.desc ?? "",
