@@ -206,52 +206,67 @@ const SignInPage = () => {
           <h2 className="text-2xl max-lg:pt-10">Getting started</h2>
           <form className="relative" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleInputChange}
-                autoComplete="name"
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(name.svg)] rounded-lg focus:border-gray-400  outline-0"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleInputChange}
-                autoComplete="email"
-                required
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(email.svg)] rounded-lg focus:border-gray-400  outline-0"
-              />
-              <PhoneInput
-                name="phone"
-                phone={formData.phone}
-                onChange={handleInputChange}
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px_18px] bg-no-repeat bg-[url(phone.svg)] rounded-lg focus:border-gray-400  outline-0"
-                required
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                autoComplete="new-password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
-              />
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Retype Password"
-                value={formData.confirmPassword}
-                autoComplete="new-password"
-                onChange={handleInputChange}
-                required
-                className="border-gray-100 border-2 px-8 py-2 w-full bg-[8px_center] bg-[length:18px] bg-no-repeat bg-[url(Passwordkey.svg)] rounded-lg focus:border-gray-400 outline-0"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  autoComplete="name"
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                />
+                <img src="/name.svg" alt="Name" className="absolute left-2 top-3 h-5 w-5" />
+              </div>
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  autoComplete="email"
+                  required
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                />
+                <img src="/email.svg" alt="Email" className="absolute left-2 top-3 h-5 w-5" />
+              </div>
+              <div className="relative">
+                <PhoneInput
+                  name="phone"
+                  phone={formData.phone}
+                  onChange={handleInputChange}
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  required
+                />
+                <img src="/phone.svg" alt="Phone" className="absolute left-2 top-3 h-5 w-5" />
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 h-5 w-5" />
+              </div>
+              <div className="relative">
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Retype Password"
+                  value={formData.confirmPassword}
+                  autoComplete="new-password"
+                  onChange={handleInputChange}
+                  required
+                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 h-5 w-5" />
+              </div>
               <p className="text-[10px] pb-2">
                 I have agreed to the{" "}
                 <button
