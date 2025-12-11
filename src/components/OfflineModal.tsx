@@ -18,7 +18,7 @@ const OfflineModal = () => {
     }
   };
 
-  if (isOnline) return null;
+  if (!isOnline) return null;
 
   if (showToast) {
     return (
@@ -35,7 +35,7 @@ const OfflineModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white p-6 rounded-lg shadow-lg text-center px-15">
+      <div className="bg-white p-6 rounded-lg shadow-lg text-center px-15 max-sm:px-8">
         {/* <img
           src="/no-internet.png"
           alt="No internet connection"
@@ -48,14 +48,14 @@ const OfflineModal = () => {
         </p>
         <div className="grid grid-cols-2 justify-center gap-4 items-center">
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-[#99fcae] max-sm:h-full hover:bg-[#d6f0e4] px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleRetry}
             disabled={isChecking}
           >
             {isChecking ? "Checking..." : "Retry"}
           </button>
           <button
-            className="bg-gray-200 px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition"
+            className="bg-gray-200 px-4 py-2 rounded cursor-pointer sm:whitespace-nowrap hover:scale-95 transition"
             onClick={() => setShowToast(true)}
           >
             Continue Browsing
