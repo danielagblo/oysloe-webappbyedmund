@@ -28,7 +28,6 @@ const VerificationPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     mode = location.state?.mode ?? "reset-password";
-    console.log("Button CLicked!");
     e.preventDefault();
     const otpValue = otp.join("");
     if (!phone || otpValue.length !== 6) {
@@ -66,38 +65,39 @@ const VerificationPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="h-screen max-sm:bg-(--bg) w-screen flex text-(--dark-def) items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
         <div className="flex flex-col gap-5 items-center justify-center">
-          <h2 className="text-2xl">OTP Login</h2>
-          <form className="w-4/5 relative">
-            <div className="flex flex-col items-center p-8 bg-white rounded-lg">
+          <h2 className="text-2xl max-sm:text-[36px]">OTP Login</h2>
+          <form className="w-4/5 max-sm:w-full relative">
+            <div className="flex flex-col items-center p-8 max-sm:bg-(--bg) bg-white rounded-lg">
               <div className="flex space-x-2" id="otp-container">
                 <OTPInput length={6} otp={otp} setOtp={setOtp} />
               </div>
             </div>
-            <p className="text-center font-extralight">
+            <p className="text-center max-sm:text-[20px] text-gray-600 max-sm:px-4">
               Enter the code sent to your phone number
             </p>
             {(error || localError) && (
               <p className="text-red-500 text-center">{error ?? localError}</p>
             )}
-            <div className="flex flex-col gap-3 w-full mt-8">
+            <div className="flex flex-col gap-3 w-full mt-8 max-sm:px-4">
               <Button
                 type="submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
                 name={loading || localLoading ? "Verifying..." : "Submit"}
+                //should countdown 60 seconds then allows you to resend OTP
                 onClick={handleSubmit}
               />
             </div>
-            <h6 className="text-[10px] my-4 sm:text-sm text-center">Can't Login?</h6>
-            <div className="flex gap-2 justify-center items-center">
+            <h6 className="text-[16px] my-4 max-sm:mb-8 max-sm:my-6 sm:text-sm text-center">Can't Login?</h6>
+            <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
               <ResetDropdown />
-              <OTPLogin />
+              <OTPLogin page="otp-login" />
             </div>
           </form>
         </div>
-        <h2 className="font-extralight mt-20">
+        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[16px] mt-20">
           Don't have an account ?
           <Link to="/signUp">
             <h2 className="text-black inline opacity-100"> Sign up</h2>

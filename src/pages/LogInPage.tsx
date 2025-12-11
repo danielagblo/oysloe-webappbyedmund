@@ -96,11 +96,11 @@ const LogInPage = () => {
   };
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="max-sm:bg-(--bg) h-screen w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
 
-        <div className="flex flex-col gap-5 items-center justify-center">
-          <div className="w-full flex mb-4 justify-center items-center">
+        <div className="flex flex-col gap-5 max-sm:gap-10 items-center justify-center">
+          <div className="w-full max-sm:hidden max-sm:text-(--dark-def) flex mb-4 justify-center items-center">
             <button
               type="button"
               onClick={() => {
@@ -115,8 +115,8 @@ const LogInPage = () => {
               <img className="inline h-4 w-4" src="/skip.svg" alt=">" />
             </button>
           </div>
-          <h2 className="text-2xl">Welcome!</h2>
-          <form className="relative" onSubmit={handleSubmit}>
+          <h2 className="text-2xl max-sm:text-[36px]">Welcome!</h2>
+          <form className="relative max-sm:space-y-6" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-3">
               <div className="relative">
                 <input
@@ -125,12 +125,12 @@ const LogInPage = () => {
                   placeholder="Email Address"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="border-gray-100 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
                 <img 
                   src="/mailbox-svgrepo-com.svg" 
                   alt="Email"
-                  className="absolute left-2 top-3 h-5 w-5" 
+                  className="absolute left-2 max-sm:left-4 top-3 max-sm:top-7 h-5 max-sm:h-6 max-sm:w-6 w-5" 
                 />
               </div>
               <div className="relative">
@@ -140,12 +140,12 @@ const LogInPage = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="border-gray-100 max-sm:bg-white max-sm:text-[16px] max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
                 <img 
                   src="/Passwordkey.svg" 
                   alt="Password"
-                  className="absolute left-2 top-3 h-5 w-5" 
+                  className="absolute left-2 top-3 h-5 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:w-6 w-5" 
                 />
               </div>
             </div>
@@ -153,19 +153,19 @@ const LogInPage = () => {
               <Button
                 type="submit"
                 name={isLoading ? "Logging in..." : "Log In"}
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
                 disabled={isLoading}
               />
             </div>
-            <h6 className="text-[10px] sm:text-sm my-4 text-center">Can't Login?</h6>
-            <div className="flex gap-2 justify-center items-center">
+            <h6 className="text-[16px] sm:text-sm my-4 max-sm:mb-8 max-sm:my-6 text-center">Can't Login?</h6>
+            <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
               <ResetDropdown />
 
               <OTPLogin />
             </div>
           </form>
         </div>
-        <h2 className="font-extralight mt-20">
+        <h2 className="text-[#646161] mt-20 max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[16px]">
           Don't have an account ? &nbsp;
           <Link to="/signUp">
             <h2 className="text-black inline opacity-100 hover:underline">Sign up</h2>

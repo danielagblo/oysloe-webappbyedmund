@@ -41,12 +41,13 @@ const OTPInput = ({ length = 6, otp, setOtp }: OTPInputProps) => {
           type="text"
           maxLength={1}
           value={value}
+          autoComplete="off"
           onChange={(e) => handleChange(e.target.value, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
           ref={(el) => {
             inputsRef.current[index] = el;
           }}
-          className="w-9 h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+          className="w-9 max-sm:w-[12.5vw] max-sm:h-[12.5vw] max-sm:text-3xl h-12 text-center text-xl font-bold text-gray-800 border-2 border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
           inputMode="numeric"
         />
       ))}

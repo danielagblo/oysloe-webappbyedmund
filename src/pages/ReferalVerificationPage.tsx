@@ -87,27 +87,31 @@ const ReferalVerificationPage = () => {
     }
   };
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-[60%] m-8">
+    <div className="h-screen max-sm:bg-(--bg) w-screen flex items-center justify-center">
+      <div className="flex flex-col items-center justify-center w-full sm:w-[60%] m-8">
         <div className="flex flex-col gap-5 items-center justify-center">
-          <div className="w-7/8 h-4/5 overflow-y-auto relative">
+          <div className="w-7/8 max-sm:w-full h-4/5 overflow-y-auto relative">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Referal code (Optional)"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value)}
-                className="border-gray-100 border-2 px-7 py-2 w-full rounded-lg focus:border-gray-200  outline-0"
+                className="border-gray-100 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-2 px-7 py-2 w-full rounded-lg focus:border-gray-200  outline-0"
               />
-              <img src="/Referral.svg" alt="Referral Icon" className="absolute h-5 w-5 left-2 top-3" />
+              <img src="/Referral.svg" alt="Referral Icon" className="absolute h-5 w-5 left-2 top-3  max-sm:left-4 max-sm:top-6 max-sm:h-6 max-sm:w-6" />
             </div>
             <div className="flex flex-col gap-5 w-full mt-5 justify-center items-center">
-              <Button name="Verify" className="bg-[#74FFA7] hover:bg-[#74FFA7]/80" onClick={handleVerify} />
+              <Button 
+                name="Verify" 
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                onClick={handleVerify} 
+              />
               <button
-                className="flex items-center justify-center bg-[#F9F9F9] px-5 py-3 rounded-full text-black gap-3"
+                className="flex hover:bg-gray-100 transition cursor-pointer items-center justify-center bg-[#F9F9F9] px-5 py-3 rounded-full text-black gap-3"
                 onClick={handleSkip}
               >
-                <h2 className="hover:bg-gray-100 transition cursor-pointer">Skip</h2>
+                <h2>Skip</h2>
                 <img src="skip.svg" alt="Skip" className="h-3" />
               </button>
             </div>

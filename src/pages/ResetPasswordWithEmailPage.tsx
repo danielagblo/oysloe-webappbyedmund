@@ -17,41 +17,41 @@ const ResetPasswordWithEmailPage = () => {
       : true;
 
   return (
-    <div className="h-screen w-screen flex items-center justify-center">
+    <div className="h-screen max-sm:bg-(--bg) w-screen flex items-center justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
-        <div className="flex flex-col gap-5 items-center justify-center">
-          <h2 className="text-2xl">Reset Password</h2>
-          <form className=" w-3/5 max-md:w-full">
+        <div className="flex flex-col gap-5 max-sm:space-y-6 items-center justify-center">
+          <h2 className="text-2xl max-sm:text-[36px]">Reset Password</h2>
+          <form className=" w-3/5 max-sm:space-y-6 max-md:w-full">
             <div className="relative">
               <input
                 type="email"
                 placeholder="Email address"
-                className="border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
+                className="max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/email.svg" alt="email" className="absolute h-6 w-6 top-3 left-2" />
+              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-6 max-sm:h-6 max-sm:w-6" />
             </div>
-            <p className="text-center font-extralight">
+            <p className="text-center max-sm:text-[20px] text-gray-600">
               We'll send a link to the email provided to reset your password
             </p>
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
                 type="submit"
                 name="Submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowModal(true);
                 }}
               />
             </div>
-            <h6 className="text-[10px] sm:text-sm my-4 text-center">Can't Login?</h6>
-            <div className="flex gap-2 justify-center items-center">
-              <ResetDropdown />
+            <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">Can't Login?</h6>
+            <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
+              <ResetDropdown page="email-reset"/>
               <OTPLogin />
             </div>
           </form>
         </div>
-        <h2 className="font-extralight mt-20">
+        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[16px] mt-20">
           Don't have an account ? &nbsp;
           <Link to="/signUp">
             <h2 className="text-black inline opacity-100 hover:underline transition">Sign up</h2>

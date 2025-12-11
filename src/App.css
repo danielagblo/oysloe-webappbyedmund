@@ -6,6 +6,7 @@
   --some-gray: #dbdee1;
   --some-other-gray: #2632386c;
   --green: #74ffa7;
+  --bg: #ededed;
 
   --font-size: 1rem;
 }
@@ -17,6 +18,7 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: "inter", Arial, Helvetica, sans-serif;
 }
 
 html,

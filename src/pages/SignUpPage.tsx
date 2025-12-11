@@ -183,9 +183,9 @@ const SignInPage = () => {
   }, [policyModalOpen, policyModalType]);
 
   return (
-    <div className="lg:max-h-screen no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center justify-center relative">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7">
-        <div className=" flex flex-col gap-5 items-center justify-center">
+    <div className="lg:max-h-screen max-sm:text-(--dark-def) max-sm:bg-(--bg) no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center justify-center relative">
+      <div className="flex flex-col items-center justify-center sm:w-full m-8 max-sm:m-0 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7">
+        <div className="flex flex-col gap-5 items-center justify-center">
           <div>
             <button
               type="button"
@@ -197,15 +197,16 @@ const SignInPage = () => {
                 }
                 navigate("/");
               }}
-              className="text-sm text-gray-500 max-lg:-mb-5 lg:mt-17.5 bg-(--div-active) rounded-full flex items-center gap-1 pl-3 px-2 py-1 hover:bg-gray-200 transition"
+              className="text-sm max-sm:hidden text-gray-500 max-lg:-mb-5 lg:mt-17.5 bg-(--div-active) rounded-full flex items-center gap-1 pl-3 px-2 py-1 hover:bg-gray-200 transition"
             >
               Skip &nbsp;
               <img src="skip.svg" alt=">" className="inline h-4 w-4" />
             </button>
           </div>
-          <h2 className="text-2xl max-lg:pt-10">Getting started</h2>
-          <form className="relative" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-3">
+          <h2 className="text-2xl max-sm:text-[36px]">Get
+            <span className="max-sm:hidden">ting</span> started</h2>
+          <form className="relative max-sm:space-y-6" onSubmit={handleSubmit}>
+            <div className="flex flex-col items-center gap-3 max-sm:gap-2 max-sm:m-0">
               <div className="relative">
                 <input
                   type="text"
@@ -214,9 +215,9 @@ const SignInPage = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   autoComplete="name"
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
-                <img src="/name.svg" alt="Name" className="absolute left-2 top-3 h-5 w-5" />
+                <img src="/name.svg" alt="Name" className="absolute left-2  max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -227,19 +228,19 @@ const SignInPage = () => {
                   onChange={handleInputChange}
                   autoComplete="email"
                   required
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
-                <img src="/email.svg" alt="Email" className="absolute left-2 top-3 h-5 w-5" />
+                <img src="/email.svg" alt="Email" className="absolute  max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 left-2 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <PhoneInput
                   name="phone"
                   phone={formData.phone}
                   onChange={handleInputChange}
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                   required
                 />
-                <img src="/phone.svg" alt="Phone" className="absolute left-2 top-3 h-5 w-5" />
+                <img src="/phone.svg" alt="Phone" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -250,9 +251,9 @@ const SignInPage = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
-                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 h-5 w-5" />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -263,11 +264,11 @@ const SignInPage = () => {
                   autoComplete="new-password"
                   onChange={handleInputChange}
                   required
-                  className="border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
-                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 h-5 w-5" />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
-              <p className="text-[10px] pb-2">
+              <p className="text-[10px] pt-2">
                 I have agreed to the{" "}
                 <button
                   type="button"
@@ -275,7 +276,7 @@ const SignInPage = () => {
                     setPolicyModalType("privacy");
                     setPolicyModalOpen(true);
                   }}
-                  className="text-black inline underline"
+                  className="inline underline"
                 >
                   privacy policy
                 </button>{" "}
@@ -286,7 +287,7 @@ const SignInPage = () => {
                     setPolicyModalType("terms");
                     setPolicyModalOpen(true);
                   }}
-                  className="text-black inline underline"
+                  className="inline underline"
                 >
                   terms & conditions
                 </button>{" "}
@@ -336,7 +337,7 @@ const SignInPage = () => {
             <div className="flex flex-col gap-3 w-full">
               <Button
                 type="submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80  max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
                 name={
                   registerMutation.status === "pending"
                     ? "Signing up..."
@@ -345,14 +346,14 @@ const SignInPage = () => {
                 disabled={registerMutation.status === "pending"}
               />
             </div>
-            <h6 className="text-[10px] sm:text-sm my-4 text-center">Can't Login?</h6>
-            <div className="flex gap-2 justify-center items-center">
+            <h6 className="text-[16px] sm:text-sm my-4 text-center max-sm:mb-8 max-sm:my-6">Can't Login?</h6>
+            <div className="flex gap-2 max-sm:gap-[18px] justify-center max-sm:hidden items-center">
               <ResetDropdown />
               <OTPLogin />
             </div>
           </form>
         </div>
-        <h2 className="font-light mt-10">
+        <h2 className="font-light mt-10 max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:bg-(--bg) max-sm:w-full max-sm:text-center max-sm:text-[16px]">
           I have an account already ? &nbsp;  
           <Link to="/login">
             <h2 className="text-black inline opacity-100 hover:underline transition">Login</h2>
