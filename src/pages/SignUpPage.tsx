@@ -186,7 +186,7 @@ const SignInPage = () => {
     <div className="lg:max-h-screen no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center justify-center relative">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7">
         <div className=" flex flex-col gap-5 items-center justify-center">
-          <div className="max-lg:absolute max-lg:top-4 max-lg:right-4 max-lg:z-30">
+          <div>
             <button
               type="button"
               onClick={() => {
@@ -197,7 +197,7 @@ const SignInPage = () => {
                 }
                 navigate("/");
               }}
-              className="text-sm text-gray-500 lg:mt-17.5 bg-(--div-active) rounded-full flex items-center gap-1 pl-3 px-2 py-1 hover:bg-gray-200 transition"
+              className="text-sm text-gray-500 max-lg:-mb-5 lg:mt-17.5 bg-(--div-active) rounded-full flex items-center gap-1 pl-3 px-2 py-1 hover:bg-gray-200 transition"
             >
               Skip &nbsp;
               <img src="skip.svg" alt=">" className="inline h-4 w-4" />

@@ -18,7 +18,7 @@ const OfflineModal = () => {
     }
   };
 
-  if (!isOnline) return null;
+  if (isOnline) return null;
 
   if (showToast) {
     return (

@@ -61,7 +61,7 @@ const ResetPasswordWithPhonePage = ({
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
         <div className="flex flex-col gap-5 items-center justify-center">
           <h2 className="text-2xl">{page}</h2>
-          <form className="w-3/5 relative">
+          <form className="w-3/5 max-md:w-full relative">
             <div className="relative">
               <PhoneInput
                 phone={phone}

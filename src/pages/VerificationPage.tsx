@@ -85,11 +85,12 @@ const VerificationPage = () => {
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
                 type="submit"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80"
                 name={loading || localLoading ? "Verifying..." : "Submit"}
                 onClick={handleSubmit}
               />
             </div>
-            <h6 className="text-[10px] m-2.5 text-center">Can't Login?</h6>
+            <h6 className="text-[10px] my-4 sm:text-sm text-center">Can't Login?</h6>
             <div className="flex gap-2 justify-center items-center">
               <ResetDropdown />
               <OTPLogin />
