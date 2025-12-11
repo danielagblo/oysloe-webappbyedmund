@@ -57,7 +57,7 @@ const HomePage = () => {
     setIsAdLoading(true);
     // Small delay to ensure overlay renders
     await new Promise(resolve => setTimeout(resolve, 100));
-    navigate(`/ads/${ad.id}`, { state: { adData: ad } });
+    navigate(`/ads/${ad.id}`, { state: { adData: ad }, replace: false });
     // Reset after navigation (component will unmount but just in case)
     setTimeout(() => setIsAdLoading(false), 500);
   };

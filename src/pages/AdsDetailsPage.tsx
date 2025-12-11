@@ -70,6 +70,23 @@ const AdsDetailsPage = () => {
 
   const markTaken = useMarkProductAsTaken();
 
+  // Scroll to top when ad details page loads or ad ID changes
+  useEffect(() => {
+    // Immediate scroll
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    
+    // Delayed scroll to ensure it happens after any router transitions
+    const timeoutId = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
+  }, [numericId]);
+
   useEffect(() => {
     const favFromProduct = Boolean(
       (currentAdDataFromQuery as Product)?.favourited_by_user,
