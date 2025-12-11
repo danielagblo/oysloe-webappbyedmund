@@ -1620,8 +1620,8 @@ export default function PostAdForm({
             </div>
           </div>
         )}
-        {showSaveModal && !embedded && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        {showSaveModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
               <h2 className="text-lg font-semibold text-[var(--dark-def)] mb-2">
                 Would you want to save this location for future use?

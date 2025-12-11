@@ -50,8 +50,8 @@ const SubscriptionPage = () => {
           res?.authorizationUrl;
 
         if (redirectUrl) {
-          // redirect to Paystack checkout in a new tab
-          window.open(redirectUrl, "_blank", "noopener,noreferrer");
+          // redirect to Paystack checkout in the same tab
+          window.open(redirectUrl, "_self");
           return;
         }
 
@@ -62,7 +62,6 @@ const SubscriptionPage = () => {
         console.error("Paystack initiation failed", err);
       } finally {
         setSubscribingId(null);
-        window.close();
       }
     })();
   };
@@ -193,7 +192,7 @@ const SubscriptionPage = () => {
                   <div className="w-full flex items-center justify-center">
                     <button
                       className="bg-gray-200 hover:scale-95 active:scale-105 hover:bg-gray-100 cursor-pointer lg:w-4/5 transition w-full py-3 rounded text-center mt-2"
-                      title="clicking this will open Paystack in a new tab"
+                      title="Clicking this will open Paystack. Complete payment to Subscribe and be redirected back."
                       onClick={() => handleSubscribe(s.id)}
                       disabled={subscribingId === s.id}
                     >
