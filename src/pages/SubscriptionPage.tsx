@@ -20,6 +20,11 @@ const SubscriptionPage = () => {
 
   const activeUserSub = userSubscriptions.length ? userSubscriptions[0] : null;
 
+  const now = Date.now();
+  const activeNotExpired =
+    !!activeUserSub && new Date(activeUserSub.end_date).getTime() > now;
+  const activeSubId = activeUserSub?.subscription?.id ?? null;
+
   // track which subscription is currently being processed to avoid showing
   // "Processing..." on all package buttons when one is clicked
   const [subscribingId, setSubscribingId] = useState<number | null>(null);
@@ -51,7 +56,7 @@ const SubscriptionPage = () => {
 
         if (redirectUrl) {
           // redirect to Paystack checkout in the same tab
-          window.open(redirectUrl, "_self");
+          window.location.assign(redirectUrl);
           return;
         }
 
@@ -67,13 +72,53 @@ const SubscriptionPage = () => {
   };
 
   const handleRenew = (userSubId: number, subscriptionId: number) => {
-    setUpdatingId(userSubId);
-    updateSub.mutate(
-      { id: userSubId, body: { subscription_id: subscriptionId } },
-      {
-        onSettled: () => setUpdatingId(null),
-      },
-    );
+    (async () => {
+      try {
+        setUpdatingId(userSubId);
+
+        // include the user subscription id in the callback so the callback
+        // handler can perform a direct update for the specific record
+        const callbackUrl = `${window.location.origin}/paystack/callback?user_subscription_id=${userSubId}`;
+
+        // store pending subscription so callback knows which subscription was bought
+        localStorage.setItem(
+          "pending_subscription",
+          JSON.stringify({ subscription_id: subscriptionId }),
+        );
+
+        const res = await initiatePaystackPayment({
+          subscription_id: subscriptionId,
+          callback_url: callbackUrl,
+        });
+
+        // attempt to extract redirect URL from common shapes
+        const redirectUrl =
+          res?.data?.authorization_url ||
+          res?.authorization_url ||
+          res?.data?.url ||
+          res?.url ||
+          res?.authorizationUrl;
+
+        if (redirectUrl) {
+          // open Paystack checkout in the same tab — callback will update the user subscription
+          window.location.assign(redirectUrl);
+          return;
+        }
+
+        // fallback: call update directly if backend didn't return a redirect URL
+        updateSub.mutate(
+          { id: userSubId, body: { subscription_id: subscriptionId } },
+          {
+            onSettled: () => setUpdatingId(null),
+          },
+        );
+      } catch (err) {
+        // log and clear state
+        console.error("Paystack initiation failed", err);
+      } finally {
+        setUpdatingId(null);
+      }
+    })();
   };
 
   return (
@@ -121,11 +166,17 @@ const SubscriptionPage = () => {
                         activeUserSub.subscription.id,
                       )
                     }
-                    disabled={updatingId === activeUserSub.id}
+                    disabled={updatingId === activeUserSub.id || activeNotExpired}
                   >
-                    {updatingId === activeUserSub.id
-                      ? "Processing..."
-                      : "Renew / Update"}
+                    {updatingId === activeUserSub.id ? (
+                      "Processing..."
+                    ) : activeNotExpired ? (
+                      `Active — expires ${new Date(
+                        activeUserSub.end_date,
+                      ).toLocaleDateString()}`
+                    ) : (
+                      "Renew / Update"
+                    )}
                   </button>
                 </div>
               )}
@@ -194,11 +245,17 @@ const SubscriptionPage = () => {
                       className="bg-gray-200 hover:scale-95 active:scale-105 hover:bg-gray-100 cursor-pointer lg:w-4/5 transition w-full py-3 rounded text-center mt-2"
                       title="Clicking this will open Paystack. Complete payment to Subscribe and be redirected back."
                       onClick={() => handleSubscribe(s.id)}
-                      disabled={subscribingId === s.id}
+                      disabled={
+                        subscribingId === s.id || (activeNotExpired && activeSubId === s.id)
+                      }
                     >
-                      {subscribingId === s.id
-                        ? "Processing..."
-                        : "Subscribe / Pay Now"}
+                      {subscribingId === s.id ? (
+                        "Processing..."
+                      ) : activeNotExpired && activeSubId === s.id ? (
+                        "Current plan"
+                      ) : (
+                        "Subscribe / Pay Now"
+                      )}
                     </button>
                   </div>
                 </div>

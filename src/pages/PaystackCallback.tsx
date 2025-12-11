@@ -34,6 +34,19 @@ const PaystackCallback = () => {
       }
 
       if (userSubId && pendingObj?.subscription_id) {
+        // Prevent repeated attempts for the same user subscription id
+        const attemptedKey = `pending_subscription_attempted_user_${userSubId}`;
+        if (localStorage.getItem(attemptedKey)) {
+          // Already tried updating this user subscription; just refresh and navigate
+          qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+          localStorage.removeItem("pending_subscription");
+          navigate("/profile");
+          return;
+        }
+
+        // mark as attempted so we don't keep retrying on reloads
+        localStorage.setItem(attemptedKey, String(Date.now()));
+
         // call PUT (update) to mark subscription (body: { subscription_id })
         updateUserSub.mutate(
           {
@@ -43,12 +56,15 @@ const PaystackCallback = () => {
           {
             onSuccess: () => {
               localStorage.removeItem("pending_subscription");
+              localStorage.removeItem(attemptedKey);
               qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
               navigate("/profile");
             },
             onError: () => {
-              // fallback: refresh list
+              // fallback: refresh list and clear pending so polling branch won't re-run
               qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+              localStorage.removeItem("pending_subscription");
+              localStorage.removeItem(attemptedKey);
               navigate("/profile");
             },
           },
@@ -91,6 +107,15 @@ const PaystackCallback = () => {
         }
 
         if (found) {
+          const attemptedKey = `pending_subscription_attempted_user_${found.id}`;
+          if (localStorage.getItem(attemptedKey)) {
+            qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+            localStorage.removeItem("pending_subscription");
+            navigate("/profile");
+            return;
+          }
+          localStorage.setItem(attemptedKey, String(Date.now()));
+
           // call PUT to update/confirm the subscription as requested
           updateUserSub.mutate(
             {
@@ -100,12 +125,14 @@ const PaystackCallback = () => {
             {
               onSuccess: () => {
                 localStorage.removeItem("pending_subscription");
+                localStorage.removeItem(attemptedKey);
                 qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
                 navigate("/profile");
               },
               onError: () => {
                 qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
                 localStorage.removeItem("pending_subscription");
+                localStorage.removeItem(attemptedKey);
                 navigate("/profile");
               },
             },

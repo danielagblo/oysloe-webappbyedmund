@@ -267,13 +267,36 @@ export const setProductStatus = async (
 export const getRelatedProducts = async (
   productId?: number,
 ): Promise<Product[]> => {
-  if (useMocks) return [...mockProducts];
+  // Return a sorted copy (highest `multiplier` first). Keep behavior
+  // consistent for mocks and real API responses.
+  const sortByMultiplier = (items: Product[]) => {
+    try {
+      return [...items].sort((a, b) => {
+        const ma = Number((a as any).multiplier ?? 0) || 0;
+        const mb = Number((b as any).multiplier ?? 0) || 0;
+        if (mb !== ma) return mb - ma;
+        const ta = Date.parse((a as any).created_at || (a as any).createdAt || "");
+        const tb = Date.parse((b as any).created_at || (b as any).createdAt || "");
+        if (isFinite(tb) && isFinite(ta)) return tb - ta;
+        return 0;
+      });
+    } catch {
+      return items;
+    }
+  };
+
+  if (useMocks) {
+    return sortByMultiplier([...mockProducts]);
+  }
 
   const qs = new URLSearchParams();
   if (productId != null) qs.append("product_id", String(productId));
   const query = qs.toString() ? `?${qs.toString()}` : "";
 
-  return apiClient.get<Product[]>(`${products.related}${query}`);
+  const resp = await apiClient.get<Product[]>(`${products.related}${query}`);
+  // resp is expected to be an array; sort defensively
+  if (Array.isArray(resp)) return sortByMultiplier(resp);
+  return resp as unknown as Product[];
 };
 
 // ---------------------

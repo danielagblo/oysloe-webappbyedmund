@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 // react-router imports removed (not used in this page)
 import { toast } from "sonner";
 import MenuButton from "../components/MenuButton";
@@ -28,6 +29,7 @@ const AdsPage = () => {
   // navigate removed (not used in this view)
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAdId, setEditingAdId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const mapToLabel = (p: any) => {
     if (p.is_taken) return "Taken";
@@ -176,6 +178,15 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
                     <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                      }}
+                    >
+                      View Product
+                    </button>
+                    <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         // open edit modal instead of navigation
@@ -244,6 +255,15 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                      }}
+                    >
+                      View Product
+                    </button>
+                    <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
                       onClick={() => {
                         // open edit modal instead of navigation
@@ -275,6 +295,15 @@ const AdsPage = () => {
               ) : mapToLabel(selectedAd) === "Active" ? (
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
+                    <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-blue-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                      }}
+                    >
+                      View Product
+                    </button>
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40"
                       onClick={async () => {
@@ -325,6 +354,15 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
+                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                      onClick={() => {
+                        setSelectedAd(null);
+                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                      }}
+                    >
+                      View Product
+                    </button>
+                    <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
                       onClick={async () => {
                         try {
@@ -338,7 +376,8 @@ const AdsPage = () => {
                               (selectedAd.images?.[0] as any)?.src ||
                               "",
                             type: selectedAd.type ?? "SALE",
-                            status: selectedAd.status ?? "ACTIVE",
+                            // When reposting, always set status to PENDING
+                            status: "PENDING",
                             is_taken: selectedAd.is_taken ?? true,
                             description:
                               selectedAd.description ?? selectedAd.desc ?? "",
