@@ -9,7 +9,6 @@ type SupportAndCasesProps = {
 };
 
 export default function SupportAndCases({
-  onSelectCase,
   onSelectChat,
 }: SupportAndCasesProps) {
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
