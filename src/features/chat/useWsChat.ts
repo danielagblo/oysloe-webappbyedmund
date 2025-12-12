@@ -485,7 +485,28 @@ export default function useWsChat(): UseWsChatReturn {
         return;
       }
 
-      // Fallback: send via REST if websocket not available
+      // If this is a temp chat room (created from email), prefer websocket tempchat/<email>/ and DO NOT fall back to REST chatrooms/<temp>/send/
+      // temp room naming convention: starts with "temp_" followed by encoded email or raw email
+      const isTempRoom = String(roomId).startsWith("temp_");
+      if (isTempRoom) {
+        // try to extract email from roomId (after "temp_") and connect to tempchat websocket
+        const possibleEmail = String(roomId).replace(/^temp_/, "");
+        try {
+          await connectToTempChat(possibleEmail);
+          const tempClientCurrent = roomClients.current[String(roomId)];
+          // Note: connectToTempChat may establish messages under a resolved room id; best-effort: send over temp client if available
+          if (tempClientCurrent && tempClientCurrent.isOpen()) {
+            tempClientCurrent.send({ type: "message", content: text, temp_id: tempId });
+            return;
+          }
+        } catch (err) {
+          console.debug("useWsChat: connectToTempChat/send failed", err);
+        }
+        // If we couldn't send via WS for a temp room, do NOT call REST to /chatrooms/temp_.../send/. Throw so caller can decide fallback.
+        throw new Error("Temp chat websocket unavailable");
+      }
+
+      // Fallback: send via REST if websocket not available for persistent rooms
       try {
         const body: any = { content: text, message: text };
         if (tempId) body.temp_id = tempId;

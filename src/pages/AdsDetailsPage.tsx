@@ -21,7 +21,7 @@ import useReviews from "../features/reviews/useReviews";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
-import { resolveChatroomId } from "../services/chatService";
+import { createChatRoom } from "../services/chatService";
 import { likeReview } from "../services/reviewService";
 import type { Product } from "../types/Product";
 import type { Review } from "../types/Review";
@@ -63,7 +63,7 @@ const AdsDetailsPage = () => {
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
 
-  const { sendMessage, addLocalMessage } = useWsChat();
+  const { sendMessage, addLocalMessage, connectToRoom, connectToTempChat } = useWsChat();
 
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
@@ -76,14 +76,14 @@ const AdsDetailsPage = () => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-    
+
     // Delayed scroll to ensure it happens after any router transitions
     const timeoutId = setTimeout(() => {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }, 0);
-    
+
     return () => clearTimeout(timeoutId);
   }, [numericId]);
 
@@ -461,13 +461,20 @@ const AdsDetailsPage = () => {
     }
 
     try {
-      const params: Record<string, unknown> = {
-        user_id: owner.id,
-        product_id: currentAdData?.id ?? numericId,
-      };
-      const res = await resolveChatroomId(params as any);
-      const roomKey =
-        (res as any)?.room_id || String((res as any)?.room || (res as any)?.id);
+      // Prefer creating or resolving a persistent room via REST create endpoint.
+      // Some backends return existing room when creating with same participants.
+      let roomKey: string | null = null;
+      try {
+        const created = await createChatRoom({
+          user_id: owner.id,
+          product_id: currentAdData?.id ?? numericId,
+        } as any);
+        const roomKeyRaw = (created as any)?.room_id ?? (created as any)?.room ?? (created as any)?.id ?? null;
+        roomKey = roomKeyRaw != null ? String(roomKeyRaw) : null;
+      } catch (createErr) {
+        console.debug("createChatRoom failed, will fallback to tempchat", createErr);
+        roomKey = null;
+      }
 
       const tempId = `tmp_${Date.now()}`;
       const tempMsg = {
@@ -486,22 +493,38 @@ const AdsDetailsPage = () => {
       } as unknown as ChatMessage;
 
       try {
-        addLocalMessage(String(roomKey), tempMsg as ChatMessage);
+        // Ensure websocket room client is connected where possible so sendMessage uses WS (wss/chat/<room>)
+        if (roomKey) {
+          try {
+            await connectToRoom(roomKey);
+          } catch (e) {
+            console.debug("connectToRoom failed, will still attempt send", e);
+          }
+        } else if (owner?.email) {
+          // If server didn't return a room id, try tempchat using owner's email
+          try {
+            await connectToTempChat(owner.email);
+          } catch (e) {
+            console.debug("connectToTempChat failed", e);
+          }
+        }
+        const targetRoom = roomKey ?? `temp_${owner?.email ?? "anon"}`;
+        addLocalMessage(String(targetRoom), tempMsg as ChatMessage);
+
+        try {
+          await sendMessage(String(targetRoom), text, tempId);
+        } catch (err) {
+          console.warn("AdsDetailsPage: sendMessage failed", err);
+        }
       } catch (err) {
-        console.warn("AdsDetailsPage: addLocalMessage failed", err);
+        console.warn("AdsDetailsPage: addLocalMessage/send flow failed", err);
       }
 
-      try {
-        await sendMessage(String(roomKey), text, tempId);
-      } catch (err) {
-        console.warn("AdsDetailsPage: sendMessage failed", err);
-      }
-
-      navigate("/inbox", { state: { openRoom: String(roomKey) } });
+      // Do not redirect to inbox — stay on the ad details page after sending
+      // navigate("/inbox", { state: { openRoom: String(roomKey) } });
     } catch (err) {
       console.warn("AdsDetailsPage: createChatRoom/send failed", err);
       toast.error("Failed to start chat. Please try again.");
-      navigate("/inbox");
     }
   };
 

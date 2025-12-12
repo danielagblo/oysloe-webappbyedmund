@@ -48,6 +48,7 @@ export function useChat(roomId: string | null): UseChatReturn {
         if (mounted) setMessages(msgs);
       } catch (e) {
         console.error("useChat failed to load messages", e);
+        if (mounted) setMessages([]);
       }
 
       // build websocket url (append token as query param per backend spec)

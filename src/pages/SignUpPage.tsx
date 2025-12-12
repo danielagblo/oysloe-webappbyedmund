@@ -215,9 +215,9 @@ const SignInPage = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   autoComplete="name"
-                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
-                <img src="/name.svg" alt="Name" className="absolute left-2  max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
+                <img src="/name.svg" alt="Name" className="absolute left-2  max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -228,19 +228,19 @@ const SignInPage = () => {
                   onChange={handleInputChange}
                   autoComplete="email"
                   required
-                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
-                <img src="/email.svg" alt="Email" className="absolute  max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 left-2 top-3 h-5 w-5" />
+                <img src="/email.svg" alt="Email" className="absolute  max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:text-[16px] max-sm:w-6 left-2 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <PhoneInput
                   name="phone"
                   phone={formData.phone}
                   onChange={handleInputChange}
-                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                   required
                 />
-                <img src="/phone.svg" alt="Phone" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
+                <img src="/phone.svg" alt="Phone" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -251,9 +251,9 @@ const SignInPage = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   required
-                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
-                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 h-5 w-5" />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 top-3 max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:text-[16px] max-sm:w-6 h-5 w-5" />
               </div>
               <div className="relative">
                 <input
@@ -264,9 +264,9 @@ const SignInPage = () => {
                   autoComplete="new-password"
                   onChange={handleInputChange}
                   required
-                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
-                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
+                <img src="/Passwordkey.svg" alt="Password" className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5" />
               </div>
               <p className="text-[10px] pt-2">
                 I have agreed to the{" "}
@@ -337,7 +337,7 @@ const SignInPage = () => {
             <div className="flex flex-col gap-3 w-full">
               <Button
                 type="submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80  max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80  max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
                 name={
                   registerMutation.status === "pending"
                     ? "Signing up..."
@@ -354,7 +354,7 @@ const SignInPage = () => {
           </form>
         </div>
         <h2 className="font-light mt-10 max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:bg-(--bg) max-sm:w-full max-sm:text-center max-sm:text-[16px]">
-          I have an account already ? &nbsp;  
+          I have an account already ? &nbsp;
           <Link to="/login">
             <h2 className="text-black inline opacity-100 hover:underline transition">Login</h2>
           </Link>

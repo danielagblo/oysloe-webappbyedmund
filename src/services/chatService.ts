@@ -6,6 +6,8 @@ export type ChatMember = {
   name?: string;
   email?: string;
   avatar?: string | null;
+  is_staff?: boolean;
+  is_superuser?: boolean;
 };
 
 export type ChatRoom = {

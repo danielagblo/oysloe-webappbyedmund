@@ -67,9 +67,9 @@ const ResetPasswordWithPhonePage = ({
               <PhoneInput
                 phone={phone}
                 onChange={handlePhoneOnChange}
-                className="max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
+                className="max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/phone.svg" alt="phone" className="absolute top-4 left-2 h-6 w-6 max-sm:left-4 max-sm:top-7 max-sm:h-6 max-sm:w-6" />
+              <img src="/phone.svg" alt="phone" className="absolute top-4 left-2 h-6 w-6 max-sm:left-4 max-sm:top-4 max-sm:h-6 max-sm:w-6" />
             </div>
             <p className="text-center max-sm:text-[20px] text-gray-600">
               We'll send a verification link to the number if it is in our
@@ -88,7 +88,7 @@ const ResetPasswordWithPhonePage = ({
                 type="submit"
                 name={loading ? "Sending..." : "Submit"}
                 onClick={handleSubmit}
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
               />
             </div>
             <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">Can't Login?</h6>

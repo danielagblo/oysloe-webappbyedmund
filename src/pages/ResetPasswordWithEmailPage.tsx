@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 const ResetPasswordWithEmailPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -26,9 +26,9 @@ const ResetPasswordWithEmailPage = () => {
               <input
                 type="email"
                 placeholder="Email address"
-                className="max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
+                className="max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-6 max-sm:h-6 max-sm:w-6" />
+              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-4 max-sm:h-6 max-sm:w-6" />
             </div>
             <p className="text-center max-sm:text-[20px] text-gray-600">
               We'll send a link to the email provided to reset your password
@@ -37,7 +37,7 @@ const ResetPasswordWithEmailPage = () => {
               <Button
                 type="submit"
                 name="Submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowModal(true);
@@ -46,7 +46,7 @@ const ResetPasswordWithEmailPage = () => {
             </div>
             <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">Can't Login?</h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
-              <ResetDropdown page="email-reset"/>
+              <ResetDropdown page="email-reset" />
               <OTPLogin />
             </div>
           </form>

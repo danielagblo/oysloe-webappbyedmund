@@ -84,7 +84,7 @@ const VerificationPage = () => {
             <div className="flex flex-col gap-3 w-full mt-8 max-sm:px-4">
               <Button
                 type="submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
                 name={loading || localLoading ? "Verifying..." : "Submit"}
                 //should countdown 60 seconds then allows you to resend OTP
                 onClick={handleSubmit}

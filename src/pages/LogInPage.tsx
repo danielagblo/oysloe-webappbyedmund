@@ -106,7 +106,7 @@ const LogInPage = () => {
               onClick={() => {
                 try {
                   localStorage.setItem("oysloe_guest", "true");
-                } catch {}
+                } catch { }
                 navigate("/");
               }}
               className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition"
@@ -125,12 +125,12 @@ const LogInPage = () => {
                   placeholder="Email Address"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="border-gray-100 max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
+                  className="border-gray-100 max-sm:bg-white max-sm:h-[54px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
-                <img 
-                  src="/mailbox-svgrepo-com.svg" 
+                <img
+                  src="/mailbox-svgrepo-com.svg"
                   alt="Email"
-                  className="absolute left-2 max-sm:left-4 top-3 max-sm:top-7 h-5 max-sm:h-6 max-sm:w-6 w-5" 
+                  className="absolute left-2 max-sm:left-4 top-3 max-sm:top-4 h-5 max-sm:h-6 max-sm:w-6 w-5"
                 />
               </div>
               <div className="relative">
@@ -140,12 +140,12 @@ const LogInPage = () => {
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="border-gray-100 max-sm:bg-white max-sm:text-[16px] max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
+                  className="border-gray-100 max-sm:bg-white max-sm:text-[16px] max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400 outline-0"
                 />
-                <img 
-                  src="/Passwordkey.svg" 
+                <img
+                  src="/Passwordkey.svg"
                   alt="Password"
-                  className="absolute left-2 top-3 h-5 max-sm:h-6 max-sm:left-4 max-sm:top-7 max-sm:w-6 w-5" 
+                  className="absolute left-2 top-3 h-5 max-sm:h-6 max-sm:left-4 max-sm:top-4 max-sm:w-6 w-5"
                 />
               </div>
             </div>
@@ -153,7 +153,7 @@ const LogInPage = () => {
               <Button
                 type="submit"
                 name={isLoading ? "Logging in..." : "Log In"}
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
                 disabled={isLoading}
               />
             </div>
