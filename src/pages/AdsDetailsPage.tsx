@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
+import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import ReportModal from "../components/ReportModal";
@@ -21,7 +22,7 @@ import useReviews from "../features/reviews/useReviews";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
-import { createChatRoom } from "../services/chatService";
+import { resolveChatroomId } from "../services/chatService";
 import { likeReview } from "../services/reviewService";
 import type { Product } from "../types/Product";
 import type { Review } from "../types/Review";
@@ -63,7 +64,8 @@ const AdsDetailsPage = () => {
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
 
-  const { sendMessage, addLocalMessage, connectToRoom, connectToTempChat } = useWsChat();
+  const { sendMessage, addLocalMessage, connectToRoom } = useWsChat();
+  const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(null);
 
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
@@ -461,18 +463,14 @@ const AdsDetailsPage = () => {
     }
 
     try {
-      // Prefer creating or resolving a persistent room via REST create endpoint.
-      // Some backends return existing room when creating with same participants.
+      // Ask the API for the chatroom id by email (GET /chatroomid/?email=...), which returns existing room or creates one
       let roomKey: string | null = null;
       try {
-        const created = await createChatRoom({
-          user_id: owner.id,
-          product_id: currentAdData?.id ?? numericId,
-        } as any);
-        const roomKeyRaw = (created as any)?.room_id ?? (created as any)?.room ?? (created as any)?.id ?? null;
+        const res = await resolveChatroomId({ email: owner.email } as any);
+        const roomKeyRaw = (res as any)?.room_id ?? (res as any)?.room ?? (res as any)?.id ?? null;
         roomKey = roomKeyRaw != null ? String(roomKeyRaw) : null;
-      } catch (createErr) {
-        console.debug("createChatRoom failed, will fallback to tempchat", createErr);
+      } catch (resolveErr) {
+        console.debug("resolveChatroomId by email failed; will try creating room via REST", resolveErr);
         roomKey = null;
       }
 
@@ -500,21 +498,32 @@ const AdsDetailsPage = () => {
           } catch (e) {
             console.debug("connectToRoom failed, will still attempt send", e);
           }
-        } else if (owner?.email) {
-          // If server didn't return a room id, try tempchat using owner's email
-          try {
-            await connectToTempChat(owner.email);
-          } catch (e) {
-            console.debug("connectToTempChat failed", e);
-          }
         }
         const targetRoom = roomKey ?? `temp_${owner?.email ?? "anon"}`;
         addLocalMessage(String(targetRoom), tempMsg as ChatMessage);
 
-        try {
-          await sendMessage(String(targetRoom), text, tempId);
-        } catch (err) {
-          console.warn("AdsDetailsPage: sendMessage failed", err);
+        // Always prefer websocket for sending messages (persistent rooms use wss/chat/<id>/)
+        if (roomKey) {
+          try {
+            await connectToRoom(roomKey);
+          } catch (e) {
+            console.debug("connectToRoom failed for persistent room", e);
+          }
+          try {
+            await sendMessage(String(roomKey), text, tempId);
+            // Open in-page chat for persistent rooms
+            setOpenLiveChatRoomId(String(roomKey));
+          } catch (err) {
+            console.warn("AdsDetailsPage: sendMessage via websocket failed for persistent room", err);
+            toast.error("Failed to send message via websocket");
+          }
+        } else {
+          try {
+            await sendMessage(String(targetRoom), text, tempId);
+          } catch (err) {
+            console.warn("AdsDetailsPage: sendMessage via websocket failed for temp room", err);
+            toast.error("Failed to send message via websocket");
+          }
         }
       } catch (err) {
         console.warn("AdsDetailsPage: addLocalMessage/send flow failed", err);
@@ -766,6 +775,11 @@ const AdsDetailsPage = () => {
         <SimilarAds relatedProducts={relatedProducts} />
         <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
+      {openLiveChatRoomId && (
+        <div className="fixed bottom-4 right-4 z-50 w-[360px] h-[480px]">
+          <LiveChat caseId={openLiveChatRoomId} onClose={() => setOpenLiveChatRoomId(null)} />
+        </div>
+      )}
       <MenuButton />
     </div>
   );

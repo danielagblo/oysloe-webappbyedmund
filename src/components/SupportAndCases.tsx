@@ -46,7 +46,7 @@ export default function SupportAndCases({
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
-              return {
+              return ({
                 id: raw.id,
                 name: raw.name ?? String(raw.id ?? ""),
                 is_group: raw.is_group ?? false,
@@ -55,7 +55,7 @@ export default function SupportAndCases({
                 created_at: raw.created_at ?? raw.createdAt ?? null,
                 messages: Array.isArray(raw.messages) ? raw.messages : [],
                 members: Array.isArray(raw.members) ? raw.members : [],
-              } as ChatRoom;
+              } as ChatRoom);
             };
 
             // Handle initial chatrooms list

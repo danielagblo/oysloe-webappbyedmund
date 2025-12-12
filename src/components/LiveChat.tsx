@@ -335,7 +335,16 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (el) el.scrollTop = el.scrollHeight;
 
     try {
-      await sendMessage(String(caseId), text, tempId);
+      // ensure the websocket room client is connected before sending
+      if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
+        try {
+          await connectToRoom(validatedRoomId);
+        } catch (e) {
+          console.debug("LiveChat: connectToRoom before send failed", e);
+        }
+      }
+
+      await sendMessage(String(validatedRoomId ?? caseId), text, tempId);
     } catch (e) {
       console.error("Failed to send message via ws/rest fallback", e);
     } finally {
@@ -364,7 +373,16 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
     try {
-      await sendMessage(String(caseId), "", tempId, file);
+      // ensure connection for files as well
+      if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
+        try {
+          await connectToRoom(validatedRoomId);
+        } catch (e) {
+          console.debug("LiveChat: connectToRoom before file send failed", e);
+        }
+      }
+
+      await sendMessage(String(validatedRoomId ?? caseId), "", tempId, file);
     } catch (err) {
       console.error("Image send failed", err);
     } finally {
