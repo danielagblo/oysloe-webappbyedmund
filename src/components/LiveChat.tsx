@@ -316,9 +316,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
     setInput("");
 
-    // optimistic UI
-    const optimistic: ChatMessage = {
-      id: Date.now(),
+    // optimistic UI (do NOT set a stable `id` locally; use a temp id instead)
+    const optimistic: Partial<ChatMessage> = {
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: text,
@@ -358,8 +357,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
     const file = fileInput.files[0];
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const optimistic: ChatMessage = {
-      id: Date.now(),
+    const optimistic: Partial<ChatMessage> = {
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: "",
@@ -403,7 +401,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
-          {(messages[validatedRoomId ?? ""] || []).map((msg) => {
+          {(messages[validatedRoomId ?? ""] || []).map((msg, idx) => {
             const isMine = currentUser && msg.sender?.id === currentUser.id;
             const delivery = getMessageDelivery(msg as unknown);
 
@@ -426,97 +424,65 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                 key={msg.id}
                 className={isMine ? "flex justify-end" : "flex justify-start"}
               >
-                <div
-                  className={`flex flex-col items-${isMine ? "end" : "start"}`}
-                >
-                  <div className="inline-flex items-center  z-20 -mb-2 gap-2">
-                    {!isMine && (
-                      <img
-                        src="/face.svg"
-                        alt="User"
-                        className="w-8 h-8 rounded-full"
-                      />
-                    )}
-                    <p className="text-sm inline">
-                      {msg.sender?.name ??
-                        (isMine ? (currentUser?.name ?? "Me") : "User")}
-                    </p>
-                  </div>
-                  <div
-                    className={`border border-gray-200 p-3 rounded-xl max-w-[70%] wrap-break-word ${isMine ? "bg-green-100 rounded-tr-none text-black" : "rounded-tl-none"}`}
-                  >
-                    {maybeImageSrc ? (
-                      <div className="flex flex-col">
-                        <img
-                          src={String(maybeImageSrc)}
-                          alt="attachment"
-                          className="max-w-full max-h-60 object-contain rounded cursor-pointer"
-                          onClick={() => openImage(String(maybeImageSrc))}
-                          role="button"
-                        />
-                        <div
-                          className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            <span>
-                              {formatTime(
-                                (msg as unknown as { created_at?: string })
-                                  .created_at ?? null,
-                              )}
-                            </span>
-                            {isMine && delivery && (
-                              <svg
-                                className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M20 6L9 17l-5-5"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </span>
+                <div className="flex flex-col">
+                  {isMine ? (
+                    <div className="flex flex-col justify-end gap-1">
+                      <div className="flex items-center gap-2 mb-1 justify-end">
+                        <p className="text-sm font-medium text-gray-600">You</p>
+                        <img src="/face.svg" alt="You" className="w-8 h-8 rounded-full" />
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
+                          {maybeImageSrc ? (
+                            <img
+                              src={String(maybeImageSrc)}
+                              alt="attachment"
+                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                              onClick={() => openImage(String(maybeImageSrc))}
+                              role="button"
+                            />
+                          ) : (
+                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <div>
-                        <p className="text-sm">{msg.content}</p>
-                        <div
-                          className={`text-[9px] text-gray-400 mt-2 ${isMine ? "text-right" : "text-left"}`}
-                        >
-                          <span className="inline-flex items-center gap-1">
-                            <span>
-                              {formatTime(
-                                (msg as unknown as { created_at?: string })
-                                  .created_at ?? null,
-                              )}
-                            </span>
-                            {isMine && delivery && (
-                              <svg
-                                className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  d="M20 6L9 17l-5-5"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </span>
+                      <div className="text-[9px] text-gray-400 mt-1 text-right">
+                        <span className="inline-flex items-center gap-1">
+                          <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
+                          {isMine && delivery && (
+                            <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-start gap-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <img src="/face.svg" alt="User" className="w-8 h-8 rounded-full" />
+                        <p className="text-sm font-medium">{msg.sender?.name ?? "User"}</p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
+                          {maybeImageSrc ? (
+                            <img
+                              src={String(maybeImageSrc)}
+                              alt="attachment"
+                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                              onClick={() => openImage(String(maybeImageSrc))}
+                              role="button"
+                            />
+                          ) : (
+                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                          )}
                         </div>
                       </div>
-                    )}
-                  </div>
+                      <div className="text-[9px] text-gray-400 mt-1 text-left">
+                        {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );

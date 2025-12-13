@@ -40,6 +40,7 @@ export default function useWsChat(): UseWsChatReturn {
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const roomClients = useRef<Record<string, WebSocketClient | null>>({});
+  const roomConnecting = useRef<Record<string, boolean>>({});
   const listClient = useRef<WebSocketClient | null>(null);
   const unreadClient = useRef<WebSocketClient | null>(null);
 
@@ -57,18 +58,37 @@ export default function useWsChat(): UseWsChatReturn {
 
   const ensureRoomClient = useCallback(
     async (roomId: string) => {
-      if (roomClients.current[roomId]?.isOpen()) return;
-      // close previous if exists
-      roomClients.current[roomId]?.close();
+      const key = String(roomId);
+
+      // If already connected or connecting, nothing to do
+      if (roomClients.current[key]?.isOpen()) return;
+      if (roomConnecting.current[key]) {
+        console.debug("useWsChat.ensureRoomClient: already connecting", { roomId: key });
+        return;
+      }
+      // mark as connecting to avoid races
+      roomConnecting.current[key] = true;
+      // close previous non-open client (we'll replace it)
+      try {
+        if (roomClients.current[key]) {
+          try {
+            roomClients.current[key]?.close();
+          } catch (e) {
+            /* ignore */
+          }
+        }
+      } catch {}
 
       const wsBase = getWsBase();
-      const encoded = encodeURIComponent(roomId);
+      const encoded = encodeURIComponent(key);
       const url = `${wsBase}/chat/${encoded}/`;
 
+      const clientId = `${key}-${Date.now()}`;
       console.log("useWsChat.ensureRoomClient: creating WebSocketClient", {
         url,
         tokenPresent: !!token,
-        roomId,
+        roomId: key,
+        clientId,
       });
 
       // Try once with the given url; if server rejects immediately (close code 1006), try without trailing slash
@@ -78,15 +98,20 @@ export default function useWsChat(): UseWsChatReturn {
       const createClient = (attemptUrl: string) =>
         new WebSocketClient(attemptUrl, token, {
           onOpen: () => {
-            console.log("useWsChat: socket open", { roomId, url: attemptUrl });
+            console.log("useWsChat: socket open", { roomId: key, url: attemptUrl, clientId });
+            // connected
+            roomConnecting.current[key] = false;
           },
           onClose: (ev) => {
             console.log("useWsChat: socket closed", {
-              roomId,
+              roomId: key,
               code: ev?.code,
               reason: ev?.reason,
               url: attemptUrl,
+              clientId,
             });
+            // allow reconnect attempts later
+            roomConnecting.current[key] = false;
             // If server closed immediately (1006) and we haven't tried the alt URL, try it once
             if (
               (ev?.code === 1006 || ev?.code === 1005) &&
@@ -96,16 +121,17 @@ export default function useWsChat(): UseWsChatReturn {
               triedAlternative = true;
               console.log("useWsChat: retrying with alternative URL", {
                 altUrl,
-                roomId,
+                roomId: key,
+                clientId,
               });
               // create alt client and connect
               const altClient = createClient(altUrl);
-              roomClients.current[roomId] = altClient;
+              roomClients.current[key] = altClient;
               try {
                 altClient.connect();
               } catch (err) {
                 console.warn("useWsChat: alt client connect failed", err, {
-                  roomId,
+                  roomId: key,
                   altUrl,
                 });
               }
@@ -113,37 +139,44 @@ export default function useWsChat(): UseWsChatReturn {
           },
           onError: (ev) => {
             console.warn("useWsChat: socket error", {
-              roomId,
+              roomId: key,
               ev,
               url: attemptUrl,
+              clientId,
             });
           },
           onMessage: (data) => {
             if (!data) return;
+            try {
+              console.debug("useWsChat.onMessage", { roomId: key, clientId, data });
+            } catch {}
             // If server sends an array of messages as history
             if (Array.isArray(data)) {
-              setMessages((prev) => ({ ...prev, [roomId]: data }));
+              setMessages((prev) => ({ ...prev, [key]: data }));
               return;
             }
-            // single message
-            if ((data as any).id) {
+            // single message (server may send message frames without an `id` yet)
+            if ((data as any).id || (data as any).type === "message") {
               const incoming = data as Message & { temp_id?: string };
               setMessages((prev) => {
-                const list = prev[roomId] || [];
-                // dedupe by id
-                if (list.find((m) => String(m.id) === String(incoming.id)))
-                  return prev;
+                const list = prev[key] || [];
+
+                // If `id` exists, dedupe by id first
+                if ((incoming as any).id) {
+                  if (list.find((m) => String(m.id) === String((incoming as any).id)))
+                    return prev;
+                }
 
                 // If server echoed our temp_id, replace the optimistic placeholder
                 const tempId = (incoming as any).temp_id;
                 if (tempId) {
                   const byTemp = list.findIndex(
-                    (m) => (m as any).__temp_id === tempId,
+                    (m) => ((m as any).__temp_id || (m as any).temp_id) === tempId,
                   );
                   if (byTemp !== -1) {
                     const newList = [...list];
                     newList[byTemp] = incoming;
-                    return { ...prev, [roomId]: newList };
+                    return { ...prev, [key]: newList };
                   }
                 }
 
@@ -160,23 +193,21 @@ export default function useWsChat(): UseWsChatReturn {
                   )
                     return false;
                   if (m.content !== incoming.content) return false;
-                  const mTime = m.created_at
-                    ? new Date(m.created_at).getTime()
-                    : 0;
+                  const mTime = m.created_at ? new Date(m.created_at).getTime() : 0;
                   return Math.abs(mTime - incomingTime) <= 5000; // 5 seconds
                 });
                 if (likelyIndex !== -1) {
-                  // If the existing message was an optimistic placeholder, replace it with the server message
                   const existing = list[likelyIndex] as any;
                   if (existing && existing.__optimistic) {
                     const newList = [...list];
                     newList[likelyIndex] = incoming;
-                    return { ...prev, [roomId]: newList };
+                    return { ...prev, [key]: newList };
                   }
                   // otherwise assume it's a duplicate and ignore incoming
                   return prev;
                 }
-                return { ...prev, [roomId]: [...list, incoming] };
+
+                return { ...prev, [key]: [...list, incoming] };
               });
               return;
             }
@@ -185,7 +216,7 @@ export default function useWsChat(): UseWsChatReturn {
         });
 
       const client = createClient(url);
-      roomClients.current[roomId] = client;
+      roomClients.current[key] = client;
       try {
         client.connect();
       } catch (err) {
@@ -199,8 +230,9 @@ export default function useWsChat(): UseWsChatReturn {
     async (roomId: string) => {
       // load history first
       try {
+        const key = String(roomId);
         const history = await chatService.getChatRoomMessages(roomId);
-        setMessages((prev) => ({ ...prev, [roomId]: history }));
+        setMessages((prev) => ({ ...prev, [key]: history }));
       } catch (err) {
         console.warn("useWsChat: failed to load history for", roomId, err);
       }
@@ -287,7 +319,8 @@ export default function useWsChat(): UseWsChatReturn {
       tempId?: string,
       file?: File | Blob,
     ) => {
-      const client = roomClients.current[roomId];
+      const key = String(roomId);
+      const client = roomClients.current[key];
       // If a file is provided, always use REST FormData upload (WS can't carry file reliably here)
       if (file) {
         // If the file is reasonably small, try embedding it as a data URL in the JSON
@@ -334,7 +367,7 @@ export default function useWsChat(): UseWsChatReturn {
                 asAny.content = String(possibleUrl);
 
               setMessages((prev) => {
-                const list = prev[roomId] || [];
+                const list = prev[key] || [];
                 if (returnedTemp) {
                   const idx = list.findIndex(
                     (m) =>
@@ -344,10 +377,10 @@ export default function useWsChat(): UseWsChatReturn {
                   if (idx !== -1) {
                     const newList = [...list];
                     newList[idx] = msg;
-                    return { ...prev, [roomId]: newList };
+                    return { ...prev, [key]: newList };
                   }
                 }
-                return { ...prev, [roomId]: [...list, msg] };
+                return { ...prev, [key]: [...list, msg] };
               });
               return true;
             }
@@ -412,7 +445,7 @@ export default function useWsChat(): UseWsChatReturn {
             }
 
             setMessages((prev) => {
-              const list = prev[roomId] || [];
+              const list = prev[key] || [];
               if (returnedTemp) {
                 const idx = list.findIndex(
                   (m) =>
@@ -422,10 +455,10 @@ export default function useWsChat(): UseWsChatReturn {
                 if (idx !== -1) {
                   const newList = [...list];
                   newList[idx] = msg;
-                  return { ...prev, [roomId]: newList };
+                  return { ...prev, [key]: newList };
                 }
               }
-              return { ...prev, [roomId]: [...list, msg] };
+              return { ...prev, [key]: [...list, msg] };
             });
           }
           return;
@@ -453,7 +486,8 @@ export default function useWsChat(): UseWsChatReturn {
           if (rid) {
             // ensure room client exists and try to send via websocket where possible
             await ensureRoomClient(rid);
-            const clientForResolved = roomClients.current[rid];
+            const ridKey = String(rid);
+            const clientForResolved = roomClients.current[ridKey];
             if (clientForResolved && clientForResolved.isOpen()) {
               clientForResolved.send({ type: "message", content: text, temp_id: tempId });
               return;
@@ -473,7 +507,8 @@ export default function useWsChat(): UseWsChatReturn {
           const rid = createdId != null ? String(createdId) : null;
           if (rid) {
             await ensureRoomClient(rid);
-            const clientForResolved = roomClients.current[rid];
+            const ridKey = String(rid);
+            const clientForResolved = roomClients.current[ridKey];
             if (clientForResolved && clientForResolved.isOpen()) {
               clientForResolved.send({ type: "message", content: text, temp_id: tempId });
               return;
@@ -518,7 +553,7 @@ export default function useWsChat(): UseWsChatReturn {
           }
 
           setMessages((prev) => {
-            const list = prev[roomId] || [];
+            const list = prev[key] || [];
             // If server returned our temp_id, replace optimistic placeholder
             if (returnedTemp) {
               const idx = list.findIndex(
@@ -530,7 +565,7 @@ export default function useWsChat(): UseWsChatReturn {
               if (idx !== -1) {
                 const newList = [...list];
                 newList[idx] = msg;
-                return { ...prev, [roomId]: newList };
+                return { ...prev, [key]: newList };
               }
             }
             // fallback: fuzzy match optimistic placeholder and replace if found
@@ -554,9 +589,9 @@ export default function useWsChat(): UseWsChatReturn {
             if (likelyIndex !== -1) {
               const newList = [...list];
               newList[likelyIndex] = msg;
-              return { ...prev, [roomId]: newList };
+              return { ...prev, [key]: newList };
             }
-            return { ...prev, [roomId]: [...list, msg] };
+            return { ...prev, [key]: [...list, msg] };
           });
         }
         return;
@@ -569,15 +604,17 @@ export default function useWsChat(): UseWsChatReturn {
   );
 
   const sendTyping = useCallback((roomId: string, typing: boolean) => {
-    const client = roomClients.current[roomId];
+    const k = String(roomId);
+    const client = roomClients.current[k];
     if (!client || !client.isOpen()) return;
     client.send({ type: "typing", typing });
   }, []);
 
   const markAsRead = useCallback(async (roomId: string) => {
     // Optimistically mark messages in this room as read locally so UI updates immediately
+    const k = String(roomId);
     setMessages((prev) => {
-      const list = prev[roomId] || [];
+      const list = prev[k] || [];
       if (list.length === 0) return prev;
       const updated = list.map((m) =>
         m.sender?.id !== undefined
@@ -586,11 +623,11 @@ export default function useWsChat(): UseWsChatReturn {
       );
       try {
         console.debug("useWsChat.markAsRead: optimistic update", {
-          roomId,
+          roomId: k,
           updatedCount: updated.length,
         });
       } catch {}
-      return { ...prev, [roomId]: updated };
+      return { ...prev, [k]: updated };
     });
 
     try {
@@ -600,7 +637,7 @@ export default function useWsChat(): UseWsChatReturn {
     }
 
     // also notify ws (best-effort)
-    const client = roomClients.current[roomId];
+    const client = roomClients.current[String(roomId)];
     try {
       client?.send({ type: "mark_read" });
     } catch {
@@ -610,13 +647,14 @@ export default function useWsChat(): UseWsChatReturn {
 
   const isRoomConnected = useCallback(
     (roomId: string) =>
-      !!roomClients.current[roomId] && roomClients.current[roomId]!.isOpen(),
+      !!roomClients.current[String(roomId)] && roomClients.current[String(roomId)]!.isOpen(),
     [],
   );
 
   const addLocalMessage = useCallback((roomId: string, msg: Message) => {
+    const k = String(roomId);
     setMessages((prev) => {
-      const list = prev[roomId] || [];
+      const list = prev[k] || [];
       // dedupe by id
       if (list.find((m) => String(m.id) === String(msg.id))) return prev;
       // dedupe by temp id if present
@@ -651,7 +689,7 @@ export default function useWsChat(): UseWsChatReturn {
       if ((msg as any).temp_id && !(msg as any).__temp_id) {
         (msg as any).__temp_id = (msg as any).temp_id;
       }
-      return { ...prev, [roomId]: [...list, msg] };
+      return { ...prev, [k]: [...list, msg] };
     });
   }, []);
 
