@@ -428,12 +428,10 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               >
                 <div className="flex flex-col">
                   {isMine ? (
-                    <div className="flex flex-col justify-end gap-1">
-                      <div className="flex items-center gap-2 mb-1 justify-end">
-                        <p className="text-sm font-medium text-gray-600">You</p>
-                        <img src="/face.svg" alt="You" className="w-8 h-8 rounded-full" />
-                      </div>
-                      <div className="flex justify-end gap-2">
+                    <div className="flex flex-col items-end gap-1">
+                      <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+
+                      <div className="relative flex items-end justify-end">
                         <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
                           {maybeImageSrc ? (
                             <img
@@ -447,7 +445,13 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                             <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                           )}
                         </div>
+                        <img
+                          src="/favicon.png"
+                          alt="You"
+                          className="w-10 h-auto rounded-full absolute -top-6 -right-3 border-2 border-white shadow"
+                        />
                       </div>
+
                       <div className="text-[9px] text-gray-400 mt-1 text-right">
                         <span className="inline-flex items-center gap-1">
                           <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
@@ -461,11 +465,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                     </div>
                   ) : (
                     <div className="flex flex-col items-start gap-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <img src="/face.svg" alt="User" className="w-8 h-8 rounded-full" />
-                        <p className="text-sm font-medium">{msg.sender?.name ?? "User"}</p>
-                      </div>
-                      <div className="flex items-start gap-2">
+                      <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
+
+                      <div className="relative flex items-start justify-start">
                         <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
                           {maybeImageSrc ? (
                             <img
@@ -479,7 +481,13 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                             <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                           )}
                         </div>
+                        <img
+                          src="/favicon.png"
+                          alt="User"
+                          className="w-10 h-auto rounded-full absolute -top-6 -left-3 border-2 border-white shadow"
+                        />
                       </div>
+
                       <div className="text-[9px] text-gray-400 mt-1 text-left">
                         {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
                       </div>
