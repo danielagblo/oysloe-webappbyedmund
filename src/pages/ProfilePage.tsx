@@ -37,6 +37,23 @@ const ProfilePage = () => {
     }
   });
 
+  const [previousTab, setPreviousTab] = useState<string | null>(null);
+
+  // Store the previous page on mount
+  useEffect(() => {
+    try {
+      const referrer = document.referrer || "/homepage";
+      localStorage.setItem("profile_previous_page", referrer);
+    } catch {
+      // ignore write failures
+    }
+  }, []);
+
+  // Track previous tab when activeTab changes
+  useEffect(() => {
+    setPreviousTab(activeTab);
+  }, []);
+
   // Persist the active tab so it remains selected across page reloads
   useEffect(() => {
     try {
@@ -47,12 +64,19 @@ const ProfilePage = () => {
   }, [activeTab]);
 
   const handleBackClick = () => {
-    const previousPage = localStorage.getItem("profile_previous_page");
-    if (previousPage && previousPage !== "/profile") {
-      navigate(previousPage);
-      localStorage.removeItem("profile_previous_page");
+    // If there's a previous tab, go back to it
+    if (previousTab && previousTab !== activeTab) {
+      setActiveTab(previousTab);
+      setPreviousTab(activeTab);
     } else {
-      navigate(-1);
+      // Otherwise, go back to the page before ProfilePage
+      const previousPage = localStorage.getItem("profile_previous_page");
+      if (previousPage) {
+        navigate(previousPage);
+        localStorage.removeItem("profile_previous_page");
+      } else {
+        navigate(-1);
+      }
     }
   };
 
