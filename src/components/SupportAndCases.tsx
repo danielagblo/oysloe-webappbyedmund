@@ -265,7 +265,7 @@ export default function SupportAndCases({
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 truncate">
-                  {previewText || "No messages"}
+                  {previewText || ""}
                 </p>
               </div>
             </button>
