@@ -32,16 +32,16 @@ const QuickChat: React.FC<QuickChatProps> = ({
         >
           Delivery possible?
         </button>
-        <div className="flex flex-wrap gap-2" >
+        <div className="flex flex-row flex-wrap gap-1" >
           <button
-            className="px-4 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
             onClick={() => setQuickChatInput("Lower the price please?")}
           >
             Lower the price please?
           </button>
 
           <button
-            className="px-4 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
             onClick={() => setQuickChatInput("Confirm the condition?")}
           >
             Confirm the condition?
