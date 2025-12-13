@@ -49,12 +49,12 @@ const AdsPage = () => {
       {isSmall && (
         <div className="flex flex-col w-screen h-screen bg-gray-50 max-sm:pt-14">
           {/* Inline Tab Buttons */}
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-4 overflow-x-auto no-scrollbar">
+          <div className="flex px-4 py-4 gap-2 w-full justify-around overflow-x-auto no-scrollbar">
             {["Active", "Pending", "Taken", "Suspended"].map((status) => (
               <button
                 key={status}
                 onClick={() => setActiveTab(status)}
-                className={`flex items-center justify-center gap-1 shadow-xs px-2 py-3 text-base rounded-xl font-medium whitespace-nowrap transition-all ${
+                className={`flex items-center justify-center gap-1 shadow-xs px-2 py-2 text-sm rounded-xl font-medium whitespace-nowrap transition-all ${
                   activeTab === status
                     ? "bg-(--green) text-(--dark-def)"
                     : "bg-white text-(--dark-def)"

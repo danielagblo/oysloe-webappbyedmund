@@ -24,7 +24,7 @@ const FavouritesPage = () => {
       {isSmall && (
         <div className="flex flex-col w-screen h-screen bg-gray-50 max-sm:pt-14">
           {/* Header */}
-          <div className="px-4 py-4">
+          {/* <div className="px-4 py-4">
             <div className="flex items-center gap-3">
               <img
                 src="/favorited.svg"
@@ -36,7 +36,7 @@ const FavouritesPage = () => {
                 <p className="text-sm text-gray-600">Ads Favourited</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Favourites List */}
           <div className="flex-1 overflow-y-auto px-4 pb-20">
