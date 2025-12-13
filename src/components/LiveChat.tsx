@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import useWsChat from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
+import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
 import type { UserProfile } from "../types/UserProfile";
 type LiveChatProps = {
@@ -15,6 +16,7 @@ type ChatInputProps = {
   onSend: () => void;
   disabled?: boolean;
   onAttach?: () => void;
+  onRecord?: (recording: boolean) => void;
 };
 
 function ChatInput({
@@ -24,7 +26,20 @@ function ChatInput({
   onSend,
   disabled,
   onAttach,
+  onRecord,
 }: ChatInputProps) {
+  const [recording, setRecording] = useState(false);
+
+  const toggleRecording = () => {
+    if (disabled) return;
+    const next = !recording;
+    setRecording(next);
+    try {
+      onRecord?.(next);
+    } catch {
+      // ignore
+    }
+  };
   return (
     <div className="relative flex gap-2 w-full">
       <input
@@ -36,7 +51,6 @@ function ChatInput({
         style={{ border: "1px solid var(--div-border)" }}
         className="rounded-2xl px-10 py-3 bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
       />
-      {/* file input moved to parent; attach button will call parent handler */}
       <button
         onClick={onSend}
         type="button"
@@ -47,6 +61,20 @@ function ChatInput({
       >
         <img src="/send.svg" alt="Send" className="w-6 h-6" />
       </button>
+      {/* file input moved to parent; attach button will call parent handler */}
+      <button
+        onClick={toggleRecording}
+        type="button"
+        aria-label={recording ? "Stop recording" : "Start recording"}
+        disabled={disabled}
+        style={{ border: "1px solid var(--div-border)" }}
+        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${recording ? "bg-red-500 text-white" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      >
+        {/* microphone icon */}
+        <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+      </button>
+
+
       <button
         onClick={() => onAttach?.()}
         className="absolute bottom-3 left-3"
@@ -82,6 +110,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   } | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
 
   const openImage = (src: string) => {
     setLightboxSrc(src);
@@ -147,6 +176,48 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       mounted = false;
     };
   }, []);
+
+  // Prefetch avatars for message senders using product data if sender.avatar missing
+  useEffect(() => {
+    const senders = new Set<number>();
+    Object.values(messages).forEach((roomMsgs) => {
+      (roomMsgs || []).forEach((m: any) => {
+        if (m?.sender?.id != null) senders.add(Number(m.sender.id));
+      });
+    });
+
+    const missing = Array.from(senders).filter((id) => !avatarMap[id]);
+    if (missing.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      for (const id of missing) {
+        try {
+          // First try to fetch products for owner; use product image or owner.avatar if available
+          const prods = await productService.getProductsForOwner(id);
+          if (cancelled) return;
+          if (Array.isArray(prods) && prods.length > 0) {
+            const p = prods[0] as any;
+            const ownerAvatar = p?.owner?.avatar || p?.owner?.image || null;
+            const prodImage = p?.image || (Array.isArray(p?.images) && p.images[0]?.image) || null;
+            const avatar = ownerAvatar || prodImage || null;
+            if (avatar) {
+              setAvatarMap((s) => ({ ...s, [id]: String(avatar) }));
+              continue;
+            }
+          }
+
+          // As a last fallback, try fetching product detail by owner (getProductsForOwner may return none)
+        } catch (e) {
+          void e;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages, avatarMap]);
 
   // Debug: show incoming caseId changes
   useEffect(() => {
@@ -446,9 +517,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                           )}
                         </div>
                         <img
-                          src="/favicon.png"
+                          src={
+                            avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"
+                          }
                           alt="You"
-                          className="w-10 h-auto rounded-full absolute -top-6 -right-3 border-2 border-white shadow"
+                          className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
                         />
                       </div>
 
@@ -482,9 +555,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                           )}
                         </div>
                         <img
-                          src="/favicon.png"
+                          src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
                           alt="User"
-                          className="w-10 h-auto rounded-full absolute -top-6 -left-3 border-2 border-white shadow"
+                          className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
                         />
                       </div>
 
