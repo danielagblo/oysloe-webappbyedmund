@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import useFeedbacks, {
   useCreateFeedback,
 } from "../features/feedback/useFeedback";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { toast } from "sonner";
 
 const FeedbackPage = () => {
   const [selectedStars, setSelectedStars] = useState<number>(0);
@@ -9,9 +11,39 @@ const FeedbackPage = () => {
   const [sent, setSent] = useState(false);
   const [noRating, setNoRating] = useState(false);
   const [noReviewMessage, setNoReviewMessage] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalStartY, setModalStartY] = useState(0);
+  const [modalTranslateY, setModalTranslateY] = useState(0);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const isSmall = useIsSmallScreen();
 
   useFeedbacks();
   const create = useCreateFeedback();
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (modalRef.current?.contains(e.target as Node)) {
+      setModalStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (modalStartY === 0) return;
+    const currentY = e.touches[0].clientY;
+    const diff = currentY - modalStartY;
+    if (diff > 0) {
+      setModalTranslateY(diff);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (modalTranslateY > 100) {
+      setShowModal(false);
+      setModalTranslateY(0);
+    } else {
+      setModalTranslateY(0);
+    }
+    setModalStartY(0);
+  };
 
   const submit = async () => {
     setNoRating(false);
@@ -21,11 +53,13 @@ const FeedbackPage = () => {
 
     if (selectedStars < 1) {
       setNoRating(true);
+      toast.error("Please choose a rating.");
       hasError = true;
     }
 
     if (!comment.trim()) {
       setNoReviewMessage(true);
+      toast.error("Please enter a review message.");
       hasError = true;
     }
 
@@ -36,11 +70,94 @@ const FeedbackPage = () => {
       setComment("");
       setSelectedStars(0);
       setSent(true);
+      setShowModal(false);
+      toast.success("Thank you. Your feedback has been sent!");
       setTimeout(() => setSent(false), 3000);
     } catch (err) {
       console.error("Failed to submit feedback", err);
+      toast.error("Failed to submit feedback");
     }
   };
+
+  if (isSmall) {
+    return (
+      <div className="flex justify-center items-center h-screen w-screen bg-gray-50">
+        <div className="flex flex-col w-full max-w-md h-full items-center justify-center gap-4 px-4 py-8">
+          <div className="flex flex-col items-center justify-center w-full gap-4 -mt-40">
+            <h2 className="text-3xl font-medium text-gray-700">Feedback</h2>
+            <p className="text-gray-500 text-base">Help us improve on our app</p>
+
+            <div className="my-6 max-sm:my-2.5 text-5xl space-x-2">
+              {Array.from({ length: 5 }).map((_, i) => {
+                const num = i + 1;
+                return (
+                  <span
+                    key={i}
+                    className={`cursor-pointer ${num <= selectedStars ? "text-yellow-500" : "text-gray-300"}`}
+                    onClick={() => setSelectedStars(num)}
+                  >
+                    ★
+                  </span>
+                );
+              })}
+            </div>
+            <p className="text-gray-500 text-base">
+              {selectedStars === 0 ? "No rating" : `${selectedStars} / 5`}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-white text-gray-700 py-4 rounded-2xl font-medium text-base cursor-pointer hover:bg-gray-100 transition fixed bottom-20 left-4 right-4"
+          >
+            Send Feedback
+          </button>
+        </div>
+
+        {showModal && (
+          <>
+            <div
+              className="fixed inset-0 bg-black/30 z-40"
+              onClick={() => setShowModal(false)}
+            />
+            <div
+              ref={modalRef}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 max-w-md mx-auto w-full transition-transform"
+              style={{
+                transform: `translateY(${modalTranslateY}px)`,
+              }}
+            >
+              <div className="flex justify-center pt-2 pb-4">
+                <div className="w-12 h-1 bg-gray-300 rounded-full" />
+              </div>
+              <div className="px-4 pb-8 max-h-[80vh] overflow-y-auto">
+                <h3 className="text-xl font-medium text-gray-700 mb-6">
+                  Send Your Feedback
+                </h3>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="border-2 border-gray-300 w-full h-40 rounded-2xl text-base resize-none p-4 mb-4"
+                  placeholder="Tell us what you think..."
+                />
+
+                <button
+                  onClick={submit}
+                  disabled={create.status === "pending"}
+                  className="w-full text-base cursor-pointer bg-gray-100 py-3 rounded-2xl hover:bg-gray-200 active:scale-95 transition font-medium"
+                >
+                  {create.status === "pending" ? "Sending..." : "Send Review"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-between h-screen w-screen items-center gap-2 lg:overflow-hidden">

@@ -177,7 +177,8 @@ function ServiceApplicationPage() {
       navigate("/");
     } catch (err: any) {
       console.error("Failed to submit application:", err);
-      const msg = err instanceof Error ? err.message : "Failed to submit application";
+      const msg =
+        err instanceof Error ? err.message : "Failed to submit application";
       toast.error(msg);
     } finally {
       setIsSaving(false);
@@ -192,12 +193,13 @@ function ServiceApplicationPage() {
           className="flex items-center gap-1 sm:gap-2 flex-1 sm:flex-none"
         >
           <div
-            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm ${step === currentStep
+            className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm ${
+              step === currentStep
                 ? "bg-(--dark-def) text-white"
                 : step < currentStep
                   ? "bg-green-500 text-white"
                   : "bg-gray-300 text-gray-600"
-              }`}
+            }`}
           >
             {step < currentStep ? "✓" : step}
           </div>
@@ -241,8 +243,9 @@ function ServiceApplicationPage() {
             <button
               onClick={() => handleSaveDraft(false)}
               disabled={isSaving}
-              className={`px-3 sm:px-6 py-2 bg-(--dark-def) text-white rounded-lg text-xs sm:text-base font-medium transition-all whitespace-nowrap ${isSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
-                }`}
+              className={`px-3 sm:px-6 py-2 bg-(--dark-def) text-white rounded-lg text-xs sm:text-base font-medium transition-all whitespace-nowrap ${
+                isSaving ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+              }`}
             >
               {isSaving ? "Saving..." : "Save"}
             </button>

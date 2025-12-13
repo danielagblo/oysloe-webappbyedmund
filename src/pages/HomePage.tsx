@@ -38,9 +38,15 @@ const HomePage = () => {
 
   // Filter states
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
-  const [selectedTimeframe, setSelectedTimeframe] = useState<"newest" | "7days" | "30days" | "anytime">("anytime");
-  const [priceSort, setPriceSort] = useState<"none" | "low-to-high" | "high-to-low">("none");
-  const [timeframeSort, setTimeframeSort] = useState<"none" | "newest" | "oldest">("none");
+  const [selectedTimeframe, setSelectedTimeframe] = useState<
+    "newest" | "7days" | "30days" | "anytime"
+  >("anytime");
+  const [priceSort, setPriceSort] = useState<
+    "none" | "low-to-high" | "high-to-low"
+  >("none");
+  const [timeframeSort, setTimeframeSort] = useState<
+    "none" | "newest" | "oldest"
+  >("none");
   const [priceFilter, setPriceFilter] = useState<{
     mode: "none" | "below" | "above" | "between";
     below?: number;
@@ -48,15 +54,21 @@ const HomePage = () => {
     min?: number;
     max?: number;
   }>({ mode: "none" });
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | "">("");
-  const [selectedFeatures, setSelectedFeatures] = useState<Record<number, string>>({});
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null,
+  );
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<
+    number | ""
+  >("");
+  const [selectedFeatures, setSelectedFeatures] = useState<
+    Record<number, string>
+  >({});
 
   const handleAdClick = async (ad: Product, e: React.MouseEvent) => {
     e.preventDefault();
     setIsAdLoading(true);
     // Small delay to ensure overlay renders
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     navigate(`/ads/${ad.id}`, { state: { adData: ad }, replace: false });
     // Reset after navigation (component will unmount but just in case)
     setTimeout(() => setIsAdLoading(false), 500);
@@ -114,7 +126,13 @@ const HomePage = () => {
   if (categoriesLoading) console.log("Loading up categories...");
 
   // helper values and functions used by extracted components
-  const uniqueLocations: string[] = Array.from(new Set(products.map((p: Product) => (p.location?.name ?? p.location?.region ?? "")).filter(Boolean)));
+  const uniqueLocations: string[] = Array.from(
+    new Set(
+      products
+        .map((p: Product) => p.location?.name ?? p.location?.region ?? "")
+        .filter(Boolean),
+    ),
+  );
 
   const handleBackToHome = () => {
     setSelectedCategory(null);
@@ -127,7 +145,10 @@ const HomePage = () => {
     const el = document.getElementById(`move-${id}`);
     if (!el) return;
     const distance = Math.max(200, Math.floor(el.clientWidth * 0.6));
-    el.scrollBy({ left: dir === "left" ? -distance : distance, behavior: "smooth" });
+    el.scrollBy({
+      left: dir === "left" ? -distance : distance,
+      behavior: "smooth",
+    });
   };
 
   const applyFilters = (items: Product[]) => {
@@ -138,7 +159,12 @@ const HomePage = () => {
       out = out.filter((p) => p.category === selectedCategoryId);
     }
     if (selectedSubcategoryId !== null && selectedSubcategoryId !== "") {
-      out = out.filter((p) => p.product_features.some((pf: { feature?: { subcategory?: string | number } }) => pf.feature?.subcategory === selectedSubcategoryId));
+      out = out.filter((p) =>
+        p.product_features.some(
+          (pf: { feature?: { subcategory?: string | number } }) =>
+            pf.feature?.subcategory === selectedSubcategoryId,
+        ),
+      );
     }
 
     // Feature filtering (best effort - match string values)
@@ -176,13 +202,21 @@ const HomePage = () => {
     // Timeframe filter (approximate using created_at or createdAt)
     if (selectedTimeframe && selectedTimeframe !== "anytime") {
       const now = Date.now();
-      const cutoff = selectedTimeframe === "newest" ? 1000 * 60 * 60 * 24
-        : selectedTimeframe === "7days" ? 1000 * 60 * 60 * 24 * 7
-          : selectedTimeframe === "30days" ? 1000 * 60 * 60 * 24 * 30
-            : null;
+      const cutoff =
+        selectedTimeframe === "newest"
+          ? 1000 * 60 * 60 * 24
+          : selectedTimeframe === "7days"
+            ? 1000 * 60 * 60 * 24 * 7
+            : selectedTimeframe === "30days"
+              ? 1000 * 60 * 60 * 24 * 30
+              : null;
       if (cutoff) {
         out = out.filter((p) => {
-          const created = (p as unknown as { created_at?: string; createdAt?: string }).created_at || (p as unknown as { created_at?: string; createdAt?: string }).createdAt;
+          const created =
+            (p as unknown as { created_at?: string; createdAt?: string })
+              .created_at ||
+            (p as unknown as { created_at?: string; createdAt?: string })
+              .createdAt;
           const t = created ? Date.parse(created as string) : null;
           if (!t) return false;
           return now - t <= cutoff;
@@ -191,12 +225,26 @@ const HomePage = () => {
     }
 
     // Price filter
-    if (priceFilter?.mode === "below" && typeof priceFilter.below === "number") {
+    if (
+      priceFilter?.mode === "below" &&
+      typeof priceFilter.below === "number"
+    ) {
       out = out.filter((p) => Number(p.price) <= priceFilter.below!);
-    } else if (priceFilter?.mode === "above" && typeof priceFilter.above === "number") {
+    } else if (
+      priceFilter?.mode === "above" &&
+      typeof priceFilter.above === "number"
+    ) {
       out = out.filter((p) => Number(p.price) >= priceFilter.above!);
-    } else if (priceFilter?.mode === "between" && typeof priceFilter.min === "number" && typeof priceFilter.max === "number") {
-      out = out.filter((p) => Number(p.price) >= priceFilter.min! && Number(p.price) <= priceFilter.max!);
+    } else if (
+      priceFilter?.mode === "between" &&
+      typeof priceFilter.min === "number" &&
+      typeof priceFilter.max === "number"
+    ) {
+      out = out.filter(
+        (p) =>
+          Number(p.price) >= priceFilter.min! &&
+          Number(p.price) <= priceFilter.max!,
+      );
     }
 
     // Sorting
@@ -208,8 +256,20 @@ const HomePage = () => {
 
     if (timeframeSort === "newest" || timeframeSort === "oldest") {
       out = out.sort((a, b) => {
-        const ta = Date.parse((a as unknown as { created_at?: string; createdAt?: string }).created_at || (a as unknown as { created_at?: string; createdAt?: string }).createdAt || "");
-        const tb = Date.parse((b as unknown as { created_at?: string; createdAt?: string }).created_at || (b as unknown as { created_at?: string; createdAt?: string }).createdAt || "");
+        const ta = Date.parse(
+          (a as unknown as { created_at?: string; createdAt?: string })
+            .created_at ||
+            (a as unknown as { created_at?: string; createdAt?: string })
+              .createdAt ||
+            "",
+        );
+        const tb = Date.parse(
+          (b as unknown as { created_at?: string; createdAt?: string })
+            .created_at ||
+            (b as unknown as { created_at?: string; createdAt?: string })
+              .createdAt ||
+            "",
+        );
         if (!ta || !tb) return 0;
         return timeframeSort === "newest" ? tb - ta : ta - tb;
       });
@@ -267,9 +327,18 @@ const HomePage = () => {
         )}
 
         {selectedCategory ? (
-          <ConditionalAds selectedCategory={selectedCategory} productsByCategory={productsByCategory} applyFilters={applyFilters} handleAdClick={handleAdClick} />
+          <ConditionalAds
+            selectedCategory={selectedCategory}
+            productsByCategory={productsByCategory}
+            applyFilters={applyFilters}
+            handleAdClick={handleAdClick}
+          />
         ) : debouncedSearch ? (
-          <SearchResults products={products} applyFilters={applyFilters} handleAdClick={handleAdClick} />
+          <SearchResults
+            products={products}
+            applyFilters={applyFilters}
+            handleAdClick={handleAdClick}
+          />
         ) : (
           <>
             <div>
@@ -277,16 +346,28 @@ const HomePage = () => {
                 categories={categories}
                 onCategoryClick={handleCategoryClick}
               />
-              <CircularSummaries categories={categoriesWithCounts} total={totalProducts} categoriesLoading={categoriesLoading} categoriesError={categoriesError} />
+              <CircularSummaries
+                categories={categoriesWithCounts}
+                total={totalProducts}
+                categoriesLoading={categoriesLoading}
+                categoriesError={categoriesError}
+              />
             </div>
 
             <div className="bg-(--div-active) w-screen">
-              <ScrollableAds categories={categories} productsByCategory={productsByCategory} applyFilters={applyFilters} productsLoading={productsLoading} handleArrowClick={handleArrowClick} handleAdClick={handleAdClick} />
+              <ScrollableAds
+                categories={categories}
+                productsByCategory={productsByCategory}
+                applyFilters={applyFilters}
+                productsLoading={productsLoading}
+                handleArrowClick={handleArrowClick}
+                handleAdClick={handleAdClick}
+              />
               <div className="h-35 lg:h-35" />
             </div>
           </>
         )}
-        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center" >
+        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center">
           <FilterButton
             handleFilterSettings={handleFilterSettings}
             selectedCategoryId={selectedCategoryId}

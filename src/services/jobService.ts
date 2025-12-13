@@ -12,7 +12,8 @@ export const createJobApplication = async (body: any) => {
       if (body.location) fd.append("location", String(body.location));
       if (body.gender) fd.append("gender", String(body.gender));
       if (body.dob) fd.append("dob", String(body.dob));
-      if (body.cover_letter) fd.append("cover_letter", String(body.cover_letter));
+      if (body.cover_letter)
+        fd.append("cover_letter", String(body.cover_letter));
       fd.append("resume", body.resume as File);
 
       return apiClient.post(endpoints.jobApplications.create(), fd);

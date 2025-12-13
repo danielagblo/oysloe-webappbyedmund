@@ -51,9 +51,10 @@ const AdsPage = () => {
                 key={status}
                 onClick={() => setActiveTab(status)}
                 className={`flex items-center gap-2 cursor-pointer border-b-[5px] pb-3 lg:pr-3 transition-colors 
-                  ${activeTab === status
-                    ? "border-(--dark-def)"
-                    : "border-transparent hover:border-gray-300"
+                  ${
+                    activeTab === status
+                      ? "border-(--dark-def)"
+                      : "border-transparent hover:border-gray-300"
                   }`}
               >
                 <img
@@ -174,14 +175,16 @@ const AdsPage = () => {
               </div>
 
               {mapToLabel(selectedAd) === "Suspended" ||
-                mapToLabel(selectedAd) === "Other" ? (
+              mapToLabel(selectedAd) === "Other" ? (
                 <div className="flex flex-col gap-3 mt-6">
                   <div className="flex justify-around text-xs">
                     <button
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                        navigate(`/ads/${selectedAd!.id}`, {
+                          state: { adData: selectedAd },
+                        });
                       }}
                     >
                       View Product
@@ -245,7 +248,9 @@ const AdsPage = () => {
                       <div className=" mt-2 ml-2 text-sm text-gray-700 border border-(--div-border) rounded-xl p-2">
                         <div className="mb-3">
                           <p className="font-medium">Suspension note:</p>
-                          <p className="break-words">{selectedAd.suspension_note}</p>
+                          <p className="break-words">
+                            {selectedAd.suspension_note}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -258,7 +263,9 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                        navigate(`/ads/${selectedAd!.id}`, {
+                          state: { adData: selectedAd },
+                        });
                       }}
                     >
                       View Product
@@ -299,7 +306,9 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                        navigate(`/ads/${selectedAd!.id}`, {
+                          state: { adData: selectedAd },
+                        });
                       }}
                     >
                       View Product
@@ -357,7 +366,9 @@ const AdsPage = () => {
                       className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
-                        navigate(`/ads/${selectedAd!.id}`, { state: { adData: selectedAd } });
+                        navigate(`/ads/${selectedAd!.id}`, {
+                          state: { adData: selectedAd },
+                        });
                       }}
                     >
                       View Product
@@ -385,8 +396,8 @@ const AdsPage = () => {
                             duration: selectedAd.duration ?? "",
                             category: Number(
                               selectedAd.category ??
-                              selectedAd.category_id ??
-                              0,
+                                selectedAd.category_id ??
+                                0,
                             ),
                           };
 

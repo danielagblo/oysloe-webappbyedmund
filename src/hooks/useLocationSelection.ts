@@ -136,14 +136,19 @@ export default function useLocationSelection(
   };
 
   // user clicked a place from dropdown or typed a place we resolved:
-  const selectPlace = useCallback((opt: string) => {
-    const parsed = parseOptionString(opt);
-    // UI label shows place (and region for clarity)
-    const label = parsed.region ? `${parsed.place}, ${parsed.region}` : parsed.place;
-    setRegionLabel(label || null);
-    setLocationDetails({ region: parsed.region, place: parsed.place });
-    setShowSaveLocationModal(true);
-  }, [groupedLocations]);
+  const selectPlace = useCallback(
+    (opt: string) => {
+      const parsed = parseOptionString(opt);
+      // UI label shows place (and region for clarity)
+      const label = parsed.region
+        ? `${parsed.place}, ${parsed.region}`
+        : parsed.place;
+      setRegionLabel(label || null);
+      setLocationDetails({ region: parsed.region, place: parsed.place });
+      setShowSaveLocationModal(true);
+    },
+    [groupedLocations],
+  );
 
   // apply a saved location to the form (user clicked a saved shortcut)
   const applySavedLocation = useCallback((loc: SavedLocation) => {
@@ -156,10 +161,17 @@ export default function useLocationSelection(
   const saveCurrentLocation = useCallback(() => {
     if (!locationDetails) return false;
 
-    const label = newLocationName.trim() !== "" ? newLocationName.trim() : locationDetails.place;
+    const label =
+      newLocationName.trim() !== ""
+        ? newLocationName.trim()
+        : locationDetails.place;
     setSavedLocations((prev) => {
       if (
-        prev.some((p) => p.place === locationDetails.place && p.region === locationDetails.region)
+        prev.some(
+          (p) =>
+            p.place === locationDetails.place &&
+            p.region === locationDetails.region,
+        )
       )
         return prev;
       return [

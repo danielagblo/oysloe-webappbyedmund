@@ -19,7 +19,8 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
   owner,
 }) => {
   if (!isSellerAdsModalOpen) return null;
-  const sellerAdsToShow = sellerProducts?.filter((p) => !p.is_taken && p.status === "ACTIVE") ?? [];
+  const sellerAdsToShow =
+    sellerProducts?.filter((p) => !p.is_taken && p.status === "ACTIVE") ?? [];
 
   return (
     <div
@@ -62,10 +63,14 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                     {ad.name}
                   </h3>
                   <p className="text-gray-600 text-xs md:text-sm">
-                    {(ad.location?.name || "") + ((ad.location?.name && ad.location?.region) ? ", " : "") + (ad.location?.region || "") || "Unknown location"}
+                    {(ad.location?.name || "") +
+                      (ad.location?.name && ad.location?.region ? ", " : "") +
+                      (ad.location?.region || "") || "Unknown location"}
                   </p>
                   <p className="text-gray-800 font-semibold text-sm md:text-base mt-1">
-                    {ad.price ? `${formatMoney(ad.price)}${ad.type?.toLowerCase() === "rent" ? "/month" : ""}` : "Contact for price"}
+                    {ad.price
+                      ? `${formatMoney(ad.price)}${ad.type?.toLowerCase() === "rent" ? "/month" : ""}`
+                      : "Contact for price"}
                   </p>
                 </div>
               </Link>

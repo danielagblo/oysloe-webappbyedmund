@@ -8,7 +8,11 @@ interface AdDetailsProps {
   currentAdData?: Product | any;
 }
 
-const AdDetails: React.FC<AdDetailsProps> = ({ id, currentAdDataFromQuery, currentAdData }) => {
+const AdDetails: React.FC<AdDetailsProps> = ({
+  id,
+  currentAdDataFromQuery,
+  currentAdData,
+}) => {
   return (
     <div className=" sm:p-6 md:pl-0">
       <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Ad Details</h2>

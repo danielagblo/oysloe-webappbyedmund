@@ -65,10 +65,10 @@ const VerificationPage = () => {
   };
 
   return (
-    <div className="h-screen max-sm:bg-(--bg) w-screen flex text-(--dark-def) items-center justify-center">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
+    <div className="h-screen max-sm:bg-(--bg) w-screen flex text-(--dark-def) items-center max-sm:items-start justify-center max-sm:justify-center">
+      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 max-sm:pb-20">
         <div className="flex flex-col gap-5 items-center justify-center">
-          <h2 className="text-2xl max-sm:text-[36px]">OTP Login</h2>
+          <h2 className="text-2xl max-sm:text-[28px]">OTP Login</h2>
           <form className="w-4/5 max-sm:w-full relative">
             <div className="flex flex-col items-center p-8 max-sm:bg-(--bg) bg-white rounded-lg">
               <div className="flex space-x-2" id="otp-container">
@@ -84,20 +84,22 @@ const VerificationPage = () => {
             <div className="flex flex-col gap-3 w-full mt-8 max-sm:px-4">
               <Button
                 type="submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[54px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[20px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[18px]"
                 name={loading || localLoading ? "Verifying..." : "Submit"}
                 //should countdown 60 seconds then allows you to resend OTP
                 onClick={handleSubmit}
               />
             </div>
-            <h6 className="text-[16px] my-4 max-sm:mb-8 max-sm:my-6 sm:text-sm text-center">Can't Login?</h6>
+            <h6 className="text-[16px] my-4 max-sm:mb-8 max-sm:my-6 sm:text-sm text-center">
+              Can't Login?
+            </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
               <ResetDropdown />
               <OTPLogin page="otp-login" />
             </div>
           </form>
         </div>
-        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[16px] mt-20">
+        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[14px] mt-20">
           Don't have an account ?
           <Link to="/signUp">
             <h2 className="text-black inline opacity-100"> Sign up</h2>

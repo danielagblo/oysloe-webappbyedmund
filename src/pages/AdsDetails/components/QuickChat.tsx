@@ -17,8 +17,10 @@ const QuickChat: React.FC<QuickChatProps> = ({
         <img src="/quick chat.svg" alt="" className="w-5 h-5" />
         <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
       </div>
-      <div className="flex flex-wrap
-       flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start">
+      <div
+        className="flex flex-wrap
+       flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start"
+      >
         <button
           className="py-1 px-4  bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[22px] md:text-[1.8vw]  max-sm:py-1 hover:bg-gray-100 whitespace-nowrap w-fit"
           onClick={() => setQuickChatInput("👋")}
@@ -32,7 +34,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
         >
           Delivery possible?
         </button>
-        <div className="flex flex-row flex-wrap gap-1" >
+        <div className="flex flex-row flex-wrap gap-1">
           <button
             className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
             onClick={() => setQuickChatInput("Lower the price please?")}
@@ -77,10 +79,34 @@ const QuickChat: React.FC<QuickChatProps> = ({
           style={{ border: "1px solid var(--div-border)" }}
           className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white shrink-0"
         >
-          <svg className="w-6 h-6" viewBox="0 0 25 39" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.998535 14.625C1.98883 33.1542 23.9842 30.6966 23.9924 14.6384" stroke="#374957" strokeWidth="2" />
-            <rect x="6.49268" y="0.5" width="11" height="20" rx="5.5" fill="#374957" stroke="#374957" />
-            <rect x="10.4927" y="31.5" width="4" height="7" fill="#374957" stroke="#374957" />
+          <svg
+            className="w-6 h-6"
+            viewBox="0 0 25 39"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M0.998535 14.625C1.98883 33.1542 23.9842 30.6966 23.9924 14.6384"
+              stroke="#374957"
+              strokeWidth="2"
+            />
+            <rect
+              x="6.49268"
+              y="0.5"
+              width="11"
+              height="20"
+              rx="5.5"
+              fill="#374957"
+              stroke="#374957"
+            />
+            <rect
+              x="10.4927"
+              y="31.5"
+              width="4"
+              height="7"
+              fill="#374957"
+              stroke="#374957"
+            />
           </svg>
         </button>
       </div>

@@ -46,16 +46,17 @@ export default function SupportAndCases({
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
-              return ({
+              return {
                 id: raw.id,
                 name: raw.name ?? String(raw.id ?? ""),
                 is_group: raw.is_group ?? false,
                 // some payloads use `unread` rather than `total_unread`
-                total_unread: raw.total_unread ?? raw.unread ?? raw.unread_count ?? 0,
+                total_unread:
+                  raw.total_unread ?? raw.unread ?? raw.unread_count ?? 0,
                 created_at: raw.created_at ?? raw.createdAt ?? null,
                 messages: Array.isArray(raw.messages) ? raw.messages : [],
                 members: Array.isArray(raw.members) ? raw.members : [],
-              } as ChatRoom);
+              } as ChatRoom;
             };
 
             // Handle initial chatrooms list
@@ -74,7 +75,9 @@ export default function SupportAndCases({
               const normalized = normalizeRoom(payload);
               // Update allRooms
               setAllRooms((prev) => {
-                const idx = prev.findIndex((r) => String(r.id) === String(normalized.id));
+                const idx = prev.findIndex(
+                  (r) => String(r.id) === String(normalized.id),
+                );
                 if (idx === -1) return [normalized, ...prev];
                 const copy = [...prev];
                 copy[idx] = { ...copy[idx], ...normalized };
@@ -107,13 +110,13 @@ export default function SupportAndCases({
   useEffect(() => {
     // Calculate counts from all rooms received via WebSocket
     const userRooms = allRooms.filter((r) =>
-      r.members?.every((m) => !m.is_staff && !m.is_superuser)
+      r.members?.every((m) => !m.is_staff && !m.is_superuser),
     );
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
 
     const staffRooms = allRooms.filter((r) =>
-      r.members?.some((m) => m.is_staff || m.is_superuser)
+      r.members?.some((m) => m.is_staff || m.is_superuser),
     );
     setSupportActive(staffRooms.length);
   }, [allRooms]);
@@ -121,13 +124,18 @@ export default function SupportAndCases({
   // Precompute filtered room lists and memoize to avoid nested effects
   const userRoomsMemo = useMemo(
     () =>
-      allRooms.filter((r) => r.members?.every((m) => !m.is_staff && !m.is_superuser)),
-    [allRooms]
+      allRooms.filter((r) =>
+        r.members?.every((m) => !m.is_staff && !m.is_superuser),
+      ),
+    [allRooms],
   );
 
   const staffRoomsMemo = useMemo(
-    () => allRooms.filter((r) => r.members?.some((m) => m.is_staff || m.is_superuser)),
-    [allRooms]
+    () =>
+      allRooms.filter((r) =>
+        r.members?.some((m) => m.is_staff || m.is_superuser),
+      ),
+    [allRooms],
   );
 
   const HeaderTabs = () => (
@@ -188,7 +196,6 @@ export default function SupportAndCases({
   );
 
   function ChatsList({ rooms }: { rooms: ChatRoom[] }) {
-
     if (rooms.length === 0)
       return <p className="text-sm text-gray-500">No recent chats</p>;
 
@@ -201,24 +208,34 @@ export default function SupportAndCases({
               : null;
 
           // Prefer explicit last_message fields from websocket payload if present
-          const payloadLast = (r as any).last_message ?? (r as any).lastMessage ?? (r as any).last;
+          const payloadLast =
+            (r as any).last_message ??
+            (r as any).lastMessage ??
+            (r as any).last;
           const payloadLastContent = (() => {
             if (!payloadLast) return null;
             if (typeof payloadLast === "string") return payloadLast;
-            if (typeof payloadLast?.content === "string") return String(payloadLast.content);
-            if (typeof payloadLast?.text === "string") return String(payloadLast.text);
-            if (typeof payloadLast?.message === "string") return payloadLast.message;
-            if (typeof payloadLast?.message?.content === "string") return String(payloadLast.message.content);
+            if (typeof payloadLast?.content === "string")
+              return String(payloadLast.content);
+            if (typeof payloadLast?.text === "string")
+              return String(payloadLast.text);
+            if (typeof payloadLast?.message === "string")
+              return payloadLast.message;
+            if (typeof payloadLast?.message?.content === "string")
+              return String(payloadLast.message.content);
             return null;
           })();
 
           const lastContent =
             lastMessage && typeof (lastMessage as any).content === "string"
               ? String((lastMessage as any).content)
-              : payloadLastContent ?? "";
+              : (payloadLastContent ?? "");
 
           // If the last message content is a data URL (base64 image), show a friendly label instead
-          const previewText = lastContent && lastContent.startsWith("data:") ? "picture" : lastContent;
+          const previewText =
+            lastContent && lastContent.startsWith("data:")
+              ? "picture"
+              : lastContent;
 
           return (
             <button
@@ -242,10 +259,14 @@ export default function SupportAndCases({
                         {r.total_unread}
                       </span>
                     ) : null}
-                    {r.created_at ? new Date(r.created_at).toLocaleDateString() : ""}
+                    {r.created_at
+                      ? new Date(r.created_at).toLocaleDateString()
+                      : ""}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 truncate">{previewText || "No messages"}</p>
+                <p className="text-xs text-gray-500 truncate">
+                  {previewText || "No messages"}
+                </p>
               </div>
             </button>
           );
@@ -283,7 +304,6 @@ export default function SupportAndCases({
   );
 
   const OpenCases = ({ supportRooms }: { supportRooms: ChatRoom[] }) => {
-
     if (supportRooms.length === 0)
       return (
         <div>
@@ -305,22 +325,32 @@ export default function SupportAndCases({
                 room.messages && room.messages.length
                   ? room.messages[room.messages.length - 1]
                   : null;
-              const payloadLast = (room as any).last_message ?? (room as any).lastMessage ?? (room as any).last;
+              const payloadLast =
+                (room as any).last_message ??
+                (room as any).lastMessage ??
+                (room as any).last;
               const payloadLastContent = (() => {
                 if (!payloadLast) return null;
                 if (typeof payloadLast === "string") return payloadLast;
-                if (typeof payloadLast?.content === "string") return String(payloadLast.content);
-                if (typeof payloadLast?.text === "string") return String(payloadLast.text);
-                if (typeof payloadLast?.message === "string") return payloadLast.message;
-                if (typeof payloadLast?.message?.content === "string") return String(payloadLast.message.content);
+                if (typeof payloadLast?.content === "string")
+                  return String(payloadLast.content);
+                if (typeof payloadLast?.text === "string")
+                  return String(payloadLast.text);
+                if (typeof payloadLast?.message === "string")
+                  return payloadLast.message;
+                if (typeof payloadLast?.message?.content === "string")
+                  return String(payloadLast.message.content);
                 return null;
               })();
 
               const lastContent =
                 lastMessage && typeof (lastMessage as any).content === "string"
                   ? String((lastMessage as any).content)
-                  : payloadLastContent ?? "";
-              const previewText = lastContent && lastContent.startsWith("data:") ? "picture" : lastContent;
+                  : (payloadLastContent ?? "");
+              const previewText =
+                lastContent && lastContent.startsWith("data:")
+                  ? "picture"
+                  : lastContent;
 
               return (
                 <button
@@ -344,10 +374,14 @@ export default function SupportAndCases({
                             {room.total_unread}
                           </span>
                         ) : null}
-                        {room.created_at ? new Date(room.created_at).toLocaleDateString() : ""}
+                        {room.created_at
+                          ? new Date(room.created_at).toLocaleDateString()
+                          : ""}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 truncate">{previewText || "No messages"}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {previewText || "No messages"}
+                    </p>
                   </div>
                 </button>
               );

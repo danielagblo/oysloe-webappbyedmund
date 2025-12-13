@@ -36,7 +36,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <h2 className="text-base  md:text-[1.125vw]">
           {currentAdData?.average_rating ? currentAdData.average_rating : "0.0"}{" "}
           &nbsp;&nbsp;&nbsp;{currentAdData?.total_reviews || "No"} Review
-          {(currentAdData?.total_reviews > 1 || currentAdData?.total_reviews === 0) &&
+          {(currentAdData?.total_reviews > 1 ||
+            currentAdData?.total_reviews === 0) &&
             "s"}
         </h2>
       </div>

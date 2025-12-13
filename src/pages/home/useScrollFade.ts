@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const useScrollFade = (containerId: string) => {
   const [maskStyle, setMaskStyle] = useState<string>(
-    "linear-gradient(to right, black 100%)"
+    "linear-gradient(to right, black 100%)",
   );
 
   useEffect(() => {
@@ -25,13 +25,16 @@ const useScrollFade = (containerId: string) => {
       let gradient = "";
       if (atStart && !atEnd) {
         // Only fade on right
-        gradient = "linear-gradient(to right, black 0%, black 92%, transparent 100%)";
+        gradient =
+          "linear-gradient(to right, black 0%, black 92%, transparent 100%)";
       } else if (atEnd && !atStart) {
         // Only fade on left
-        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 100%)";
+        gradient =
+          "linear-gradient(to right, transparent 0%, black 8%, black 100%)";
       } else if (!atStart && !atEnd) {
         // Fade on both sides
-        gradient = "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
+        gradient =
+          "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)";
       } else {
         // No fade needed (shouldn't happen but safety)
         gradient = "linear-gradient(to right, black 100%)";

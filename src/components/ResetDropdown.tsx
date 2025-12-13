@@ -33,34 +33,33 @@ export const ResetDropdown = ({ page = "default" }: { page?: string }) => {
             e.stopPropagation();
             navigate("/login");
           }}
-          className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[50px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+          className="px-5 py-3 w-full bg-[#F9F9F9] font-medium text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
         >
           Login
         </button>
-      ) : page === "phone-reset" ?
-        (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate("/reset-password/email");
-            }}
-            className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[50px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
-          >
-            Reset with Email
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowResetDropdown((p) => !p);
-            }}
-            className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[50px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
-          >
-            Password Reset
-          </button>
-        )}
+      ) : page === "phone-reset" ? (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate("/reset-password/email");
+          }}
+          className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+        >
+          Reset with Email
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowResetDropdown((p) => !p);
+          }}
+          className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+        >
+          Password Reset
+        </button>
+      )}
 
       {showResetDropdown && (
         <div className="absolute left-0 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 pointer-events-auto">
@@ -84,7 +83,7 @@ export const ResetDropdown = ({ page = "default" }: { page?: string }) => {
             className="fixed top-0 left-0 h-screen w-screen z-40 bg-transparent"
             onClick={() => setShowResetDropdown(false)}
           />,
-          document.body
+          document.body,
         )}
     </div>
   );

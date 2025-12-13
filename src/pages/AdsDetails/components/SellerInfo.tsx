@@ -31,12 +31,16 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
           role="button"
           tabIndex={0}
           onClick={() => {
-            setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+            setSellerModalImage(
+              owner?.avatar || owner?.business_logo || "/userPfp2.jpg",
+            );
             setIsSellerModalOpen(true);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
-              setSellerModalImage(owner?.avatar || owner?.business_logo || "/userPfp2.jpg");
+              setSellerModalImage(
+                owner?.avatar || owner?.business_logo || "/userPfp2.jpg",
+              );
               setIsSellerModalOpen(true);
             }
           }}
@@ -48,12 +52,16 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             alt={`${owner?.name || "Seller"} business logo`}
             className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
             onClick={() => {
-              setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+              setSellerModalImage(
+                owner?.business_logo || owner?.avatar || "/userPfp2.jpg",
+              );
               setIsSellerModalOpen(true);
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
-                setSellerModalImage(owner?.business_logo || owner?.avatar || "/userPfp2.jpg");
+                setSellerModalImage(
+                  owner?.business_logo || owner?.avatar || "/userPfp2.jpg",
+                );
                 setIsSellerModalOpen(true);
               }
             }}
@@ -64,9 +72,9 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
         <h2 className="text-sm text-gray-500 md:text-[1vw]">
           {currentAdData?.created_at
             ? new Date(currentAdData.created_at).toLocaleString(undefined, {
-              month: "short",
-              year: "numeric",
-            })
+                month: "short",
+                year: "numeric",
+              })
             : ""}
         </h2>
         <h3 className="font-semibold md:text-[1.2vw]">
@@ -87,7 +95,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
           <img src="/tick.svg" alt="" className="w-3 h-3" />
           <span className="text-[10px] md:text-[0.9vw] text-green-800">
             {(() => {
-              const ownerLevel = (owner as unknown as { level?: string })?.level as string | undefined;
+              const ownerLevel = (owner as unknown as { level?: string })
+                ?.level as string | undefined;
               if (ownerLevel) return ownerLevel;
               return "High level";
             })()}
@@ -175,17 +184,29 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
     <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
       <div className="relative">
         <img
-          src={currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg"}
+          src={
+            currentAdData?.owner?.avatar ||
+            currentAdData?.owner?.business_logo ||
+            "/userPfp2.jpg"
+          }
           alt={currentAdData?.owner?.name || "Seller"}
           role="button"
           tabIndex={0}
           onClick={() => {
-            setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+            setSellerModalImage(
+              currentAdData?.owner?.avatar ||
+                currentAdData?.owner?.business_logo ||
+                "/userPfp2.jpg",
+            );
             setIsSellerModalOpen(true);
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
-              setSellerModalImage(currentAdData?.owner?.avatar || currentAdData?.owner?.business_logo || "/userPfp2.jpg");
+              setSellerModalImage(
+                currentAdData?.owner?.avatar ||
+                  currentAdData?.owner?.business_logo ||
+                  "/userPfp2.jpg",
+              );
               setIsSellerModalOpen(true);
             }
           }}
@@ -197,7 +218,11 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             alt={`${currentAdData?.owner?.name || "Seller"} business logo`}
             className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white cursor-pointer"
             onClick={() => {
-              setSellerModalImage(currentAdData?.owner?.business_logo || currentAdData?.owner?.avatar || "/userPfp2.jpg");
+              setSellerModalImage(
+                currentAdData?.owner?.business_logo ||
+                  currentAdData?.owner?.avatar ||
+                  "/userPfp2.jpg",
+              );
               setIsSellerModalOpen(true);
             }}
           />
@@ -207,9 +232,9 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
         <h2 className="text-sm text-gray-500">
           {currentAdData?.created_at
             ? new Date(currentAdData.created_at).toLocaleString(undefined, {
-              month: "short",
-              year: "numeric",
-            })
+                month: "short",
+                year: "numeric",
+              })
             : ""}
         </h2>
         <h3 className="font-semibold">

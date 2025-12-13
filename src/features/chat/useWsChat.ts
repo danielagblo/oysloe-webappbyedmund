@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import chatService, {
-    type ChatRoom,
-    type Message,
+  type ChatRoom,
+  type Message,
 } from "../../services/chatService";
 import WebSocketClient from "../../services/wsClient";
 
@@ -241,8 +241,6 @@ export default function useWsChat(): UseWsChatReturn {
     [ensureRoomClient],
   );
 
-  
-
   const connectToChatroomsList = useCallback(() => {
     if (listClient.current?.isOpen()) return;
     listClient.current?.close();
@@ -480,8 +478,14 @@ export default function useWsChat(): UseWsChatReturn {
         const possibleEmail = String(roomId).replace(/^temp_/, "");
         // Try to resolve existing room by email
         try {
-          const res = await chatService.resolveChatroomId({ email: possibleEmail } as any);
-          const resolved = (res as any)?.room_id ?? (res as any)?.room ?? (res as any)?.id ?? null;
+          const res = await chatService.resolveChatroomId({
+            email: possibleEmail,
+          } as any);
+          const resolved =
+            (res as any)?.room_id ??
+            (res as any)?.room ??
+            (res as any)?.id ??
+            null;
           const rid = resolved != null ? String(resolved) : null;
           if (rid) {
             // ensure room client exists and try to send via websocket where possible
@@ -489,35 +493,63 @@ export default function useWsChat(): UseWsChatReturn {
             const ridKey = String(rid);
             const clientForResolved = roomClients.current[ridKey];
             if (clientForResolved && clientForResolved.isOpen()) {
-              clientForResolved.send({ type: "message", content: text, temp_id: tempId });
+              clientForResolved.send({
+                type: "message",
+                content: text,
+                temp_id: tempId,
+              });
               return;
             }
             // fallback to REST send for resolved room
-            await chatService.sendMessageToRoom(rid, { content: text, message: text, temp_id: tempId } as any);
+            await chatService.sendMessageToRoom(rid, {
+              content: text,
+              message: text,
+              temp_id: tempId,
+            } as any);
             return;
           }
         } catch (err) {
-          console.debug("useWsChat: resolveChatroomId for temp email failed", err);
+          console.debug(
+            "useWsChat: resolveChatroomId for temp email failed",
+            err,
+          );
         }
 
         // If resolve failed, try to create a room via REST using the email
         try {
-          const created = await chatService.createChatRoom({ email: possibleEmail } as any);
-          const createdId = (created as any)?.id ?? (created as any)?.room_id ?? (created as any)?.room ?? null;
+          const created = await chatService.createChatRoom({
+            email: possibleEmail,
+          } as any);
+          const createdId =
+            (created as any)?.id ??
+            (created as any)?.room_id ??
+            (created as any)?.room ??
+            null;
           const rid = createdId != null ? String(createdId) : null;
           if (rid) {
             await ensureRoomClient(rid);
             const ridKey = String(rid);
             const clientForResolved = roomClients.current[ridKey];
             if (clientForResolved && clientForResolved.isOpen()) {
-              clientForResolved.send({ type: "message", content: text, temp_id: tempId });
+              clientForResolved.send({
+                type: "message",
+                content: text,
+                temp_id: tempId,
+              });
               return;
             }
-            await chatService.sendMessageToRoom(rid, { content: text, message: text, temp_id: tempId } as any);
+            await chatService.sendMessageToRoom(rid, {
+              content: text,
+              message: text,
+              temp_id: tempId,
+            } as any);
             return;
           }
         } catch (err) {
-          console.warn("useWsChat: failed to create chatroom for temp email", err);
+          console.warn(
+            "useWsChat: failed to create chatroom for temp email",
+            err,
+          );
         }
 
         throw new Error("Unable to resolve or create chatroom for temp email");
