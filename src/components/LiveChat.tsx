@@ -17,7 +17,7 @@ type ChatInputProps = {
   onSend: () => void;
   disabled?: boolean;
   onAttach?: () => void;
-  onRecord?: (recording: boolean) => void;
+  onRecord?: (recordingOrFile: boolean | File) => void;
   onRecorded?: (file: File) => void;
 };
 
@@ -32,17 +32,6 @@ function ChatInput({
 }: ChatInputProps) {
   const [recording, setRecording] = useState(false);
 
-  const toggleRecording = () => {
-    if (disabled) return;
-    const next = !recording;
-    // start/stop handled below with MediaRecorder
-    if (!next) {
-      // stop handled by stopRecording
-      stopRecording();
-      return;
-    }
-    void startRecording();
-  };
   const mediaRecRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
@@ -76,7 +65,7 @@ function ChatInput({
             const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
             try {
               console.debug("ChatInput: recorded file ready", { size: (file as any).size, type: file.type, name: file.name });
-              onRecorded?.(file);
+              onRecord?.(file);
             } catch (e) {
               void e;
             }
@@ -257,6 +246,33 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
   const [roomInfo, setRoomInfo] = useState<any | null>(null);
   const [headerProduct, setHeaderProduct] = useState<Product | null>(null);
+  // cache for object URLs created from data: URLs to avoid recreating blobs repeatedly
+  const dataUrlObjectUrlRef = useRef<Record<string, string>>({});
+
+  // Helper: convert data:...;base64,... into a Blob and return an object URL (cached)
+  const dataUrlToObjectUrl = (dataUrl: string) => {
+    try {
+      const cache = dataUrlObjectUrlRef.current;
+      if (cache[dataUrl]) return cache[dataUrl];
+      const comma = dataUrl.indexOf(",");
+      if (comma === -1) return dataUrl;
+      const meta = dataUrl.substring(0, comma);
+      const base64 = dataUrl.substring(comma + 1);
+      const m = /data:([^;]+);base64/.exec(meta);
+      const mime = m ? m[1] : "application/octet-stream";
+      // decode base64
+      const binary = atob(base64);
+      const len = binary.length;
+      const u8 = new Uint8Array(len);
+      for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+      const blob = new Blob([u8], { type: mime });
+      const url = URL.createObjectURL(blob);
+      cache[dataUrl] = url;
+      return url;
+    } catch {
+      return dataUrl;
+    }
+  };
 
   const openImage = (src: string) => {
     setLightboxSrc(src);
@@ -434,6 +450,20 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       mounted = false;
     };
   }, [validatedRoomId]);
+
+  // cleanup any created object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        Object.values(dataUrlObjectUrlRef.current).forEach((u) => {
+          try {
+            URL.revokeObjectURL(u);
+          } catch {/*ignore*/ }
+        });
+      } catch {/*ignore*/ }
+      dataUrlObjectUrlRef.current = {};
+    };
+  }, []);
 
   // Debug: show incoming caseId changes
   useEffect(() => {
@@ -723,26 +753,10 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       // Prefer uploading via the REST `/send` endpoint so audio is sent as multipart/form-data.
       // If that fails, fall back to the existing `sendMessage` hook which may use REST/WS.
       try {
-        const chatSvc = await import("../services/chatService");
-        const form = new FormData();
-        form.append("text", "");
-        form.append("temp_id", String(tempId));
-        form.append("file", file);
-        console.debug("LiveChat: uploading recorded file via /send", {
-          roomToSend,
-          tempId,
-          fileName: file.name,
-          fileSize: (file as any).size,
-        });
-        const resp = await chatSvc.sendMessageToRoom(String(roomToSend), form);
-        console.debug("LiveChat: upload response", resp);
-      } catch (uploadErr) {
-        console.error("Recorded /send upload failed, falling back to sendMessage()", uploadErr);
-        try {
-          await sendMessage(String(roomToSend), "", tempId, file);
-        } catch (fallbackErr) {
-          console.error("Fallback sendMessage failed", fallbackErr);
-        }
+        // Use sendMessage hook which handles file uploads correctly
+        await sendMessage(String(roomToSend), "", tempId, file);
+      } catch (err) {
+        console.error("Recorded file send failed", err);
       }
     } catch (err) {
       console.error("Recorded send failed", err);
@@ -808,13 +822,18 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               const asAny = msg as unknown as Record<string, unknown>;
               const content = typeof asAny.content === "string" ? String(asAny.content) : "";
               const explicitImage = (asAny.image_url ?? asAny.file_url ?? asAny.image) as string | undefined | null;
-              const explicitAudio = (asAny.audio_url ?? asAny.audio) as string | undefined | null;
+              // detect common attachment fields for audio: audio_url, audio, file_url, file, attachments
+              const explicitAudio = (asAny.audio_url ?? asAny.audio ?? asAny.file_url ?? asAny.file ?? (Array.isArray(asAny.attachments) && asAny.attachments[0] && (asAny.attachments[0].url || (asAny.attachments[0] as any).file))) as string | undefined | null;
               const isImageDataUrl = content.startsWith("data:image/");
               const isAudioDataUrl = content.startsWith("data:audio/");
-              const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-              const looksLikeAudioUrl = /^https?:\/\/.+\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
+              const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content) || /^\/.*\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
+              // broaden audio detection: URLs with audio extensions, /media/ paths, or relative paths
+              const looksLikeAudioUrl = /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content) || (/^https?:\/\//i.test(content) && /\/media\//i.test(content)) || /^\/media\//i.test(content) || /^\/.*\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
               const maybeImageSrc = explicitImage || (isImageDataUrl || looksLikeImageUrl ? content : null);
-              const maybeAudioSrc = explicitAudio || (isAudioDataUrl || looksLikeAudioUrl ? content : null);
+              // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
+              const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
+
+              
 
               nodes.push(
                 <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
@@ -916,7 +935,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             onSend={() => void handleSend()}
             disabled={sending}
             onAttach={() => fileInputRef.current?.click()}
-            onRecorded={(f) => void handleRecordedFile(f)}
+            onRecord={(f) => {
+              if (f instanceof File) {
+                void handleRecordedFile(f);
+              }
+            }}
           />
         </div>
 
