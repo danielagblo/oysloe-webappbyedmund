@@ -938,7 +938,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                               onChange={() => {}}
                               className="w-4 h-4 cursor-pointer"
                             />
-                            <span className="text-gray-800 text-sm font-semibold flex-1">
+                            <span className="text-gray-800 text-left pl-4 text-sm font-semibold flex-1">
                               All locations in {selectedRegion}
                             </span>
                           </button>
@@ -971,7 +971,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                               onChange={() => {}}
                               className="w-4 h-4 cursor-pointer"
                             />
-                            <span className="text-gray-800 text-sm flex-1">
+                            <span className="text-gray-800 text-left pl-4 text-sm flex-1">
                               {location}
                             </span>
                           </button>
