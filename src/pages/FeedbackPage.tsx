@@ -81,7 +81,8 @@ const FeedbackPage = () => {
 
   if (isSmall) {
     return (
-      <div className="flex justify-center items-center h-screen w-screen bg-gray-50">
+      <>
+        <div className="flex justify-center items-center h-screen w-screen bg-gray-50 pt-20">
         <div className="flex flex-col w-full max-w-md h-full items-center justify-center gap-4 px-4 py-8">
           <div className="flex flex-col items-center justify-center w-full gap-4 -mt-40">
             <h2 className="text-3xl font-medium text-gray-700">Feedback</h2>
@@ -155,7 +156,8 @@ const FeedbackPage = () => {
             </div>
           </>
         )}
-      </div>
+        </div>
+      </>
     );
   }
 

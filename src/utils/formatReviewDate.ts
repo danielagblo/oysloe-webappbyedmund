@@ -3,6 +3,18 @@ export function formatReviewDate(isoString: string): string {
   const now = new Date();
 
   const ms = now.getTime() - date.getTime();
+
+  // If date is in the future, just return the formatted date
+  if (ms < 0) {
+    const day = date.getDate();
+    const monthName = date.toLocaleString("en-US", { month: "long" });
+    const year = date.getFullYear();
+
+    const isThisYear = year === now.getFullYear();
+
+    return isThisYear ? `${monthName} ${day}` : `${monthName} ${day} ${year}`;
+  }
+
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(ms / (1000 * 60));
   const hours = Math.floor(ms / (1000 * 60 * 60));

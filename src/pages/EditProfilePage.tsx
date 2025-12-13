@@ -185,7 +185,8 @@ const EditProfilePage = () => {
   const [imageModalAlt, setImageModalAlt] = useState<string | null>(null);
 
   return (
-    <div className="flex justify-between min-h-screen w-screen relative">
+    <>
+      <div className="flex justify-between min-h-screen w-screen relative max-sm:pt-10">
       <style>{`
         .hide-scrollbar {
           -ms-overflow-style: none; /* IE and Edge */
@@ -193,7 +194,7 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-      <div className="flex flex-col lg:flex-row w-full -mt-4 md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 md:py-[3.5vh]">
+      <div className="flex flex-col lg:flex-row w-full md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 md:py-[3.5vh]">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2">
           <div className="relative lg:overflow-auto no-scrollbar bg-white  h-fit sm:h-[93vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
@@ -546,7 +547,7 @@ const EditProfilePage = () => {
               </div>
             )} */}
 
-            <div className="w-[95%] bg-white p-4 rounded-md">
+            <div className="w-[95%] bg-white p-4 rounded-md max-sm:pb-14">
               <div className="flex gap-6 items-center my-2">
                 <p className="text-sm font-medium">Payment Account</p>
               </div>
@@ -825,7 +826,8 @@ const EditProfilePage = () => {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

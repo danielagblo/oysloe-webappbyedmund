@@ -116,10 +116,7 @@ const ReferPage = () => {
 
   const Refer = () => (
     <div className="h-full md:h-[93vh] min-h-0 md:overflow-auto no-scrollbar w-full flex flex-col gap-2 rounded-2xl">
-      <h2 className="md:hidden max-md:block w-full text-center text-2xl font-bold max-md:mt-2 text-[var(--dark-def)]">
-        &nbsp; &nbsp; &nbsp;Refer a Friend
-      </h2>
-      <div className="max-md:px-2 max-md:mt-3">
+      <div className="max-md:px-2 max-md:mt-3 max-sm:mt-11">
         <div className="bg-white w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
           <div className="flex gap-2 my-2 ">
             <img
@@ -209,7 +206,7 @@ const ReferPage = () => {
         </div>
         <img className="mb-9" src="/arrowright.svg" alt="" />
       </div>
-      <div className="bg-white w-full h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 pb-18">
+      <div className="bg-white w-full max-sm:w-[96%] max-sm:mx-auto max-sm:h-fit h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 max-sm:pb-0 pb-18">
         <div className="w-full flex flex-col justify-center gap-2">
           <h2 className="text-sm 2xl:text-xl md:text-[1.5vw]">
             Refer Your friends and Earn
@@ -490,7 +487,7 @@ const ReferPage = () => {
 
       {(how || apply || redraw || showLevel) && (
         <div className="fixed inset-0 bg-white z-50 flex flex-col md:hidden animate-fadeIn">
-          <div className="flex items-center gap-3 p-4 pl-16 pt-7 border-b border-gray-200">
+          <div className="flex items-center gap-3 p-4 pt-7 border-b border-gray-200">
             <button
               onClick={() => {
                 setHow(false);

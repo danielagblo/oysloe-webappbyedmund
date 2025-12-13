@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Subscription from "../assets/Subscription.png";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import {
   useCreateUserSubscription,
   useSubscriptions,
@@ -9,6 +10,7 @@ import {
 import { initiatePaystackPayment } from "../services/paymentService";
 
 const SubscriptionPage = () => {
+  const isSmall = useIsSmallScreen();
   const subsQuery = useSubscriptions();
   const userSubsQuery = useUserSubscriptions();
 
@@ -25,10 +27,10 @@ const SubscriptionPage = () => {
     !!activeUserSub && new Date(activeUserSub.end_date).getTime() > now;
   const activeSubId = activeUserSub?.subscription?.id ?? null;
 
-  // track which subscription is currently being processed to avoid showing
-  // "Processing..." on all package buttons when one is clicked
+  // track which subscription is currently being processed and selected
   const [subscribingId, setSubscribingId] = useState<number | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [selectedSubId, setSelectedSubId] = useState<number | null>(null);
 
   const handleSubscribe = (id: number) => {
     (async () => {
@@ -69,6 +71,12 @@ const SubscriptionPage = () => {
         setSubscribingId(null);
       }
     })();
+  };
+
+  const handlePayNow = () => {
+    if (selectedSubId !== null) {
+      handleSubscribe(selectedSubId);
+    }
   };
 
   const handleRenew = (userSubId: number, subscriptionId: number) => {
@@ -121,8 +129,109 @@ const SubscriptionPage = () => {
     })();
   };
 
+  // Mobile layout
+  if (isSmall) {
+    return (
+      <>
+        <div className="flex flex-col w-full h-screen w-screen bg-gray-50 px-4 py-8 max-sm:py-20 overflow-y-auto">
+          {activeUserSub && (
+            <div className="bg-(--div-active) max-sm:bg-white flex p-4 rounded-2xl justify-between items-center gap-2 w-full mb-6">
+              <div className="w-full flex flex-col justify-start items-start gap-4">
+                <p className="text-sm font-light text-nowrap">
+                  You're currently subscribed
+                </p>
+                <div className="flex justify-start items-start gap-4">
+                  <p className="font-medium text-xs bg-[#FFECEC] px-1.5 py-0.5">
+                    {activeUserSub.subscription.name}
+                  </p>
+                  <p className="font-medium text-xs">
+                    Expires{" "}
+                    {new Date(activeUserSub.end_date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <img src={Subscription} alt="subscription" className="w-16" />
+            </div>
+          )}
+
+          <h2 className="text-center text-gray-500 font-medium mb-8">
+            Choose a monthly plan that works for you
+          </h2>
+
+          {subsQuery.isLoading && <p className="text-center">Loading plans...</p>}
+          {subsQuery.isError && (
+            <p className="text-center text-red-500">Failed to load plans</p>
+          )}
+
+          <div className="flex flex-col gap-6 flex-1">
+            {subscriptions.map((s) => (
+              <div
+                key={s.id}
+                onClick={() => setSelectedSubId(s.id)}
+                className={`rounded-2xl relative p-4 border cursor-pointer transition-all ${
+                  selectedSubId === s.id
+                    ? "border-4 border-black bg-white"
+                    : "border-4 border-transparent bg-white"
+                }`}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <p className="font-bold text-lg">
+                    {s.name}{" "}
+                    <span className="font-normal text-gray-600">
+                      {s.multiplier ? `${s.multiplier}x` : ""}
+                    </span>
+                  </p>
+                  {s.discount_percentage && (
+                    <div className="absolute right-5 -top-4 bg-gray-900 text-white text-xs p-2 rounded-full">
+                      For you {Number(s.discount_percentage).toString()}% off
+                    </div>
+                  )}
+                </div>
+
+                {s.features_list && (
+                  <ul className="mb-4 space-y-2">
+                    {s.features_list.map((f, i) => (
+                      <li key={i} className="text-sm text-gray-700">
+                        <span className="font-bold">✓ </span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div className="flex justify-start items-center gap-4">
+                  <p className="font-bold">
+                    ₵ {Number(s.effective_price ?? s.price).toFixed(0)}
+                  </p>
+                  {s.original_price && (
+                    <p className="text-gray-500 text-sm">
+                      ₵{" "}
+                      <span className="line-through">
+                        {Number(s.original_price).toFixed(0)}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={handlePayNow}
+            disabled={selectedSubId === null || subscribingId !== null}
+            className="w-full bg-gray-200  font-medium py-3 rounded-xl mt-8 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            {subscribingId !== null ? "Processing..." : "Pay Now"}
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // Desktop layout
   return (
-    <div className="flex justify-between h-screen w-screen items-center gap-2 no-scrollbar">
+    <>
+      <div className="flex justify-between h-screen w-screen items-center gap-2 no-scrollbar">
       <div className="flex flex-col lg:flex-row w-full -mt-10 md:mt-4 h-full md:py-[2vh] min-h-0 max-h-screen lg:overflow-hidden overflow-auto justify-start gap-4 no-scrollbar">
         <div className="lg:w-1/2">
           <div className="w-full md:bg-white md:h-[95vh] lg:overflow-auto no-scrollbar lg:w-full pt-20 md:mt-0 flex flex-col justify-start items-center gap-4 px-3 md:py-3 rounded-2xl text-xs">
@@ -263,7 +372,8 @@ const SubscriptionPage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

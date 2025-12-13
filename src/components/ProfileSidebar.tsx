@@ -111,7 +111,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       </div>
 
       {/* ---------- MOBILE MENU BUTTON ---------- */}
-      <div className="sm:hidden fixed top-4 left-4 z-[100]">
+      <div className="sm:hidden fixed top-2 right-3 z-[100]">
         <button
           onClick={() => setIsOpen(true)}
           className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border-gray-200"
@@ -122,12 +122,12 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
       {/* ---------- MOBILE SIDEBAR DRAWER ---------- */}
       {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-[200] flex">
+        <div className="sm:hidden fixed inset-0 z-[200] flex justify-end">
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative w-64 h-full bg-white shadow-2xl flex flex-col justify-between animate-slide-in-left">
+          <div className="relative w-64 h-full bg-white shadow-2xl flex flex-col justify-between animate-slide-in-right">
             <div className="flex flex-col gap-6 pt-8">
               <button
                 className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200"

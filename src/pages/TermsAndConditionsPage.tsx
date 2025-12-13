@@ -4,7 +4,8 @@ function TermsAndConditionsPage() {
   const { policy, isLoading, isError } = useLatestTermsAndConditions();
 
   return (
-    <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center">
+    <>
+      <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center max-sm:pt-10">
       <div
         className={`
           shadow-lg rounded-2xl bg-white lg:h-[93vh] px-6 py-10 sm:px-5 max-lg:pt-0 sm:py-6 w-full 
@@ -31,7 +32,8 @@ function TermsAndConditionsPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
