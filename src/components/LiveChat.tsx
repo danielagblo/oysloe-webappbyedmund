@@ -3,6 +3,7 @@ import useWsChat from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
+import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 type LiveChatProps = {
   caseId: string | null;
@@ -111,6 +112,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
+  const [roomInfo, setRoomInfo] = useState<any | null>(null);
+  const [headerProduct, setHeaderProduct] = useState<Product | null>(null);
 
   const openImage = (src: string) => {
     setLightboxSrc(src);
@@ -218,6 +221,46 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       cancelled = true;
     };
   }, [messages, avatarMap]);
+
+  // Fetch room details and try to resolve a product for the chat header
+  useEffect(() => {
+    if (!validatedRoomId) {
+      setRoomInfo(null);
+      setHeaderProduct(null);
+      return;
+    }
+    let mounted = true;
+    (async () => {
+      try {
+        const room = await (await import("../services/chatService")).getChatRoom(validatedRoomId);
+        if (!mounted) return;
+        setRoomInfo(room as any);
+
+        // If room includes staff members, treat this as an admin/case chat
+        const isAdminChat = Array.isArray((room as any).members) && (room as any).members.some((m: any) => m?.is_staff || m?.is_superuser);
+        if (isAdminChat) {
+          setHeaderProduct(null);
+          return;
+        }
+
+        // Try to fetch a product using the room id (some chats map to a product id)
+        try {
+          const prod = await productService.getProduct(Number(validatedRoomId));
+          if (!mounted) return;
+          setHeaderProduct(prod as Product);
+        } catch {
+          // fallback: no product found
+          setHeaderProduct(null);
+        }
+      } catch {
+        if (mounted) setRoomInfo(null);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [validatedRoomId]);
 
   // Debug: show incoming caseId changes
   useEffect(() => {
@@ -464,13 +507,37 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 ">
-      <div className="relative rounded-2xl bg-white px-4 py-3 h-full w-full flex flex-col">
-        <button className="absolute right-1 block sm:hidden" onClick={onClose}>
-          <img src="/close.svg" alt="" className="p-2" />
-        </button>
+      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col">
+
+        <div className="mb-2 w-full relative">
+          {/* Header: product or chat title / case number (edge-to-edge) */}
+          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 rounded-b-2xl bg-white shadow z-10 py-2">
+            <button
+              onClick={onClose}
+              aria-label="Back"
+              className="p-2 hover:bg-gray-100 rounded-full ml-2"
+            >
+              <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3" />
+            </button>
+
+            <img
+              src={headerProduct?.image ?? (avatarMap[Number(roomInfo?.members?.[0]?.id ?? currentUser?.id ?? 0)] || "/chat-default.png")}
+              alt={headerProduct?.name ?? "Chat"}
+              className="w-12 h-10 rounded-xl object-cover"
+            />
+
+            <div className="flex-1">
+              <div className="font-semibold text-sm">
+                {roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
+                  ? `Case #${validatedRoomId ?? caseId}`
+                  : `${validatedRoomId ?? caseId}`}
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           ref={containerRef}
-          className="flex-1 p-3 overflow-y-auto space-y-6"
+          className="flex-1 p-3 px-6 overflow-y-auto space-y-6 no-scrollbar pt-14"
         >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
