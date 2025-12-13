@@ -317,18 +317,19 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     setInput("");
 
     // optimistic UI (do NOT set a stable `id` locally; use a temp id instead)
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimistic: Partial<ChatMessage> = {
+      id: 0, // temporary id for optimistic UI
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: text,
       created_at: new Date().toISOString(),
     };
     // attach a client-generated temp id so we can reconcile server echo
-    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
     (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
     // optimistic UI immediately
-    addLocalMessage(String(caseId), optimistic);
+    addLocalMessage(String(caseId), optimistic as ChatMessage);
     // ensure we scroll to the bottom when the user sends a message
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -358,6 +359,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     const file = fileInput.files[0];
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimistic: Partial<ChatMessage> = {
+      id: 0, // temporary id for optimistic UI
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: "",
@@ -367,7 +369,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
     (optimistic as unknown as Record<string, unknown>).image_url =
       URL.createObjectURL(file);
-    addLocalMessage(String(caseId), optimistic);
+    addLocalMessage(String(caseId), optimistic as ChatMessage);
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
     try {
@@ -401,7 +403,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
-          {(messages[validatedRoomId ?? ""] || []).map((msg, idx) => {
+          {(messages[validatedRoomId ?? ""] || []).map((msg) => {
             const isMine = currentUser && msg.sender?.id === currentUser.id;
             const delivery = getMessageDelivery(msg as unknown);
 
