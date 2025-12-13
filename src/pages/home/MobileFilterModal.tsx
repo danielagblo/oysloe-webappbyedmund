@@ -776,7 +776,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                                   onChange={() => {}}
                                   className="w-4 h-4 cursor-pointer"
                                 />
-                                <span className="text-gray-800 text-sm flex-1 font-semibold">
+                                <span className="text-gray-800 text-sm flex-1 text-left pl-4 font-semibold">
                                   All Subcategories
                                 </span>
                               </button>
@@ -812,7 +812,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                                     onChange={() => {}}
                                     className="w-4 h-4 cursor-pointer"
                                   />
-                                  <span className="text-gray-800 text-sm flex-1">
+                                  <span className="text-gray-800 text-sm flex-1 text-left pl-4">
                                     {subcategory.name}
                                   </span>
                                 </button>
