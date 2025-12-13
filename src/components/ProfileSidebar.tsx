@@ -67,10 +67,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 <button
                   type="button"
                   onClick={() => handleSelect(item.key)}
-                  className={`text-left py-[2vh] px-2 pl-3 flex items-center gap-3 w-full cursor-pointer transition-all ${isActive
+                  className={`text-left py-[2vh] px-2 pl-3 flex items-center gap-3 w-full cursor-pointer transition-all ${
+                    isActive
                       ? "border-r-[0.425vw] border-(--dark-def) bg-gray-50"
                       : "hover:bg-gray-100"
-                    }`}
+                  }`}
                 >
                   {item.icon && (
                     <img
@@ -142,10 +143,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                     <button
                       key={item.key}
                       onClick={() => handleSelect(item.key)}
-                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${isActive
+                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${
+                        isActive
                           ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
                           : "hover:bg-gray-100"
-                        }`}
+                      }`}
                     >
                       {item.icon && (
                         <img
@@ -178,11 +180,20 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       {Logout && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-[300] px-4">
           <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm flex flex-col items-center gap-5">
-            <svg className="h-35 w-auto" viewBox="0 0 65 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              className="h-35 w-auto"
+              viewBox="0 0 65 77"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <rect x="12" y="17" width="28" height="46" fill="#374957" />
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M0 32.264C0 20.0064 3.20375e-07 13.8777 1.35278 11.8159C2.70552 9.75407 8.09231 7.78151 18.8659 3.83636L20.9185 3.08476C26.5346 1.02825 29.3425 0 32.25 0C35.1575 0 37.9654 1.02825 43.5816 3.08476L45.6341 3.83636C56.4078 7.78151 61.7946 9.75407 63.1473 11.8159C64.5 13.8777 64.5 20.0064 64.5 32.264V38.3004C64.5 59.9127 49.3102 70.4011 39.78 74.8546C37.195 76.0625 35.9025 76.6667 32.25 76.6667C28.5975 76.6667 27.305 76.0625 24.7198 74.8546C15.1896 70.4011 0 59.9127 0 38.3004V32.264ZM32.25 20.125C33.7342 20.125 34.9375 21.4122 34.9375 23V38.3333C34.9375 39.9211 33.7342 41.2083 32.25 41.2083C30.7658 41.2083 29.5625 39.9211 29.5625 38.3333V23C29.5625 21.4122 30.7658 20.125 32.25 20.125ZM32.25 53.6667C34.2291 53.6667 35.8333 51.9505 35.8333 49.8333C35.8333 47.7162 34.2291 46 32.25 46C30.2709 46 28.6667 47.7162 28.6667 49.8333C28.6667 51.9505 30.2709 53.6667 32.25 53.6667Z" fill="#74FFA7" />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M0 32.264C0 20.0064 3.20375e-07 13.8777 1.35278 11.8159C2.70552 9.75407 8.09231 7.78151 18.8659 3.83636L20.9185 3.08476C26.5346 1.02825 29.3425 0 32.25 0C35.1575 0 37.9654 1.02825 43.5816 3.08476L45.6341 3.83636C56.4078 7.78151 61.7946 9.75407 63.1473 11.8159C64.5 13.8777 64.5 20.0064 64.5 32.264V38.3004C64.5 59.9127 49.3102 70.4011 39.78 74.8546C37.195 76.0625 35.9025 76.6667 32.25 76.6667C28.5975 76.6667 27.305 76.0625 24.7198 74.8546C15.1896 70.4011 0 59.9127 0 38.3004V32.264ZM32.25 20.125C33.7342 20.125 34.9375 21.4122 34.9375 23V38.3333C34.9375 39.9211 33.7342 41.2083 32.25 41.2083C30.7658 41.2083 29.5625 39.9211 29.5625 38.3333V23C29.5625 21.4122 30.7658 20.125 32.25 20.125ZM32.25 53.6667C34.2291 53.6667 35.8333 51.9505 35.8333 49.8333C35.8333 47.7162 34.2291 46 32.25 46C30.2709 46 28.6667 47.7162 28.6667 49.8333C28.6667 51.9505 30.2709 53.6667 32.25 53.6667Z"
+                fill="#74FFA7"
+              />
             </svg>
-
 
             <p className="text-lg font-semibold text-center sm:px-7">
               Are you sure you would like to log out?
@@ -191,10 +202,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
               <button
                 onClick={handleLogout}
-                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending"
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${
+                  logoutMutation.status === "pending"
                     ? "opacity-60 pointer-events-none"
                     : "hover:bg-red-200/40"
-                  }`}
+                }`}
                 disabled={logoutMutation.status === "pending"}
               >
                 {logoutMutation.status === "pending"
@@ -203,10 +215,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               </button>
               <button
                 onClick={() => setLogout(false)}
-                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${logoutMutation.status === "pending"
+                className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${
+                  logoutMutation.status === "pending"
                     ? "opacity-60 pointer-events-none"
                     : "hover:bg-green-200/40"
-                  }`}
+                }`}
                 disabled={logoutMutation.status === "pending"}
               >
                 Cancel

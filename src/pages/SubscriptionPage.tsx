@@ -166,17 +166,17 @@ const SubscriptionPage = () => {
                         activeUserSub.subscription.id,
                       )
                     }
-                    disabled={updatingId === activeUserSub.id || activeNotExpired}
+                    disabled={
+                      updatingId === activeUserSub.id || activeNotExpired
+                    }
                   >
-                    {updatingId === activeUserSub.id ? (
-                      "Processing..."
-                    ) : activeNotExpired ? (
-                      `Active — expires ${new Date(
-                        activeUserSub.end_date,
-                      ).toLocaleDateString()}`
-                    ) : (
-                      "Renew / Update"
-                    )}
+                    {updatingId === activeUserSub.id
+                      ? "Processing..."
+                      : activeNotExpired
+                        ? `Active — expires ${new Date(
+                            activeUserSub.end_date,
+                          ).toLocaleDateString()}`
+                        : "Renew / Update"}
                   </button>
                 </div>
               )}
@@ -246,16 +246,15 @@ const SubscriptionPage = () => {
                       title="Clicking this will open Paystack. Complete payment to Subscribe and be redirected back."
                       onClick={() => handleSubscribe(s.id)}
                       disabled={
-                        subscribingId === s.id || (activeNotExpired && activeSubId === s.id)
+                        subscribingId === s.id ||
+                        (activeNotExpired && activeSubId === s.id)
                       }
                     >
-                      {subscribingId === s.id ? (
-                        "Processing..."
-                      ) : activeNotExpired && activeSubId === s.id ? (
-                        "Current plan"
-                      ) : (
-                        "Subscribe / Pay Now"
-                      )}
+                      {subscribingId === s.id
+                        ? "Processing..."
+                        : activeNotExpired && activeSubId === s.id
+                          ? "Current plan"
+                          : "Subscribe / Pay Now"}
                     </button>
                   </div>
                 </div>

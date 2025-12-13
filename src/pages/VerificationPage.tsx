@@ -90,7 +90,9 @@ const VerificationPage = () => {
                 onClick={handleSubmit}
               />
             </div>
-            <h6 className="text-[16px] my-4 max-sm:mb-8 max-sm:my-6 sm:text-sm text-center">Can't Login?</h6>
+            <h6 className="text-[16px] my-4 max-sm:mb-8 max-sm:my-6 sm:text-sm text-center">
+              Can't Login?
+            </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
               <ResetDropdown />
               <OTPLogin page="otp-login" />

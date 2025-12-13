@@ -275,8 +275,12 @@ export const getRelatedProducts = async (
         const ma = Number((a as any).multiplier ?? 0) || 0;
         const mb = Number((b as any).multiplier ?? 0) || 0;
         if (mb !== ma) return mb - ma;
-        const ta = Date.parse((a as any).created_at || (a as any).createdAt || "");
-        const tb = Date.parse((b as any).created_at || (b as any).createdAt || "");
+        const ta = Date.parse(
+          (a as any).created_at || (a as any).createdAt || "",
+        );
+        const tb = Date.parse(
+          (b as any).created_at || (b as any).createdAt || "",
+        );
         if (isFinite(tb) && isFinite(ta)) return tb - ta;
         return 0;
       });
@@ -400,9 +404,10 @@ export const createProductFromAd = async (metadata: any) => {
     description:
       typeof metadata.description === "string" && metadata.description.trim()
         ? metadata.description.trim()
-        : typeof (metadata as any).desc === "string" && (metadata as any).desc.trim()
-        ? (metadata as any).desc.trim()
-        : `Posted via app on ${new Date(metadata.createdAt || Date.now()).toLocaleString()}`,
+        : typeof (metadata as any).desc === "string" &&
+            (metadata as any).desc.trim()
+          ? (metadata as any).desc.trim()
+          : `Posted via app on ${new Date(metadata.createdAt || Date.now()).toLocaleString()}`,
     price: price as unknown as string | number,
     duration:
       metadata.pricing?.monthly?.duration ??
@@ -419,8 +424,8 @@ export const createProductFromAd = async (metadata: any) => {
     ...(metadata.location_id
       ? { location_id: Number(metadata.location_id) }
       : metadata.location
-      ? { location: metadata.location }
-      : {}),
+        ? { location: metadata.location }
+        : {}),
   };
 
   // Helper: convert blob: URL to File by fetching it

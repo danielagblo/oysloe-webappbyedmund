@@ -69,19 +69,24 @@ const ResetPasswordWithPhonePage = ({
                 onChange={handlePhoneOnChange}
                 className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/phone.svg" alt="phone" className="absolute top-4 left-2 h-6 w-6 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6" />
+              <img
+                src="/phone.svg"
+                alt="phone"
+                className="absolute top-4 left-2 h-6 w-6 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
+              />
             </div>
             <p className="text-center max-sm:text-[17px] text-sm text-gray-600">
               We'll send a verification link to the number if it is in our
               system
             </p>
             {error &&
-              (error.length < 20 ? (
-                toast.error(error)
-              ) : (
-                  toast.error("An error occurred. Please check your entered phone number and try again."),
-                  console.log(error), null
-              ))}
+              (error.length < 20
+                ? toast.error(error)
+                : (toast.error(
+                    "An error occurred. Please check your entered phone number and try again.",
+                  ),
+                  console.log(error),
+                  null))}
 
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
@@ -91,9 +96,11 @@ const ResetPasswordWithPhonePage = ({
                 className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[18px]"
               />
             </div>
-            <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">Can't Login?</h6>
+            <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">
+              Can't Login?
+            </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
-              <ResetDropdown page="phone-reset"/>
+              <ResetDropdown page="phone-reset" />
               <OTPLogin page="phone-reset" />
             </div>
           </form>
@@ -101,7 +108,9 @@ const ResetPasswordWithPhonePage = ({
         <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[14px] mt-20">
           Don't have an account ? &nbsp;
           <Link to="/signUp">
-            <h2 className="text-black inline opacity-100 hover:underline transition">Sign up</h2>
+            <h2 className="text-black inline opacity-100 hover:underline transition">
+              Sign up
+            </h2>
           </Link>
         </h2>
       </div>

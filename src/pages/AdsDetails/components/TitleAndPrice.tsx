@@ -28,10 +28,10 @@ const TitleAndPrice: React.FC<TitleAndPriceProps> = ({
         </h2>
         {((currentAdData as any)?.is_taken ||
           (currentAdDataFromQuery as any)?.is_taken) && (
-            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
-              Taken
-            </span>
-          )}
+          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
+            Taken
+          </span>
+        )}
       </div>
       <h2 className="text-xl font-medium md:text-[1.5vw]">
         {currentAdData?.price

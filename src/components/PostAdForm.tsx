@@ -26,7 +26,10 @@ import DropdownPopup from "./DropDownPopup";
 // Module-level cache to persist possible-values requests across component
 // mounts. This prevents duplicate network calls when React StrictMode mounts
 // components twice during development or when the component unmounts/remounts.
-const possibleValuesGlobalCache = new Map<number, string[] | Promise<string[]>>();
+const possibleValuesGlobalCache = new Map<
+  number,
+  string[] | Promise<string[]>
+>();
 
 async function fetchPossibleValuesDedup(featureId: number) {
   const cache = possibleValuesGlobalCache;
@@ -70,8 +73,6 @@ export default function PostAdForm({
   onClose,
   embedded = false,
 }: PostAdFormProps) {
-
-
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileStep, setMobileStep] = useState("images");
 
@@ -437,7 +438,9 @@ export default function PostAdForm({
     try {
       setTitle(existingProduct.name ?? "");
       setDescription(
-        (existingProduct as any).description ?? (existingProduct as any).desc ?? "",
+        (existingProduct as any).description ??
+          (existingProduct as any).desc ??
+          "",
       );
       setPrice(
         typeof existingProduct.price === "number"
@@ -744,7 +747,15 @@ export default function PostAdForm({
     // We include `setShowSaveLocationModal` so we can safely close the save modal
     // when pre-filling a string location without showing the modal to the user.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [existingProduct, fetchedCategories, applySavedLocation, groupedLocations, selectPlace, subcategories, setShowSaveLocationModal]);
+  }, [
+    existingProduct,
+    fetchedCategories,
+    applySavedLocation,
+    groupedLocations,
+    selectPlace,
+    subcategories,
+    setShowSaveLocationModal,
+  ]);
 
   // Infer subcategory from feature definitions (run once when defs appear and
   // no subcategory is set). This is split out from the large prefill effect to
@@ -783,7 +794,11 @@ export default function PostAdForm({
           if (r.status === "fulfilled") {
             const feat = r.value as any;
             const possibleSub =
-              feat?.subcategory ?? feat?.subcategory_id ?? feat?.sub_category ?? feat?.category ?? null;
+              feat?.subcategory ??
+              feat?.subcategory_id ??
+              feat?.sub_category ??
+              feat?.category ??
+              null;
             let subId = null as number | null;
             if (possibleSub != null) {
               if (typeof possibleSub === "object" && possibleSub?.id)
@@ -794,15 +809,19 @@ export default function PostAdForm({
               setSubcategoryId(Number(subId));
               try {
                 const sub = await getSubcategory(Number(subId));
-                const catRaw = (sub as any)?.category ?? (sub as any)?.category_id ?? null;
+                const catRaw =
+                  (sub as any)?.category ?? (sub as any)?.category_id ?? null;
                 let catId = null as number | null;
                 if (catRaw != null) {
-                  if (typeof catRaw === "object" && catRaw?.id) catId = Number(catRaw.id);
+                  if (typeof catRaw === "object" && catRaw?.id)
+                    catId = Number(catRaw.id);
                   else if (!isNaN(Number(catRaw))) catId = Number(catRaw);
                 }
                 if (catId && !isNaN(catId)) {
                   setCategoryId(Number(catId));
-                  const cat = fetchedCategories.find((c) => Number(c.id) === Number(catId));
+                  const cat = fetchedCategories.find(
+                    (c) => Number(c.id) === Number(catId),
+                  );
                   if (cat) setCategory(cat.name);
                 }
               } catch {
@@ -832,8 +851,8 @@ export default function PostAdForm({
     try {
       const candidateId =
         typeof prodSubRaw === "object" &&
-          prodSubRaw !== null &&
-          typeof prodSubRaw.id !== "undefined"
+        prodSubRaw !== null &&
+        typeof prodSubRaw.id !== "undefined"
           ? Number(prodSubRaw.id)
           : Number(prodSubRaw);
       if (
@@ -942,35 +961,66 @@ export default function PostAdForm({
     const explicitFeatureValues = [
       ...(featureValues && Object.keys(featureValues).length > 0
         ? Object.entries(featureValues)
-          .map(([k, v]) => ({ feature: Number(k), value: v }))
-          .filter((f) => f.value && String(f.value).trim() !== "")
+            .map(([k, v]) => ({ feature: Number(k), value: v }))
+            .filter((f) => f.value && String(f.value).trim() !== "")
         : []),
       ...(attachedFeatures && Array.isArray(attachedFeatures)
         ? attachedFeatures
-          .filter((a) => a.feature != null && String(a.value).trim() !== "")
-          .map((a) => ({
-            feature: Number(a.feature),
-            value: String(a.value),
-          }))
+            .filter((a) => a.feature != null && String(a.value).trim() !== "")
+            .map((a) => ({
+              feature: Number(a.feature),
+              value: String(a.value),
+            }))
         : []),
     ];
 
     const locationResolution = (function resolveLocation() {
       try {
-        if (!locationDetails) return { location: { region: null as Region | null, name: "Unknown" } as LocationPayload };
+        if (!locationDetails)
+          return {
+            location: {
+              region: null as Region | null,
+              name: "Unknown",
+            } as LocationPayload,
+          };
         const found = allLocations.find((l: any) => {
-          const regionMatch = String(l.region || "").trim().toLowerCase() === String(locationDetails.region || "").trim().toLowerCase();
-          const placeMatch = String(l.name || l.place || "").trim().toLowerCase() === String(locationDetails.place || "").trim().toLowerCase();
+          const regionMatch =
+            String(l.region || "")
+              .trim()
+              .toLowerCase() ===
+            String(locationDetails.region || "")
+              .trim()
+              .toLowerCase();
+          const placeMatch =
+            String(l.name || l.place || "")
+              .trim()
+              .toLowerCase() ===
+            String(locationDetails.place || "")
+              .trim()
+              .toLowerCase();
           return regionMatch && placeMatch;
         });
-        if (found && (typeof found.id === "number" || typeof found.id === "string")) {
+        if (
+          found &&
+          (typeof found.id === "number" || typeof found.id === "string")
+        ) {
           // Prefer sending the canonical integer id as `location_id`.
           return { location_id: Number(found.id) };
         }
         // fallback to legacy shape (region + place) so server can handle it
-        return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+        return {
+          location: {
+            region: (locationDetails?.region as Region) || null,
+            name: locationDetails?.place ?? "Unknown",
+          } as LocationPayload,
+        };
       } catch (e) {
-        return { location: { region: (locationDetails?.region as Region) || null, name: locationDetails?.place ?? "Unknown" } as LocationPayload };
+        return {
+          location: {
+            region: (locationDetails?.region as Region) || null,
+            name: locationDetails?.place ?? "Unknown",
+          } as LocationPayload,
+        };
       }
     })();
 
@@ -1019,12 +1069,14 @@ export default function PostAdForm({
         : {}),
       // include keyFeatures if user added any (filter out empty strings)
       ...(keyFeatures &&
-        Array.isArray(keyFeatures) &&
-        keyFeatures.filter((k) => k.trim() !== "").length > 0
+      Array.isArray(keyFeatures) &&
+      keyFeatures.filter((k) => k.trim() !== "").length > 0
         ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
         : {}),
       // include merged explicit feature values (from fetched defs and user attachments)
-      ...(explicitFeatureValues.length > 0 ? { featureValues: explicitFeatureValues } : {}),
+      ...(explicitFeatureValues.length > 0
+        ? { featureValues: explicitFeatureValues }
+        : {}),
     } as any;
 
     console.log("Ad metadata (JSON):", metadata);
@@ -1245,9 +1297,9 @@ export default function PostAdForm({
                   <DropdownPopup
                     triggerLabel={
                       subcategoryId &&
-                        subcategories.find((s) => s.id === subcategoryId)
+                      subcategories.find((s) => s.id === subcategoryId)
                         ? subcategories.find((s) => s.id === subcategoryId)!
-                          .name
+                            .name
                         : "Select subcategory"
                     }
                     options={subcategories.map((s) => s.name)}
@@ -1289,10 +1341,12 @@ export default function PostAdForm({
               <p className="mb-1">Declare ad purpose?</p>
               <div className="flex gap-3">
                 {(
-                  ["Sale", 
-                    // "Pay Later", 
-                    "Rent"
-                  ] as const).map((option) => (
+                  [
+                    "Sale",
+                    // "Pay Later",
+                    "Rent",
+                  ] as const
+                ).map((option) => (
                   <label
                     key={option}
                     className="relative flex items-center gap-1 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"

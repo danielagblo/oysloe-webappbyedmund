@@ -56,7 +56,9 @@ const AdsDetailsPage = () => {
     error: adError,
   } = useProduct(numericId!);
   const { profile: currentUserProfile } = useUserProfile();
-  const { reviews: reviews = [] } = useReviews({ product: numericId ?? undefined });
+  const { reviews: reviews = [] } = useReviews({
+    product: numericId ?? undefined,
+  });
   const { data: userSubscriptions = [] } = useUserSubscriptions();
 
   const queryClient = useQueryClient();
@@ -65,7 +67,9 @@ const AdsDetailsPage = () => {
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
 
   const { sendMessage, addLocalMessage, connectToRoom } = useWsChat();
-  const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(null);
+  const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(
+    null,
+  );
 
   const { data: favourites = [], toggleFavourite } = useFavourites();
   const [isFavourited, setIsFavourited] = useState<boolean>(false);
@@ -137,7 +141,8 @@ const AdsDetailsPage = () => {
   };
 
   const handleMarkAsTaken = async () => {
-    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    const pidRaw =
+      currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pidRaw) return;
     const pid = Number(pidRaw);
     if (Number.isNaN(pid)) return;
@@ -163,7 +168,10 @@ const AdsDetailsPage = () => {
           await (markTaken as any).mutateAsync({ id: pid, body: payload });
         } else {
           await new Promise((resolve, reject) =>
-            markTaken.mutate({ id: pid, body: payload }, { onSuccess: resolve, onError: reject }),
+            markTaken.mutate(
+              { id: pid, body: payload },
+              { onSuccess: resolve, onError: reject },
+            ),
           );
         }
         try {
@@ -192,7 +200,8 @@ const AdsDetailsPage = () => {
   const [reportMessage, setReportMessage] = useState("");
 
   const submitReport = async () => {
-    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    const pidRaw =
+      currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
     if (!pidRaw) return;
     const pid = Number(pidRaw);
     if (Number.isNaN(pid)) return;
@@ -217,11 +226,11 @@ const AdsDetailsPage = () => {
       const mutatePromise = (reportProduct as any).mutateAsync
         ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
         : new Promise((resolve, reject) => {
-          reportProduct.mutate(
-            { id: pid, body: payload },
-            { onSuccess: resolve, onError: reject },
-          );
-        });
+            reportProduct.mutate(
+              { id: pid, body: payload },
+              { onSuccess: resolve, onError: reject },
+            );
+          });
 
       await toast.promise(mutatePromise, {
         loading: "Reporting ad...",
@@ -261,13 +270,16 @@ const AdsDetailsPage = () => {
       likeReview(id, body),
     onMutate: async ({ id }) => {
       const queryKey = ["reviews", { product: numericId }];
-      const previousReviews = queryClient.getQueryData(queryKey) as Review[] | undefined;
+      const previousReviews = queryClient.getQueryData(queryKey) as
+        | Review[]
+        | undefined;
 
       if (previousReviews) {
         const updated = previousReviews.map((review: Review) => {
           if (review.id !== id) return review;
           const wasLiked = Boolean(review.liked);
-          const likes = typeof review.likes_count === "number" ? review.likes_count : 0;
+          const likes =
+            typeof review.likes_count === "number" ? review.likes_count : 0;
           return {
             ...review,
             liked: !wasLiked,
@@ -285,18 +297,25 @@ const AdsDetailsPage = () => {
       const reviewsKey = ["reviews", { product: prodId }];
 
       if (revId != null) {
-        queryClient.setQueryData(["review", revId], { ...(data || {}), id: revId });
+        queryClient.setQueryData(["review", revId], {
+          ...(data || {}),
+          id: revId,
+        });
       }
 
-      const allReviews = queryClient.getQueryData(reviewsKey) as Review[] | undefined;
+      const allReviews = queryClient.getQueryData(reviewsKey) as
+        | Review[]
+        | undefined;
       if (allReviews) {
         const updated = allReviews.map((review: Review) =>
-          review.id === revId ? { ...review, ...(data || {}), id: revId } : review,
+          review.id === revId
+            ? { ...review, ...(data || {}), id: revId }
+            : review,
         );
         queryClient.setQueryData(reviewsKey, updated);
       }
 
-      toast.success((data && data.liked) ? "Review liked!" : "Review unliked!");
+      toast.success(data && data.liked ? "Review liked!" : "Review unliked!");
     },
     onError: (err: unknown, context: any) => {
       const queryKey = ["reviews", { product: numericId }];
@@ -306,7 +325,8 @@ const AdsDetailsPage = () => {
         queryClient.invalidateQueries({ queryKey });
       }
 
-      const message = err instanceof Error ? err.message : "Failed to like review";
+      const message =
+        err instanceof Error ? err.message : "Failed to like review";
       toast.error(message);
     },
   });
@@ -424,7 +444,8 @@ const AdsDetailsPage = () => {
       if (Array.isArray(maybeArr)) {
         list = list.concat(addFromArray(maybeArr));
       } else {
-        const vals = (Object.values(imgsRaw) as any).flat?.() ?? Object.values(imgsRaw);
+        const vals =
+          (Object.values(imgsRaw) as any).flat?.() ?? Object.values(imgsRaw);
         if (Array.isArray(vals) && vals.length > 0) {
           list = list.concat(addFromArray(vals as any[]));
         }
@@ -467,10 +488,17 @@ const AdsDetailsPage = () => {
       let roomKey: string | null = null;
       try {
         const res = await resolveChatroomId({ email: owner.email } as any);
-        const roomKeyRaw = (res as any)?.room_id ?? (res as any)?.room ?? (res as any)?.id ?? null;
+        const roomKeyRaw =
+          (res as any)?.room_id ??
+          (res as any)?.room ??
+          (res as any)?.id ??
+          null;
         roomKey = roomKeyRaw != null ? String(roomKeyRaw) : null;
       } catch (resolveErr) {
-        console.debug("resolveChatroomId by email failed; will try creating room via REST", resolveErr);
+        console.debug(
+          "resolveChatroomId by email failed; will try creating room via REST",
+          resolveErr,
+        );
         roomKey = null;
       }
 
@@ -513,14 +541,20 @@ const AdsDetailsPage = () => {
             // Open in-page chat for persistent rooms
             setOpenLiveChatRoomId(String(roomKey));
           } catch (err) {
-            console.warn("AdsDetailsPage: sendMessage via websocket failed for persistent room", err);
+            console.warn(
+              "AdsDetailsPage: sendMessage via websocket failed for persistent room",
+              err,
+            );
             toast.error("Failed to send message via websocket");
           }
         } else {
           try {
             await sendMessage(String(targetRoom), text, tempId);
           } catch (err) {
-            console.warn("AdsDetailsPage: sendMessage via websocket failed for temp room", err);
+            console.warn(
+              "AdsDetailsPage: sendMessage via websocket failed for temp room",
+              err,
+            );
             toast.error("Failed to send message via websocket");
           }
         }
@@ -627,7 +661,9 @@ const AdsDetailsPage = () => {
           <div className="sm:pr-6">
             {currentAdData?.description && (
               <div className="bg-white sm:bg-(--div-active) my-4 sm:p-6 rounded-2xl py-3 px-4 w-full">
-                <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Description</h2>
+                <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">
+                  Description
+                </h2>
                 <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
                   {String(currentAdData.description)}
                 </p>
@@ -666,7 +702,11 @@ const AdsDetailsPage = () => {
                     toggleCaller1={toggleCaller1}
                     toggleCaller2={toggleCaller2}
                     showOffer={openPanel === "makeOffer"}
-                    toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
+                    toggleOffer={() =>
+                      setOpenPanel((p) =>
+                        p === "makeOffer" ? null : "makeOffer",
+                      )
+                    }
                     openChatWithOwnerAndSend={openChatWithOwnerAndSend}
                     setOpenPanel={setOpenPanel}
                   />
@@ -691,7 +731,11 @@ const AdsDetailsPage = () => {
                     <RatingReviews layout="row" />
                   </div>
                   <div className="md:hidden">
-                    <RatingReviews layout="row" fullWidth rd={reviewDeconstruction} />
+                    <RatingReviews
+                      layout="row"
+                      fullWidth
+                      rd={reviewDeconstruction}
+                    />
                   </div>
                 </div>
 
@@ -743,7 +787,11 @@ const AdsDetailsPage = () => {
                         toggleCaller1={toggleCaller1}
                         toggleCaller2={toggleCaller2}
                         showOffer={openPanel === "makeOffer"}
-                        toggleOffer={() => setOpenPanel((p) => (p === "makeOffer" ? null : "makeOffer"))}
+                        toggleOffer={() =>
+                          setOpenPanel((p) =>
+                            p === "makeOffer" ? null : "makeOffer",
+                          )
+                        }
                         openChatWithOwnerAndSend={openChatWithOwnerAndSend}
                         setOpenPanel={setOpenPanel}
                       />
@@ -776,7 +824,10 @@ const AdsDetailsPage = () => {
       </div>
       {openLiveChatRoomId && (
         <div className="fixed bottom-4 right-4 z-50 w-[360px] h-[480px]">
-          <LiveChat caseId={openLiveChatRoomId} onClose={() => setOpenLiveChatRoomId(null)} />
+          <LiveChat
+            caseId={openLiveChatRoomId}
+            onClose={() => setOpenLiveChatRoomId(null)}
+          />
         </div>
       )}
       <MenuButton />
@@ -785,4 +836,3 @@ const AdsDetailsPage = () => {
 };
 
 export default AdsDetailsPage;
-

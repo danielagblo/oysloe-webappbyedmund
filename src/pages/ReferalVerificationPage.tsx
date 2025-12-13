@@ -100,13 +100,17 @@ const ReferalVerificationPage = () => {
                 onChange={(e) => setReferralCode(e.target.value)}
                 className="border-gray-100 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-2 px-7 py-2 w-full rounded-lg focus:border-gray-200  outline-0"
               />
-              <img src="/Referral.svg" alt="Referral Icon" className="absolute h-5 w-5 left-2 top-3  max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6" />
+              <img
+                src="/Referral.svg"
+                alt="Referral Icon"
+                className="absolute h-5 w-5 left-2 top-3  max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
+              />
             </div>
             <div className="flex flex-col gap-5 w-full mt-5 justify-center items-center">
-              <Button 
-                name="Verify" 
+              <Button
+                name="Verify"
                 className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[18px]"
-                onClick={handleVerify} 
+                onClick={handleVerify}
               />
               <button
                 className="flex hover:bg-gray-100 transition cursor-pointer items-center justify-center bg-[#F9F9F9] px-5 py-3 rounded-full text-black gap-3"

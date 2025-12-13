@@ -95,7 +95,9 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
     >
       <div className={listClass}>
         <div className="px-2">
-          <h2 className={`text-[1.25vw] font-semibold max-sm:text-lg`}>Earning track</h2>
+          <h2 className={`text-[1.25vw] font-semibold max-sm:text-lg`}>
+            Earning track
+          </h2>
         </div>
         <div className="flex flex-col gap-2 max-sm:gap-4 w-full h-full justify-evenly">
           <div

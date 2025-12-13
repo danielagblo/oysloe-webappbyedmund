@@ -116,10 +116,11 @@ const AlertRow = ({
             onClick={handleMarkRead}
             disabled={!showActions}
             title="Mark as read"
-            className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${showActions
+            className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${
+              showActions
                 ? "bg-blue-500 hover:bg-blue-600 cursor-pointer"
                 : "bg-blue-300 cursor-not-allowed"
-              }`}
+            }`}
           >
             <Mail size={20} className="text-white" />
           </button>
@@ -128,10 +129,11 @@ const AlertRow = ({
           onClick={handleDelete}
           disabled={!showActions}
           title="Delete alert"
-          className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${showActions
+          className={`p-2 rounded-lg transition-colors pointer-events-auto flex items-center justify-center ${
+            showActions
               ? "bg-red-500 hover:bg-red-600 cursor-pointer"
               : "bg-red-300 cursor-not-allowed"
-            }`}
+          }`}
         >
           <Trash2 size={20} className="text-white" />
         </button>
@@ -141,8 +143,9 @@ const AlertRow = ({
       <div
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
-        className={`flex items-start gap-3 w-full relative bg-white p-3 transition-all ${showActions ? "cursor-default" : "cursor-grab active:cursor-grabbing"
-          } hover:bg-gray-50`}
+        className={`flex items-start gap-3 w-full relative bg-white p-3 transition-all ${
+          showActions ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+        } hover:bg-gray-50`}
         style={{
           transform: `translateX(-${dragOffset}px)`,
           zIndex: 10,

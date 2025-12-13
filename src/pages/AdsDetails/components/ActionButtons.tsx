@@ -69,7 +69,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             ["mark as taken.svg", "Mark as taken"],
             ["flag.svg", "Report Ad"],
             ["outgoing call.svg", "Caller 1"],
-            ...(caller2 ? ([ ["outgoing call.svg", "Caller 2"] ] as [string, string][]) : []),
+            ...(caller2
+              ? ([["outgoing call.svg", "Caller 2"]] as [string, string][])
+              : []),
             ["Make an offer.svg", "Make Offer"],
             ["favorited.svg", "Favorites"],
           ];
@@ -78,9 +80,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               <button
                 key={label}
                 className={`flex items-center max-sm:w-full gap-2 max-sm:py-6 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
-                  ${actions[label]
-                    ? "cursor-pointer hover:bg-gray-200 lg:hover:scale-95 active:scale-105"
-                    : "cursor-not-allowed"
+                  ${
+                    actions[label]
+                      ? "cursor-pointer hover:bg-gray-200 lg:hover:scale-95 active:scale-105"
+                      : "cursor-not-allowed"
                   }
                 `}
                 onClick={(e) => {
@@ -162,10 +165,17 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2 text-sm"
-                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        style={{
+                          color: "var(--dark-def)",
+                          textDecoration: "none",
+                        }}
                       >
-                        <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
-                        <span className="border border-gray-200 px-2.5 py-1.5">{caller1}</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          Call
+                        </span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          {caller1}
+                        </span>
                       </a>
                       <div className="w-full flex justify-end">
                         <button
@@ -231,7 +241,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                             className="border border-gray-200 px-1 rounded bg-(--div-active) text-(--dark-def) font-medium"
                             onClick={async (ev) => {
                               ev.stopPropagation();
-                              if (!offerInput || offerInput.trim().length === 0) return;
+                              if (!offerInput || offerInput.trim().length === 0)
+                                return;
                               await openChatWithOwnerAndSend(offerInput.trim());
                               (toggleOffer || (() => {}))();
                             }}
@@ -260,17 +271,28 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   >
                     <div className="flex flex-col items-center gap-4">
                       <div className="font-semibold flex items-center gap-2">
-                        <img src="/outgoing call.svg" alt="" className="w-4 h-auto" />
+                        <img
+                          src="/outgoing call.svg"
+                          alt=""
+                          className="w-4 h-auto"
+                        />
                         <span className="text-sm">Caller 2</span>
                       </div>
                       <a
                         href={`tel:${caller2}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2 text-sm"
-                        style={{ color: "var(--dark-def)", textDecoration: "none" }}
+                        style={{
+                          color: "var(--dark-def)",
+                          textDecoration: "none",
+                        }}
                       >
-                        <span className="border border-gray-200 px-2.5 py-1.5">Call</span>
-                        <span className="border border-gray-200 px-2.5 py-1.5">{caller2}</span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          Call
+                        </span>
+                        <span className="border border-gray-200 px-2.5 py-1.5">
+                          {caller2}
+                        </span>
                       </a>
                       <div className="w-full flex justify-end">
                         <button

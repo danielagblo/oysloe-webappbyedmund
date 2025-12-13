@@ -241,7 +241,7 @@ const EditProfilePage = () => {
                   onClick={() => {
                     setImageModalSrc(
                       buildMediaUrl(selectedUser?.profileImage) ||
-                      avatarPlaceholder,
+                        avatarPlaceholder,
                     );
                     setImageModalAlt("Profile Image");
                     setImageModalOpen(true);
@@ -284,7 +284,7 @@ const EditProfilePage = () => {
                   onClick={() => {
                     setImageModalSrc(
                       buildMediaUrl(selectedUser?.businessLogo) ||
-                      logoPlaceholder,
+                        logoPlaceholder,
                     );
                     setImageModalAlt("Business Logo");
                     setImageModalOpen(true);
@@ -429,7 +429,7 @@ const EditProfilePage = () => {
                     onClick={() => {
                       setImageModalSrc(
                         buildMediaUrl(selectedUser?.idFrontImage) ||
-                        idFrontPlaceholder,
+                          idFrontPlaceholder,
                       );
                       setImageModalAlt("ID Front");
                       setImageModalOpen(true);
@@ -476,7 +476,7 @@ const EditProfilePage = () => {
                     onClick={() => {
                       setImageModalSrc(
                         buildMediaUrl(selectedUser?.idBackImage) ||
-                        idBackPlaceholder,
+                          idBackPlaceholder,
                       );
                       setImageModalAlt("ID Back");
                       setImageModalOpen(true);
@@ -515,9 +515,7 @@ const EditProfilePage = () => {
               </div>
 
               {setupProgress === 100 ? (
-                <>
-
-                </>
+                <></>
               ) : (
                 <div className="py-3 text-sm text-gray-600">
                   Finish the remaining account details to complete your profile.
@@ -682,7 +680,10 @@ const EditProfilePage = () => {
                             await updateProfile(payloadForUpdate);
                           } catch (err) {
                             // no-op; we don't want to block user on cache refresh
-                            console.warn("updateProfile cache refresh failed", err);
+                            console.warn(
+                              "updateProfile cache refresh failed",
+                              err,
+                            );
                           }
                         } else {
                           // build JSON payload according to UserProfileUpdatePayload

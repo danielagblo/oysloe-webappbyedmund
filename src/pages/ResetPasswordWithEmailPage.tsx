@@ -28,7 +28,11 @@ const ResetPasswordWithEmailPage = () => {
                 placeholder="Email address"
                 className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6" />
+              <img
+                src="/email.svg"
+                alt="email"
+                className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
+              />
             </div>
             <p className="text-center max-sm:text-[17px] text-sm text-gray-600">
               We'll send a link to the email provided to reset your password
@@ -44,9 +48,11 @@ const ResetPasswordWithEmailPage = () => {
                 }}
               />
             </div>
-            <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">Can't Login?</h6>
+            <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">
+              Can't Login?
+            </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
-              <ResetDropdown page="email-reset"/>
+              <ResetDropdown page="email-reset" />
               <OTPLogin />
             </div>
           </form>
@@ -54,7 +60,9 @@ const ResetPasswordWithEmailPage = () => {
         <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[14px] mt-20">
           Don't have an account ? &nbsp;
           <Link to="/signUp">
-            <h2 className="text-black inline opacity-100 hover:underline transition">Sign up</h2>
+            <h2 className="text-black inline opacity-100 hover:underline transition">
+              Sign up
+            </h2>
           </Link>
         </h2>
       </div>

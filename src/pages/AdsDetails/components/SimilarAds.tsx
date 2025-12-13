@@ -14,7 +14,8 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
 
     <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
       {(() => {
-        const availableAds = relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
+        const availableAds =
+          relatedProducts?.filter((ad) => !ad.is_taken) ?? [];
         return availableAds.length > 0 ? (
           availableAds.map((ad) => (
             <Link
