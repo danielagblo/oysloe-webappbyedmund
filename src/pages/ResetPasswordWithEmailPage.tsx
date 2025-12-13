@@ -17,27 +17,27 @@ const ResetPasswordWithEmailPage = () => {
       : true;
 
   return (
-    <div className="h-screen max-sm:bg-(--bg) w-screen flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8">
+    <div className="h-screen max-sm:bg-(--bg) w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center">
+      <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 max-sm:pb-20">
         <div className="flex flex-col gap-5 max-sm:space-y-6 items-center justify-center">
-          <h2 className="text-2xl max-sm:text-[36px]">Reset Password</h2>
+          <h2 className="text-2xl max-sm:text-[28px]">Reset Password</h2>
           <form className=" w-3/5 max-sm:space-y-6 max-md:w-full">
             <div className="relative">
               <input
                 type="email"
                 placeholder="Email address"
-                className="max-sm:bg-white max-sm:h-[76px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
+                className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
-              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-6 max-sm:h-6 max-sm:w-6" />
+              <img src="/email.svg" alt="email" className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6" />
             </div>
-            <p className="text-center max-sm:text-[20px] text-gray-600">
+            <p className="text-center max-sm:text-[17px] text-sm text-gray-600">
               We'll send a link to the email provided to reset your password
             </p>
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
                 type="submit"
                 name="Submit"
-                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[76px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[24px]"
+                className="bg-[#74FFA7] hover:bg-[#74FFA7]/80 max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl text-(--dark-def) max-sm:text-[18px]"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowModal(true);
@@ -51,7 +51,7 @@ const ResetPasswordWithEmailPage = () => {
             </div>
           </form>
         </div>
-        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[16px] mt-20">
+        <h2 className="max-sm:mt-0 max-sm:fixed max-sm:bottom-4 max-sm:text-[14px] mt-20">
           Don't have an account ? &nbsp;
           <Link to="/signUp">
             <h2 className="text-black inline opacity-100 hover:underline transition">Sign up</h2>

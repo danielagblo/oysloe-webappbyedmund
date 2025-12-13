@@ -33,7 +33,7 @@ export const ResetDropdown = ( {page = "default"} : {page?: string} ) => {
               e.stopPropagation();
               navigate("/login");
             }}
-            className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[57px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+            className="px-5 py-3 w-full bg-[#F9F9F9] font-medium text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
           >
             Login
           </button>
@@ -45,7 +45,7 @@ export const ResetDropdown = ( {page = "default"} : {page?: string} ) => {
                 e.stopPropagation();
                 navigate("/reset-password/email");
               }}
-              className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[57px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+              className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
             >
               Reset with Email
             </button>
@@ -56,7 +56,7 @@ export const ResetDropdown = ( {page = "default"} : {page?: string} ) => {
                 e.stopPropagation();
                 setShowResetDropdown((p) => !p);
               }}
-              className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[57px] max-sm:w-[152px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
+              className="px-5 py-3 w-full bg-[#F9F9F9] text-(--dark-def) max-sm:bg-white max-sm:h-[47px] max-sm:w-[132px] rounded-full text-[12px] sm:text-xs hover:bg-gray-100 transition cursor-pointer"
             >
               Password Reset
             </button>
