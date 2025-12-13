@@ -22,7 +22,7 @@ const FavouritesPage = () => {
     <>
       {/* Mobile Layout */}
       {isSmall && (
-        <div className="flex flex-col w-screen h-screen bg-gray-50 max-sm:pt-14">
+        <div className="flex flex-col w-screen h-screen bg-gray-50 max-sm:pt-17.5">
           {/* Header */}
           {/* <div className="px-4 py-4">
             <div className="flex items-center gap-3">
