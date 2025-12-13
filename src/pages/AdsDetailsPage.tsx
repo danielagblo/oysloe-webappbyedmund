@@ -474,9 +474,8 @@ const AdsDetailsPage = () => {
         roomKey = null;
       }
 
-      const tempId = `tmp_${Date.now()}`;
-      const tempMsg = {
-        id: -Date.now(),
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const tempMsg: Partial<ChatMessage> = {
         room: roomKey as any,
         sender: {
           id: currentUserProfile?.id ?? 0,
@@ -486,9 +485,9 @@ const AdsDetailsPage = () => {
         content: text,
         created_at: new Date().toISOString(),
         is_read: false,
-        __temp_id: tempId,
-        __optimistic: true,
-      } as unknown as ChatMessage;
+      };
+      (tempMsg as unknown as Record<string, unknown>).__temp_id = tempId;
+      (tempMsg as unknown as Record<string, unknown>).__optimistic = true;
 
       try {
         // Ensure websocket room client is connected where possible so sendMessage uses WS (wss/chat/<room>)
