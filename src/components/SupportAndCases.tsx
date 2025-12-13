@@ -1,7 +1,7 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChatRoom } from "../services/chatService";
-import chatService from "../services/chatService";
+import WebSocketClient from "../services/wsClient";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -9,10 +9,126 @@ type SupportAndCasesProps = {
 };
 
 export default function SupportAndCases({
-  onSelectCase,
   onSelectChat,
 }: SupportAndCasesProps) {
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
+  const [chatUnread, setChatUnread] = useState<number>(0);
+  const [supportActive, setSupportActive] = useState<number>(0);
+  const [allRooms, setAllRooms] = useState<ChatRoom[]>([]);
+  const wsRef = useRef<WebSocketClient | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    // Connect WebSocket to listen for room updates
+    try {
+      const apiBase =
+        (import.meta.env.VITE_API_URL as string) ||
+        "https://api.oysloe.com/api-v1";
+      const wsBaseRaw = (import.meta.env.VITE_WS_URL as string) || apiBase;
+      const wsBase = wsBaseRaw.replace(/^http/, "ws").replace(/\/$/, "");
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("oysloe_token")
+          : null;
+      const wsUrl = `${wsBase}/chatrooms/`;
+
+      const client = new WebSocketClient(wsUrl, token, {
+        onOpen: () => {
+          /* noop */
+        },
+        onClose: () => {
+          /* noop */
+        },
+        onError: (ev) => console.warn("SupportAndCases ws error", ev),
+        onMessage: (payload: any) => {
+          if (!mounted) return;
+          try {
+            // Normalize rooms received from websocket to expected ChatRoom shape
+            const normalizeRoom = (raw: any): ChatRoom => {
+              return ({
+                id: raw.id,
+                name: raw.name ?? String(raw.id ?? ""),
+                is_group: raw.is_group ?? false,
+                // some payloads use `unread` rather than `total_unread`
+                total_unread: raw.total_unread ?? raw.unread ?? raw.unread_count ?? 0,
+                created_at: raw.created_at ?? raw.createdAt ?? null,
+                messages: Array.isArray(raw.messages) ? raw.messages : [],
+                members: Array.isArray(raw.members) ? raw.members : [],
+              } as ChatRoom);
+            };
+
+            // Handle initial chatrooms list
+            if (
+              payload &&
+              typeof payload === "object" &&
+              payload.type === "chatrooms_list" &&
+              Array.isArray(payload.chatrooms)
+            ) {
+              setAllRooms(payload.chatrooms.map((r: any) => normalizeRoom(r)));
+              return;
+            }
+
+            // Handle individual room updates
+            if (payload && typeof payload === "object" && payload.id) {
+              const normalized = normalizeRoom(payload);
+              // Update allRooms
+              setAllRooms((prev) => {
+                const idx = prev.findIndex((r) => String(r.id) === String(normalized.id));
+                if (idx === -1) return [normalized, ...prev];
+                const copy = [...prev];
+                copy[idx] = { ...copy[idx], ...normalized };
+                return copy;
+              });
+            }
+          } catch (e) {
+            console.warn("Failed to handle room ws message", e);
+          }
+        },
+      });
+
+      wsRef.current = client;
+      try {
+        client.connect();
+      } catch (e) {
+        console.warn("SupportAndCases ws connect failed", e);
+      }
+    } catch (err) {
+      console.warn("SupportAndCases: failed to create ws client", err);
+    }
+
+    return () => {
+      mounted = false;
+      wsRef.current?.close();
+      wsRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Calculate counts from all rooms received via WebSocket
+    const userRooms = allRooms.filter((r) =>
+      r.members?.every((m) => !m.is_staff && !m.is_superuser)
+    );
+    const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
+    setChatUnread(unread);
+
+    const staffRooms = allRooms.filter((r) =>
+      r.members?.some((m) => m.is_staff || m.is_superuser)
+    );
+    setSupportActive(staffRooms.length);
+  }, [allRooms]);
+
+  // Precompute filtered room lists and memoize to avoid nested effects
+  const userRoomsMemo = useMemo(
+    () =>
+      allRooms.filter((r) => r.members?.every((m) => !m.is_staff && !m.is_superuser)),
+    [allRooms]
+  );
+
+  const staffRoomsMemo = useMemo(
+    () => allRooms.filter((r) => r.members?.some((m) => m.is_staff || m.is_superuser)),
+    [allRooms]
+  );
 
   const HeaderTabs = () => (
     <div className="flex items-center justify-center w-[100%] gap-5">
@@ -26,7 +142,7 @@ export default function SupportAndCases({
         <div style={{ display: "flex", flexDirection: "column" }}>
           <p style={{ margin: "0", display: "inline" }}>Chat</p>
           <span className=" text-gray-500" style={{ fontSize: "70%" }}>
-            0 unread
+            {chatUnread === null ? "…" : `${chatUnread} unread`}
           </span>
         </div>
       </button>
@@ -52,7 +168,7 @@ export default function SupportAndCases({
         <div style={{ display: "flex", flexDirection: "column" }}>
           <p style={{ margin: "0", display: "inline" }}>Support</p>
           <span className="text-gray-500" style={{ fontSize: "70%" }}>
-            14 active
+            {supportActive === null ? "…" : `${supportActive} active`}
           </span>
         </div>
       </button>
@@ -67,30 +183,12 @@ export default function SupportAndCases({
         Continue conversations with support or other users. Tap a chat to open
         it.
       </p>
-      <ChatsList />
+      <ChatsList rooms={userRoomsMemo} />
     </div>
   );
 
-  function ChatsList() {
-    const [rooms, setRooms] = useState<ChatRoom[] | null>(null);
+  function ChatsList({ rooms }: { rooms: ChatRoom[] }) {
 
-    useEffect(() => {
-      let mounted = true;
-      (async () => {
-        try {
-          const data = await chatService.listChatRooms();
-          if (mounted) setRooms(data);
-        } catch (e) {
-          console.error("Failed to load chat rooms", e);
-          if (mounted) setRooms([]);
-        }
-      })();
-      return () => {
-        mounted = false;
-      };
-    }, []);
-
-    if (!rooms) return <p className="text-sm text-gray-500">Loading chats…</p>;
     if (rooms.length === 0)
       return <p className="text-sm text-gray-500">No recent chats</p>;
 
@@ -101,14 +199,26 @@ export default function SupportAndCases({
             r.messages && r.messages.length
               ? r.messages[r.messages.length - 1]
               : null;
+
+          // Prefer explicit last_message fields from websocket payload if present
+          const payloadLast = (r as any).last_message ?? (r as any).lastMessage ?? (r as any).last;
+          const payloadLastContent = (() => {
+            if (!payloadLast) return null;
+            if (typeof payloadLast === "string") return payloadLast;
+            if (typeof payloadLast?.content === "string") return String(payloadLast.content);
+            if (typeof payloadLast?.text === "string") return String(payloadLast.text);
+            if (typeof payloadLast?.message === "string") return payloadLast.message;
+            if (typeof payloadLast?.message?.content === "string") return String(payloadLast.message.content);
+            return null;
+          })();
+
           const lastContent =
             lastMessage && typeof (lastMessage as any).content === "string"
               ? String((lastMessage as any).content)
-              : "";
+              : payloadLastContent ?? "";
+
           // If the last message content is a data URL (base64 image), show a friendly label instead
-          const previewText = lastContent.startsWith("data:")
-            ? "picture"
-            : lastContent;
+          const previewText = lastContent && lastContent.startsWith("data:") ? "picture" : lastContent;
 
           return (
             <button
@@ -126,13 +236,16 @@ export default function SupportAndCases({
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">{r.name}</p>
-                  <span className="text-xs text-gray-400">
-                    {r.messages?.length
-                      ? `${Math.max(0, r.messages!.length - 1)}m`
-                      : ""}
+                  <span className="text-xs text-gray-400 flex items-center gap-2">
+                    {r.total_unread ? (
+                      <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                        {r.total_unread}
+                      </span>
+                    ) : null}
+                    {r.created_at ? new Date(r.created_at).toLocaleDateString() : ""}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 truncate">{previewText}</p>
+                <p className="text-xs text-gray-500 truncate">{previewText || "No messages"}</p>
               </div>
             </button>
           );
@@ -169,68 +282,81 @@ export default function SupportAndCases({
     </div>
   );
 
-  const OpenCases = () => (
-    <div>
-      <h3 className="text-sm font-medium mb-2">Open Case</h3>
+  const OpenCases = ({ supportRooms }: { supportRooms: ChatRoom[] }) => {
 
-      <div className="flex flex-col gap-2.5">
-        {[
-          {
-            date: "Aug 21, 2025",
-            status: "Active",
-            supportNum: "S678432",
-            color: "text-[var(--dark-def)]",
-            bg: "#acf3b1",
-          },
-          {
-            date: "Aug 21, 2025",
-            status: "Active",
-            supportNum: "S678432",
-            color: "text-[var(--dark-def)]",
-            bg: "#acf3b1",
-          },
-          {
-            date: "Aug 21, 2025",
-            status: "Active",
-            supportNum: "S678432",
-            color: "text-[var(--dark-def)]",
-            bg: "#acf3b1",
-          },
-          {
-            date: "Aug 21, 2025",
-            status: "Closed",
-            supportNum: "S678432",
-            color: "text-[var(--some-gray)]",
-            bg: "#e49995",
-          },
-        ].map((caseData, index) => (
-          <button
-            key={index}
-            onClick={() => onSelectCase?.(caseData.supportNum)}
-            className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none"
-            style={{ display: "flex", flexDirection: "column" }}
-            aria-pressed="false"
-          >
-            <p className="text-xs text-gray-400" style={{ fontSize: "60%" }}>
-              {caseData.date}
-            </p>
-            <p style={{ fontSize: "90%" }}>Support: {caseData.supportNum}</p>
-            <p
-              className={`text-xs font-medium ${caseData.color}`}
-              style={{
-                maxWidth: "fit-content",
-                fontSize: "60%",
-                backgroundColor: caseData.bg,
-                padding: "0.08rem 0.3rem",
-              }}
-            >
-              {caseData.status}
-            </p>
-          </button>
-        ))}
+    if (supportRooms.length === 0)
+      return (
+        <div>
+          <h3 className="text-sm font-medium mb-2">Support Cases</h3>
+          <p className="text-sm text-gray-500">No support cases</p>
+        </div>
+      );
+
+    return (
+      <div>
+        <h3 className="text-sm font-medium mb-2">Support Cases</h3>
+
+        <div className="flex flex-col gap-2.5">
+          {supportRooms.length === 0 ? (
+            <p className="text-sm text-gray-500">No support cases</p>
+          ) : (
+            supportRooms.map((room) => {
+              const lastMessage =
+                room.messages && room.messages.length
+                  ? room.messages[room.messages.length - 1]
+                  : null;
+              const payloadLast = (room as any).last_message ?? (room as any).lastMessage ?? (room as any).last;
+              const payloadLastContent = (() => {
+                if (!payloadLast) return null;
+                if (typeof payloadLast === "string") return payloadLast;
+                if (typeof payloadLast?.content === "string") return String(payloadLast.content);
+                if (typeof payloadLast?.text === "string") return String(payloadLast.text);
+                if (typeof payloadLast?.message === "string") return payloadLast.message;
+                if (typeof payloadLast?.message?.content === "string") return String(payloadLast.message.content);
+                return null;
+              })();
+
+              const lastContent =
+                lastMessage && typeof (lastMessage as any).content === "string"
+                  ? String((lastMessage as any).content)
+                  : payloadLastContent ?? "";
+              const previewText = lastContent && lastContent.startsWith("data:") ? "picture" : lastContent;
+
+              return (
+                <button
+                  key={room.id}
+                  onClick={() => onSelectChat?.(String(room.id))}
+                  className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
+                    {room.name
+                      .split(" ")
+                      .map((s) => s[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{room.name}</p>
+                      <span className="text-xs text-gray-400 flex items-center gap-2">
+                        {room.total_unread ? (
+                          <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
+                            {room.total_unread}
+                          </span>
+                        ) : null}
+                        {room.created_at ? new Date(room.created_at).toLocaleDateString() : ""}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{previewText || "No messages"}</p>
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="flex h-full">
@@ -242,7 +368,7 @@ export default function SupportAndCases({
           ) : (
             <>
               <GetHelp />
-              <OpenCases />
+              <OpenCases supportRooms={staffRoomsMemo} />
             </>
           )}
           <div className="w-1 h-13" />

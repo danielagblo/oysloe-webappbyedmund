@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import chatService, {
-  type ChatRoom,
-  type Message,
+    type ChatRoom,
+    type Message,
 } from "../../services/chatService";
 import WebSocketClient from "../../services/wsClient";
 
@@ -12,7 +12,6 @@ export type UseWsChatReturn = {
   chatrooms: ChatRoom[];
   unreadCount: number;
   connectToRoom: (roomId: string) => Promise<void>;
-  connectToTempChat: (email: string) => Promise<void>;
   connectToChatroomsList: () => void;
   connectToUnreadCount: () => void;
   sendMessage: (
@@ -41,7 +40,6 @@ export default function useWsChat(): UseWsChatReturn {
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const roomClients = useRef<Record<string, WebSocketClient | null>>({});
-  const tempClient = useRef<WebSocketClient | null>(null);
   const listClient = useRef<WebSocketClient | null>(null);
   const unreadClient = useRef<WebSocketClient | null>(null);
 
@@ -49,7 +47,6 @@ export default function useWsChat(): UseWsChatReturn {
     return () => {
       // cleanup all clients on unmount
       Object.values(roomClients.current).forEach((c) => c?.close());
-      tempClient.current?.close();
       listClient.current?.close();
       unreadClient.current?.close();
     };
@@ -212,48 +209,7 @@ export default function useWsChat(): UseWsChatReturn {
     [ensureRoomClient],
   );
 
-  const connectToTempChat = useCallback(
-    async (email: string) => {
-      // close existing temp client
-      tempClient.current?.close();
-      const wsBase = getWsBase();
-      const encoded = encodeURIComponent(email);
-      const url = `${wsBase}/tempchat/${encoded}/`;
-      const client = new WebSocketClient(url, token, {
-        onMessage: (data) => {
-          // backend will likely return the resolved room and messages
-          if (!data) return;
-          const resolvedRoom = (data as any).room_id ?? (data as any).room;
-          if (resolvedRoom) {
-            const rid = String(resolvedRoom);
-            if ((data as any).messages) {
-              setMessages((prev) => ({
-                ...prev,
-                [rid]: (data as any).messages as Message[],
-              }));
-            }
-            // ensure a dedicated room client is connected for live updates
-            void ensureRoomClient(rid);
-          }
-          // if server pushes messages directly, try to append to whichever room is present
-          if ((data as any).id && (data as any).room) {
-            const rid = String((data as any).room);
-            setMessages((prev) => ({
-              ...prev,
-              [rid]: [...(prev[rid] || []), data as Message],
-            }));
-          }
-        },
-      });
-      tempClient.current = client;
-      try {
-        client.connect();
-      } catch (err) {
-        console.warn("useWsChat: tempchat connect failed", err);
-      }
-    },
-    [token, ensureRoomClient],
-  );
+  
 
   const connectToChatroomsList = useCallback(() => {
     if (listClient.current?.isOpen()) return;
@@ -485,7 +441,54 @@ export default function useWsChat(): UseWsChatReturn {
         return;
       }
 
-      // Fallback: send via REST if websocket not available
+      // If this is a temp chat room (created from email), resolve or create a real room via REST and send via WS/REST
+      const isTempRoom = String(roomId).startsWith("temp_");
+      if (isTempRoom) {
+        const possibleEmail = String(roomId).replace(/^temp_/, "");
+        // Try to resolve existing room by email
+        try {
+          const res = await chatService.resolveChatroomId({ email: possibleEmail } as any);
+          const resolved = (res as any)?.room_id ?? (res as any)?.room ?? (res as any)?.id ?? null;
+          const rid = resolved != null ? String(resolved) : null;
+          if (rid) {
+            // ensure room client exists and try to send via websocket where possible
+            await ensureRoomClient(rid);
+            const clientForResolved = roomClients.current[rid];
+            if (clientForResolved && clientForResolved.isOpen()) {
+              clientForResolved.send({ type: "message", content: text, temp_id: tempId });
+              return;
+            }
+            // fallback to REST send for resolved room
+            await chatService.sendMessageToRoom(rid, { content: text, message: text, temp_id: tempId } as any);
+            return;
+          }
+        } catch (err) {
+          console.debug("useWsChat: resolveChatroomId for temp email failed", err);
+        }
+
+        // If resolve failed, try to create a room via REST using the email
+        try {
+          const created = await chatService.createChatRoom({ email: possibleEmail } as any);
+          const createdId = (created as any)?.id ?? (created as any)?.room_id ?? (created as any)?.room ?? null;
+          const rid = createdId != null ? String(createdId) : null;
+          if (rid) {
+            await ensureRoomClient(rid);
+            const clientForResolved = roomClients.current[rid];
+            if (clientForResolved && clientForResolved.isOpen()) {
+              clientForResolved.send({ type: "message", content: text, temp_id: tempId });
+              return;
+            }
+            await chatService.sendMessageToRoom(rid, { content: text, message: text, temp_id: tempId } as any);
+            return;
+          }
+        } catch (err) {
+          console.warn("useWsChat: failed to create chatroom for temp email", err);
+        }
+
+        throw new Error("Unable to resolve or create chatroom for temp email");
+      }
+
+      // Fallback: send via REST if websocket not available for persistent rooms
       try {
         const body: any = { content: text, message: text };
         if (tempId) body.temp_id = tempId;
@@ -655,8 +658,6 @@ export default function useWsChat(): UseWsChatReturn {
   const closeAll = useCallback(() => {
     Object.values(roomClients.current).forEach((c) => c?.close());
     roomClients.current = {};
-    tempClient.current?.close();
-    tempClient.current = null;
     listClient.current?.close();
     listClient.current = null;
     unreadClient.current?.close();
@@ -668,7 +669,6 @@ export default function useWsChat(): UseWsChatReturn {
     chatrooms,
     unreadCount,
     connectToRoom,
-    connectToTempChat,
     connectToChatroomsList,
     connectToUnreadCount,
     sendMessage,

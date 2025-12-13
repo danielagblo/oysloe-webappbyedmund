@@ -17,23 +17,36 @@ const QuickChat: React.FC<QuickChatProps> = ({
         <img src="/quick chat.svg" alt="" className="w-5 h-5" />
         <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
       </div>
-      <div className="flex flex-wrap max-sm:grid max-sm:grid-cols-2 flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start">
-        {[
-          "Is this Original?",
-          "Do you have delivery options?",
-          "What is the warranty period?",
-          "Can I see the service history?",
-        ].map((text, i) => (
+      <div className="flex flex-wrap
+       flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start">
+        <button
+          className="py-1 px-4  bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[22px] md:text-[1.8vw]  max-sm:py-1 hover:bg-gray-100 whitespace-nowrap w-fit"
+          onClick={() => setQuickChatInput("👋")}
+        >
+          👋
+        </button>
+
+        <button
+          className="px-4 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+          onClick={() => setQuickChatInput("Delivery possible?")}
+        >
+          Delivery possible?
+        </button>
+        <div className="flex flex-row flex-wrap gap-1" >
           <button
-            key={i}
-            className="px-1 py-2 bg-(--div-active) sm:bg-white rounded text-[11px] md:text-[0.9vw] max-sm:w-full max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
-            onClick={async () => {
-              await openChatWithOwnerAndSend(text);
-            }}
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            onClick={() => setQuickChatInput("Lower the price please?")}
           >
-            {text}
+            Lower the price please?
           </button>
-        ))}
+
+          <button
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            onClick={() => setQuickChatInput("Confirm the condition?")}
+          >
+            Confirm the condition?
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 w-full items-center">
