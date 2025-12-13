@@ -222,6 +222,36 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     };
   }, [messages, avatarMap]);
 
+  // Helpers to group messages by day and render date headers
+  const getDateKey = (iso?: string | null) => {
+    if (!iso) return "";
+    try {
+      const d = new Date(iso);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const formatDateHeader = (iso?: string | null) => {
+    if (!iso) return "";
+    try {
+      const d = new Date(iso);
+      const today = new Date();
+      const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diff = Math.round((t0.getTime() - d0.getTime()) / (24 * 60 * 60 * 1000));
+      if (diff === 0) return "Today";
+      if (diff === 1) return "Yesterday";
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return "";
+    }
+  };
+
   // Fetch room details and try to resolve a product for the chat header
   useEffect(() => {
     if (!validatedRoomId) {
@@ -541,102 +571,108 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
-          {(messages[validatedRoomId ?? ""] || []).map((msg) => {
-            const isMine = currentUser && msg.sender?.id === currentUser.id;
-            const delivery = getMessageDelivery(msg as unknown);
+          {(() => {
+            const nodes: JSX.Element[] = [];
+            const roomMsgs = (messages[validatedRoomId ?? ""] || []) as any[];
+            let lastKey = "";
+            for (const msg of roomMsgs) {
+              const created = (msg as any).created_at ?? null;
+              const dateKey = getDateKey(created);
+              if (dateKey && dateKey !== lastKey) {
+                nodes.push(
+                  <div key={`date-${dateKey}`} className="text-center text-xs text-gray-400 my-2">
+                    {formatDateHeader(created)}
+                  </div>,
+                );
+                lastKey = dateKey;
+              }
 
-            // Determine image source from common fields or from content if it's a data URL or an image URL
-            const asAny = msg as unknown as Record<string, unknown>;
-            const content =
-              typeof asAny.content === "string" ? String(asAny.content) : "";
-            const explicitImage = (asAny.image_url ??
-              asAny.file_url ??
-              asAny.image) as string | undefined | null;
-            const isDataUrl = content.startsWith("data:image/");
-            const looksLikeImageUrl =
-              /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-            const maybeImageSrc =
-              explicitImage ||
-              (isDataUrl || looksLikeImageUrl ? content : null);
+              const isMine = currentUser && msg.sender?.id === currentUser?.id;
+              const delivery = getMessageDelivery(msg as unknown);
 
-            return (
-              <div
-                key={msg.id}
-                className={isMine ? "flex justify-end" : "flex justify-start"}
-              >
-                <div className="flex flex-col">
-                  {isMine ? (
-                    <div className="flex flex-col items-end gap-1">
-                      <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+              // Determine image source from common fields or from content if it's a data URL or an image URL
+              const asAny = msg as unknown as Record<string, unknown>;
+              const content = typeof asAny.content === "string" ? String(asAny.content) : "";
+              const explicitImage = (asAny.image_url ?? asAny.file_url ?? asAny.image) as string | undefined | null;
+              const isDataUrl = content.startsWith("data:image/");
+              const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
+              const maybeImageSrc = explicitImage || (isDataUrl || looksLikeImageUrl ? content : null);
 
-                      <div className="relative flex items-end justify-end">
-                        <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
-                          {maybeImageSrc ? (
-                            <img
-                              src={String(maybeImageSrc)}
-                              alt="attachment"
-                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
-                              onClick={() => openImage(String(maybeImageSrc))}
-                              role="button"
-                            />
-                          ) : (
-                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
-                          )}
+              nodes.push(
+                <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
+                  <div className="flex flex-col">
+                    {isMine ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+
+                        <div className="relative flex items-end justify-end">
+                          <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
+                            {maybeImageSrc ? (
+                              <img
+                                src={String(maybeImageSrc)}
+                                alt="attachment"
+                                className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                                onClick={() => openImage(String(maybeImageSrc))}
+                                role="button"
+                              />
+                            ) : (
+                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                            )}
+                          </div>
+                          <img
+                            src={avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"}
+                            alt="You"
+                            className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
+                          />
                         </div>
-                        <img
-                          src={
-                            avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"
-                          }
-                          alt="You"
-                          className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
-                        />
-                      </div>
 
-                      <div className="text-[9px] text-gray-400 mt-1 text-right">
-                        <span className="inline-flex items-center gap-1">
-                          <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
-                          {isMine && delivery && (
-                            <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-start gap-1">
-                      <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
-
-                      <div className="relative flex items-start justify-start">
-                        <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
-                          {maybeImageSrc ? (
-                            <img
-                              src={String(maybeImageSrc)}
-                              alt="attachment"
-                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
-                              onClick={() => openImage(String(maybeImageSrc))}
-                              role="button"
-                            />
-                          ) : (
-                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
-                          )}
+                        <div className="text-[9px] text-gray-400 mt-1 text-right">
+                          <span className="inline-flex items-center gap-1">
+                            <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
+                            {isMine && delivery && (
+                              <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </span>
                         </div>
-                        <img
-                          src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
-                          alt="User"
-                          className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
-                        />
                       </div>
+                    ) : (
+                      <div className="flex flex-col items-start gap-1">
+                        <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
 
-                      <div className="text-[9px] text-gray-400 mt-1 text-left">
-                        {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
+                        <div className="relative flex items-start justify-start">
+                          <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
+                            {maybeImageSrc ? (
+                              <img
+                                src={String(maybeImageSrc)}
+                                alt="attachment"
+                                className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                                onClick={() => openImage(String(maybeImageSrc))}
+                                role="button"
+                              />
+                            ) : (
+                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                            )}
+                          </div>
+                          <img
+                            src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
+                            alt="User"
+                            className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
+                          />
+                        </div>
+
+                        <div className="text-[9px] text-gray-400 mt-1 text-left">
+                          {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                    )}
+                  </div>
+                </div>,
+              );
+            }
+            return nodes;
+          })()}
         </div>
         <div className="flex items-center gap-2">
           <input
