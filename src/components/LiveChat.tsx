@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type JSX, type KeyboardEvent } from "react";
 import useWsChat from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
@@ -18,6 +18,7 @@ type ChatInputProps = {
   disabled?: boolean;
   onAttach?: () => void;
   onRecord?: (recording: boolean) => void;
+  onRecorded?: (file: File) => void;
 };
 
 function ChatInput({
@@ -34,55 +35,197 @@ function ChatInput({
   const toggleRecording = () => {
     if (disabled) return;
     const next = !recording;
-    setRecording(next);
+    // start/stop handled below with MediaRecorder
+    if (!next) {
+      // stop handled by stopRecording
+      stopRecording();
+      return;
+    }
+    void startRecording();
+  };
+  const mediaRecRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
+  const sendOnStopRef = useRef<boolean>(true);
+  const startTimeRef = useRef<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedIntervalRef = useRef<number | null>(null);
+
+  const startRecording = async () => {
+    if (disabled) return;
     try {
-      onRecord?.(next);
-    } catch {
-      // ignore
+      // request microphone
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const mr: MediaRecorder = new (window as any).MediaRecorder(stream);
+      mediaRecRef.current = mr;
+      chunksRef.current = [];
+      mr.ondataavailable = (e: any) => {
+        if (e?.data) chunksRef.current.push(e.data);
+      };
+      mr.onstop = () => {
+        try {
+          const send = sendOnStopRef.current !== false;
+          if (send && (chunksRef.current || []).length > 0) {
+            const blob = new Blob(chunksRef.current || [], { type: "audio/webm" });
+            chunksRef.current = [];
+            const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
+            try {
+              console.debug("ChatInput: recorded file ready", { size: (file as any).size, type: file.type, name: file.name });
+              onRecorded?.(file);
+            } catch (e) {
+              void e;
+            }
+          } else {
+            // discard
+            chunksRef.current = [];
+          }
+        } finally {
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+            mediaStreamRef.current = null;
+          }
+          mediaRecRef.current = null;
+          setRecording(false);
+          setElapsed(0);
+          if (elapsedIntervalRef.current) {
+            window.clearInterval(elapsedIntervalRef.current);
+            elapsedIntervalRef.current = null;
+          }
+          try {
+            onRecord?.(false);
+          } catch {
+            // ignore
+          }
+        }
+      };
+      mr.start();
+      setRecording(true);
+      startTimeRef.current = Date.now();
+      setElapsed(0);
+      if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
+      elapsedIntervalRef.current = window.setInterval(() => {
+        if (startTimeRef.current) setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }, 500) as unknown as number;
+      try {
+        onRecord?.(true);
+      } catch {
+        // ignore
+      }
+    } catch (err) {
+      console.error("Recording start failed", err);
     }
   };
+
+  const stopRecording = (send = true) => {
+    try {
+      sendOnStopRef.current = send;
+      mediaRecRef.current?.stop();
+    } catch (e) {
+      void e;
+      setRecording(false);
+      setElapsed(0);
+      try {
+        onRecord?.(false);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      try {
+        mediaRecRef.current?.stop();
+      } catch {
+        // ignore
+      }
+      if (mediaStreamRef.current) mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="relative flex gap-2 w-full">
-      <input
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        onKeyDown={onKeyDown}
-        type="text"
-        placeholder="Start a chat"
-        style={{ border: "1px solid var(--div-border)" }}
-        className="rounded-2xl px-10 py-3 bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
-      />
-      <button
-        onClick={onSend}
-        type="button"
-        aria-label="Send"
-        disabled={disabled}
-        style={{ border: "1px solid var(--div-border)" }}
-        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        <img src="/send.svg" alt="Send" className="w-6 h-6" />
-      </button>
-      {/* file input moved to parent; attach button will call parent handler */}
-      <button
-        onClick={toggleRecording}
-        type="button"
-        aria-label={recording ? "Stop recording" : "Start recording"}
-        disabled={disabled}
-        style={{ border: "1px solid var(--div-border)" }}
-        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${recording ? "bg-red-500 text-white" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        {/* microphone icon */}
-        <img src="/audio.svg" alt="Record" className="w-6 h-6" />
-      </button>
+      {recording ? (
+        <div className="flex items-center gap-2 w-full rounded-2xl px-10 py-3" style={{ border: "1px solid var(--div-border)", background: "white" }}>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+            <div className="text-sm font-medium text-gray-700">Recording</div>
+          </div>
+          <div className="flex-1 text-center text-sm text-gray-700">
+            {Math.floor(elapsed / 60).toString().padStart(2, "0")}:{(elapsed % 60).toString().padStart(2, "0")}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => stopRecording(false)}
+              type="button"
+              aria-label="Cancel recording"
+              className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center"
+              style={{ border: "1px solid var(--div-border)" }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <button
+              onClick={() => stopRecording(true)}
+              type="button"
+              aria-label="Send recording"
+              className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <input
+            value={value}
+            onChange={(e) => onValueChange(e.target.value)}
+            onKeyDown={onKeyDown}
+            type="text"
+            placeholder="Start a chat"
+            style={{ border: "1px solid var(--div-border)" }}
+            className="rounded-2xl px-10 py-3 bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
+          />
+          <button
+            onClick={onSend}
+            type="button"
+            aria-label="Send"
+            disabled={disabled}
+            style={{ border: "1px solid var(--div-border)" }}
+            className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <img src="/send.svg" alt="Send" className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => startRecording()}
+            type="button"
+            aria-label={recording ? "Stop recording" : "Start recording"}
+            disabled={disabled}
+            style={{ border: "1px solid var(--div-border)" }}
+            className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+          </button>
+        </>
+      )}
 
-
-      <button
-        onClick={() => onAttach?.()}
-        className="absolute bottom-3 left-3"
-        type="button"
-      >
-        <img src="/image.png" alt="Attach" className="w-5 h-auto" />
-      </button>
+      {/* file attach button (hide while recording so recording UI covers it) */}
+      {!recording && (
+        <button
+          onClick={() => onAttach?.()}
+          className="absolute bottom-3 left-3"
+          type="button"
+        >
+          <img src="/image.png" alt="Attach" className="w-5 h-auto" />
+        </button>
+      )}
     </div>
   );
 }
@@ -535,6 +678,77 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
+  // Handle recorded audio file from ChatInput
+  const handleRecordedFile = async (file: File) => {
+    // Choose a room id to send to: prefer validatedRoomId, fall back to incoming caseId
+    const roomToSend = validatedRoomId ?? caseId;
+    if (!roomToSend) {
+      console.warn("Refusing to send recorded file: missing room id", { validatedRoomId, caseId });
+      return;
+    }
+
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimistic: Partial<ChatMessage> = {
+      id: 0,
+      room: Number(caseId),
+      sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
+      content: "",
+      created_at: new Date().toISOString(),
+    };
+    (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
+    (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
+    // expose audio preview URL for optimistic UI
+    (optimistic as unknown as Record<string, unknown>).audio_url = URL.createObjectURL(file);
+    addLocalMessage(String(roomToSend), optimistic as ChatMessage);
+    const el = containerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+
+    try {
+      if (roomToSend && !isRoomConnected(roomToSend)) {
+        try {
+          await connectToRoom(roomToSend);
+        } catch (e) {
+          console.debug("LiveChat: connectToRoom before recorded send failed", e);
+        }
+      }
+
+      console.debug("LiveChat: sending recorded file", {
+        roomToSend,
+        tempId,
+        fileName: file.name,
+        fileSize: (file as any).size,
+        fileType: file.type,
+      });
+
+      // Prefer uploading via the REST `/send` endpoint so audio is sent as multipart/form-data.
+      // If that fails, fall back to the existing `sendMessage` hook which may use REST/WS.
+      try {
+        const chatSvc = await import("../services/chatService");
+        const form = new FormData();
+        form.append("text", "");
+        form.append("temp_id", String(tempId));
+        form.append("file", file);
+        console.debug("LiveChat: uploading recorded file via /send", {
+          roomToSend,
+          tempId,
+          fileName: file.name,
+          fileSize: (file as any).size,
+        });
+        const resp = await chatSvc.sendMessageToRoom(String(roomToSend), form);
+        console.debug("LiveChat: upload response", resp);
+      } catch (uploadErr) {
+        console.error("Recorded /send upload failed, falling back to sendMessage()", uploadErr);
+        try {
+          await sendMessage(String(roomToSend), "", tempId, file);
+        } catch (fallbackErr) {
+          console.error("Fallback sendMessage failed", fallbackErr);
+        }
+      }
+    } catch (err) {
+      console.error("Recorded send failed", err);
+    }
+  };
+
   return (
     <div className="flex h-full border-gray-100 ">
       <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col">
@@ -594,9 +808,13 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               const asAny = msg as unknown as Record<string, unknown>;
               const content = typeof asAny.content === "string" ? String(asAny.content) : "";
               const explicitImage = (asAny.image_url ?? asAny.file_url ?? asAny.image) as string | undefined | null;
-              const isDataUrl = content.startsWith("data:image/");
+              const explicitAudio = (asAny.audio_url ?? asAny.audio) as string | undefined | null;
+              const isImageDataUrl = content.startsWith("data:image/");
+              const isAudioDataUrl = content.startsWith("data:audio/");
               const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-              const maybeImageSrc = explicitImage || (isDataUrl || looksLikeImageUrl ? content : null);
+              const looksLikeAudioUrl = /^https?:\/\/.+\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
+              const maybeImageSrc = explicitImage || (isImageDataUrl || looksLikeImageUrl ? content : null);
+              const maybeAudioSrc = explicitAudio || (isAudioDataUrl || looksLikeAudioUrl ? content : null);
 
               nodes.push(
                 <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
@@ -615,6 +833,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
                               />
+                            ) : maybeAudioSrc ? (
+                              <audio controls src={String(maybeAudioSrc)} className="w-full" />
                             ) : (
                               <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
@@ -651,6 +871,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
                               />
+                            ) : maybeAudioSrc ? (
+                              <audio controls src={String(maybeAudioSrc)} className="w-full" />
                             ) : (
                               <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
@@ -694,6 +916,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             onSend={() => void handleSend()}
             disabled={sending}
             onAttach={() => fileInputRef.current?.click()}
+            onRecorded={(f) => void handleRecordedFile(f)}
           />
         </div>
 
