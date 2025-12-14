@@ -19,6 +19,8 @@ type Props = {
   setSelectedTimeframe: (
     timeframe: "newest" | "7days" | "30days" | "anytime",
   ) => void;
+  selectedAdType?: "SALE" | "RENT" | "PAYLATER" | "all";
+  setSelectedAdType?: (adType: "SALE" | "RENT" | "PAYLATER" | "all") => void;
   priceSort: "none" | "low-to-high" | "high-to-low";
   setPriceSort: (sort: "none" | "low-to-high" | "high-to-low") => void;
   timeframeSort: "none" | "newest" | "oldest";
@@ -40,6 +42,8 @@ const FilterButton = ({
   setSelectedLocation,
   selectedTimeframe,
   setSelectedTimeframe,
+  selectedAdType = "all",
+  setSelectedAdType,
   priceSort,
   setPriceSort,
   timeframeSort,
@@ -59,6 +63,7 @@ const FilterButton = ({
     selectedCategoryId !== null ? 1 : 0,
     selectedLocation ? 1 : 0,
     selectedTimeframe !== "anytime" ? 1 : 0,
+    selectedAdType !== "all" ? 1 : 0,
     priceSort !== "none" ? 1 : 0,
     timeframeSort !== "none" ? 1 : 0,
     priceFilter.mode !== "none" ? 1 : 0,
@@ -124,6 +129,8 @@ const FilterButton = ({
         setSelectedLocation={setSelectedLocation}
         selectedTimeframe={selectedTimeframe}
         setSelectedTimeframe={setSelectedTimeframe}
+        selectedAdType={selectedAdType}
+        setSelectedAdType={setSelectedAdType}
         priceSort={priceSort}
         setPriceSort={setPriceSort}
         timeframeSort={timeframeSort}

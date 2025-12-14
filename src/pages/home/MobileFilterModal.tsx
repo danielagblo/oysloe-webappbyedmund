@@ -24,6 +24,8 @@ interface MobileFilterModalProps {
   setSelectedTimeframe: (
     timeframe: "newest" | "7days" | "30days" | "anytime",
   ) => void;
+  selectedAdType?: "SALE" | "RENT" | "PAYLATER" | "all";
+  setSelectedAdType?: (adType: "SALE" | "RENT" | "PAYLATER" | "all") => void;
   priceSort: "none" | "low-to-high" | "high-to-low";
   setPriceSort: (sort: "none" | "low-to-high" | "high-to-low") => void;
   timeframeSort: "none" | "newest" | "oldest";
@@ -53,6 +55,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   setSelectedLocation,
   selectedTimeframe,
   setSelectedTimeframe,
+  selectedAdType = "all",
+  setSelectedAdType,
   priceSort,
   setPriceSort,
   timeframeSort,
@@ -68,6 +72,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     min: (priceFilter as any)?.min || "",
     max: (priceFilter as any)?.max || "",
   });
+  const [tempSelectedAdType, setTempSelectedAdType] = useState<
+    "SALE" | "RENT" | "PAYLATER" | "all"
+  >(selectedAdType);
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
   const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState<
@@ -275,6 +282,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     setSelectedRegion(null);
     setSelectedLocationIds([]);
     setSelectedTimeframe("anytime");
+    setTempSelectedAdType("all");
     setPriceSort("none");
     setTimeframeSort("none");
     setPriceFilter({ mode: "none" });
@@ -290,6 +298,11 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       setSelectedLocation(selectedLocationIds.join(","));
     } else {
       setSelectedLocation(null);
+    }
+
+    // Apply ad type filter
+    if (setSelectedAdType) {
+      setSelectedAdType(tempSelectedAdType);
     }
 
     // Apply price filter if set
@@ -554,6 +567,28 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                     <option value="newest">Newest</option>
                     <option value="7days">Last 7 days</option>
                     <option value="30days">Last 30 days</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Ad Type Filter Section */}
+              <div className="bg-white rounded-3xl p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-700">
+                    Ad Type
+                  </span>
+                  <select
+                    value={tempSelectedAdType}
+                    onChange={(e) =>
+                      setTempSelectedAdType(
+                        e.target.value as "all" | "SALE" | "RENT",
+                      )
+                    }
+                    className="text-sm text-right rounded-lg px-2 py-1"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="SALE">For Sale</option>
+                    <option value="RENT">For Rent</option>
                   </select>
                 </div>
               </div>

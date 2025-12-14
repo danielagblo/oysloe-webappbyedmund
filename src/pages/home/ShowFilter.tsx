@@ -31,6 +31,9 @@ type Props = {
   selectedTimeframe: "newest" | "7days" | "30days" | "anytime";
   setSelectedTimeframe: (v: "newest" | "7days" | "30days" | "anytime") => void;
 
+  selectedAdType: "SALE" | "RENT" | "PAYLATER" | "all";
+  setSelectedAdType: (v: "SALE" | "RENT" | "PAYLATER" | "all") => void;
+
   priceSort: "none" | "low-to-high" | "high-to-low";
   setPriceSort: (v: "none" | "low-to-high" | "high-to-low") => void;
 
@@ -58,6 +61,9 @@ const ShowFilter = ({
 
   selectedTimeframe,
   setSelectedTimeframe,
+
+  selectedAdType,
+  setSelectedAdType,
 
   priceSort,
   setPriceSort,
@@ -92,6 +98,9 @@ const ShowFilter = ({
   const [localSelectedTimeframe, setLocalSelectedTimeframe] = useState<
     "newest" | "7days" | "30days" | "anytime"
   >(selectedTimeframe);
+  const [localAdType, setLocalAdType] = useState<
+    "SALE" | "RENT" | "PAYLATER" | "all"
+  >(selectedAdType);
   const [localPriceSort, setLocalPriceSort] = useState<
     "none" | "low-to-high" | "high-to-low"
   >(priceSort);
@@ -266,6 +275,7 @@ const ShowFilter = ({
         : null,
     );
     setSelectedTimeframe(localSelectedTimeframe);
+    setSelectedAdType(localAdType);
     setPriceSort(localPriceSort);
     setTimeframeSort(localTimeframeSort);
 
@@ -297,7 +307,9 @@ const ShowFilter = ({
     setShowSubcategoryModal(false);
     setSubcategorySearch("");
     setLocalSelectedTimeframe("anytime");
+    setLocalAdType("all");
     setLocalPriceSort("none");
+    setLocalTimeframeSort("none");
     setLocalTimeframeSort("none");
     setLocalPriceMin("");
     setLocalPriceMax("");
@@ -890,6 +902,37 @@ const ShowFilter = ({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Ad Type Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <img
+                src="/boxes-svgrepo-com.svg"
+                alt="Ad Type"
+                className="w-5 h-5"
+              />
+              Ad Type
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "all" as const, label: "All Types" },
+                { value: "SALE" as const, label: "For Sale" },
+                { value: "RENT" as const, label: "For Rent" },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setLocalAdType(option.value)}
+                  className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-colors ${
+                    localAdType === option.value
+                      ? "bg-(--dark-def) text-white"
+                      : "bg-gray-100 border border-gray-300 hover:bg-gray-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Timeframe Section */}

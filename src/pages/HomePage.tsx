@@ -41,6 +41,9 @@ const HomePage = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState<
     "newest" | "7days" | "30days" | "anytime"
   >("anytime");
+  const [selectedAdType, setSelectedAdType] = useState<
+    "SALE" | "RENT" | "PAYLATER" | "all"
+  >("all");
   const [priceSort, setPriceSort] = useState<
     "none" | "low-to-high" | "high-to-low"
   >("none");
@@ -224,6 +227,11 @@ const HomePage = () => {
       }
     }
 
+    // Ad Type filter
+    if (selectedAdType && selectedAdType !== "all") {
+      out = out.filter((p) => p.type === selectedAdType);
+    }
+
     // Price filter
     if (
       priceFilter?.mode === "below" &&
@@ -316,6 +324,8 @@ const HomePage = () => {
             setSelectedLocation={setSelectedLocation}
             selectedTimeframe={selectedTimeframe}
             setSelectedTimeframe={setSelectedTimeframe}
+            selectedAdType={selectedAdType}
+            setSelectedAdType={setSelectedAdType}
             priceSort={priceSort}
             setPriceSort={setPriceSort}
             timeframeSort={timeframeSort}
@@ -378,6 +388,8 @@ const HomePage = () => {
             setSelectedLocation={setSelectedLocation}
             selectedTimeframe={selectedTimeframe}
             setSelectedTimeframe={setSelectedTimeframe}
+            selectedAdType={selectedAdType}
+            setSelectedAdType={setSelectedAdType}
             priceSort={priceSort}
             setPriceSort={setPriceSort}
             timeframeSort={timeframeSort}

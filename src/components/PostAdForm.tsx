@@ -1386,19 +1386,19 @@ export default function PostAdForm({
                 />
               </div>
 
-              <div className="flex flex-wrap gap-2 lg:gap-1 my-1 font-bold">
+              <div className="flex flex-wrap gap-2 lg:gap-1 my-1 font-medium">
                 {savedLocations.map((loc) => (
                   <button
                     key={`${loc.label}|${loc.place}`}
                     type="button"
-                    className="p-1 bg-gray-100 rounded-xs text-[8px] hover:bg-gray-200"
+                    className="p-1 bg-gray-100 rounded-xs text-xs hover:bg-gray-200"
                     onClick={() => applySavedLocation(loc)}
                   >
                     {loc.label}
                   </button>
                 ))}
               </div>
-
+{/* 
               <p className="text-[8px] text-[var(--bg-active)] mt-1 font-bold">
                 <svg
                   className="inline"
@@ -1426,7 +1426,7 @@ export default function PostAdForm({
                   </g>
                 </svg>
                 &nbsp; This is required only for verification and safety purpose
-              </p>
+              </p> */}
             </div>
 
             <div>
