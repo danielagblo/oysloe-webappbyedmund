@@ -6,6 +6,7 @@ import OnboardingScreen from "../components/OnboardingScreen";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { resetPassword } from "../services/authService";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import PhoneInput from "../components/PhoneInput";
 
 const ResetPasswordPage = () => {
   const location = useLocation();
@@ -17,7 +18,7 @@ const ResetPasswordPage = () => {
       ? localStorage.getItem("oysloe_onboarding_seen") !== "true"
       : true;
 
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState(phoneFromState);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -29,6 +30,10 @@ const ResetPasswordPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!phone) {
+      setError("Phone number is required");
+      return;
+    }
     if (!newPassword || !confirmPassword) {
       setError("Both password fields are required");
       return;
@@ -45,7 +50,7 @@ const ResetPasswordPage = () => {
     setLoading(true);
     try {
       await resetPassword({
-        phone: phoneFromState,
+        phone: phone,
         new_password: newPassword,
         confirm_password: confirmPassword,
       });
@@ -88,21 +93,20 @@ const ResetPasswordPage = () => {
             )}
             <div className="flex flex-col gap-3">
               <div className="relative">
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                <PhoneInput
+                  phone={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-2 pl-10 w-full rounded-lg focus:border-gray-400 outline-0"
+                  required
                 />
                 <img
-                  src="/email.svg"
-                  alt="email"
+                  src="/phone.svg"
+                  alt="phone"
                   className="absolute h-6 w-6 left-2 top-3 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
                 />
               </div>
               <p className="text-left max-sm:text-[12px]  text-sm text-gray-600">
-                Use the email linked to your account
+                Use the phone number linked to your account
               </p>
             </div>
             <div className="flex flex-col gap-3 mt-3 max-sm:-mt-2">
