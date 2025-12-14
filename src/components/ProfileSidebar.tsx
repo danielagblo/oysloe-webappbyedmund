@@ -2,6 +2,11 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogout } from "../features/Auth/useAuth";
+import useUserProfile from "../features/userProfile/useUserProfile";
+import { buildMediaUrl } from "../services/media";
+import type { UserProfile } from "../types/UserProfile";
+import { LEVELS } from "../constants/levels";
+import ProgressBar from "./ProgressBar";
 import Tooltip from "./Tooltip";
 
 export type MenuItem = {
@@ -30,6 +35,14 @@ type Props = {
 const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [Logout, setLogout] = useState(false);
+  const { profile: user, loading, error } = useUserProfile();
+
+  let name = (user as UserProfile)?.name;
+  const nameParts = name?.split(" ") || [];
+  name =
+    nameParts.length > 1
+      ? (nameParts[0] || "") + " " + (nameParts[nameParts.length - 1] || "")
+      : nameParts[0];
 
   const handleSelect = (key: string) => {
     onSelect(key);
@@ -127,51 +140,213 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative w-64 h-full bg-white shadow-2xl flex flex-col justify-between animate-slide-in-right">
-            <div className="flex flex-col gap-6 pt-8">
+          <div className="relative w-80 max-w-[90vw] h-full bg-(--bg) shadow-2xl flex flex-col animate-slide-in-right overflow-y-auto">
+            {/* Header with close button */}
+            <div className="flex justify-end items-center p-4 border-gray-200">
               <button
-                className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200"
+                className="p-1 md:p-2 rounded-full bg-(--div-active) hover:bg-gray-200"
                 onClick={() => setIsOpen(false)}
               >
-                <XMarkIcon className="w-5 h-5 text-gray-700" />
+                <XMarkIcon className="w-5 h-5 font-bold text-gray-700" />
               </button>
+            </div>
 
-              <div className="flex flex-col mt-10">
-                {items.map((item) => {
-                  const isActive = item.key === active;
-                  return (
-                    <button
-                      key={item.key}
-                      onClick={() => handleSelect(item.key)}
-                      className={`flex items-center gap-3 px-6 py-3 text-left transition-all ${
-                        isActive
-                          ? "bg-[var(--div-active)] border-r-7 border-[var(--dark-def)]"
-                          : "hover:bg-gray-100"
-                      }`}
+            {/* Logout button */}
+            <div className="py-1 flex items-center justify-center w-full">
+              <button
+                className="flex items-center bg-(--div-active) justify-center gap-2 w-fit py-2 px-3 rounded-full hover:bg-gray-200 transition text-base"
+                onClick={() => setLogout(true)}
+              >
+                <img src="/logout.svg" alt="Logout" className="w-6 h-6" />
+                <span className="font-medium">Logout</span>
+              </button>
+            </div>
+
+            {/* Profile Card - New Layout */}
+            <div className="px-4 py-4">
+              <div className="flex items-start bg-(--div-active) rounded-2xl p-2 gap-3">
+                {/* Left: Profile Picture */}
+                <div className="bg-green-400 rounded-full h-17 w-17 flex items-center justify-center flex-shrink-0">
+                  <img
+                    src={
+                      buildMediaUrl((user as UserProfile)?.avatar) ||
+                      "/userPfp2.jpg"
+                    }
+                    alt="pfp"
+                    className="rounded-full object-cover bg-green-100 h-14 w-14 border-6 border-white"
+                  />
+                </div>
+
+                {/* Right: Name, Level, Progress Bar stacked */}
+                <div className="flex-1 flex flex-col gap-1.5">
+                  {/* Seller Name */}
+                  <h3 className="font-medium text-sm">
+                    {loading || error ? "User" : name !== " " ? name : "User"}
+                  </h3>
+
+                  {/* Level Badge */}
+                  <div className="flex items-center gap-1">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 10 11"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {item.icon && (
-                        <img
-                          src={item.icon}
-                          alt={item.label}
-                          className="w-5 h-auto"
+                      <ellipse
+                        cx="5"
+                        cy="5.24271"
+                        rx="5"
+                        ry="4.96781"
+                        fill="#74FFA7"
+                      />
+                      <path
+                        d="M2.05218 4.39318C2.37825 4.18062 2.83842 4.2557 3.08 4.56089L4.8702 6.82242L3.6894 7.59217L1.89921 5.33064C1.65763 5.02545 1.72611 4.60574 2.05218 4.39318Z"
+                        fill="#374957"
+                      />
+                      <rect
+                        width="6.34413"
+                        height="1.26744"
+                        rx="0.633722"
+                        transform="matrix(-0.830425 0.55713 -0.631604 -0.775291 9.14648 4.37305)"
+                        fill="#374957"
+                      />
+                    </svg>
+                    <p className="text-xs text-gray-600">
+                      {loading ? "" : (user as UserProfile)?.level || " "}
+                    </p>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {(() => {
+                    const points =
+                      Number((user as UserProfile)?.referral_points ?? 0) || 0;
+                    const DIAMOND = LEVELS.diamondTop;
+                    let percent = Math.round(
+                      (points / Math.max(1, DIAMOND)) * 100
+                    );
+                    if (!isFinite(percent) || percent < 0) percent = 0;
+                    if (percent > 100) percent = 100;
+                    return (
+                      <div className="h-1.5 bg-gray-300 mt-1 rounded-full overflow-hidden w-full">
+                        <div
+                          className="h-full bg-green-600 transition-all"
+                          style={{ width: `${percent}%` }}
                         />
-                      )}
-                      <span className="text-sm">{item.label}</span>
-                    </button>
-                  );
-                })}
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
 
-            {/* Mobile logout button */}
-            <div className="w-full mb-6 px-6">
+            {/* Stats */}
+            <div className="px-4 pb-3">
+              <div className="flex gap-3">
+                <div className="flex-1 text-center bg-(--div-active) p-3 rounded-lg">
+                  <p className="font-semibold text-base">
+                    {(user?.active_ads ?? 0).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500">Active Ads</p>
+                </div>
+                <div className="flex-1 text-center bg-(--div-active) p-3 rounded-lg">
+                  <p className="font-semibold text-base">
+                    {(user?.taken_ads ?? 0).toLocaleString()}
+                  </p>
+                  <p className="text-xs text-gray-500">Taken Ads</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Account Section */}
+            <div className="px-4 py-3">
+              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Account
+              </p>
               <button
-                className="flex items-center gap-2 w-full py-3 rounded-lg hover:bg-gray-100"
-                onClick={() => setLogout(true)}
+                onClick={() => handleSelect("profile")}
+                className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all ${
+                  active === "profile"
+                    ? "bg-gray-200 text-gray-900 font-medium"
+                    : "text-gray-700 hover:bg-gray-50"
+                }`}
               >
-                <img src="/logout.svg" alt="Logout" className="w-4 h-auto" />
-                <span className="text-sm">Logout</span>
+                <div className="bg-(--div-active) p-1.5 rounded-full">
+                  <img src="/profile.svg" alt="Edit profile" className="w-5 h-5" />
+                </div>
+                <span>Edit profile</span>
               </button>
+            </div>
+
+            {/* Business Section */}
+            <div className="px-4 py-3 border-t border-gray-200">
+              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Business
+              </p>
+              {[
+                { key: "ads", label: "Ads", icon: "/ads.svg" },
+                {
+                  key: "favorite",
+                  label: "Favourite",
+                  icon: "/favorite.svg",
+                },
+                {
+                  key: "subscription",
+                  label: "Subscription",
+                  icon: "/subecribe.svg",
+                },
+                {
+                  key: "refer",
+                  label: "Refer & Earn",
+                  icon: "/refer and earn.svg",
+                },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => handleSelect(item.key)}
+                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all ${
+                    active === item.key
+                      ? "bg-gray-200 text-gray-900 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="bg-(--div-active) p-1.5 rounded-full">
+                    <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                  </div>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Settings Section */}
+            <div className="px-4 py-3 border-t border-gray-200 pb-20">
+              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+                Settings
+              </p>
+              {[
+                { key: "feedback", label: "Feedback", icon: "/feedback.svg" },
+                { key: "terms", label: "T&C", icon: "/terms and conditions.svg" },
+                {
+                  key: "privacy",
+                  label: "Privacy Policy",
+                  icon: "/privacypolicy.svg",
+                },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => handleSelect(item.key)}
+                  className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all ${
+                    active === item.key
+                      ? "bg-gray-200 text-gray-900 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="bg-(--div-active) p-1.5 rounded-full">
+                    <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                  </div>
+                  <span>{item.label}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
