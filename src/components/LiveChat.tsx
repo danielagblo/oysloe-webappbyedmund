@@ -342,10 +342,19 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       <div className="flex items-center gap-3 w-full">
         {/* range styling for a thinner, visible progress bar */}
         <style>{`
-          .livechat-range{ -webkit-appearance:none; appearance:none; height:6px; background:#e5e7eb; border-radius:9999px; }
-          .livechat-range::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; box-shadow:0 0 0 2px rgba(0,0,0,0.03); margin-top:-5px; }
-          .livechat-range::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; }
+          .livechat-range{ -webkit-appearance:none; appearance:none; height:6px; background:transparent; border-radius:9999px; padding:0; margin:0; }
+          .livechat-range::-webkit-slider-runnable-track{ height:6px; border-radius:9999px; background:transparent; }
+          .livechat-range::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; box-shadow:0 0 0 2px rgba(0,0,0,0.03); margin-top:-4px; transform:translateY(0); }
           .livechat-range:focus{ outline:none; }
+          /* Firefox */
+          .livechat-range::-moz-range-track{ height:6px; background:transparent; border-radius:9999px; }
+          .livechat-range::-moz-range-progress{ height:6px; background:#10b981; border-radius:9999px; }
+          .livechat-range::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; transform:translateY(0); }
+          /* make sure the thumb is vertically centered in common browsers */
+          @supports (-webkit-appearance: none) {
+            .livechat-range{ padding-top:4px; padding-bottom:4px; }
+            .livechat-range::-webkit-slider-thumb{ margin-top:-4px; }
+          }
         `}</style>
         <button
           type="button"
@@ -942,19 +951,20 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               // detect common attachment fields for audio: audio_url, audio, file_url, file, attachments
               const explicitAudio = (asAny.audio_url ?? asAny.audio ?? asAny.file_url ?? asAny.file ?? (Array.isArray(asAny.attachments) && asAny.attachments[0] && (asAny.attachments[0].url || (asAny.attachments[0] as any).file))) as string | undefined | null;
               const isImageDataUrl = content.startsWith("data:image/");
-              const isAudioDataWebm = content.startsWith("data:audio/webm;");
+              const isAudioDataUrl = content.startsWith("data:audio/");
               const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content) || /^\/.*\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
+              // broaden audio detection: URLs with audio extensions, /media/ paths, or relative paths
+              const looksLikeAudioUrl = /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content) || (/^https?:\/\//i.test(content) && /\/media\//i.test(content)) || /^\/media\//i.test(content) || /^\/.*\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
+              // const isAudioDataWebm = content.startsWith("data:audio/webm;");
               const maybeImageSrc = explicitImage || (isImageDataUrl || looksLikeImageUrl ? content : null);
-              // Only treat audio when content is a data:audio/webm; base64 string or explicit audio field
-              const maybeAudioSrc = explicitAudio || (isAudioDataWebm ? content : null);
+              // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
+              const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
 
               // For audio messages we want the bubble to expand so the player can show full controls
               const bubbleBaseClass = "border border-gray-200 p-3 rounded-xl min-w-0 wrap-break-word";
               const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
               const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "flex-1 rounded-tl-none";
               const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
-
-
 
               nodes.push(
                 <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
