@@ -90,3 +90,16 @@ button:focus-visible {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: #718096;
 }
+
+/* Utility to hide scrollbars while keeping element scrollable */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
+}

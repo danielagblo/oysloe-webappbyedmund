@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type JSX, type KeyboardEvent } from "react";
 import useWsChat from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
+import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 type LiveChatProps = {
   caseId: string | null;
@@ -16,7 +17,8 @@ type ChatInputProps = {
   onSend: () => void;
   disabled?: boolean;
   onAttach?: () => void;
-  onRecord?: (recording: boolean) => void;
+  onRecord?: (recordingOrFile: boolean | File) => void;
+  onRecorded?: (file: File) => void;
 };
 
 function ChatInput({
@@ -30,58 +32,189 @@ function ChatInput({
 }: ChatInputProps) {
   const [recording, setRecording] = useState(false);
 
-  const toggleRecording = () => {
+  const mediaRecRef = useRef<MediaRecorder | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
+  const sendOnStopRef = useRef<boolean>(true);
+  const startTimeRef = useRef<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedIntervalRef = useRef<number | null>(null);
+
+  const startRecording = async () => {
     if (disabled) return;
-    const next = !recording;
-    setRecording(next);
     try {
-      onRecord?.(next);
-    } catch {
-      // ignore
+      // request microphone
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const mr: MediaRecorder = new (window as any).MediaRecorder(stream);
+      mediaRecRef.current = mr;
+      chunksRef.current = [];
+      mr.ondataavailable = (e: any) => {
+        if (e?.data) chunksRef.current.push(e.data);
+      };
+      mr.onstop = () => {
+        try {
+          const send = sendOnStopRef.current !== false;
+          if (send && (chunksRef.current || []).length > 0) {
+            const blob = new Blob(chunksRef.current || [], { type: "audio/webm" });
+            chunksRef.current = [];
+            const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
+            try {
+              console.debug("ChatInput: recorded file ready", { size: (file as any).size, type: file.type, name: file.name });
+              onRecord?.(file);
+            } catch (e) {
+              void e;
+            }
+          } else {
+            // discard
+            chunksRef.current = [];
+          }
+        } finally {
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+            mediaStreamRef.current = null;
+          }
+          mediaRecRef.current = null;
+          setRecording(false);
+          setElapsed(0);
+          if (elapsedIntervalRef.current) {
+            window.clearInterval(elapsedIntervalRef.current);
+            elapsedIntervalRef.current = null;
+          }
+          try {
+            onRecord?.(false);
+          } catch {
+            // ignore
+          }
+        }
+      };
+      mr.start();
+      setRecording(true);
+      startTimeRef.current = Date.now();
+      setElapsed(0);
+      if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
+      elapsedIntervalRef.current = window.setInterval(() => {
+        if (startTimeRef.current) setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      }, 500) as unknown as number;
+      try {
+        onRecord?.(true);
+      } catch {
+        // ignore
+      }
+    } catch (err) {
+      console.error("Recording start failed", err);
     }
   };
+
+  const stopRecording = (send = true) => {
+    try {
+      sendOnStopRef.current = send;
+      mediaRecRef.current?.stop();
+    } catch (e) {
+      void e;
+      setRecording(false);
+      setElapsed(0);
+      try {
+        onRecord?.(false);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      try {
+        mediaRecRef.current?.stop();
+      } catch {
+        // ignore
+      }
+      if (mediaStreamRef.current) mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="relative flex gap-2 w-full">
-      <input
-        value={value}
-        onChange={(e) => onValueChange(e.target.value)}
-        onKeyDown={onKeyDown}
-        type="text"
-        placeholder="Start a chat"
-        style={{ border: "1px solid var(--div-border)" }}
-        className="rounded-2xl px-10 py-3 bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
-      />
-      <button
-        onClick={onSend}
-        type="button"
-        aria-label="Send"
-        disabled={disabled}
-        style={{ border: "1px solid var(--div-border)" }}
-        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        <img src="/send.svg" alt="Send" className="w-6 h-6" />
-      </button>
-      {/* file input moved to parent; attach button will call parent handler */}
-      <button
-        onClick={toggleRecording}
-        type="button"
-        aria-label={recording ? "Stop recording" : "Start recording"}
-        disabled={disabled}
-        style={{ border: "1px solid var(--div-border)" }}
-        className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${recording ? "bg-red-500 text-white" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        {/* microphone icon */}
-        <img src="/audio.svg" alt="Record" className="w-6 h-6" />
-      </button>
+      {recording ? (
+        <div className="flex items-center gap-2 w-full rounded-2xl px-10 py-3" style={{ border: "1px solid var(--div-border)", background: "white" }}>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+            <div className="text-sm font-medium text-gray-700">Recording</div>
+          </div>
+          <div className="flex-1 text-center text-sm text-gray-700">
+            {Math.floor(elapsed / 60).toString().padStart(2, "0")}:{(elapsed % 60).toString().padStart(2, "0")}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => stopRecording(false)}
+              type="button"
+              aria-label="Cancel recording"
+              className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center"
+              style={{ border: "1px solid var(--div-border)" }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <button
+              onClick={() => stopRecording(true)}
+              type="button"
+              aria-label="Send recording"
+              className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <input
+            value={value}
+            onChange={(e) => onValueChange(e.target.value)}
+            onKeyDown={onKeyDown}
+            type="text"
+            placeholder="Start a chat"
+            style={{ border: "1px solid var(--div-border)" }}
+            className="rounded-2xl px-10 py-3 bg-no-repeat sm:bg-white text-sm w-full sm:border-[var(--dark-def)]"
+          />
+          <button
+            onClick={onSend}
+            type="button"
+            aria-label="Send"
+            disabled={disabled}
+            style={{ border: "1px solid var(--div-border)" }}
+            className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <img src="/send.svg" alt="Send" className="w-6 h-6" />
+          </button>
+          <button
+            onClick={() => startRecording()}
+            type="button"
+            aria-label={recording ? "Stop recording" : "Start recording"}
+            disabled={disabled}
+            style={{ border: "1px solid var(--div-border)" }}
+            className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+          >
+            <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+          </button>
+        </>
+      )}
 
-
-      <button
-        onClick={() => onAttach?.()}
-        className="absolute bottom-3 left-3"
-        type="button"
-      >
-        <img src="/image.png" alt="Attach" className="w-5 h-auto" />
-      </button>
+      {/* file attach button (hide while recording so recording UI covers it) */}
+      {!recording && (
+        <button
+          onClick={() => onAttach?.()}
+          className="absolute bottom-3 left-3"
+          type="button"
+        >
+          <img src="/image.png" alt="Attach" className="w-5 h-auto" />
+        </button>
+      )}
     </div>
   );
 }
@@ -111,6 +244,161 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
+  const [roomInfo, setRoomInfo] = useState<any | null>(null);
+  const [headerProduct, setHeaderProduct] = useState<Product | null>(null);
+  // cache for object URLs created from data: URLs to avoid recreating blobs repeatedly
+  const dataUrlObjectUrlRef = useRef<Record<string, string>>({});
+
+  // Helper: convert data:...;base64,... into a Blob and return an object URL (cached)
+  const dataUrlToObjectUrl = (dataUrl: string) => {
+    try {
+      const cache = dataUrlObjectUrlRef.current;
+      if (cache[dataUrl]) return cache[dataUrl];
+      const comma = dataUrl.indexOf(",");
+      if (comma === -1) return dataUrl;
+      const meta = dataUrl.substring(0, comma);
+      const base64 = dataUrl.substring(comma + 1);
+      const m = /data:([^;]+);base64/.exec(meta);
+      const mime = m ? m[1] : "application/octet-stream";
+      // decode base64
+      const binary = atob(base64);
+      const len = binary.length;
+      const u8 = new Uint8Array(len);
+      for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+      const blob = new Blob([u8], { type: mime });
+      const url = URL.createObjectURL(blob);
+      cache[dataUrl] = url;
+      return url;
+    } catch {
+      return dataUrl;
+    }
+  };
+
+  // Small helper audio player to guarantee visible controls (play/pause, progress, times)
+  function AudioPlayer({ src }: { src: string }) {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [playing, setPlaying] = useState(false);
+    const [current, setCurrent] = useState(0);
+    const [dur, setDur] = useState(0);
+
+    useEffect(() => {
+      if (!src) return;
+      const a = new Audio(src);
+      a.preload = "metadata";
+      audioRef.current = a;
+
+      const onLoaded = () => setDur(a.duration || 0);
+      const onTime = () => setCurrent(a.currentTime || 0);
+      const onEnd = () => setPlaying(false);
+
+      a.addEventListener("loadedmetadata", onLoaded);
+      a.addEventListener("timeupdate", onTime);
+      a.addEventListener("ended", onEnd);
+
+      return () => {
+        try {
+          a.pause();
+          a.removeEventListener("loadedmetadata", onLoaded);
+          a.removeEventListener("timeupdate", onTime);
+          a.removeEventListener("ended", onEnd);
+          audioRef.current = null;
+        } catch {
+          // ignore
+        }
+      };
+    }, [src]);
+
+    const toggle = async () => {
+      const a = audioRef.current;
+      if (!a) return;
+      if (playing) {
+        a.pause();
+        setPlaying(false);
+        return;
+      }
+      try {
+        await a.play();
+        setPlaying(true);
+      } catch {
+        setPlaying(false);
+      }
+    };
+
+    const seek = (v: number) => {
+      const a = audioRef.current;
+      if (!a) return;
+      a.currentTime = v;
+      setCurrent(v);
+    };
+
+    const fmt = (s: number) => {
+      if (!isFinite(s) || isNaN(s)) return "0:00";
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, "0");
+      return `${m}:${sec}`;
+    };
+
+    return (
+      <div className="flex items-center gap-3 w-full">
+        {/* range styling for a thinner, visible progress bar */}
+        <style>{`
+          .livechat-range{ -webkit-appearance:none; appearance:none; height:6px; background:transparent; border-radius:9999px; padding:0; margin:0; }
+          .livechat-range::-webkit-slider-runnable-track{ height:6px; border-radius:9999px; background:transparent; }
+          .livechat-range::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; box-shadow:0 0 0 2px rgba(0,0,0,0.03); margin-top:-4px; transform:translateY(0); }
+          .livechat-range:focus{ outline:none; }
+          /* Firefox */
+          .livechat-range::-moz-range-track{ height:6px; background:transparent; border-radius:9999px; }
+          .livechat-range::-moz-range-progress{ height:6px; background:#10b981; border-radius:9999px; }
+          .livechat-range::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; transform:translateY(0); }
+          /* make sure the thumb is vertically centered in common browsers */
+          @supports (-webkit-appearance: none) {
+            .livechat-range{ padding-top:4px; padding-bottom:4px; }
+            .livechat-range::-webkit-slider-thumb{ margin-top:-4px; }
+          }
+        `}</style>
+        <button
+          type="button"
+          aria-label={playing ? "Pause" : "Play"}
+          onClick={toggle}
+          className="p-2 rounded-full border bg-white flex items-center justify-center"
+        >
+          {playing ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3v18l15-9z" />
+            </svg>
+          )}
+        </button>
+
+        <div className="flex-1">
+          {
+            (() => {
+              const pct = dur > 0 ? Math.max(0, Math.min(100, (current / dur) * 100)) : 0;
+              return (
+                <input
+                  type="range"
+                  min={0}
+                  max={dur || 0}
+                  value={current}
+                  step={0.1}
+                  onChange={(e) => seek(Number((e.target as HTMLInputElement).value))}
+                  className="w-full livechat-range"
+                  style={{ background: `linear-gradient(90deg, #10b981 ${pct}%, #e5e7eb ${pct}%)` }}
+                />
+              );
+            })()
+          }
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{fmt(current)}</span>
+            <span>{fmt(dur)}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const openImage = (src: string) => {
     setLightboxSrc(src);
@@ -218,6 +506,90 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       cancelled = true;
     };
   }, [messages, avatarMap]);
+
+  // Helpers to group messages by day and render date headers
+  const getDateKey = (iso?: string | null) => {
+    if (!iso) return "";
+    try {
+      const d = new Date(iso);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const formatDateHeader = (iso?: string | null) => {
+    if (!iso) return "";
+    try {
+      const d = new Date(iso);
+      const today = new Date();
+      const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diff = Math.round((t0.getTime() - d0.getTime()) / (24 * 60 * 60 * 1000));
+      if (diff === 0) return "Today";
+      if (diff === 1) return "Yesterday";
+      return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return "";
+    }
+  };
+
+  // Fetch room details and try to resolve a product for the chat header
+  useEffect(() => {
+    if (!validatedRoomId) {
+      setRoomInfo(null);
+      setHeaderProduct(null);
+      return;
+    }
+    let mounted = true;
+    (async () => {
+      try {
+        const room = await (await import("../services/chatService")).getChatRoom(validatedRoomId);
+        if (!mounted) return;
+        setRoomInfo(room as any);
+
+        // If room includes staff members, treat this as an admin/case chat
+        const isAdminChat = Array.isArray((room as any).members) && (room as any).members.some((m: any) => m?.is_staff || m?.is_superuser);
+        if (isAdminChat) {
+          setHeaderProduct(null);
+          return;
+        }
+
+        // Try to fetch a product using the room id (some chats map to a product id)
+        try {
+          const prod = await productService.getProduct(Number(validatedRoomId));
+          if (!mounted) return;
+          setHeaderProduct(prod as Product);
+        } catch {
+          // fallback: no product found
+          setHeaderProduct(null);
+        }
+      } catch {
+        if (mounted) setRoomInfo(null);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [validatedRoomId]);
+
+  // cleanup any created object URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      try {
+        Object.values(dataUrlObjectUrlRef.current).forEach((u) => {
+          try {
+            URL.revokeObjectURL(u);
+          } catch {/*ignore*/ }
+        });
+      } catch {/*ignore*/ }
+      dataUrlObjectUrlRef.current = {};
+    };
+  }, []);
 
   // Debug: show incoming caseId changes
   useEffect(() => {
@@ -462,114 +834,221 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
+  // Handle recorded audio file from ChatInput
+  const handleRecordedFile = async (file: File) => {
+    // Choose a room id to send to: prefer validatedRoomId, fall back to incoming caseId
+    const roomToSend = validatedRoomId ?? caseId;
+    if (!roomToSend) {
+      console.warn("Refusing to send recorded file: missing room id", { validatedRoomId, caseId });
+      return;
+    }
+
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const optimistic: Partial<ChatMessage> = {
+      id: 0,
+      room: Number(caseId),
+      sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
+      content: "",
+      created_at: new Date().toISOString(),
+    };
+    (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
+    (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
+    // expose audio preview URL for optimistic UI
+    (optimistic as unknown as Record<string, unknown>).audio_url = URL.createObjectURL(file);
+    addLocalMessage(String(roomToSend), optimistic as ChatMessage);
+    const el = containerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+
+    try {
+      if (roomToSend && !isRoomConnected(roomToSend)) {
+        try {
+          await connectToRoom(roomToSend);
+        } catch (e) {
+          console.debug("LiveChat: connectToRoom before recorded send failed", e);
+        }
+      }
+
+      console.debug("LiveChat: sending recorded file", {
+        roomToSend,
+        tempId,
+        fileName: file.name,
+        fileSize: (file as any).size,
+        fileType: file.type,
+      });
+
+      // Prefer uploading via the REST `/send` endpoint so audio is sent as multipart/form-data.
+      // If that fails, fall back to the existing `sendMessage` hook which may use REST/WS.
+      try {
+        // Use sendMessage hook which handles file uploads correctly
+        await sendMessage(String(roomToSend), "", tempId, file);
+      } catch (err) {
+        console.error("Recorded file send failed", err);
+      }
+    } catch (err) {
+      console.error("Recorded send failed", err);
+    }
+  };
+
   return (
     <div className="flex h-full border-gray-100 ">
-      <div className="relative rounded-2xl bg-white px-4 py-3 h-full w-full flex flex-col">
-        <button className="absolute right-1 block sm:hidden" onClick={onClose}>
-          <img src="/close.svg" alt="" className="p-2" />
-        </button>
+      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col">
+
+        <div className="mb-2 w-full relative">
+          {/* Header: product or chat title / case number (edge-to-edge) */}
+          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 rounded-b-2xl bg-white shadow z-10 py-2">
+            <button
+              onClick={onClose}
+              aria-label="Back"
+              className="p-2 hover:bg-gray-100 rounded-full ml-2"
+            >
+              <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3" />
+            </button>
+
+            <img
+              src={headerProduct?.image ?? (avatarMap[Number(roomInfo?.members?.[0]?.id ?? currentUser?.id ?? 0)] || "/chat-default.png")}
+              alt={headerProduct?.name ?? "Chat"}
+              className="w-12 h-10 rounded-xl object-cover"
+            />
+
+            <div className="flex-1">
+              <div className="font-semibold text-sm">
+                {roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
+                  ? `Case #${validatedRoomId ?? caseId}`
+                  : `${validatedRoomId ?? caseId}`}
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           ref={containerRef}
-          className="flex-1 p-3 overflow-y-auto space-y-6"
+          className="flex-1 p-3 px-6 overflow-y-auto space-y-6 no-scrollbar pt-14"
         >
           <p className="text-xs text-gray-400 text-center mb-6">Chat</p>
 
-          {(messages[validatedRoomId ?? ""] || []).map((msg) => {
-            const isMine = currentUser && msg.sender?.id === currentUser.id;
-            const delivery = getMessageDelivery(msg as unknown);
+          {(() => {
+            const nodes: JSX.Element[] = [];
+            const roomMsgs = (messages[validatedRoomId ?? ""] || []) as any[];
+            let lastKey = "";
+            for (const msg of roomMsgs) {
+              const created = (msg as any).created_at ?? null;
+              const dateKey = getDateKey(created);
+              if (dateKey && dateKey !== lastKey) {
+                nodes.push(
+                  <div key={`date-${dateKey}`} className="text-center text-xs text-gray-400 my-2">
+                    {formatDateHeader(created)}
+                  </div>,
+                );
+                lastKey = dateKey;
+              }
 
-            // Determine image source from common fields or from content if it's a data URL or an image URL
-            const asAny = msg as unknown as Record<string, unknown>;
-            const content =
-              typeof asAny.content === "string" ? String(asAny.content) : "";
-            const explicitImage = (asAny.image_url ??
-              asAny.file_url ??
-              asAny.image) as string | undefined | null;
-            const isDataUrl = content.startsWith("data:image/");
-            const looksLikeImageUrl =
-              /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-            const maybeImageSrc =
-              explicitImage ||
-              (isDataUrl || looksLikeImageUrl ? content : null);
+              const isMine = currentUser && msg.sender?.id === currentUser?.id;
+              const delivery = getMessageDelivery(msg as unknown);
 
-            return (
-              <div
-                key={msg.id}
-                className={isMine ? "flex justify-end" : "flex justify-start"}
-              >
-                <div className="flex flex-col">
-                  {isMine ? (
-                    <div className="flex flex-col items-end gap-1">
-                      <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+              // Determine image source from common fields or from content if it's a data URL or an image URL
+              const asAny = msg as unknown as Record<string, unknown>;
+              const content = typeof asAny.content === "string" ? String(asAny.content) : "";
+              const explicitImage = (asAny.image_url ?? asAny.file_url ?? asAny.image) as string | undefined | null;
+              // detect common attachment fields for audio: audio_url, audio, file_url, file, attachments
+              const explicitAudio = (asAny.audio_url ?? asAny.audio ?? asAny.file_url ?? asAny.file ?? (Array.isArray(asAny.attachments) && asAny.attachments[0] && (asAny.attachments[0].url || (asAny.attachments[0] as any).file))) as string | undefined | null;
+              const isImageDataUrl = content.startsWith("data:image/");
+              const isAudioDataUrl = content.startsWith("data:audio/");
+              const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content) || /^\/.*\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
+              // broaden audio detection: URLs with audio extensions, /media/ paths, or relative paths
+              const looksLikeAudioUrl = /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content) || (/^https?:\/\//i.test(content) && /\/media\//i.test(content)) || /^\/media\//i.test(content) || /^\/.*\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
+              // const isAudioDataWebm = content.startsWith("data:audio/webm;");
+              const maybeImageSrc = explicitImage || (isImageDataUrl || looksLikeImageUrl ? content : null);
+              // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
+              const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
 
-                      <div className="relative flex items-end justify-end">
-                        <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
-                          {maybeImageSrc ? (
-                            <img
-                              src={String(maybeImageSrc)}
-                              alt="attachment"
-                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
-                              onClick={() => openImage(String(maybeImageSrc))}
-                              role="button"
-                            />
-                          ) : (
-                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
-                          )}
+              // For audio messages we want the bubble to expand so the player can show full controls
+              const bubbleBaseClass = "border border-gray-200 p-3 rounded-xl min-w-0 wrap-break-word";
+              const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
+              const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "flex-1 rounded-tl-none";
+              const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
+
+              nodes.push(
+                <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
+                  <div className="flex flex-col">
+                    {isMine ? (
+                      <div className="flex flex-col items-end gap-1">
+                        <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+
+                        <div className="relative flex items-end justify-end">
+                          <div className={bubbleClass}>
+                            {maybeImageSrc ? (
+                              <img
+                                src={String(maybeImageSrc)}
+                                alt="attachment"
+                                className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                                onClick={() => openImage(String(maybeImageSrc))}
+                                role="button"
+                              />
+                            ) : maybeAudioSrc ? (
+                              <div className="w-full">
+                                <AudioPlayer src={String(maybeAudioSrc)} />
+                              </div>
+                            ) : (
+                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                            )}
+                          </div>
+                          <img
+                            src={avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"}
+                            alt="You"
+                            className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
+                          />
                         </div>
-                        <img
-                          src={
-                            avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"
-                          }
-                          alt="You"
-                          className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
-                        />
-                      </div>
 
-                      <div className="text-[9px] text-gray-400 mt-1 text-right">
-                        <span className="inline-flex items-center gap-1">
-                          <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
-                          {isMine && delivery && (
-                            <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-start gap-1">
-                      <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
-
-                      <div className="relative flex items-start justify-start">
-                        <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
-                          {maybeImageSrc ? (
-                            <img
-                              src={String(maybeImageSrc)}
-                              alt="attachment"
-                              className="max-w-full max-h-60 object-contain rounded cursor-pointer"
-                              onClick={() => openImage(String(maybeImageSrc))}
-                              role="button"
-                            />
-                          ) : (
-                            <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
-                          )}
+                        <div className="text-[9px] text-gray-400 mt-1 text-right">
+                          <span className="inline-flex items-center gap-1">
+                            <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
+                            {isMine && delivery && (
+                              <svg className={`${delivery === "received" ? "text-blue-500" : "text-gray-400"} w-4 h-4`} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            )}
+                          </span>
                         </div>
-                        <img
-                          src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
-                          alt="User"
-                          className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
-                        />
                       </div>
+                    ) : (
+                      <div className="flex flex-col items-start gap-1">
+                        <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
 
-                      <div className="text-[9px] text-gray-400 mt-1 text-left">
-                        {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
+                        <div className="relative flex items-start justify-start">
+                          <div className={bubbleClass}>
+                            {maybeImageSrc ? (
+                              <img
+                                src={String(maybeImageSrc)}
+                                alt="attachment"
+                                className="max-w-full max-h-60 object-contain rounded cursor-pointer"
+                                onClick={() => openImage(String(maybeImageSrc))}
+                                role="button"
+                              />
+                            ) : maybeAudioSrc ? (
+                              <div className="w-full">
+                                <AudioPlayer src={String(maybeAudioSrc)} />
+                              </div>
+                            ) : (
+                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                            )}
+                          </div>
+                          <img
+                            src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
+                            alt="User"
+                            className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
+                          />
+                        </div>
+
+                        <div className="text-[9px] text-gray-400 mt-1 text-left">
+                          {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                    )}
+                  </div>
+                </div>,
+              );
+            }
+            return nodes;
+          })()}
         </div>
         <div className="flex items-center gap-2">
           <input
@@ -591,6 +1070,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             onSend={() => void handleSend()}
             disabled={sending}
             onAttach={() => fileInputRef.current?.click()}
+            onRecord={(f) => {
+              if (f instanceof File) {
+                void handleRecordedFile(f);
+              }
+            }}
           />
         </div>
 
