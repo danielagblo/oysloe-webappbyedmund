@@ -1,12 +1,13 @@
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { useLogout } from "../features/Auth/useAuth";
+import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteRequest";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
 import { LEVELS } from "../constants/levels";
-import ProgressBar from "./ProgressBar";
 import Tooltip from "./Tooltip";
 
 export type MenuItem = {
@@ -35,7 +36,12 @@ type Props = {
 const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [Logout, setLogout] = useState(false);
+  const [accountDeletionRequested, setAccountDeletionRequested] =
+    useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
   const { profile: user, loading, error } = useUserProfile();
+  const { create, data } = useAccountDeleteRequest();
 
   let name = (user as UserProfile)?.name;
   const nameParts = name?.split(" ") || [];
@@ -51,6 +57,35 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
   const navigate = useNavigate();
   const logoutMutation = useLogout();
+
+  const handleDelete = async () => {
+    if (!deleteReason) {
+      toast.warning("Delete reason required");
+      return;
+    }
+
+    if (typeof create !== "function") {
+      toast.error("Account delete action is not available");
+      return;
+    }
+
+    if (data && (data.status === "PENDING" || data.status === "APPROVED")) {
+      toast.warning(
+        `You already have a${data.status === "APPROVED" ? "n " : " "}${data.status.toLowerCase()} delete request.`,
+      );
+      return;
+    }
+
+    try {
+      await create({ reason: deleteReason });
+      setAccountDeletionRequested(false);
+      setDeleteReason("");
+      toast.success("Account delete request submitted successfully");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`Failed to submit delete request: ${msg}`);
+    }
+  };
 
   const handleLogout = async () => {
     if (logoutMutation.status === "pending") return;
@@ -140,9 +175,9 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative w-80 max-w-[90vw] h-full bg-(--bg) shadow-2xl flex flex-col animate-slide-in-right overflow-y-auto">
+          <div className="relative w-80 max-w-[90vw] h-full bg-(--bg) shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
             {/* Header with close button */}
-            <div className="flex justify-end items-center p-4 border-gray-200">
+            <div className="flex justify-end items-center p-4 pb-0 border-gray-200">
               <button
                 className="p-1 md:p-2 rounded-full bg-(--div-active) hover:bg-gray-200"
                 onClick={() => setIsOpen(false)}
@@ -152,7 +187,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             </div>
 
             {/* Logout button */}
-            <div className="py-1 flex items-center justify-center w-full">
+            <div className="pb-3 flex items-center justify-center w-full">
               <button
                 className="flex items-center bg-(--div-active) justify-center gap-2 w-fit py-2 px-3 rounded-full hover:bg-gray-200 transition text-base"
                 onClick={() => setLogout(true)}
@@ -163,7 +198,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             </div>
 
             {/* Profile Card - New Layout */}
-            <div className="px-4 py-4">
+            <div className="px-4 pb-4">
               <div className="flex items-start bg-(--div-active) rounded-2xl p-2 gap-3">
                 {/* Left: Profile Picture */}
                 <div className="bg-green-400 rounded-full h-17 w-17 flex items-center justify-center flex-shrink-0">
@@ -260,7 +295,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
             {/* Account Section */}
             <div className="px-4 py-3">
-              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
                 Account
               </p>
               <button
@@ -280,7 +315,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
             {/* Business Section */}
             <div className="px-4 py-3 border-t border-gray-200">
-              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
                 Business
               </p>
               {[
@@ -320,7 +355,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
             {/* Settings Section */}
             <div className="px-4 py-3 border-t border-gray-200 pb-20">
-              <p className="text-sm font-semibold text-gray-500 uppercase mb-2">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
                 Settings
               </p>
               {[
@@ -347,6 +382,17 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                   <span>{item.label}</span>
                 </button>
               ))}
+              
+              {/* Delete Account Button */}
+              <button
+                onClick={() => setAccountDeletionRequested(true)}
+                className="flex text-gray-700 items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all hover:bg-red-50"
+              >
+                <div className="bg-(--div-active) p-1.5 rounded-full">
+                  <img className="h-5 w-5" src="/bin-svg.svg" alt="x" />
+                </div>
+                <span>Delete my account</span>
+              </button>
             </div>
           </div>
         </div>
@@ -401,6 +447,72 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {accountDeletionRequested && (
+        <div className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center px-4">
+          {!deleteConfirmation ? (
+            <div className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm">
+              <h2 className="text-base text-center font-semibold">
+                <span>Are you sure you want to delete your account?</span>
+                <br />
+                <span className="text-red-600 text-lg font-bold">
+                  ⚠️ This action is irreversible.
+                </span>
+              </h2>
+              <div className="flex gap-3 w-full flex-col">
+                <button
+                  onClick={() => setDeleteConfirmation(true)}
+                  className="text-sm bg-red-600 text-white hover:bg-red-700 cursor-pointer rounded-lg py-3 px-4 transition font-medium"
+                >
+                  Yes, Delete My Account
+                </button>
+                <button
+                  onClick={() => {
+                    setAccountDeletionRequested(false);
+                  }}
+                  className="text-sm cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-lg py-3 px-4 transition font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm">
+              <h3 className="text-lg font-semibold text-center">
+                Why do you want to delete your account?
+              </h3>
+              <textarea
+                placeholder="Please provide your reason for deleting your account here."
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded resize-none text-sm"
+                rows={4}
+              />
+              <div className="flex justify-end gap-2 w-full">
+                <button
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 cursor-pointer transition text-sm font-medium"
+                  onClick={() => {
+                    setAccountDeletionRequested(false);
+                    setDeleteConfirmation(false);
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer transition text-sm font-medium"
+                  onClick={() => {
+                    handleDelete();
+                    setDeleteConfirmation(false);
+                    setAccountDeletionRequested(false);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
