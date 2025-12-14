@@ -274,6 +274,123 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
+  // Small helper audio player to guarantee visible controls (play/pause, progress, times)
+  function AudioPlayer({ src }: { src: string }) {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [playing, setPlaying] = useState(false);
+    const [current, setCurrent] = useState(0);
+    const [dur, setDur] = useState(0);
+
+    useEffect(() => {
+      if (!src) return;
+      const a = new Audio(src);
+      a.preload = "metadata";
+      audioRef.current = a;
+
+      const onLoaded = () => setDur(a.duration || 0);
+      const onTime = () => setCurrent(a.currentTime || 0);
+      const onEnd = () => setPlaying(false);
+
+      a.addEventListener("loadedmetadata", onLoaded);
+      a.addEventListener("timeupdate", onTime);
+      a.addEventListener("ended", onEnd);
+
+      return () => {
+        try {
+          a.pause();
+          a.removeEventListener("loadedmetadata", onLoaded);
+          a.removeEventListener("timeupdate", onTime);
+          a.removeEventListener("ended", onEnd);
+          audioRef.current = null;
+        } catch {
+          // ignore
+        }
+      };
+    }, [src]);
+
+    const toggle = async () => {
+      const a = audioRef.current;
+      if (!a) return;
+      if (playing) {
+        a.pause();
+        setPlaying(false);
+        return;
+      }
+      try {
+        await a.play();
+        setPlaying(true);
+      } catch {
+        setPlaying(false);
+      }
+    };
+
+    const seek = (v: number) => {
+      const a = audioRef.current;
+      if (!a) return;
+      a.currentTime = v;
+      setCurrent(v);
+    };
+
+    const fmt = (s: number) => {
+      if (!isFinite(s) || isNaN(s)) return "0:00";
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, "0");
+      return `${m}:${sec}`;
+    };
+
+    return (
+      <div className="flex items-center gap-3 w-full">
+        {/* range styling for a thinner, visible progress bar */}
+        <style>{`
+          .livechat-range{ -webkit-appearance:none; appearance:none; height:6px; background:#e5e7eb; border-radius:9999px; }
+          .livechat-range::-webkit-slider-thumb{ -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; box-shadow:0 0 0 2px rgba(0,0,0,0.03); margin-top:-5px; }
+          .livechat-range::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #9ca3af; }
+          .livechat-range:focus{ outline:none; }
+        `}</style>
+        <button
+          type="button"
+          aria-label={playing ? "Pause" : "Play"}
+          onClick={toggle}
+          className="p-2 rounded-full border bg-white flex items-center justify-center"
+        >
+          {playing ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-700" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3v18l15-9z" />
+            </svg>
+          )}
+        </button>
+
+        <div className="flex-1">
+          {
+            (() => {
+              const pct = dur > 0 ? Math.max(0, Math.min(100, (current / dur) * 100)) : 0;
+              return (
+                <input
+                  type="range"
+                  min={0}
+                  max={dur || 0}
+                  value={current}
+                  step={0.1}
+                  onChange={(e) => seek(Number((e.target as HTMLInputElement).value))}
+                  className="w-full livechat-range"
+                  style={{ background: `linear-gradient(90deg, #10b981 ${pct}%, #e5e7eb ${pct}%)` }}
+                />
+              );
+            })()
+          }
+          <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{fmt(current)}</span>
+            <span>{fmt(dur)}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const openImage = (src: string) => {
     setLightboxSrc(src);
     setLightboxOpen(true);
@@ -825,13 +942,17 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               // detect common attachment fields for audio: audio_url, audio, file_url, file, attachments
               const explicitAudio = (asAny.audio_url ?? asAny.audio ?? asAny.file_url ?? asAny.file ?? (Array.isArray(asAny.attachments) && asAny.attachments[0] && (asAny.attachments[0].url || (asAny.attachments[0] as any).file))) as string | undefined | null;
               const isImageDataUrl = content.startsWith("data:image/");
-              const isAudioDataUrl = content.startsWith("data:audio/");
+              const isAudioDataWebm = content.startsWith("data:audio/webm;");
               const looksLikeImageUrl = /^https?:\/\/.+\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content) || /^\/.*\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(content);
-              // broaden audio detection: URLs with audio extensions, /media/ paths, or relative paths
-              const looksLikeAudioUrl = /\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content) || (/^https?:\/\//i.test(content) && /\/media\//i.test(content)) || /^\/media\//i.test(content) || /^\/.*\.(mp3|wav|ogg|webm)(\?.*)?$/i.test(content);
               const maybeImageSrc = explicitImage || (isImageDataUrl || looksLikeImageUrl ? content : null);
-              // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
-              const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
+              // Only treat audio when content is a data:audio/webm; base64 string or explicit audio field
+              const maybeAudioSrc = explicitAudio || (isAudioDataWebm ? content : null);
+
+              // For audio messages we want the bubble to expand so the player can show full controls
+              const bubbleBaseClass = "border border-gray-200 p-3 rounded-xl min-w-0 wrap-break-word";
+              const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
+              const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "flex-1 rounded-tl-none";
+              const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
 
 
 
@@ -843,7 +964,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                         <p className="text-sm font-medium text-gray-600 mr-7">You</p>
 
                         <div className="relative flex items-end justify-end">
-                          <div className={`border border-gray-200 p-3 rounded-xl max-w-[80%] min-w-0 wrap-break-word bg-green-100 text-black rounded-tr-none`}>
+                          <div className={bubbleClass}>
                             {maybeImageSrc ? (
                               <img
                                 src={String(maybeImageSrc)}
@@ -853,7 +974,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 role="button"
                               />
                             ) : maybeAudioSrc ? (
-                              <audio controls src={String(maybeAudioSrc)} className="w-full" />
+                              <div className="w-full">
+                                <AudioPlayer src={String(maybeAudioSrc)} />
+                              </div>
                             ) : (
                               <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
@@ -881,7 +1004,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                         <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
 
                         <div className="relative flex items-start justify-start">
-                          <div className={`border border-gray-200 p-3 rounded-xl flex-1 min-w-0 max-w-[80%] wrap-break-word rounded-tl-none`}>
+                          <div className={bubbleClass}>
                             {maybeImageSrc ? (
                               <img
                                 src={String(maybeImageSrc)}
@@ -891,7 +1014,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 role="button"
                               />
                             ) : maybeAudioSrc ? (
-                              <audio controls src={String(maybeAudioSrc)} className="w-full" />
+                              <div className="w-full">
+                                <AudioPlayer src={String(maybeAudioSrc)} />
+                              </div>
                             ) : (
                               <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
