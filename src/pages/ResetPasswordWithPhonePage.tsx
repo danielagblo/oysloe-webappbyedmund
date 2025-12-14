@@ -5,7 +5,6 @@ import Button from "../components/Button";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
 import PhoneInput from "../components/PhoneInput";
-import { ResetDropdown } from "../components/ResetDropdown";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import { toast } from "sonner";
 
@@ -37,6 +36,7 @@ const ResetPasswordWithPhonePage = ({
   };
 
   const mode = location.state?.mode ?? "reset-password";
+  if (error) console.log(error);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,14 +79,6 @@ const ResetPasswordWithPhonePage = ({
               We'll send a verification link to the number if it is in our
               system
             </p>
-            {error &&
-              (error.length < 20
-                ? toast.error(error)
-                : (toast.error(
-                    "An error occurred. Please check your entered phone number and try again.",
-                  ),
-                  console.log(error),
-                  null))}
 
             <div className="flex flex-col gap-3 w-full mt-8">
               <Button
@@ -97,10 +89,10 @@ const ResetPasswordWithPhonePage = ({
               />
             </div>
             <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">
-              Can't Login?
+              Want to Log in?
             </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
-              <ResetDropdown page="phone-reset" />
+              {/* <ResetDropdown page="phone-reset" /> */}
               <OTPLogin page="phone-reset" />
             </div>
           </form>
