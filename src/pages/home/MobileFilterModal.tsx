@@ -130,6 +130,11 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     }
   }, [currentPanel]);
 
+  // Clear selected subcategories when category changes
+  useEffect(() => {
+    setSelectedSubcategoryIds([]);
+  }, [selectedCategoryId]);
+
   // Fetch subcategories when category changes
   useEffect(() => {
     let mounted = true;
@@ -548,9 +553,10 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                 </div>
               </div>
 
-              {/* Features Section - Show if subcategories selected */}
+              {/* Features Section - Show if subcategories selected and features exist */}
               {selectedSubcategoryIds.length > 0 &&
-                featureDefinitions.length > 0 && (
+                featureDefinitions.length > 0 &&
+                !featuresLoading && (
                   <div className="bg-white rounded-3xl p-4 space-y-3">
                     <button
                       onClick={() => setIsFeaturesExpanded(!isFeaturesExpanded)}
