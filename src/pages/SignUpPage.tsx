@@ -407,35 +407,15 @@ const SignInPage = () => {
                       checked={
                         formData.agreedToPrivacy && formData.agreedToTerms
                       }
-                      readOnly
-                    />
-                    <label
-                      htmlFor="agree-checkbox"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // If both policies already accepted, allow toggling off (clears both)
-                        if (
-                          formData.agreedToPrivacy &&
-                          formData.agreedToTerms
-                        ) {
-                          setFormData((p) => ({
-                            ...p,
-                            agreedToPrivacy: false,
-                            agreedToTerms: false,
-                          }));
-                          return;
-                        }
-
-                        // Not fully accepted yet — open the missing policy modal
-                        if (!formData.agreedToPrivacy) {
-                          setPolicyModalType("privacy");
-                          setPolicyModalOpen(true);
-                        } else if (!formData.agreedToTerms) {
-                          setPolicyModalType("terms");
-                          setPolicyModalOpen(true);
-                        }
+                      onChange={(e) => {
+                        setFormData((p) => ({
+                          ...p,
+                          agreedToPrivacy: e.target.checked,
+                          agreedToTerms: e.target.checked,
+                        }));
                       }}
                     />
+                    <label htmlFor="agree-checkbox" />
                   </div>
 
                   {/* no text next to checkbox by design */}
@@ -508,7 +488,7 @@ const SignInPage = () => {
                 className="absolute inset-0 bg-black/40"
                 onClick={() => setPolicyModalOpen(false)}
               />
-              <div className="relative w-full max-w-3xl bg-white rounded-2xl p-4 max-h-[85vh] overflow-hidden">
+              <div className="relative w-full max-w-3xl bg-white sm:rounded-2xl p-4 max-h-[85vh] overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold">
                     {policyModalType === "privacy"
@@ -526,17 +506,7 @@ const SignInPage = () => {
 
                 <div
                   ref={contentRef}
-                  onScroll={() => {
-                    const el = contentRef.current;
-                    if (!el) return;
-                    if (
-                      el.scrollTop + el.clientHeight >=
-                      el.scrollHeight - 20
-                    ) {
-                      setHasScrolledToEnd(true);
-                    }
-                  }}
-                  className="border-t pt-2 overflow-auto pb-12.5"
+                  className="border-t pt-2 overflow-auto no-scrollbar pb-12.5"
                   style={{ maxHeight: "72vh" }}
                 >
                   {loading ? (
@@ -557,42 +527,6 @@ const SignInPage = () => {
                       No content available.
                     </div>
                   )}
-                </div>
-
-                <div className="flex items-center justify-between gap-4 mt-3 absolute bottom-2 right-10">
-                  <div className="text-xs text-gray-500 invisible">
-                    Scroll to the end to enable confirmation
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      disabled={!hasScrolledToEnd}
-                      onClick={() => {
-                        setFormData((p) => {
-                          const next =
-                            policyModalType === "privacy"
-                              ? { ...p, agreedToPrivacy: true }
-                              : { ...p, agreedToTerms: true };
-
-                          if (next.agreedToPrivacy && next.agreedToTerms) {
-                            toast.success(
-                              "Thanks — you have accepted the privacy policy and terms.",
-                            );
-                          } else {
-                            toast.success(
-                              "Thanks — you have accepted the policy.",
-                            );
-                          }
-
-                          return next;
-                        });
-                        setPolicyModalOpen(false);
-                      }}
-                      className={`px-4 py-2 rounded-lg ${hasScrolledToEnd ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}
-                    >
-                      I have read and accept
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
