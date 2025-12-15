@@ -205,7 +205,7 @@ const SignInPage = () => {
               <img src="skip.svg" alt=">" className="inline h-4 w-4" />
             </button>
           </div>
-          <h2 className="text-2xl max-sm:text-[28px]">
+          <h2 className="text-2xl max-sm:text-black max-sm:text-[28px]">
             Get
             <span className="max-sm:hidden">ting</span> started
           </h2>

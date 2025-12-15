@@ -33,7 +33,7 @@ function App() {
         <Route
           path="/enterphone"
           element={
-            <ResetPasswordWithPhonePage page="Enter Your Phone Number" />
+            <ResetPasswordWithPhonePage page="OTP Login" />
           }
         />
         <Route

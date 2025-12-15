@@ -61,7 +61,7 @@ const ResetPasswordWithPhonePage = ({
     <div className="h-screen max-sm:bg-(--bg) text-(--dark-def) w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 max-sm:pb-20">
         <div className="flex flex-col gap-5 items-center max-sm:space-y-6 justify-center">
-          <h2 className="text-2xl max-sm:text-[28px]">{page}</h2>
+          <h2 className="text-2xl max-sm:text-black max-sm:text-[28px]">{page}</h2>
           <form className="w-3/5 max-md:w-full max-sm:space-y-6 relative">
             <div className="relative">
               <PhoneInput
