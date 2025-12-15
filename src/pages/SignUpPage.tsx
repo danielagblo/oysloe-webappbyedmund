@@ -483,12 +483,12 @@ const SignInPage = () => {
                 : null);
 
           return (
-            <div className="fixed inset-0 z-50 flex items-center justify-center h-screen w-screen">
+            <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center h-screen w-screen">
               <div
                 className="absolute inset-0 bg-black/40"
                 onClick={() => setPolicyModalOpen(false)}
               />
-              <div className="relative w-full max-w-3xl bg-white sm:rounded-2xl p-4 max-h-[85vh] overflow-hidden">
+              <div className="relative w-full max-w-3xl bg-white sm:rounded-2xl p-4 max-h-[85vh] max-sm:max-h-[90vh] overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold">
                     {policyModalType === "privacy"
@@ -506,7 +506,7 @@ const SignInPage = () => {
 
                 <div
                   ref={contentRef}
-                  className="border-t pt-2 overflow-auto no-scrollbar pb-12.5"
+                  className="border-t pt-2 overflow-auto no-scrollbar pb-10"
                   style={{ maxHeight: "72vh" }}
                 >
                   {loading ? (
