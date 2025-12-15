@@ -48,6 +48,7 @@ export default function SupportAndCases({
             const normalizeRoom = (raw: any): ChatRoom => {
               return {
                 id: raw.id,
+                room_id: raw.room_id ?? String(raw.id ?? ""), // Added room_id
                 name: raw.name ?? String(raw.id ?? ""),
                 is_group: raw.is_group ?? false,
                 // some payloads use `unread` rather than `total_unread`
@@ -56,6 +57,10 @@ export default function SupportAndCases({
                 created_at: raw.created_at ?? raw.createdAt ?? null,
                 messages: Array.isArray(raw.messages) ? raw.messages : [],
                 members: Array.isArray(raw.members) ? raw.members : [],
+                // preserve any last message fields from websocket payloads
+                // so UI can show previews (some payloads include `last_message`)
+                // keep the raw field names to remain compatible with usage
+                last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
               } as ChatRoom;
             };
 
@@ -187,10 +192,6 @@ export default function SupportAndCases({
   const GetChats = () => (
     <div className="mb-6">
       <h2 className="text-xl font-medium mt-3 mb-1">Recent Chats</h2>
-      <p className="text-gray-400 text-xs mb-4">
-        Continue conversations with support or other users. Tap a chat to open
-        it.
-      </p>
       <ChatsList rooms={userRoomsMemo} />
     </div>
   );
@@ -231,11 +232,19 @@ export default function SupportAndCases({
               ? String((lastMessage as any).content)
               : (payloadLastContent ?? "");
 
-          // If the last message content is a data URL (base64 image), show a friendly label instead
-          const previewText =
-            lastContent && lastContent.startsWith("data:")
-              ? "picture"
-              : lastContent;
+          // If the last message content is a data URL (base64), show a friendly label instead
+          const previewText = (() => {
+            if (!lastContent) return "";
+            if (lastContent.startsWith("data:")) {
+              const semi = lastContent.indexOf(";", 5);
+              const mime = semi === -1 ? lastContent.substring(5) : lastContent.substring(5, semi);
+              if (mime.startsWith("audio/")) return "audio";
+              if (mime.startsWith("image/")) return "picture";
+              if (mime.startsWith("video/")) return "video";
+              return "file";
+            }
+            return lastContent;
+          })();
 
           return (
             <button
@@ -347,10 +356,18 @@ export default function SupportAndCases({
                 lastMessage && typeof (lastMessage as any).content === "string"
                   ? String((lastMessage as any).content)
                   : (payloadLastContent ?? "");
-              const previewText =
-                lastContent && lastContent.startsWith("data:")
-                  ? "picture"
-                  : lastContent;
+              const previewText = (() => {
+                if (!lastContent) return "";
+                if (lastContent.startsWith("data:")) {
+                  const semi = lastContent.indexOf(";", 5);
+                  const mime = semi === -1 ? lastContent.substring(5) : lastContent.substring(5, semi);
+                  if (mime.startsWith("audio/")) return "audio";
+                  if (mime.startsWith("image/")) return "picture";
+                  if (mime.startsWith("video/")) return "video";
+                  return "file";
+                }
+                return lastContent;
+              })();
 
               return (
                 <button
