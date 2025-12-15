@@ -332,6 +332,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   }, [regionsData, selectedRegion, locationSearch]);
 
   const handleClearAll = () => {
+    setCurrentPanel("main");
     setSelectedCategoryId(null);
     setSelectedLocation(null);
     setSelectedRegion(null);
