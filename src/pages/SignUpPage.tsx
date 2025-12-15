@@ -470,7 +470,7 @@ const SignInPage = () => {
           const activeQuery =
             policyModalType === "privacy" ? privacyQuery : termsQuery;
           const loading = activeQuery.isLoading || activeQuery.isFetching;
-          const raw = activeQuery.data as any;
+          const raw = activeQuery.data as { content?: string; html?: string; body?: string; text?: string } | null;
           const content =
             raw?.content ||
             raw?.html ||
