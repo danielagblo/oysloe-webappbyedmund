@@ -1,0 +1,37 @@
+name: Deploy to Droplet
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment: prod
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v0.1.9
+              with:
+                  host: ${{ secrets.DROPLET_HOST }}
+                  username: ${{ secrets.DROPLET_USER }}
+                  key: ${{ secrets.DROPLET_PEKEY }}
+                  port: 22
+                  script: |
+                      cd oysloe-webappbyedmund
+                      sudo rm -rf dist/* 
+                      git pull origin main           
+                      npm install                   
+                      npm run build                 
+
+                      sudo rm -rf /var/www/oysloe-frontend/dist/*
+
+                      sudo cp -r dist/* /var/www/oysloe-frontend/dist
+
+                      sudo chown -R www-data:www-data /var/www/oysloe-frontend
+                      sudo chmod -R 755 /var/www/oysloe-frontend
+
+                      sudo systemctl restart nginx
