@@ -110,7 +110,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
           </svg>
         </button>
       </div>
-      <div className="mt-4 whitespace-nowrap text-[10px] flex flex-nowrap gap-2 text-gray-600 justify-center items-center">
+      <div className="mt-4 whitespace-nowrap text-[10px] flex flex-nowrap gap-2 text-gray-600 justify-start items-center">
         <div className="flex items-center justify-end relative">
           <h4 className="bg-(--green) h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
             Chat is secured

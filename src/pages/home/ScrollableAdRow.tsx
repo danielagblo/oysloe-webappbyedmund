@@ -87,22 +87,22 @@ const ScrollableAdRow = ({
                         alt={ad.name}
                         className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
                       />
-                      <div className="flex items-center gap-1 px-2 py-1">
+                      <div className="flex items-center gap-1 px-2 py-0.5">
                         <img
                           src="/location.svg"
                           alt=""
                           className="w-3 sm:w-5 h-3 sm:h-5"
                         />
-                        <p className="text-[10px] sm:text-sm text-gray-500 truncate">
+                        <p className="text-xs sm:text-sm text-gray-500 truncate">
                           {ad.location?.name ??
                             ad.location?.region ??
                             "Unknown"}
                         </p>
                       </div>
-                      <p className="px-2 text-[11px] sm:text-xl truncate line-clamp-1 text-gray-600">
+                      <p className="px-2 text-sm sm:text-xl truncate line-clamp-1 text-gray-600">
                         {ad.name}
                       </p>
-                      <p className="px-2 text-[11px] sm:text-base font-medium text-gray-800">
+                      <p className="px-2 text-xs sm:text-base font-medium text-gray-800">
                         {formatMoney(ad.price, "GHS")}
                       </p>
                     </Link>
