@@ -4,7 +4,6 @@ import Loader from "../../components/LoadingDots";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
-import useScrollFade from "./useScrollFade";
 
 type Props = {
   category: Category;

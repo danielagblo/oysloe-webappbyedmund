@@ -46,7 +46,6 @@ const SignInPage = () => {
     "privacy" | "terms" | null
   >(null);
   // track whether user scrolled to end of policy content in modal
-  const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -178,7 +177,6 @@ const SignInPage = () => {
   // Reset scroll/read state when modal opens
   useEffect(() => {
     if (policyModalOpen) {
-      setHasScrolledToEnd(false);
       // reset scroll position
       if (contentRef.current) contentRef.current.scrollTop = 0;
     }
