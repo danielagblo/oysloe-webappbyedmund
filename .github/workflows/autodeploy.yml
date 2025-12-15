@@ -27,11 +27,11 @@ jobs:
                       npm install                   
                       npm run build                 
 
-                      sudo rm -rf /var/www/oysloe-frontend/dist/*
+                      sudo rm -rf /var/www/oysloe/dist/*
 
-                      sudo cp -r dist/* /var/www/oysloe-frontend/dist
+                      sudo cp -r dist/* /var/www/oysloe/dist
 
-                      sudo chown -R www-data:www-data /var/www/oysloe-frontend
-                      sudo chmod -R 755 /var/www/oysloe-frontend
+                      sudo chown -R www-data:www-data /var/www/oysloe
+                      sudo chmod -R 755 /var/www/oysloe
 
                       sudo systemctl restart nginx
