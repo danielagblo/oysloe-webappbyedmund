@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import BottomSheet from "./BottomSheet";
+import SafetyTips from "./SafetyTips";
 import type { Product } from "../../../types/Product";
 
 interface ActionButtonsProps {
@@ -52,6 +54,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   );
   const showOffer = Boolean(showOfferProp);
   const [offerInput, setOfferInput] = useState<string>("");
+  const [showCallSheet, setShowCallSheet] = useState(false);
   const actions: Record<string, () => void> = {
     "Mark as taken": isTaken ? () => {} : onMarkTaken || (() => {}),
     "Report Ad": onReportAd,
@@ -62,8 +65,68 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2 mb-1 max-sm:grid max-sm:grid-cols-2">
+    <>
+      {/* MOBILE LAYOUT */}
+      <div className="max-sm:flex max-sm:flex-col max-sm:gap-3 max-sm:w-full hidden">
+        {/* Call Seller Button */}
+        <button
+          onClick={() => setShowCallSheet(true)}
+          className="w-full bg-[#74ffa7] text-[#1C274C] font-semibold py-4 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-green-300 active:scale-95 transition"
+        >
+          <img src="/outgoing call.svg" alt="" className="w-6 h-6" />
+          <span>Call Seller</span>
+        </button>
+
+        {/* Three Action Buttons */}
+        <div className="flex gap-2 w-full">
+          {/* Mark as taken */}
+          <button
+            onClick={() => {
+              if (!isTaken) onMarkTaken();
+            }}
+            className={`flex-1 flex items-center justify-center gap-1 py-3 px-2 rounded-lg text-sm font-medium transition ${
+              isTaken
+                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                : "bg-[#F3F3F3] text-gray-700 hover:bg-gray-10 active:scale-95"
+            }`}
+          >
+            <img
+              src={isTaken ? "/check.svg" : "/mark as taken.svg"}
+              alt={isTaken ? "Taken" : "Mark as taken"}
+              className="w-5 h-5"
+            />
+            <span>{isTaken ? "Taken" : "Mark as taken"}</span>
+          </button>
+
+          {/* Like */}
+          <button
+            onClick={() => {
+              if (!favouritePending) onFavorite();
+            }}
+            disabled={favouritePending}
+            className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-[#F3F3F3] rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-10 active:scale-95 transition disabled:opacity-50"
+          >
+            <img
+              src={isFavourited ? "/favorited.svg" : "/heart-outline.svg"}
+              alt="<3"
+              className="w-5 h-5"
+            />
+            <span>{isFavourited ? "Liked" : "Like"}</span>
+          </button>
+
+          {/* Report user */}
+          <button
+            onClick={onReportAd}
+            className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-[#F3F3F3] rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-95 transition"
+          >
+            <img src="/flag.svg" alt="report" className="w-5 h-5" />
+            <span>Report user</span>
+          </button>
+        </div>
+      </div>
+
+      {/* DESKTOP LAYOUT */}
+      <div className="max-sm:hidden flex flex-wrap gap-2 mb-1 sm:grid sm:grid-cols-2">
         {(() => {
           const items: Array<[string, string]> = [
             ["mark as taken.svg", "Mark as taken"],
@@ -76,10 +139,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             ["favorited.svg", "Favorites"],
           ];
           return items.map(([icon, label]) => (
-            <div key={label} className="relative inline-block">
+            <div key={label} className="relative inline-block sm:w-full">
               <button
                 key={label}
-                className={`flex items-center max-sm:w-full gap-2 max-sm:py-6 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
+                className={`flex items-center w-full gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
                   ${
                     actions[label]
                       ? "cursor-pointer hover:bg-gray-200 lg:hover:scale-95 active:scale-105"
@@ -310,7 +373,91 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           ));
         })()}
       </div>
-    </div>
+
+      {/* BOTTOM SHEET - MOBILE CALL PANEL */}
+      <BottomSheet
+        isOpen={showCallSheet}
+        onClose={() => setShowCallSheet(false)}
+        title="Call to speak to ad owner"
+      >
+        <div className="flex flex-col gap-4">
+          {/* Phone Numbers */}
+          <div className="flex flex-col gap-3">
+            {caller1 && (
+              <a
+                href={`tel:${caller1}`}
+                className="flex items-center gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
+              >
+                <span className="text-lg font-medium text-gray-800 flex-1">
+                  {caller1}
+                </span>
+                <div className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0">
+                  <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                </div>
+              </a>
+            )}
+
+            {caller2 && (
+              <a
+                href={`tel:${caller2}`}
+                className="flex items-center gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
+              >
+                <span className="text-lg font-medium text-gray-800 flex-1">
+                  {caller2}
+                </span>
+                <div className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0">
+                  <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                </div>
+              </a>
+            )}
+          </div>
+
+          {/* Safety Tips */}
+          <div className="pt-4 border rounded-2xl border-gray-200">
+            <SafetyTips />
+          </div>
+
+          <div>
+            <p className="font-bold text-sm ">Report anything that feels off.</p>
+          </div>
+
+          {/* Bottom Action Buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                onReportAd();
+                setShowCallSheet(false);
+              }}
+              className="flex-1 py-3 px-4 border border-red-400 font-semibold rounded-xl hover:bg-red-50 active:scale-95 transition flex items-center justify-center gap-2"
+            >
+              <img src="/flag.svg" alt="" className="w-4 h-4" />
+              Report user
+            </button>
+            <button
+              onClick={() => {
+                if (!isTaken) {
+                  onMarkTaken();
+                  // setShowCallSheet(false);
+                }
+              }}
+              disabled={isTaken}
+              className={`flex-1 py-3 px-4 font-semibold rounded-xl active:scale-95 transition flex items-center justify-center gap-2 ${
+                isTaken
+                  ? "border border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed"
+                  : "border border-red-400 hover:bg-red-50"
+              }`}
+            >
+              <img
+                src={isTaken ? "/check.svg" : "/mark as taken.svg"}
+                alt=""
+                className="w-4 h-4"
+              />
+              {isTaken ? "Marked Taken" : "Mark as taken"}
+            </button>
+          </div>
+        </div>
+      </BottomSheet>
+    </>
   );
 };
 

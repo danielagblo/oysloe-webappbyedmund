@@ -6,13 +6,13 @@ const SafetyTips: React.FC = () => (
     <p className="text-gray-500 mb-3 py-1 px-2 rounded-2xl text-xs bg-(--div-active) sm:bg-white md:text-[0.9vw]">
       Follow this tips and report any suspicious activity.
     </p>
-    <ul className="list-disc ml-5 marker:text-black space-y-2 font-bold text-sm md:text-[1.125vw]">
-      <li>Meet in a public place</li>
-      <li>Check the vehicle history</li>
-      <li>Inspect the vehicle thoroughly</li>
-      <li>Don't share personal information</li>
-      <li>Trust your instincts</li>
-    </ul>
+    <ol className="list-disc ml-5 marker:text-black space-y-2 font-medium text-sm md:text-[1.125vw]">
+      <li>Check the item carefully and ask relevant questions.</li>
+      <li>Payment for item is made upon delivery or Pickup.</li>
+      <li>Do not make payment for item or for delivery in advance.</li>
+      <li>Report any ad or user seems fake, misleading, right away.</li>
+      <li>For self-pickup, always meet in well-lit, busy, public places.</li>
+    </ol>
   </div>
 );
 
