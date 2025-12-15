@@ -48,6 +48,7 @@ export default function SupportAndCases({
             const normalizeRoom = (raw: any): ChatRoom => {
               return {
                 id: raw.id,
+                room_id: raw.room_id ?? String(raw.id ?? ""), // Added room_id
                 name: raw.name ?? String(raw.id ?? ""),
                 is_group: raw.is_group ?? false,
                 // some payloads use `unread` rather than `total_unread`
@@ -56,10 +57,10 @@ export default function SupportAndCases({
                 created_at: raw.created_at ?? raw.createdAt ?? null,
                 messages: Array.isArray(raw.messages) ? raw.messages : [],
                 members: Array.isArray(raw.members) ? raw.members : [],
-                  // preserve any last message fields from websocket payloads
-                  // so UI can show previews (some payloads include `last_message`)
-                  // keep the raw field names to remain compatible with usage
-                  last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
+                // preserve any last message fields from websocket payloads
+                // so UI can show previews (some payloads include `last_message`)
+                // keep the raw field names to remain compatible with usage
+                last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
               } as ChatRoom;
             };
 

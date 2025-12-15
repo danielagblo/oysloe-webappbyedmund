@@ -45,8 +45,7 @@ const SignInPage = () => {
   const [policyModalType, setPolicyModalType] = useState<
     "privacy" | "terms" | null
   >(null);
-  // track whether user scrolled to end of policy content in modal
-  const [hasScrolledToEnd, setHasScrolledToEnd] = useState(false);
+  // Removed unused state
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);

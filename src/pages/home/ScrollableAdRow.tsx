@@ -4,7 +4,6 @@ import Loader from "../../components/LoadingDots";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
-import useScrollFade from "./useScrollFade";
 
 type Props = {
   category: Category;
@@ -61,10 +60,10 @@ const ScrollableAdRow = ({
       <div
         id={containerId}
         className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2"
-        // style={{
-        //   WebkitMaskImage: maskGradient,
-        //   maskImage: maskGradient,
-        // }}
+      // style={{
+      //   WebkitMaskImage: maskGradient,
+      //   maskImage: maskGradient,
+      // }}
       >
         {filteredProducts.length > 0 ? (
           <div className="flex gap-2 sm:gap-3 w-max">
