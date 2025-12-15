@@ -23,14 +23,12 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
 
     const handleOnline = () => {
       if (isMounted) {
-        console.log("Connection restored");
         setIsOnline(true);
       }
     };
 
     const handleOffline = () => {
       if (isMounted) {
-        console.log("Connection lost");
         setIsOnline(false);
       }
     };
@@ -38,19 +36,33 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    const initialCheckTimeout = setTimeout(() => {
-      if (isMounted && navigator.onLine !== isOnline) {
-        setIsOnline(navigator.onLine);
+    // Fetch-based polling for real network detection
+    const pollInterval = setInterval(async () => {
+      if (isMounted) {
+        try {
+          await fetch(window.location.href, {
+            method: "HEAD",
+            cache: "no-store",
+            mode: "cors",
+          });
+          if (isMounted) {
+            setIsOnline(true);
+          }
+        } catch (error) {
+          if (isMounted) {
+            setIsOnline(false);
+          }
+        }
       }
-    }, 100);
+    }, 2000);
 
     return () => {
       isMounted = false;
-      clearTimeout(initialCheckTimeout);
+      clearInterval(pollInterval);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
-  }, [isOnline]);
+  }, []);
 
   return (
     <OnlineStatusContext.Provider value={isOnline}>
