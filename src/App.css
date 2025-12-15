@@ -290,6 +290,14 @@ body {
   animation: slide-up 0.3s ease-out;
 }
 
+.animate-slide-up-mobile {
+  animation: slide-up 0.4s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
 html,
 body {
   overflow-x: hidden;

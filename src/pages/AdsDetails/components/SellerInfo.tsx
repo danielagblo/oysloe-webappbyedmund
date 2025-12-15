@@ -105,7 +105,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
         onClick={() => setIsSellerAdsModalOpen(true)}
         className="px-2 py-1 h-full rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
       >
-        View Seller Ads
+        Seller Ads
       </button>
     </div>
 

@@ -5,18 +5,18 @@ import LottieNoNetwork from "./LottieNoNetwork";
 const OfflineModal = () => {
   const isOnline = useOnline();
   const [showToast, setShowToast] = useState(false);
-  const [isChecking, setIsChecking] = useState(false);
+  // const [isChecking, setIsChecking] = useState(false);
 
-  const handleRetry = async () => {
-    setIsChecking(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    if (navigator.onLine) {
-      window.location.reload();
-    } else {
-      setIsChecking(false);
-      alert("Still offline. Please check your connection and try again.");
-    }
-  };
+  // const handleRetry = async () => {
+  //   setIsChecking(true);
+  //   await new Promise((resolve) => setTimeout(resolve, 500));
+  //   if (navigator.onLine) {
+  //     window.location.reload();
+  //   } else {
+  //     setIsChecking(false);
+  //     alert("Still offline. Please check your connection and try again.");
+  //   }
+  // };
 
   if (isOnline) return null;
 
@@ -34,7 +34,10 @@ const OfflineModal = () => {
   }
 
   return (
-    <div onClick={() => setShowToast(true)} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div onClick={
+      () => setShowToast(true)} 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    >
       
       <div className="bg-white p-6 rounded-lg shadow-lg text-center px-15 max-sm:px-8">
         {/* <img
@@ -47,7 +50,7 @@ const OfflineModal = () => {
         <p className="text-gray-600 mb-4">
           Please check your network settings.
         </p>
-        <div className="grid hidden grid-cols-2 justify-center gap-4 items-center">
+        {/* <div className="grid grid-cols-2 justify-center gap-4 items-center">
           <button
             className="bg-[#99fcae] max-sm:h-full hover:bg-[#d6f0e4] px-4 py-2 rounded cursor-pointer whitespace-nowrap hover:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={handleRetry}
@@ -61,7 +64,7 @@ const OfflineModal = () => {
           >
             Continue Browsing
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

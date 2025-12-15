@@ -2,6 +2,7 @@ import React from "react";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import ScrollableAdRow from "./ScrollableAdRow";
+import LoadingDots from "../../components/LoadingDots";
 
 type Props = {
   categories: Category[];
@@ -39,6 +40,15 @@ const ScrollableAds = ({
     const filteredProducts = applyFilters(categoryProducts);
     return filteredProducts.length > 0;
   });
+
+  // Show loading state while products are being fetched
+  if (productsLoading) {
+    return (
+      <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
+        <LoadingDots />
+      </div>
+    );
+  }
 
   if (categoriesWithAds.length === 0) {
     return (

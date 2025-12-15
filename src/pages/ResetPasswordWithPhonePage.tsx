@@ -7,6 +7,7 @@ import OTPLogin from "../components/OTPLogin";
 import PhoneInput from "../components/PhoneInput";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import { toast } from "sonner";
+import { ResetDropdown } from "../components/ResetDropdown";
 
 const ResetPasswordWithPhonePage = ({
   page = "Reset Password",
@@ -89,10 +90,10 @@ const ResetPasswordWithPhonePage = ({
               />
             </div>
             <h6 className="sm:text-sm my-4 text-center max-sm:mb-8 text-[16px] max-sm:my-6">
-              Want to Log in?
+              Can't Login?
             </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center items-center">
-              {/* <ResetDropdown page="phone-reset" /> */}
+              <ResetDropdown />
               <OTPLogin page="phone-reset" />
             </div>
           </form>

@@ -38,7 +38,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
           <span className="text-xs">{totalFavourites ?? 0}</span>
         </div>
         {multiplierLabel && (
-          <div className="ml-2 text-black font-bold rounded-lg px-2 py-0.5 text-[10px] bg-green-300">
+          <div className="ml-2 text-black font-bold rounded-lg px-2 py-0.5 text-xs bg-green-300">
             {multiplierLabel}
           </div>
         )}
