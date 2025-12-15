@@ -135,8 +135,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             {sellerProducts && sellerProducts.length > 0 ? (
               sellerProducts.slice(0, 6).map(
                 (p) =>
-                  !p.is_taken &&
-                  p.status === "ACTIVE" && (
+                  (!p.is_taken &&
+                  p.status === "ACTIVE") && (
                     <img
                       key={p.id}
                       src={p.image || "/no-image.jpeg"}

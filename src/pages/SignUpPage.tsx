@@ -215,7 +215,7 @@ const SignInPage = () => {
                 <input
                   type="text"
                   name="name"
-                  placeholder="Name"
+                  placeholder="Full Name"
                   value={formData.name}
                   onChange={handleInputChange}
                   autoComplete="name"
