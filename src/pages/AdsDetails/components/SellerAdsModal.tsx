@@ -101,7 +101,7 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                   className="w-20 h-20 object-cover rounded-lg shrink-0"
                 />
                 <div className="flex flex-col justify-center flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-400 text-sm md:text-base line-clamp-2">
+                  <h3 className="font-bold text-gray-400 text-sm md:text-base line-clamp-1">
                     {ad.name}
                   </h3>
                   <p className="text-gray-600 text-xs md:text-sm">
@@ -109,7 +109,7 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                     &nbsp;
                     {(ad.location?.name || "") +
                       (ad.location?.name && ad.location?.region ? ", " : "") +
-                      (ad.location?.region || "") || "Unknown location"}
+                      (ad.location?.region || "") || "Unknown"}
                   </p>
                   <p className="text-gray-800 font-semibold text-sm md:text-base mt-1">
                     {ad.price
