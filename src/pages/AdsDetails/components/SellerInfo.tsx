@@ -86,7 +86,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
       </div>
     </div>
 
-    <div className="flex items-center justify-between px-2 md:mb-6">
+    <div className="flex items-center justify-between px-2 mb md:mb-6">
       <div className="flex items-start gap-2 flex-col max-sm:p-4">
         <h4 className="text-xl md:text-[1.5vw]">
           {currentAdData?.owner?.business_name ?? "Seller"}
@@ -105,15 +105,15 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
       </div>
       <button
         onClick={() => setIsSellerAdsModalOpen(true)}
-        className="px-2 py-1 whitespace-nowrap rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
+        className="px-2 py-1 h-full rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
       >
-        Seller Ads
+        View Seller Ads
       </button>
     </div>
 
-    <div className="flex items-center justify-center mb-4 w-full">
+    <div className="flex items-center justify-center mb-4 max-sm:mb-7 w-full">
       <div className="md:pt-4 overflow-x-hidden w-full">
-        <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4 max-sm:pt-0">
+        {/* <div className="relative flex items-center justify-center gap-2 w-full max-sm:p-4 max-sm:pt-0">
           <button
             className="absolute left-1 bg-gray-100 p-1 rounded-full hover:bg-gray-300"
             onClick={() => {
@@ -177,7 +177,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
           >
             <img src="/arrowright.svg" alt="" className="w-4 h-4" />
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
 
