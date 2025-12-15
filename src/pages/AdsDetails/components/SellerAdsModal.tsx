@@ -48,11 +48,11 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 sm:bg-black/40 max-sm:p-0 p-4 animate-fade-in"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center max-sm:mb-15 bg-black/40 sm:bg-black/40 max-sm:p-0 p-4 animate-fade-in"
       onClick={() => setIsSellerAdsModalOpen(false)}
     >
       <div
-        className="relative bg-white max-sm:w-full max-sm:rounded-t-3xl sm:rounded-2xl p-6 sm:shadow-lg max-h-[85vh] overflow-hidden w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-sm:rounded-b-none max-sm:animate-slide-up-mobile max-sm:max-h-[80vh] transition-transform duration-200 ease-out"
+        className="relative bg-white max-sm:w-full max-sm:rounded-t-3xl sm:rounded-2xl p-6 sm:shadow-lg max-h-[85vh] overflow-hidden w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] max-sm:rounded-b-none max-sm:animate-slide-up-mobile max-sm:max-h-[75vh] transition-transform duration-200 ease-out"
         onClick={(e) => e.stopPropagation()}
         style={
           dragOffset > 0
@@ -86,7 +86,7 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
         </h2>
 
         {sellerAdsToShow.length > 0 ? (
-          <div className="flex flex-col gap-3 overflow-auto max-h-[70vh] no-scrollbar max-lg:pb-17.5">
+          <div className="flex flex-col gap-3 overflow-auto max-h-[70vh] no-scrollbar max-lg:pb-20">
             {sellerAdsToShow.map((ad) => (
               <Link
                 key={ad.id}
