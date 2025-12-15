@@ -93,6 +93,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     Record<number, string[]>
   >({});
   const [featuresLoading, setFeaturesLoading] = useState(false);
+  const [isFeaturesExpanded, setIsFeaturesExpanded] = useState(true);
   const [subcategorySearch, setSubcategorySearch] = useState("");
   const [locationSearch, setLocationSearch] = useState("");
   const modalRef = useRef<HTMLDivElement>(null);
@@ -165,10 +166,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     };
   }, [selectedCategoryId]);
 
-  // Use subcategories from API
-  const currentSubcategories = subcategories;
-
-  // Fetch feature definitions when subcategories are selected
+  // Fetch feature definitions and their possible values when subcategories are selected
   useEffect(() => {
     let mounted = true;
     setFeaturesLoading(true);
@@ -177,33 +175,82 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       try {
         if (selectedSubcategoryIds.length === 0) {
           setFeatureDefinitions([]);
+          setPossibleFeatureValues({});
           setFeaturesLoading(false);
           return;
         }
 
-        // Fetch features for the first selected subcategory
-        const subId = parseInt(selectedSubcategoryIds[0], 10);
-        let features = (await getFeatures({ subcategory: subId })) as any;
+        // Fetch features for all selected subcategories
+        const featurePromises = selectedSubcategoryIds.map((subIdStr) => {
+          const subId = parseInt(subIdStr, 10);
+          return getFeatures({ subcategory: subId })
+            .then((res) => res)
+            .catch((err) => {
+              console.warn(`Failed to fetch features for subcategory ${subId}`, err);
+              return [];
+            });
+        });
+
+        const allFeaturesResults = await Promise.all(featurePromises);
 
         if (!mounted) return;
 
-        if (
-          !Array.isArray(features) &&
-          features &&
-          Array.isArray(features.results)
-        ) {
-          features = features.results;
-        }
+        // Combine all features and deduplicate by ID
+        const featureMap = new Map<number, any>();
+        allFeaturesResults.forEach((featuresResult: any) => {
+          let features = featuresResult;
+          if (
+            !Array.isArray(features) &&
+            features &&
+            Array.isArray(features.results)
+          ) {
+            features = features.results;
+          }
 
-        const defs = (features || []).map((f: any) => ({
+          (features || []).forEach((f: any) => {
+            const id = Number(f.id);
+            if (!featureMap.has(id)) {
+              featureMap.set(id, f);
+            }
+          });
+        });
+
+        const defs = Array.from(featureMap.values()).map((f: any) => ({
           id: Number(f.id),
           name: String(f.name ?? f.display_name ?? f.title ?? ""),
         }));
 
+        if (!mounted) return;
         setFeatureDefinitions(defs);
+
+        // Fetch possible values for the features
+        if (defs.length > 0) {
+          const perFeaturePromises = defs.map((fd: { id: number; name: string }) =>
+            getPossibleFeatureValues({ feature: fd.id })
+              .then((res) => ({ fid: fd.id, res }))
+              .catch((err) => {
+                console.warn(`Failed fetch for feature ${fd.id}`, err);
+                return { fid: fd.id, res: null };
+              }),
+          );
+
+          const perFeatureResults = await Promise.all(perFeaturePromises);
+          const normalized: Record<number, string[]> = {};
+          perFeatureResults.forEach(({ fid, res }) => {
+            const values = normalizePossibleFeatureValues(res, fid);
+            if (values.length > 0) normalized[fid] = values;
+          });
+
+          if (mounted) setPossibleFeatureValues(normalized);
+        } else {
+          setPossibleFeatureValues({});
+        }
       } catch (e) {
-        console.warn("Failed to fetch feature definitions for subcategory", e);
-        if (mounted) setFeatureDefinitions([]);
+        console.warn("Failed to fetch feature definitions for subcategories", e);
+        if (mounted) {
+          setFeatureDefinitions([]);
+          setPossibleFeatureValues({});
+        }
       } finally {
         if (mounted) setFeaturesLoading(false);
       }
@@ -213,6 +260,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       mounted = false;
     };
   }, [selectedSubcategoryIds]);
+
+  // Use subcategories from API
+  const currentSubcategories = subcategories;
 
   // Fetch possible values for feature definitions
   useEffect(() => {
@@ -341,9 +391,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       {/* Bottom Sheet Modal */}
       <div
         ref={modalRef}
-        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[85vh] overflow-hidden flex flex-col ${
+        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[77.5vh] overflow-hidden flex flex-col transition-transform duration-400 ease-out ${
           isOpen
-            ? "translate-y-0 transition-transform duration-500 ease-out"
+            ? "translate-y-0"
             : "translate-y-full"
         }`}
         style={{
@@ -403,7 +453,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-20">
+        <div className="flex-1 overflow-y-auto px-4 pb-20 pt-3">
           {/* Main Panel */}
           {currentPanel === "main" && (
             <div className="space-y-4">
@@ -448,9 +498,13 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                         >
                           <span className="text-sm text-gray-800">
-                            {selectedSubcategoryIds.length > 0
-                              ? `${selectedSubcategoryIds.length} selected`
-                              : "Select Subcategory"}
+                            {selectedSubcategoryIds.length === 1
+                              ? currentSubcategories.find(
+                                  (sub) => sub.id === parseInt(selectedSubcategoryIds[0], 10)
+                                )?.name || "Select Subcategory"
+                              : selectedSubcategoryIds.length > 1
+                                ? `${selectedSubcategoryIds.length} selected`
+                                : "Select Subcategory"}
                           </span>
                           <img
                             src="/arrowright.svg"
@@ -478,7 +532,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           ? selectedLocationIds
                               .find((id) => id.startsWith("All -"))
                               ?.replace("All - ", "") || "Select Location"
-                          : `${selectedLocationIds.length} ${selectedLocationIds.length === 1 ? "place" : "places"} in ${selectedRegion || ""}`
+                          : selectedLocationIds.length === 1
+                            ? `${selectedLocationIds[0]}, ${selectedRegion || ""}`
+                            : `${selectedLocationIds.length} places in ${selectedRegion || ""}`
                         : selectedRegion
                           ? selectedRegion
                           : "Select Location"}
@@ -496,56 +552,96 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               {selectedSubcategoryIds.length > 0 &&
                 featureDefinitions.length > 0 && (
                   <div className="bg-white rounded-3xl p-4 space-y-3">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                      Features
-                    </h3>
-                    {featuresLoading ? (
-                      <div className="text-center">
-                        <span className="text-sm text-gray-600">
-                          Loading features...
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {featureDefinitions.map((feature, idx) => (
-                          <div key={feature.id}>
-                            <select
-                              value={selectedFeatures[feature.id] || ""}
-                              onChange={(e) => {
-                                if (e.target.value) {
-                                  setSelectedFeatures({
-                                    ...selectedFeatures,
-                                    [feature.id]: e.target.value,
-                                  });
-                                } else {
-                                  const updated = { ...selectedFeatures };
-                                  delete updated[feature.id];
-                                  setSelectedFeatures(updated);
-                                }
-                              }}
-                              className="w-full text-sm focus:border-none rounded-lg px-3 py-2"
-                            >
-                              <option value="">{feature.name}</option>
-                              {(possibleFeatureValues[feature.id] || []).map(
-                                (value) => (
-                                  <option key={value} value={value}>
-                                    {value}
-                                  </option>
-                                ),
-                              )}
-                            </select>
-                            {idx < featureDefinitions.length - 1 && (
-                              <div className="border-t border-gray-200 mt-3" />
-                            )}
+                    <button
+                      onClick={() => setIsFeaturesExpanded(!isFeaturesExpanded)}
+                      className="flex items-center justify-between w-full"
+                    >
+                      <h3 className="text-sm font-semibold text-gray-700">
+                        Features
+                      </h3>
+                      <img
+                        src="/arrowright.svg"
+                        alt="toggle"
+                        className={`w-4 h-4 shrink-0 transition-transform ${
+                          isFeaturesExpanded ? "rotate-90" : ""
+                        }`}
+                      />
+                    </button>
+                    {isFeaturesExpanded && (
+                      <>
+                        {featuresLoading ? (
+                          <div className="text-center">
+                            <span className="text-sm text-gray-600">
+                              Loading features...
+                            </span>
                           </div>
-                        ))}
-                      </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {featureDefinitions.map((feature, idx) => (
+                              <div key={feature.id}>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-semibold text-gray-700">
+                                    {feature.name}
+                                  </span>
+                                  <select
+                                    value={selectedFeatures[feature.id] || ""}
+                                    onChange={(e) => {
+                                      if (e.target.value) {
+                                        setSelectedFeatures({
+                                          ...selectedFeatures,
+                                          [feature.id]: e.target.value,
+                                        });
+                                      } else {
+                                        const updated = { ...selectedFeatures };
+                                        delete updated[feature.id];
+                                        setSelectedFeatures(updated);
+                                      }
+                                    }}
+                                    className="text-sm text-right rounded-lg px-2 py-1 outline-0"
+                                  >
+                                    <option value="">Select</option>
+                                    {(possibleFeatureValues[feature.id] || []).map(
+                                      (value) => (
+                                        <option key={value} value={value}>
+                                          {value}
+                                        </option>
+                                      ),
+                                    )}
+                                  </select>
+                                </div>
+                                {idx < featureDefinitions.length - 1 && (
+                                  <div className="border-t border-gray-200 mt-3" />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
 
-              {/* Timeframe Filter Section */}
-              <div className="bg-white rounded-3xl p-4">
+              {/* Ad Type & Timeframe Filter Section - Stacked */}
+              <div className="bg-white rounded-3xl p-4 mb-2 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-700">
+                    Ad Type
+                  </span>
+                  <select
+                    value={tempSelectedAdType}
+                    onChange={(e) =>
+                      setTempSelectedAdType(
+                        e.target.value as "all" | "SALE" | "RENT",
+                      )
+                    }
+                    className="text-sm text-right rounded-lg px-2 py-1 outline-0"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="SALE">For Sale</option>
+                    <option value="RENT">For Rent</option>
+                  </select>
+                </div>
+                <div className="border-t border-gray-200" />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-gray-700">
                     Timeframe
@@ -561,7 +657,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           | "anytime",
                       )
                     }
-                    className="text-sm text-right rounded-lg px-2 py-1"
+                    className="text-sm text-right rounded-lg px-2 py-1 outline-0"
                   >
                     <option value="anytime">Anytime</option>
                     <option value="newest">Newest</option>
@@ -570,30 +666,6 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                   </select>
                 </div>
               </div>
-
-              {/* Ad Type Filter Section */}
-              <div className="bg-white rounded-3xl p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-700">
-                    Ad Type
-                  </span>
-                  <select
-                    value={tempSelectedAdType}
-                    onChange={(e) =>
-                      setTempSelectedAdType(
-                        e.target.value as "all" | "SALE" | "RENT",
-                      )
-                    }
-                    className="text-sm text-right rounded-lg px-2 py-1"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="SALE">For Sale</option>
-                    <option value="RENT">For Rent</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Price Section */}
               <div className="bg-white rounded-3xl p-4">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">
                   Price Range
@@ -611,7 +683,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           min: e.target.value ? Number(e.target.value) : "",
                         })
                       }
-                      className="min-w-0 w-full px-3 pl-6 py-2 border border-gray-300 rounded-lg text-sm"
+                      className="min-w-0 w-full px-3 pl-6 py-2 border outline-0 border-gray-300 rounded-lg text-sm"
                     />
                     <p
                       className={`absolute left-2 top-1.5 ${!tempPriceRange?.min && "hidden"}`}
@@ -659,7 +731,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           | "high-to-low",
                       )
                     }
-                    className="text-sm text-right rounded-lg px-2 py-1"
+                    className="text-sm text-right rounded-lg outline-0 px-2 py-1"
                   >
                     <option value="none">None</option>
                     <option value="low-to-high">Low to High</option>
@@ -678,7 +750,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                         e.target.value as "none" | "newest" | "oldest",
                       )
                     }
-                    className="text-sm text-right rounded-lg px-2 py-1"
+                    className="text-sm text-right outline-0 rounded-lg px-2 py-1"
                   >
                     <option value="none">None</option>
                     <option value="newest">Newest</option>

@@ -155,6 +155,23 @@ const HomePage = () => {
   };
 
   const applyFilters = (items: Product[]) => {
+    // Check if any filters are active (not at defaults)
+    const hasActiveFilters =
+      selectedLocation ||
+      selectedTimeframe !== "anytime" ||
+      selectedAdType !== "all" ||
+      priceSort !== "none" ||
+      timeframeSort !== "none" ||
+      priceFilter.mode !== "none" ||
+      selectedCategoryId !== null ||
+      selectedSubcategoryId !== "" ||
+      Object.keys(selectedFeatures).length > 0;
+
+    // If no filters are active, return all items as-is
+    if (!hasActiveFilters) {
+      return (items || []).filter((p) => p.status === "ACTIVE" && !p.is_taken);
+    }
+
     let out = (items || []).filter((p) => p.status === "ACTIVE" && !p.is_taken);
 
     // Category/subcategory filtering
@@ -221,7 +238,7 @@ const HomePage = () => {
             (p as unknown as { created_at?: string; createdAt?: string })
               .createdAt;
           const t = created ? Date.parse(created as string) : null;
-          if (!t) return false;
+          if (!t) return true; // Keep products without dates
           return now - t <= cutoff;
         });
       }
