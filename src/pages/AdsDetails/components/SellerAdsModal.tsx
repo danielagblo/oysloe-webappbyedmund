@@ -63,6 +63,8 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                     {ad.name}
                   </h3>
                   <p className="text-gray-600 text-xs md:text-sm">
+                    <img className="inline h-3 w-3" src="/location.svg" alt="" />
+                    &nbsp;
                     {(ad.location?.name || "") +
                       (ad.location?.name && ad.location?.region ? ", " : "") +
                       (ad.location?.region || "") || "Unknown location"}
