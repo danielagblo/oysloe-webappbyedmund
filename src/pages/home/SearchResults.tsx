@@ -29,10 +29,10 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
     <div className="bg-(--div-active) w-full flex justify-center -mb-4">
       <div
         style={{ transform: "scale(0.9)" }}
-        className="grid grid-cols-2 sm:grid-cols-5 gap-4 w-[95vw] pb-8"
+        className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-[95vw] pb-8"
       >
         {filteredResults.map((ad) => (
-          <div key={ad.id} className="flex flex-col w-full overflow-hidden">
+          <div key={ad.id} className="flex flex-col w-full sm:max-w-[18vw] overflow-hidden">
             <Link
               to={`/ads/${ad.id}`}
               state={{ adData: ad }}
@@ -41,16 +41,22 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
               <img
                 src={ad.image || "/no-image.jpeg"}
                 alt={ad.name}
-                className="w-full h-40 sm:h-48 object-cover rounded-2xl"
+                className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
               />
               <div className="flex items-center gap-1 px-2 py-1">
-                <img src="/location.svg" alt="" className="w-4 h-4" />
-                <p className="text-xs text-gray-500">
-                  {ad.location?.name ?? ad.location?.region ?? ""}
-                </p>
+                <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
+                  <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-600 truncate">
+                    {
+                      ad.location?.name ??
+                        ad.location?.region ??
+                          "Unknown"
+                    }
+                  </p>
               </div>
-              <p className="px-2 text-sm truncate text-gray-500">{ad.name}</p>
-              <p className="px-2 text-sm font-light text-gray-500">
+              <p className="px-2 text-sm sm:text-xl lg:text-[1.2vw] truncate line-clamp-1 text-gray-600">
+                {ad.name}
+              </p>
+              <p className="px-2 text-xs sm:text-base lg:text-[1vw] font-medium text-gray-800">
                 {formatMoney(ad.price, "GHS")}
               </p>
             </Link>
