@@ -412,9 +412,9 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
       {Logout && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-[300] px-4">
-          <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-sm flex flex-col items-center gap-5">
+          <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-sm:w-9/10 max-w-sm flex flex-col items-center gap-5">
             <svg
-              className="h-35 w-auto"
+              className="h-35 max-sm:h-17.5 w-auto"
               viewBox="0 0 65 77"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -432,7 +432,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               Are you sure you would like to log out?
             </p>
 
-            <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs w-4/5">
+            <div className="flex gap-2 sm:gap-1 flex-col max-sm:grid max-sm:grid-cols-2 sm:flex-row justify-around text-xs w-4/5 max-sm:w-full">
               <button
                 onClick={handleLogout}
                 className={`border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl w-full ${
