@@ -186,8 +186,8 @@ const SignInPage = () => {
 
   return (
     <div className="lg:max-h-screen max-sm:text-(--dark-def) max-sm:bg-(--bg) no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center relative">
-      <div className="flex flex-col items-center justify-center sm:w-full m-8 max-sm:m-0 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7 max-sm:pb-24">
-        <div className="flex flex-col gap-5 items-center justify-center">
+      <div className="flex flex-col items-center max-sm:justify-start justify-center sm:w-full m-8 max-sm:m-0 lg:mb-0 overflow-auto no-scrollbar h-full py-20 lg:pt-10 lg:pb-7 max-sm:pt-10 max-sm:pb-24">
+        <div className="flex flex-col gap-5 items-center max-sm:justify-start justify-center">
           <div>
             <button
               type="button"
@@ -434,7 +434,7 @@ const SignInPage = () => {
                 disabled={registerMutation.status === "pending"}
               />
             </div>
-            <h6 className="text-[16px] sm:text-sm my-4 text-center max-sm:mb-8 max-sm:my-6">
+            <h6 className=" hidden text-[16px] sm:text-sm my-4 text-center max-sm:mb-8 max-sm:my-6">
               Can't Login?
             </h6>
             <div className="flex gap-2 max-sm:gap-[18px] justify-center max-sm:hidden items-center">

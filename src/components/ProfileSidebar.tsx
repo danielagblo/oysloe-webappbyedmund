@@ -161,7 +161,16 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       {/* ---------- MOBILE MENU BUTTON ---------- */}
       <div className="sm:hidden fixed top-2 right-3 z-[100]">
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            if (accountDeletionRequested || Logout) {
+              setAccountDeletionRequested(false);
+              setDeleteConfirmation(false);
+              setLogout(false);
+              setIsOpen(true);
+            } else {
+              setIsOpen(!isOpen);
+            }
+          }}
           className="p-2 rounded-md bg-white/80 backdrop-blur-md shadow-md border-gray-200"
         >
           <Bars3Icon className="w-6 h-6 text-gray-700" />
@@ -175,7 +184,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}
           />
-          <div className="relative w-80 max-w-[90vw] h-full bg-(--bg) shadow-2xl flex flex-col animate-slide-in-right overflow-hidden">
+          <div className="relative w-80 max-w-[90vw] h-full bg-(--bg) shadow-2xl flex flex-col animate-slide-in-right overflow-auto no-scrollbar">
             {/* Header with close button */}
             <div className="flex justify-end items-center p-4 pb-0 border-gray-200">
               <button
@@ -201,7 +210,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             <div className="px-4 pb-4">
               <div className="flex items-start bg-(--div-active) rounded-2xl p-2 gap-3">
                 {/* Left: Profile Picture */}
-                <div className="bg-green-400 rounded-full h-17 w-17 flex items-center justify-center flex-shrink-0">
+                <div className="bg-green-300 rounded-full h-17 w-17 flex items-center justify-center flex-shrink-0">
                   <img
                     src={
                       buildMediaUrl((user as UserProfile)?.avatar) ||
@@ -354,7 +363,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
             </div>
 
             {/* Settings Section */}
-            <div className="px-4 py-3 border-t border-gray-200 pb-20">
+            <div className="px-4 py-3 border-t border-gray-200">
               <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
                 Settings
               </p>
@@ -385,7 +394,10 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               
               {/* Delete Account Button */}
               <button
-                onClick={() => setAccountDeletionRequested(true)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setAccountDeletionRequested(true);
+                }}
                 className="flex text-gray-700 items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all hover:bg-red-50"
               >
                 <div className="bg-(--div-active) p-1.5 rounded-full">
@@ -451,9 +463,18 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       )}
 
       {accountDeletionRequested && (
-        <div className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center px-4">
+        <div
+          onClick={() => {
+            setAccountDeletionRequested(false);
+            setDeleteConfirmation(false);
+          }}
+          className="fixed inset-0 z-30 bg-black/50 flex justify-center items-center px-4"
+        >
           {!deleteConfirmation ? (
-            <div className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm"
+            >
               <h2 className="text-base text-center font-semibold">
                 <span>Are you sure you want to delete your account?</span>
                 <br />
@@ -479,7 +500,10 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               </div>
             </div>
           ) : (
-            <div className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm">
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white flex justify-center items-center flex-col p-6 gap-4 rounded-xl w-full max-w-sm"
+            >
               <h3 className="text-lg font-semibold text-center">
                 Why do you want to delete your account?
               </h3>
