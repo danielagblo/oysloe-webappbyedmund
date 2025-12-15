@@ -45,7 +45,7 @@ const SignInPage = () => {
   const [policyModalType, setPolicyModalType] = useState<
     "privacy" | "terms" | null
   >(null);
-  // track whether user scrolled to end of policy content in modal
+  // Removed unused state
   const contentRef = useRef<HTMLDivElement | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -173,6 +173,8 @@ const SignInPage = () => {
       toast.error(errorMessage);
     }
   };
+
+  // Removed unused state
 
   // Reset scroll/read state when modal opens
   useEffect(() => {
