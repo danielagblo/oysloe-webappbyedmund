@@ -194,12 +194,12 @@ const EditProfilePage = () => {
         }
         .hide-scrollbar::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
       `}</style>
-      <div className="flex flex-col lg:flex-row w-full md:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 md:py-[3.5vh]">
+      <div className="flex flex-col lg:flex-row w-full sm:mt-0 min-h-0 max-h-screen max-lg:overflow-auto lg:overflow-hidden hide-scrollbar justify-start gap-2 py-2 sm:py-[3.5vh]">
         {/* LEFT COLUMN: full width on small screens, half on md+; no internal scroll */}
         <div className="lg:w-1/2">
-          <div className="relative lg:overflow-auto no-scrollbar bg-white  h-fit sm:h-[93vh] pt-10  md:pb-12 w-full md:mt-0 md:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 md:rounded-2xl text-xs">
+          <div className="relative lg:overflow-auto no-scrollbar bg-white  h-fit md:h-[93vh] max- pt-10  sm:pb-12 w-full sm:mt-0 sm:pt-10 flex flex-col justify-start items-center gap-4 px-3 py-3 sm:rounded-2xl text-xs">
             {closeProgress && setupProgress < 100 && (
-              <div className="flex-col gap-2 p-4 max-sm:pt-10 w-[90%] max-md:w-full bg-gray-50 rounded-2xl">
+              <div className="flex-col gap-2 p-4 max-sm:pt-10 w-[90%] max-sm:w-full bg-gray-50 rounded-2xl">
                 <div className="my-3 h-[6px] w-full bg-[#defeed] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-[#74ffa7] rounded-full"
@@ -528,7 +528,7 @@ const EditProfilePage = () => {
 
         {/* business details */}
         <div className="lg:w-1/2">
-          <div className="bg-white lg:overflow-auto no-scrollbarw-full mt-2 md:mt-0 flex flex-col justify-center items-center h-fit sm:min-h-[93vh] gap-4 px-3 py-3 pb-0 md:pb-3 md:rounded-2xl text-xs max-lg:mb-10">
+          <div className="bg-white lg:overflow-auto no-scrollbarw-full mt-2 sm:mt-0 flex flex-col justify-center items-center h-fit md:h-[93vh] gap-4 px-3 py-3 pb-0 sm:pb-3 sm:rounded-2xl text-xs max-lg:mb-10">
             {/* {!selectedUser?.emailVerified && !linkSent && (
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>

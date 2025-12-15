@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import MenuButton from "../components/MenuButton";
 import ProfileSidebar from "../components/ProfileSidebar";
 import ProfileStats from "../components/ProfileStats";
@@ -27,7 +26,6 @@ const tabLabels: Record<string, string> = {
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const isSmall = useIsSmallScreen();
   const [activeTab, setActiveTab] = useState<string>(() => {
     try {
       const saved = localStorage.getItem("profile_active_tab");
@@ -105,8 +103,8 @@ const ProfilePage = () => {
 
   return (
     <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">
-      {isSmall && (
-        <div className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-4 flex items-center justify-between">
+
+        <div className=" sm:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-4 flex items-center justify-between">
           <button
             onClick={handleBackClick}
             className="text-sm whitespace-nowrap font-medium text-gray-700 hover:text-gray-900"
@@ -119,7 +117,7 @@ const ProfilePage = () => {
           </p>
           <div className="w-12" />
         </div>
-      )}
+
       <div className="h-full">
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
