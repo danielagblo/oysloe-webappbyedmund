@@ -36,25 +36,37 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
 
-    // Fetch-based polling for real network detection
-    const pollInterval = setInterval(async () => {
-      if (isMounted) {
-        try {
-          await fetch(window.location.href, {
-            method: "HEAD",
-            cache: "no-store",
-            mode: "cors",
-          });
-          if (isMounted) {
-            setIsOnline(true);
-          }
-        } catch (error) {
-          if (isMounted) {
-            setIsOnline(false);
-          }
+    // Heartbeat polling for real connectivity detection
+    const ping = async () => {
+      if (!isMounted) return;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      try {
+        // Use external lightweight ping endpoint; add cache-busting
+        const url = new URL("https://api.oysloe.com/api-v1/");
+        url.searchParams.set("_", String(Date.now()));
+        const res = await fetch(url.toString(), {
+          method: "GET",
+          cache: "no-store",
+          signal: controller.signal,
+          // Let CORS policy decide; if blocked or network down, it will throw or be opaque
+          mode: "cors",
+        });
+        // If we get a response (even 200/204), consider online
+        if (!res || (res.status >= 500)) {
+          throw new Error("Ping failed");
         }
+        if (isMounted) setIsOnline(true);
+      } catch {
+        if (isMounted) setIsOnline(false);
+      } finally {
+        clearTimeout(timeout);
       }
-    }, 2000);
+    };
+
+    const pollInterval = setInterval(ping, 2000);
+    // Kick an initial ping immediately
+    void ping();
 
     return () => {
       isMounted = false;
