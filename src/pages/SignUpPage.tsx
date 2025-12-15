@@ -174,10 +174,11 @@ const SignInPage = () => {
     }
   };
 
+  // Removed unused state
+
   // Reset scroll/read state when modal opens
   useEffect(() => {
     if (policyModalOpen) {
-      setHasScrolledToEnd(false);
       // reset scroll position
       if (contentRef.current) contentRef.current.scrollTop = 0;
     }

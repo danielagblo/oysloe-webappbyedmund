@@ -18,8 +18,6 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
   sellerProducts,
   setSellerModalImage,
   setIsSellerModalOpen,
-  sellerCarouselRef,
-  navigate,
   setIsSellerAdsModalOpen,
 }) => (
   <div className="sm:mt-4">
