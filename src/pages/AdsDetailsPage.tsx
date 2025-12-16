@@ -259,7 +259,9 @@ const AdsDetailsPage = () => {
   const ownerProductsQuery = useOwnerProducts(
     ownerIdCandidate as number | undefined,
   );
-  const sellerProducts = ownerProductsQuery.data ?? [];
+
+  const sellerProducts = (ownerProductsQuery.data)?.filter(ad => 
+    !ad.is_taken && ad.status === "ACTIVE" ) ?? [];
 
   const { data: relatedProducts = [] } = useRelatedProducts(
     numericId ?? undefined,
@@ -407,7 +409,25 @@ const AdsDetailsPage = () => {
           404
         </span>
         <span>There was an error loading this ad</span>
-        <span className="text-3xl">(ಥ‿ಥ)</span>
+        <span className="text-3xl">
+          {
+            [
+              "(ಥ‿ಥ)",
+              "(ᗒᗣᗕ)՞",
+              "(╯▔皿▔)╯",
+              "(╯‵□′)╯︵┻━┻",
+              "(︶︹︺)",
+              "(╯︵╰,)",
+              "(；一_一)",
+              "(´･_･`)",
+              "(´-﹏-`；)",
+              "┗( T﹏T )┛",
+              "(┬┬﹏┬┬)"
+            ][
+              Math.floor(Math.random() * 11)
+            ]
+          }
+        </span>
       </p>
     );
 

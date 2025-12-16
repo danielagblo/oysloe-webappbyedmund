@@ -181,40 +181,42 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
 
     <div className="sm:hidden flex flex-row gap-4 bg-(--div-active) p-4 mb-5 w-full mx-auto">
       <div className="relative">
-        <img
-          src={
-            currentAdData?.owner?.avatar ||
-            currentAdData?.owner?.business_logo ||
-            "/userPfp2.jpg"
-          }
-          alt={currentAdData?.owner?.name || "Seller"}
-          role="button"
-          tabIndex={0}
-          onClick={() => {
-            setSellerModalImage(
+        <div className="bg-green-300 rounded-full p-1">
+          <img
+            src={
               currentAdData?.owner?.avatar ||
-                currentAdData?.owner?.business_logo ||
-                "/userPfp2.jpg",
-            );
-            setIsSellerModalOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+              currentAdData?.owner?.business_logo ||
+              "/userPfp2.jpg"
+            }
+            alt={currentAdData?.owner?.name || "Seller"}
+            role="button"
+            tabIndex={0}
+            onClick={() => {
               setSellerModalImage(
                 currentAdData?.owner?.avatar ||
                   currentAdData?.owner?.business_logo ||
                   "/userPfp2.jpg",
               );
               setIsSellerModalOpen(true);
-            }
-          }}
-          className="w-15 h-15 rounded-full cursor-pointer"
-        />
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                setSellerModalImage(
+                  currentAdData?.owner?.avatar ||
+                    currentAdData?.owner?.business_logo ||
+                    "/userPfp2.jpg",
+                );
+                setIsSellerModalOpen(true);
+              }
+            }}
+            className="w-15 h-15 rounded-full cursor-pointer border-4 border-white"
+          />
+        </div>
         {currentAdData?.owner?.business_logo && (
           <img
             src={currentAdData?.owner?.business_logo}
             alt={`${currentAdData?.owner?.name || "Seller"} business logo`}
-            className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white cursor-pointer"
+            className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white border-3 border-white cursor-pointer"
             onClick={() => {
               setSellerModalImage(
                 currentAdData?.owner?.business_logo ||

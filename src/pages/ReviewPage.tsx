@@ -198,13 +198,31 @@ const ReviewPage = () => {
 
           {/* Comments */}
           <div className="space-y-4 mt-4">
-            {isLoading && (
-              <p className="text-center text-gray-500">Loading reviews...</p>
-            )}
-            {!isLoading && reviews.length === 0 && (
-              <p className="text-center text-gray-500">No reviews yet.</p>
-            )}
-            {!isLoading &&
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="pb-4 border-b border-gray-100 flex items-center gap-3 animate-pulse"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-gray-300 shrink-0" />
+                  <div className="flex flex-col w-full gap-2">
+                    <div className="h-2.5 bg-gray-300 rounded w-24" />
+                    <div className="h-3 bg-gray-300 rounded w-32" />
+                    <div className="h-2 bg-gray-300 rounded w-full" />
+                  </div>
+                </div>
+              ))
+            ) : reviews.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-8">
+                <img src="/nothing-to-show.png" alt="Nothing to show" className="w-32 h-32 object-contain" />
+                <p className="text-center text-gray-500">This ad has no reviews.</p>
+              </div>
+            ) : displayedReviews.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-3 py-8">
+                <img src="/nothing-to-show.png" alt="Nothing to show" className="w-32 h-32 object-contain" />
+                <p className="text-center text-gray-500">No reviews with {ratingFilter} star rating{ratingFilter === 1 ? '' : 's'}.</p>
+              </div>
+            ) : (
               displayedReviews.map((rev) => (
                 <div
                   key={rev.id}
@@ -291,7 +309,8 @@ const ReviewPage = () => {
                   </div>
                   <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
                 </div>
-              ))}
+              ))
+            )}
             <div className="h-8 bg-white" />
           </div>
         </div>
@@ -388,10 +407,10 @@ const ReviewPage = () => {
         {/* Reviews Section */}
         <div className="p-4 bg-white h-[90vh] -mt-12">
           <h2 className="text-xl font-semibold mb-3">User Reviews</h2>
-          <div className="flex gap-2 flex-wrap mb-4">
+          <div className="flex gap-2 w-full items-center justify-center flex-wrap mb-4">
             <button
               onClick={() => setRatingFilter(null)}
-              className={`flex items-center justify-center gap-1 px-3 py-2 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
+              className={`flex items-center justify-center gap-1 p-2.5 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
             >
               <img src="/star.svg" alt="" className="w-4 h-4" /> All
             </button>
@@ -399,7 +418,7 @@ const ReviewPage = () => {
               <button
                 key={star}
                 onClick={() => setRatingFilter(star)}
-                className={`flex justify-center items-center gap-1 rounded-full px-3 py-2 text-sm ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
+                className={`flex justify-center items-center gap-1 rounded-full p-2.5 text-sm ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
               >
                 <img src="/star.svg" alt="" className="w-4 h-4" />
                 {star}
@@ -407,46 +426,74 @@ const ReviewPage = () => {
             ))}
           </div>
 
-          {!isLoading &&
-            displayedReviews.slice(0, 5).map((rev) => (
-              <div key={rev.id} className="pb-4 border-b border-gray-100">
-                <div className="flex items-center gap-3 justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={rev.user?.avatar || "/userPfp2.jpg"}
-                      alt=""
-                      className="w-8 h-8 rounded-lg"
-                    />
-                    <div className="flex flex-col">
-                      <p className="text-[10px] text-gray-400">
-                        {new Date(rev.created_at).toLocaleDateString()}
-                      </p>
-                      <h3 className="font-semibold">
-                        {currentUserProfile?.id === rev.user?.id
-                          ? "You"
-                          : rev.user?.account_name || rev.user?.name || "User"}
-                      </h3>
-                    </div>
-                  </div>
-                  {currentUserProfile?.id === rev.user?.id && (
-                    <button
-                      onClick={() => handleOpenEditForm(rev.id)}
-                      className="text-gray-500 hover:text-gray-700 transition"
-                      aria-label="Edit review"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                    </button>
-                  )}
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="pb-4 border-b border-gray-100 flex items-center gap-3 animate-pulse"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gray-300 shrink-0" />
+                <div className="flex flex-col w-full gap-2">
+                  <div className="h-2 bg-gray-300 rounded w-20" />
+                  <div className="h-2.5 bg-gray-300 rounded w-24" />
                 </div>
-                <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
               </div>
-            ))}
+            ))
+          ) : reviews.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <img src="/nothing-to-show.png" alt="Nothing to show" className="w-24 h-24 object-contain" />
+              <p className="text-center text-gray-500">This ad has no reviews.</p>
+            </div>
+          ) : displayedReviews.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 py-8">
+              <img src="/nothing-to-show.png" alt="Nothing to show" className="w-24 h-24 object-contain" />
+              <p className="text-center text-gray-500">No reviews with {ratingFilter} star rating{ratingFilter === 1 ? '' : 's'}.</p>
+            </div>
+          ) : (
+            <div className="overflow-y-auto no-scrollbar max-h-[calc(90vh-150px)]">
+              {
+                displayedReviews.map((rev) => (
+                  <div key={rev.id} className="pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-3 justify-between">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={rev.user?.avatar || "/userPfp2.jpg"}
+                          alt=""
+                          className="w-8 h-8 rounded-lg"
+                        />
+                        <div className="flex flex-col">
+                          <p className="text-[10px] text-gray-400">
+                            {formatReviewDate(rev.created_at)}
+                          </p>
+                          <h3 className="font-semibold">
+                            {currentUserProfile?.id === rev.user?.id
+                              ? "You"
+                              : rev.user?.account_name || rev.user?.name || "User"}
+                          </h3>
+                        </div>
+                      </div>
+                      {currentUserProfile?.id === rev.user?.id && (
+                        <button
+                          onClick={() => handleOpenEditForm(rev.id)}
+                          className="text-gray-500 hover:text-gray-700 transition"
+                          aria-label="Edit review"
+                        >
+                          <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-gray-700 text-sm mt-1">{rev.comment}</p>
+                  </div>
+                ))
+              }
+            </div>
+          )}
         </div>
 
         {/* Floating Add Review Button */}

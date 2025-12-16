@@ -1422,21 +1422,27 @@ const AdsDetailsPage = () => {
         </div>
         <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
           <button
-            onClick={() =>
-              navigate("/reviews", {
-                state: { productId: currentAdData?.id ?? numericId },
-              })
-            }
+            onClick={() => {
+              const id = currentAdData?.id ?? numericId;
+              if (typeof id === "number") {
+                navigate(`/reviews?product=${id}`, { state: { productId: id } });
+              } else {
+                navigate("/reviews");
+              }
+            }}
             className="bg-(--div-active) text-(--dark-def) px-6 py-3 rounded-full whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Make Review
           </button>
           <button
-            onClick={() =>
-              navigate("/reviews", {
-                state: { productId: currentAdData?.id ?? numericId },
-              })
-            }
+            onClick={() => {
+              const id = currentAdData?.id ?? numericId;
+              if (typeof id === "number") {
+                navigate(`/reviews?product=${id}`, { state: { productId: id } });
+              } else {
+                navigate("/reviews");
+              }
+            }}
             className="text-(--dark-def) px-6 py-3 rounded-full bg-(--div-active) whitespace-nowrap hover:scale-95 active:105 cursor-pointer hover:bg-gray-100 transition"
           >
             Show reviews
