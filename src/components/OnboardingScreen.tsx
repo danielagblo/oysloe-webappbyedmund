@@ -80,7 +80,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
             <img src="/onboarding1.gif" alt="" className="h-55 w-55 sm:hidden" />
           </div>
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
-            <h2 className="text-4xl max-md:text-5xl font-medium text-center">
+            <h2 className="text-4xl max-sm:px-4 font-medium text-center">
               User Safety Guarantee{" "}
             </h2>
             <p className="text-center text-sm w-7/10 max-md:w-9/10 px-8 max-sm:p-0">
@@ -111,7 +111,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
           </div>
 
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
-            <h2 className="text-4xl max-md:text-5xl font-medium text-center">
+            <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
               Scale To Success
             </h2>
             <p className="text-center text-sm w-7/10 max-md:w-9/10 px-8 max-sm:p-0">
@@ -142,7 +142,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
           </div>
 
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
-            <h2 className="text-4xl max-md:text-5xl font-medium text-center">
+            <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
               Journey Begins Now
             </h2>
             <p className="text-center text-sm w-7/10 max-md:w-9/10 px-8 max-sm:p-0">
