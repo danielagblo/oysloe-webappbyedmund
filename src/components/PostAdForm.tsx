@@ -11,6 +11,7 @@ import { usePatchProduct, useProduct } from "../features/products/useProducts";
 import normalizePossibleFeatureValues from "../hooks/normalizearrayfeatures";
 import useLocationSelection from "../hooks/useLocationSelection";
 import {
+  createPossibleFeatureValue,
   getFeature,
   getFeatures,
   getPossibleFeatureValues,
@@ -439,8 +440,8 @@ export default function PostAdForm({
       setTitle(existingProduct.name ?? "");
       setDescription(
         (existingProduct as any).description ??
-          (existingProduct as any).desc ??
-          "",
+        (existingProduct as any).desc ??
+        "",
       );
       setPrice(
         typeof existingProduct.price === "number"
@@ -851,8 +852,8 @@ export default function PostAdForm({
     try {
       const candidateId =
         typeof prodSubRaw === "object" &&
-        prodSubRaw !== null &&
-        typeof prodSubRaw.id !== "undefined"
+          prodSubRaw !== null &&
+          typeof prodSubRaw.id !== "undefined"
           ? Number(prodSubRaw.id)
           : Number(prodSubRaw);
       if (
@@ -961,19 +962,82 @@ export default function PostAdForm({
     const explicitFeatureValues = [
       ...(featureValues && Object.keys(featureValues).length > 0
         ? Object.entries(featureValues)
-            .map(([k, v]) => ({ feature: Number(k), value: v }))
-            .filter((f) => f.value && String(f.value).trim() !== "")
+          .map(([k, v]) => ({ feature: Number(k), value: v }))
+          .filter((f) => f.value && String(f.value).trim() !== "")
         : []),
       ...(attachedFeatures && Array.isArray(attachedFeatures)
         ? attachedFeatures
-            .filter((a) => a.feature != null && String(a.value).trim() !== "")
-            .map((a) => ({
-              feature: Number(a.feature),
-              value: String(a.value),
-            }))
+          .filter((a) => a.feature != null && String(a.value).trim() !== "")
+          .map((a) => ({
+            feature: Number(a.feature),
+            value: String(a.value),
+          }))
         : []),
     ];
 
+    // Ensure any newly-typed values which are not yet present in the
+    // possibleFeatureValues listing exist on the server. This is a
+    // best-effort step: we try to create missing possible values before
+    // submitting the ad so users don't need to add them manually.
+    try {
+      const toCreate: Array<{ feature: number; value: string }> = [];
+      explicitFeatureValues.forEach((fv) => {
+        try {
+          const vals = possibleFeatureValues[fv.feature] || [];
+          const v = String(fv.value ?? "").trim();
+          if (v && !vals.includes(v)) toCreate.push({ feature: fv.feature, value: v });
+        } catch {
+          /* ignore malformed entries */
+        }
+      });
+
+      if (toCreate.length > 0) {
+        // de-duplicate by feature+value
+        const unique = Array.from(
+          new Map(toCreate.map((t) => [`${t.feature}::${t.value}`, t])).values(),
+        );
+
+        const createPromises = unique.map((t) =>
+          createPossibleFeatureValue({
+            feature: t.feature,
+            value: t.value,
+            subcategory: typeof subcategoryId === "number" ? subcategoryId : undefined,
+          }).then(
+            () => ({ ok: true, t }),
+            (err) => ({ ok: false, t, err }),
+          ),
+        );
+
+        const results = await Promise.all(createPromises);
+
+        // Merge successful creations into local state and cache (best-effort)
+        let anyFailures = false;
+        results.forEach((r) => {
+          if (r.ok) {
+            setPossibleFeatureValues((prev) => ({
+              ...prev,
+              [r.t.feature]: [...(prev[r.t.feature] || []), r.t.value],
+            }));
+            try {
+              const cached = possibleValuesGlobalCache.get(r.t.feature);
+              if (Array.isArray(cached)) possibleValuesGlobalCache.set(r.t.feature, [...cached, r.t.value]);
+            } catch {
+              // ignore cache update errors
+            }
+          } else {
+            anyFailures = true;
+            console.warn("Failed to create possible feature value", r.t, r.err);
+          }
+        });
+
+        if (anyFailures) {
+          toast.error("Some suggested feature values couldn't be saved — ad will still be posted.");
+        }
+      }
+    } catch (e) {
+      // Non-fatal: log and continue to submit ad
+      console.warn("Auto-create possible feature values failed:", e);
+    }
     const locationResolution = (function resolveLocation() {
       try {
         if (!locationDetails)
@@ -1069,8 +1133,8 @@ export default function PostAdForm({
         : {}),
       // include keyFeatures if user added any (filter out empty strings)
       ...(keyFeatures &&
-      Array.isArray(keyFeatures) &&
-      keyFeatures.filter((k) => k.trim() !== "").length > 0
+        Array.isArray(keyFeatures) &&
+        keyFeatures.filter((k) => k.trim() !== "").length > 0
         ? { keyFeatures: keyFeatures.filter((k) => k.trim() !== "") }
         : {}),
       // include merged explicit feature values (from fetched defs and user attachments)
@@ -1297,9 +1361,9 @@ export default function PostAdForm({
                   <DropdownPopup
                     triggerLabel={
                       subcategoryId &&
-                      subcategories.find((s) => s.id === subcategoryId)
+                        subcategories.find((s) => s.id === subcategoryId)
                         ? subcategories.find((s) => s.id === subcategoryId)!
-                            .name
+                          .name
                         : "Select subcategory"
                     }
                     options={subcategories.map((s) => s.name)}
@@ -1398,7 +1462,7 @@ export default function PostAdForm({
                   </button>
                 ))}
               </div>
-{/* 
+              {/* 
               <p className="text-[8px] text-[var(--bg-active)] mt-1 font-bold">
                 <svg
                   className="inline"
@@ -1448,18 +1512,20 @@ export default function PostAdForm({
                             <div className="w-1/3 text-sm">{fd.name}</div>
                             {values && values.length > 0 ? (
                               <div className="flex-1">
-                                <input
-                                  list={`feature-values-${fd.id}`}
-                                  placeholder={`Select or type ${fd.name}`}
-                                  value={featureValues[fd.id] ?? ""}
-                                  onChange={(e) =>
-                                    setFeatureValues((prev) => ({
-                                      ...prev,
-                                      [fd.id]: e.target.value,
-                                    }))
-                                  }
-                                  className="w-full p-3 border rounded-xl border-[var(--div-border)]"
-                                />
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    list={`feature-values-${fd.id}`}
+                                    placeholder={`Select or type ${fd.name}`}
+                                    value={featureValues[fd.id] ?? ""}
+                                    onChange={(e) =>
+                                      setFeatureValues((prev) => ({
+                                        ...prev,
+                                        [fd.id]: e.target.value,
+                                      }))
+                                    }
+                                    className="w-full p-3 border rounded-xl border-[var(--div-border)]"
+                                  />
+                                </div>
                                 <datalist id={`feature-values-${fd.id}`}>
                                   {values.map((v) => (
                                     <option key={v} value={v} />
@@ -1467,18 +1533,20 @@ export default function PostAdForm({
                                 </datalist>
                               </div>
                             ) : (
-                              <input
-                                type="text"
-                                placeholder={`Value for ${fd.name}`}
-                                value={featureValues[fd.id] ?? ""}
-                                onChange={(e) =>
-                                  setFeatureValues((prev) => ({
-                                    ...prev,
-                                    [fd.id]: e.target.value,
-                                  }))
-                                }
-                                className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
-                              />
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder={`Value for ${fd.name}`}
+                                  value={featureValues[fd.id] ?? ""}
+                                  onChange={(e) =>
+                                    setFeatureValues((prev) => ({
+                                      ...prev,
+                                      [fd.id]: e.target.value,
+                                    }))
+                                  }
+                                  className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                                />
+                              </div>
                             )}
                           </div>
                         );
