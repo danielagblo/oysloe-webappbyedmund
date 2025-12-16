@@ -1026,7 +1026,7 @@ export default function PostAdForm({
             }
           } else {
             anyFailures = true;
-            console.warn("Failed to create possible feature value", r.t, r.err);
+            console.warn("Failed to create possible feature value", r.t, (r as any).err);
           }
         });
 
