@@ -5,9 +5,9 @@ const LottieJourneyBeginsNow = () => {
   return (
     <Lottie
       animationData={BoardingScreen}
-      loop={false}
+      loop={true}
       autoplay={true}
-      className="h-1/2"
+      className="h-1/2 max-sm:h-55 max-sm:w-55"
     />
   );
 };
