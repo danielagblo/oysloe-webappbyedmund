@@ -19,7 +19,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
     <>
       <div className="fixed top-0 z-50">
         <div
-          className={`relative ${page === "Alerts" ? "bg-[var(--div-active)]" : "bg-white"} w-[100vw] flex sm:hidden items-center px-2 h-12 py-3 sticky top-0 z-50`}
+          className={`relative ${page === "Alerts" ? "bg-[var(--div-active)]" : "bg-white"} w-[100vw] flex lg:hidden items-center px-2 h-12 py-3 sticky top-0 z-50`}
         >
           <button
             onClick={() => navigate(-1)}

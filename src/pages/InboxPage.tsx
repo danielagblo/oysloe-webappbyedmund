@@ -27,7 +27,7 @@ export default function InboxPage() {
         {/* Live Chat — desktop: right column; mobile: full-screen when open */}
         {/* Support list is hidden on mobile when chat is open; chat becomes full-screen */}
         <div
-          className={`sm:w-[50vw] w-full h-screen overflow-y-auto no-scrollbar sm:py-5 sm:pr-1 ${selectedCase ? "hidden sm:block" : ""}`}
+          className={`lg:w-[50vw] w-full h-screen overflow-y-auto no-scrollbar lg:py-5 lg:pr-1 ${selectedCase ? "hidden lg:block" : ""}`}
         >
           <SupportAndCases
             onSelectCase={(caseId) =>
@@ -40,7 +40,7 @@ export default function InboxPage() {
         </div>
 
         {/* Desktop right column */}
-        <div className="hidden sm:block sm:w-[50%] w-full h-screen overflow-y-auto sm:py-5 sm:px-1.5 sm:mr-1">
+        <div className="hidden lg:block lg:w-[50%] w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
           <LiveChat
             caseId={selectedCase}
             onClose={() => setSelectedCase(null)}
@@ -49,7 +49,7 @@ export default function InboxPage() {
 
         {/* Mobile full-screen chat overlay */}
         {selectedCase && (
-          <div className="sm:hidden fixed inset-0 z-400 bg-white">
+          <div className="lg:hidden fixed inset-0 z-400 bg-white">
             <div className="h-full w-full">
               <LiveChat
                 caseId={selectedCase}

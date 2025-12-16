@@ -2,6 +2,7 @@ import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChatRoom } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
+import { formatReviewDate } from "../utils/formatReviewDate";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -144,17 +145,17 @@ export default function SupportAndCases({
   );
 
   const HeaderTabs = () => (
-    <div className="flex items-center justify-center w-[100%] gap-5">
+    <div className="flex items-center justify-center max-lg:mb-3 max-sm:px-5 w-full md:gap-10 gap-7.5">
       <button
         type="button"
         onClick={() => setActiveTab("chat")}
         aria-pressed={activeTab === "chat"}
-        className={`text-black w-2/5 pl-3 py-1.5 rounded-2xl flex gap-4 items-center justify-start bg-[#EDEDED] ${activeTab === "chat" ? "bg-[#b1fab6]" : "bg-[#EDEDED]"}`}
+        className={`text-black w-full cursor-pointer max-w-[150px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "chat" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
       >
-        <ChatBubbleLeftIcon className="w-4 fill-[var(--dark-def)]" />
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <p style={{ margin: "0", display: "inline" }}>Chat</p>
-          <span className=" text-gray-500" style={{ fontSize: "70%" }}>
+        <ChatBubbleLeftIcon className="w-6 fill-(--dark-def)" />
+        <div className="flex flex-col items-start justify-center">
+          <p className="inline m-0 lg:text-[1.2vw]">Chat</p>
+          <span className=" text-gray-500 text-xs md:text-sm lg:text-[0.9vw]">
             {chatUnread === null ? "…" : `${chatUnread} unread`}
           </span>
         </div>
@@ -163,11 +164,10 @@ export default function SupportAndCases({
         type="button"
         onClick={() => setActiveTab("support")}
         aria-pressed={activeTab === "support"}
-        className={`text-black w-2/5 pl-3 py-1.5 rounded-2xl flex gap-4 items-center justify-start bg-[#EDEDED] ${activeTab === "support" ? "bg-[#b1fab6]" : "bg-[#EDEDED]"}`}
+        className={`text-black w-full cursor-pointer max-w-[150px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "support" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
       >
         <svg
-          width="21"
-          height="21"
+          className="w-6"
           viewBox="0 0 21 21"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -178,9 +178,9 @@ export default function SupportAndCases({
           />
         </svg>
 
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <p style={{ margin: "0", display: "inline" }}>Support</p>
-          <span className="text-gray-500" style={{ fontSize: "70%" }}>
+        <div className="flex flex-col items-start justify-center">
+          <p className="m-0 inline lg:text-[1.2vw]">Support</p>
+          <span className="text-gray-500 text-xs md:text-sm lg:text-[0.9vw]">
             {supportActive === null ? "…" : `${supportActive} active`}
           </span>
         </div>
@@ -191,17 +191,25 @@ export default function SupportAndCases({
   // Chats block (new) - matches style of GetHelp/OpenCases
   const GetChats = () => (
     <div className="mb-6">
-      <h2 className="text-xl font-medium mt-3 mb-1">Recent Chats</h2>
+      <h2 className="text-xl md:text-2xl lg:text-[1.5vw] font-medium mt-3 mb-1 text-(--dark-def)">Recent Chats</h2>
       <ChatsList rooms={userRoomsMemo} />
     </div>
   );
 
   function ChatsList({ rooms }: { rooms: ChatRoom[] }) {
-    if (rooms.length === 0)
-      return <p className="text-sm text-gray-500">No recent chats</p>;
+    if (rooms.length === 0) {
+      return (
+        <div>
+            <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
+              <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+              <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
+            </div>
+          </div>
+        );
+    }
 
     return (
-      <div className="flex flex-col gap-2 mb-3">
+      <div className="flex flex-col gap-2 my-3 lg:gap-3">
         {rooms.map((r) => {
           const lastMessage =
             r.messages && r.messages.length
@@ -246,34 +254,47 @@ export default function SupportAndCases({
             return lastContent;
           })();
 
+          const member = r.members[0];
+          const initials = r.name
+            ?.split(" ")
+            .map(word => word[0])
+            .join("")
+            .toUpperCase();
+
           return (
             <button
               key={r.id}
               onClick={() => onSelectChat?.(String(r.id))}
-              className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
+              className={`relative text-left p-3 cursor-pointer rounded-xl ${ (r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start gap-3`}
             >
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
-                {r.name
-                  .split(" ")
-                  .map((s) => s[0])
-                  .slice(0, 2)
-                  .join("")}
-              </div>
+              {member?.avatar ? (
+                <img
+                  src={member.avatar}
+                  alt="chat"
+                  className="w-10 h-10 md:h-12 md:w-12 lg:h-[3.25vw] lg:w-[3.25vw] rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 md:h-12 md:w-12 lg:h-[3.25vw] lg:w-[3.25vw] rounded-full bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
+                  {initials}
+                </div>
+              )}
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">{r.name}</p>
-                  <span className="text-xs text-gray-400 flex items-center gap-2">
-                    {r.total_unread ? (
-                      <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                        {r.total_unread}
-                      </span>
-                    ) : null}
+                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{r.name}</p>
+                    {
+                      r.total_unread ? (
+                        <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
+                          {r.total_unread}
+                        </span>
+                      ) : null
+                    }
+                  <span className="text-xs italic md:text-sm lg:text-[0.9vw] text-gray-400 flex items-center gap-2">
                     {r.created_at
-                      ? new Date(r.created_at).toLocaleDateString()
+                      ? formatReviewDate(r.created_at)
                       : ""}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs md:text-sm lg:text-[0.9vw] text-gray-500 truncate">
                   {previewText || ""}
                 </p>
               </div>
@@ -286,27 +307,22 @@ export default function SupportAndCases({
 
   const GetHelp = () => (
     <div className="mb-8">
-      <h2 className="text-xl font-medium mt-3 mb-1">Get Help Anytime</h2>
-      <p className="text-gray-400 text-xs mb-4">
+      <h2 className="text-xl md:text-2xl lg:text-[1.5vw] font-medium mt-3 mb-1 text-(--dark-def)">Get Help Anytime</h2>
+      <p className="text-gray-400 text-base md:text-xl lg:text-[1.1vw] mb-4">
         If you are facing an issue, send us a report, we will respond to you
         immediately. Our support is active 24/7.
       </p>
-      <div className="w-[100%] flex items-center justify-center">
+      <div className="w-full flex items-center justify-center">
         <button
-          className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-medium py-4 px-6 rounded-2xl hover:bg-gray-200"
+          className="flex items-center justify-center gap-3 bg-(--div-active) max-lg:bg-white max-lg:hover:bg-green-100/50 cursor-pointer text-(--dark-def) lg:font-medium py-4 px-6 rounded-2xl hover:bg-gray-200"
           onClick={() => onSelectChat?.("new")}
         >
-          <p>Add case</p>
-          <span
-            className="w-5 h-5 ml-2 text-green-500 bg-green-200 flex justify-center items-center"
-            style={{
-              borderRadius: "2rem",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
+          <p className="text-base lg:text-[1vw]">Add case</p>
+          <div
+            className="relative w-7 h-7 p-0 rounded-full font-medium text-(--dark-def) bg-green-200 flex justify-center items-center"
           >
-            <p>+</p>
-          </span>
+            <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl md:text-4xl lg:text-[1.7vw] inline m-0 -mt-0.5">+</p>
+          </div>
         </button>
       </div>
     </div>
@@ -316,8 +332,11 @@ export default function SupportAndCases({
     if (supportRooms.length === 0)
       return (
         <div>
-          <h3 className="text-sm font-medium mb-2">Support Cases</h3>
-          <p className="text-sm text-gray-500">No support cases</p>
+          <h3 className="text-xl md:text-2xl lg:text-[1.5vw] text-(--dark-def) font-medium mb-2">Open Case</h3>
+          <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
+            <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+            <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no support cases</p>
+          </div>
         </div>
       );
 
@@ -411,16 +430,18 @@ export default function SupportAndCases({
 
   return (
     <div className="flex h-full">
-      <div className="rounded-2xl bg-white px-5 py-3 h-full w-full flex flex-col ">
+      <div className="rounded-2xl bg-white lg:px-5 py-3 h-full w-full flex flex-col ">
         <HeaderTabs />
         <div className="no-scrollbar overflow-y-auto mt-4 flex-1">
           {activeTab === "chat" ? (
-            <GetChats />
+            <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
+              <GetChats />
+            </div>
           ) : (
-            <>
+            <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetHelp />
               <OpenCases supportRooms={staffRoomsMemo} />
-            </>
+            </div>
           )}
           <div className="w-1 h-13" />
         </div>
