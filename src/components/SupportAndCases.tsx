@@ -145,12 +145,12 @@ export default function SupportAndCases({
   );
 
   const HeaderTabs = () => (
-    <div className="flex items-center justify-center max-lg:mb-3 max-sm:px-5 w-full md:gap-10 gap-7.5">
+    <div className="flex items-center justify-center lg:mt-4 max-lg:mb-3 max-sm:px-5 w-full md:gap-10 gap-7.5">
       <button
         type="button"
         onClick={() => setActiveTab("chat")}
         aria-pressed={activeTab === "chat"}
-        className={`text-black w-full cursor-pointer max-w-[150px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "chat" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
+        className={`text-black w-full cursor-pointer max-w-[150px] lg:max-w-[200px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "chat" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
       >
         <ChatBubbleLeftIcon className="w-6 fill-(--dark-def)" />
         <div className="flex flex-col items-start justify-center">
@@ -164,7 +164,7 @@ export default function SupportAndCases({
         type="button"
         onClick={() => setActiveTab("support")}
         aria-pressed={activeTab === "support"}
-        className={`text-black w-full cursor-pointer max-w-[150px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "support" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
+        className={`text-black w-full cursor-pointer max-w-[150px] lg:max-w-[200px] md:py-3 py-1.5 rounded-2xl flex gap-4 items-center justify-center bg-(--div-active) ${activeTab === "support" ? "bg-(--green)" : "bg-(--div-active) hover:bg-gray-100"}`}
       >
         <svg
           className="w-6"
@@ -314,12 +314,12 @@ export default function SupportAndCases({
       </p>
       <div className="w-full flex items-center justify-center">
         <button
-          className="flex items-center justify-center gap-3 bg-(--div-active) max-lg:bg-white max-lg:hover:bg-green-100/50 cursor-pointer text-(--dark-def) lg:font-medium py-4 px-6 rounded-2xl hover:bg-gray-200"
+          className="flex items-center justify-center gap-3 bg-(--div-active) max-lg:bg-white max-lg:hover:bg-green-100/50 cursor-pointer text-(--dark-def) lg:font-medium max-lg:py-4 lg:px-4 max-lg:px-6 lg:w-[5vw] lg:h-[3vw] lg:max-w-[150px] lg:max-h-[60px] lg:min-h-[50px] lg:min-w-[125px] rounded-2xl hover:bg-gray-200"
           onClick={() => onSelectChat?.("new")}
         >
-          <p className="text-base lg:text-[1vw]">Add case</p>
+          <p className="text-base lg:text-[1vw] whitespace-nowrap">Add case</p>
           <div
-            className="relative w-7 h-7 p-0 rounded-full font-medium text-(--dark-def) bg-green-200 flex justify-center items-center"
+            className="relative w-7 h-7  max-w-7 max-h-7 p-0 rounded-full font-medium text-(--dark-def) bg-green-200 flex justify-center items-center"
           >
             <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl md:text-4xl lg:text-[1.7vw] inline m-0 -mt-0.5">+</p>
           </div>
