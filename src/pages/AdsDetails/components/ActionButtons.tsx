@@ -113,16 +113,15 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             />
             <span>{isFavourited ? "Liked" : "Like"}</span>
           </button>
-
-          {/* Report user */}
+        </div>
+        {/* Report user */}
           <button
             onClick={onReportAd}
-            className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-[#F3F3F3] rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 active:scale-95 transition"
+            className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-red-100/70 rounded-lg text-sm font-medium text-gray-700 hover:bg-red-100 active:scale-95 transition"
           >
             <img src="/flag.svg" alt="report" className="w-5 h-5" />
             <span>Report user</span>
           </button>
-        </div>
       </div>
 
       {/* DESKTOP LAYOUT */}
