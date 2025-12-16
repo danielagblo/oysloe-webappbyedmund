@@ -75,7 +75,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         </div>
       ) : clicked === 0 ? (
         <>
-          <div className="max-sm:hidden"><LottieUserSafetyGuarantee /></div>
+          <LottieUserSafetyGuarantee />
           <div className="max-sm:flex max-sm:items-center max-sm:justify-center max-sm:mt-30 max-sm:flex-1">
             <img src="/onboarding1.gif" alt="" className="h-55 w-55 sm:hidden" />
           </div>
@@ -106,9 +106,10 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         </>
       ) : clicked === 1 ? (
         <>
-          <div className="max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
+          <div className="hidden max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
             <LottieScaleToSuccess />
           </div>
+          <LottieScaleToSuccess />
 
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
             <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
@@ -137,10 +138,10 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         </>
       ) : clicked === 2 ? (
         <>
-          <div className="max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
+          <div className="hidden max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
             <LottieJourneyBeginsNow />
           </div>
-
+          <LottieJourneyBeginsNow />
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
             <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
               Journey Begins Now

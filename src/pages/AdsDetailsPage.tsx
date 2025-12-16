@@ -259,7 +259,9 @@ const AdsDetailsPage = () => {
   const ownerProductsQuery = useOwnerProducts(
     ownerIdCandidate as number | undefined,
   );
-  const sellerProducts = ownerProductsQuery.data ?? [];
+
+  const sellerProducts = (ownerProductsQuery.data)?.filter(ad => 
+    !ad.is_taken && ad.status === "ACTIVE" ) ?? [];
 
   const { data: relatedProducts = [] } = useRelatedProducts(
     numericId ?? undefined,
