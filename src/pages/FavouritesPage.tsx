@@ -202,15 +202,15 @@ const FavouritesPage = () => {
             >
               +
             </button>
-            <div className="mt-6 text-center text-gray-600 flex flex-col gap-1.5 sm:flex-row sm:justify-center items-center">
+            <div className="mt-6 text-center text-gray-600 flex flex-col gap-1.5 sm:grid sm:grid-cols-2 sm:justify-center items-center">
               <button
-                className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 max-sm:w-4/5"
+                className="border border-[var(--div-border)] sm:w-full sm:h-full cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-green-200/40 max-sm:w-4/5"
                 onClick={() => navigate("/ads/" + (selectedAd as any).id)}
               >
                 Open
               </button>
               <button
-                className="border border-[var(--div-border)] cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40   max-sm:w-4/5"
+                className="border border-[var(--div-border)] sm:w-full sm:h-full cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40   max-sm:w-4/5"
                 onClick={() => {
                   toggleFavourite.mutate((selectedAd as any).id);
                   setSelectedAd(null);

@@ -341,7 +341,7 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                      className="border border-(--div-border) max-sm:py-4 cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
                         navigate(`/ads/${selectedAd!.id}`, {
@@ -443,7 +443,7 @@ const AdsPage = () => {
                 <div className="flex flex-col gap-3 mt-6 font-medium">
                   <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                     <button
-                      className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                      className="border border-(--div-border) cursor-pointer max-sm:py-4 px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                       onClick={() => {
                         setSelectedAd(null);
                         navigate(`/ads/${selectedAd!.id}`, {
@@ -548,9 +548,9 @@ const AdsPage = () => {
             {mapToLabel(selectedAd) === "Suspended" ||
             mapToLabel(selectedAd) === "Other" ? (
               <div className="flex flex-col gap-3 mt-6">
-                <div className="flex justify-around text-xs">
+                <div className="flex justify-around text-xs max-sm:flex-col gap-2">
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                    className="border border-(--div-border) max-sm:py-4 sm:w-full cursor-pointer px-3.5 py-3 rounded-xl hover:bg-blue-200/40"
                     onClick={() => {
                       setSelectedAd(null);
                       navigate(`/ads/${selectedAd!.id}`, {
@@ -561,7 +561,7 @@ const AdsPage = () => {
                     View Product
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-red-200/40"
+                    className="border border-(--div-border) cursor-pointer sm:w-full max-sm:py-4 px-3.5 py-3 rounded-xl hover:bg-red-200/40"
                     onClick={async () => {
                       try {
                         await deleteMutation.mutateAsync(selectedAd.id);
@@ -620,7 +620,7 @@ const AdsPage = () => {
               <div className="flex flex-col gap-3 mt-6 font-medium">
                 <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                    className="border border-(--div-border) sm:w-full cursor-pointer max-sm:py-4 px-3.5 py-3 rounded-xl hover:bg-blue-200/40"
                     onClick={() => {
                       setSelectedAd(null);
                       navigate(`/ads/${selectedAd!.id}`, {
@@ -631,7 +631,7 @@ const AdsPage = () => {
                     View Product
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-orange-200/40"
+                    className="border sm:w-full border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-3 rounded-xl hover:bg-orange-200/40"
                     onClick={() => {
                       setSelectedAd(null);
                       setEditingAdId(String(selectedAd.id));
@@ -641,7 +641,7 @@ const AdsPage = () => {
                     Edit Details
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
+                    className="border sm:w-full border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-3 rounded-xl hover:bg-red-200/40"
                     onClick={async () => {
                       try {
                         await deleteMutation.mutateAsync(selectedAd.id);
@@ -691,7 +691,7 @@ const AdsPage = () => {
                     Mark as Taken
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
+                    className="border border-(--div-border) cursor-pointer max-sm:py-4 px-3.5 py-2 rounded-xl hover:bg-orange-200/40"
                     onClick={() => {
                       setSelectedAd(null);
                       setEditingAdId(String(selectedAd.id));
@@ -722,7 +722,7 @@ const AdsPage = () => {
               <div className="flex flex-col gap-3 mt-6 font-medium">
                 <div className="flex gap-2 sm:gap-1 flex-col sm:flex-row justify-around text-xs">
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
+                    className="border border-(--div-border) sm:w-full max-sm:py-4 cursor-pointer px-3.5 py-2 rounded-xl hover:bg-blue-200/40"
                     onClick={() => {
                       setSelectedAd(null);
                       navigate(`/ads/${selectedAd!.id}`, {
@@ -733,7 +733,7 @@ const AdsPage = () => {
                     View Product
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
+                    className="border border-(--div-border) sm:w-full max-sm:py-4 cursor-pointer px-3.5 py-2 rounded-xl hover:bg-green-200/40"
                     onClick={async () => {
                       try {
                         const payload = {
@@ -774,7 +774,7 @@ const AdsPage = () => {
                     Repost Ad
                   </button>
                   <button
-                    className="border border-(--div-border) cursor-pointer px-3.5 py-4 sm:py-2 rounded-xl hover:bg-red-200/40"
+                    className="border border-(--div-border) sm:w-full cursor-pointer px-3.5 py-4 sm:py-3 rounded-xl hover:bg-red-200/40"
                     onClick={async () => {
                       try {
                         await deleteMutation.mutateAsync(selectedAd.id);
