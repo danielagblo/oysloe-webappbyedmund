@@ -62,6 +62,14 @@ export const getPossibleFeatureValues = async (params?: {
   );
 };
 
+export const createPossibleFeatureValue = async (body: {
+  feature: number;
+  value: string;
+  subcategory?: number;
+}): Promise<any> => {
+  return apiClient.post<any>(endpoints.possibleFeatureValues.create(), body);
+};
+
 export default {
   getFeatures,
   getFeature,
@@ -69,4 +77,6 @@ export default {
   updateFeature,
   patchFeature,
   deleteFeature,
+  getPossibleFeatureValues,
+  createPossibleFeatureValue,
 };

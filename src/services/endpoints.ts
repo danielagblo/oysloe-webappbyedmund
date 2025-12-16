@@ -101,6 +101,7 @@ export const endpoints = {
   // Possible feature values (suggested choices for a feature or subcategory)
   possibleFeatureValues: {
     list: () => "/possible-feature-values/",
+    create: () => "/possible-feature-values/",
   },
   locations: {
     list: () => "/locations/",

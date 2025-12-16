@@ -1,12 +1,16 @@
-import { createQueryHook, createMutationHook } from "../../utils/queryFactory";
 import {
-  getProductFeatures,
-  getProductFeature,
+  createPossibleFeatureValue,
+  getPossibleFeatureValues,
+} from "../../services/featureService";
+import {
   createProductFeature,
-  updateProductFeature,
-  patchProductFeature,
   deleteProductFeature,
+  getProductFeature,
+  getProductFeatures,
+  patchProductFeature,
+  updateProductFeature,
 } from "../../services/productFeatureService";
+import { createMutationHook, createQueryHook } from "../../utils/queryFactory";
 
 // Queries
 export const useProductFeatures = createQueryHook(
@@ -16,6 +20,12 @@ export const useProductFeatures = createQueryHook(
 export const useProductFeature = createQueryHook(
   "productFeature",
   getProductFeature,
+);
+
+// Possible feature values (suggested choices)
+export const usePossibleFeatureValues = createQueryHook(
+  "possibleFeatureValues",
+  getPossibleFeatureValues,
 );
 
 // Mutations
@@ -34,4 +44,9 @@ export const usePatchProductFeature = createMutationHook(
 export const useDeleteProductFeature = createMutationHook(
   "deleteProductFeature",
   deleteProductFeature,
+);
+
+export const useCreatePossibleFeatureValue = createMutationHook(
+  "createPossibleFeatureValue",
+  createPossibleFeatureValue,
 );
