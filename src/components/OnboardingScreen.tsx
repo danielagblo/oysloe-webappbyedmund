@@ -157,8 +157,12 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
             <button
               type="button"
               onClick={() => {
-                setClicked(3);
                 console.log(clicked);
+                if (overlay) {
+                  handleFinish();
+                } else {
+                  setClicked(3);
+                }
               }}
               className="p-3 h-full w-1/2 max-md:fixed max-md:bottom-5 max-md:h-[60px] max-md:w-4/5 bg-[#F9F9F9] max-md:bg-gray-100 hover:bg-[#F9F9F9]/80 max-md:hover:bg-gray-200 transition cursor-pointer text-black max-md:text-(--dark-def) rounded-lg"
             >
