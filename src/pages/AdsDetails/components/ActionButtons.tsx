@@ -71,14 +71,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         {/* Call Seller Button */}
         <button
           onClick={() => setShowCallSheet(true)}
-          className="w-full bg-[#74ffa7] text-[#1C274C] font-semibold py-4 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-green-300 active:scale-95 transition"
+          className=" bg-[#74ffa7] text-[#1C274C] font-semibold py-4 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-green-300 active:scale-95 transition"
         >
           <img src="/outgoing call.svg" alt="" className="w-6 h-6" />
           <span>Call Seller</span>
         </button>
 
         {/* Three Action Buttons */}
-        <div className="flex gap-2 w-full">
+        <div className="flex gap-2">
           {/* Mark as taken */}
           <button
             onClick={() => {
@@ -386,12 +386,17 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             {caller1 && (
               <a
                 href={`tel:${caller1}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
                 className="flex items-center gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
               >
                 <span className="text-lg font-medium text-gray-800 flex-1">
                   {caller1}
                 </span>
-                <div className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0">
+                <div 
+                  className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
+                >
                   <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
                 </div>
               </a>
@@ -400,6 +405,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             {caller2 && (
               <a
                 href={`tel:${caller2}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
                 className="flex items-center gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
               >
                 <span className="text-lg font-medium text-gray-800 flex-1">
@@ -414,7 +422,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
           {/* Safety Tips */}
           <div className="pt-4 border rounded-2xl border-gray-200">
-            <SafetyTips />
+            <SafetyTips textxs />
           </div>
 
           <div>

@@ -74,11 +74,8 @@ const BottomSheet: React.FC<BottomSheetProps> = ({
     >
       <div
         ref={sheetRef}
-        className="w-full bg-white rounded-t-3xl max-h-[75vh] overflow-hidden animate-in slide-in-from-bottom-5 duration-300 flex flex-col touch-none transition-transform"
-        style={{ transform: `translateY(${translateY}px)` }}
-        onTouchStart={handleDragStart}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
+        className="w-full bg-white rounded-t-3xl max-h-[75vh] overflow-hidden animate-in slide-in-from-bottom-5 duration-300 flex flex-col transition-transform"
+        style={{ transform: `translateY(${Math.max(0, translateY)}px)` }}
       >
         {/* Drag Handle */}
         <div
