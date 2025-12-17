@@ -43,17 +43,16 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       const timeout = setTimeout(() => controller.abort(), 3000);
       try {
         // Use external lightweight ping endpoint; add cache-busting
-        const url = new URL("https://api.oysloe.com/api-v1/");
+        const url = new URL("https://www.google.com/generate_204");
         url.searchParams.set("_", String(Date.now()));
         const res = await fetch(url.toString(), {
           method: "GET",
           cache: "no-store",
           signal: controller.signal,
-          // Let CORS policy decide; if blocked or network down, it will throw or be opaque
-          mode: "cors",
+          mode: "no-cors", // allow opaque response; reaching endpoint is enough
         });
-        // If we get a response (even 200/204), consider online
-        if (!res || (res.status >= 500)) {
+        // Any resolved response (even opaque) counts as online
+        if (!res) {
           throw new Error("Ping failed");
         }
         if (isMounted) setIsOnline(true);

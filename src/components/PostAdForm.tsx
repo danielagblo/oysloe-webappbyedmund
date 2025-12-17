@@ -133,6 +133,14 @@ export default function PostAdForm({
     Record<number, string[]>
   >({});
 
+  const getCategoryIcon = (categoryName: string) => {
+    const cleanName = categoryName
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    return `/${cleanName}.png`;
+  };
+
   // Fetch subcategories whenever categoryId changes
   useEffect(() => {
     let mounted = true;
@@ -1375,6 +1383,8 @@ export default function PostAdForm({
                   title={categoriesLoading ? "Loading categories..." : "Select Category"}
                   subTitle="Select Subcategory"
                   initialSubView={!!categoryId}
+                  useBottomSheetOnMobile
+                  getMainOptionIcon={getCategoryIcon}
                   onMainSelect={(opt) => {
                     const match = fetchedCategories.find((c) => c.name === opt);
                     setCategory(opt);
@@ -1460,8 +1470,9 @@ export default function PostAdForm({
                   title={
                     locationsLoading
                       ? "Loading locations..."
-                      : "Select Region / Place"
+                      : "Select Region"
                   }
+                  useBottomSheetOnMobile
                 />
               </div>
 
@@ -1528,6 +1539,7 @@ export default function PostAdForm({
                                       }));
                                     }}
                                     title={`Select ${fd.name}`}
+                                    useBottomSheetOnMobile
                                   />
                                 </div>
                               </div>
