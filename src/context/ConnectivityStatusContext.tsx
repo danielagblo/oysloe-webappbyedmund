@@ -20,9 +20,13 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let isMounted = true;
+    let failures = 0;
+    let lastVisibleAt = Date.now();
+    let isVisible = document.visibilityState === "visible";
 
     const handleOnline = () => {
       if (isMounted) {
+        failures = 0;
         setIsOnline(true);
       }
     };
@@ -33,32 +37,57 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
+    const handleVisibilityChange = () => {
+      isVisible = document.visibilityState === "visible";
+      if (isVisible) {
+        lastVisibleAt = Date.now();
+        failures = 0; // Reset failures when tab becomes visible
+      }
+    };
+
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Heartbeat polling for real connectivity detection
     const ping = async () => {
       if (!isMounted) return;
+      
+      // Skip check if tab is hidden
+      if (!isVisible) return;
+      
+      // Grace period after returning to foreground (avoid false offline on mobile)
+      const GRACE_MS = 1500;
+      if (Date.now() - lastVisibleAt < GRACE_MS) return;
+
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3000);
       try {
         // Use external lightweight ping endpoint; add cache-busting
-        const url = new URL("https://api.oysloe.com/api-v1/");
+        const url = new URL("https://www.google.com/generate_204");
         url.searchParams.set("_", String(Date.now()));
         const res = await fetch(url.toString(), {
           method: "GET",
           cache: "no-store",
           signal: controller.signal,
-          // Let CORS policy decide; if blocked or network down, it will throw or be opaque
-          mode: "cors",
+          mode: "no-cors", // allow opaque response; reaching endpoint is enough
         });
-        // If we get a response (even 200/204), consider online
-        if (!res || (res.status >= 500)) {
+        // Any resolved response (even opaque) counts as online
+        if (!res) {
           throw new Error("Ping failed");
         }
-        if (isMounted) setIsOnline(true);
+        if (isMounted) {
+          failures = 0;
+          setIsOnline(true);
+        }
       } catch {
-        if (isMounted) setIsOnline(false);
+        if (isMounted) {
+          failures++;
+          // Require 2 consecutive failures before declaring offline
+          if (failures >= 2) {
+            setIsOnline(false);
+          }
+        }
       } finally {
         clearTimeout(timeout);
       }
@@ -73,6 +102,7 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       clearInterval(pollInterval);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 

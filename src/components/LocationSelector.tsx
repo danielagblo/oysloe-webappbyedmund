@@ -91,6 +91,7 @@ export default function LocationSelector({
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl w-[90%] max-w-3xl h-[85vh] p-4 relative flex flex-col">
             <button
+              type="button"
               onClick={() => setIsModalOpen(false)}
               className="absolute top-2 right-6 text-gray-600 font-bold text-2xl hover:text-gray-800"
             >
@@ -137,12 +138,14 @@ export default function LocationSelector({
 
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleConfirm}
                 disabled={!tempSelection}
                 className={`px-4 py-2 rounded-lg ${
