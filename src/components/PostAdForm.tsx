@@ -1521,10 +1521,12 @@ export default function PostAdForm({
                             return (
                               <div
                                 key={`def-${fd.id}`}
-                                className="flex items-center gap-2"
+                                className="grid grid-cols-1 sm:grid-cols-[auto,1fr] items-start gap-2 sm:gap-3 min-w-0"
                               >
-                                <div className="w-1/3 text-sm">{fd.name}</div>
-                                <div className="flex-1">
+                                <div className="text-sm md:text-base lg:text-[0.85vw] text-gray-700 break-words sm:pr-2">
+                                  {fd.name}
+                                </div>
+                                <div className="w-full min-w-0">
                                   <DropdownPopup
                                     triggerLabel={
                                       featureValues[fd.id]
@@ -1539,6 +1541,7 @@ export default function PostAdForm({
                                       }));
                                     }}
                                     title={`Select ${fd.name}`}
+                                    truncate
                                     useBottomSheetOnMobile
                                   />
                                 </div>
@@ -1551,7 +1554,7 @@ export default function PostAdForm({
                   );
                 })()}
                 <div className="mt-4">
-                  <label className="block mb-1  text-sm md:text-base lg:text-[1vw]">Description</label>
+                  <label className="block mb-1 max-sm:font-medium text-sm md:text-base lg:text-[1vw]">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}

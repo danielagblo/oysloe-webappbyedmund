@@ -56,6 +56,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
     });
 
     const [isClosing, setIsClosing] = useState(false);
+    const [isOpening, setIsOpening] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
 
     const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -81,12 +82,30 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
           closeTimeoutRef.current = null;
         }
         setIsClosing(false);
+        setIsOpening(isMobileSheet);
         setIsDragging(false);
         setDragOffset(0);
         setViewSub(!!forceSubView);
         setOpen(true);
       },
     }));
+
+    useEffect(() => {
+      // Trigger enter animation for the mobile bottom sheet.
+      if (!isMobileSheet) {
+        setIsOpening(false);
+        return;
+      }
+      if (!open) {
+        setIsOpening(false);
+        return;
+      }
+
+      const raf = requestAnimationFrame(() => {
+        setIsOpening(false);
+      });
+      return () => cancelAnimationFrame(raf);
+    }, [isMobileSheet, open]);
 
     useEffect(() => {
       setFinalLabel(triggerLabel);
@@ -157,6 +176,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
 
       cleanupGlobalPointerListeners();
       setIsDragging(false);
+      setIsOpening(false);
       setIsClosing(true);
       setDragOffset(0);
 
@@ -371,6 +391,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
             closeTimeoutRef.current = null;
           }
           setIsClosing(false);
+          setIsOpening(isMobileSheet);
           setIsDragging(false);
           setDragOffset(0);
           setViewSub(initialSubView || false);
@@ -405,7 +426,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
             <>
               <div
                 className={`fixed inset-0 bg-black/40 z-40 sm:hidden transition-opacity duration-300 ${
-                  isClosing ? "opacity-0" : "opacity-100"
+                  isClosing || isOpening ? "opacity-0" : "opacity-100"
                 }`}
                 onClick={() => {
                   requestClose();
@@ -415,7 +436,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                 ref={sheetRef}
                 className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl sm:hidden ${
                   isDragging ? "" : "transition-transform duration-300 ease-out"
-                } ${isDragging ? "" : isClosing ? "translate-y-full" : "translate-y-0"}`}
+                } ${isDragging ? "" : isClosing || isOpening ? "translate-y-full" : "translate-y-0"}`}
                 style={
                   isDragging
                     ? {
