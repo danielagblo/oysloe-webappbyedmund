@@ -337,7 +337,7 @@ const AlertsPanel = ({
               </div>
             ) : alerts.length === 0 ? (
               <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4">
-                <img src="/alert-bell.svg" alt="No alerts" />
+                <img className="h-25 w-25 md:h-35 md:w-35 lg:h-40 lg:w-40" src="/alert-bell.svg" alt="No alerts" />
                 <div className="flex flex-col items-center justify-center">
                   <p className="font-semibold text-xl md:text-2xl lg:text-[1.5vw]">
                     No notifications to show
@@ -467,7 +467,7 @@ const AlertsPanel = ({
             </div>
           ) : alerts.length === 0 ? (
               <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4">
-                <img src="/alert-bell.svg" alt="No alerts" />
+                <img className="h-25 w-25 md:h-35 md:w-35 lg:h-40 lg:w-40" src="/alert-bell.svg" alt="No alerts" />
                 <div className="flex flex-col items-center justify-center">
                   <p className="font-semibold text-xl md:text-2xl lg:text-[1.5vw]">
                     No notifications to show

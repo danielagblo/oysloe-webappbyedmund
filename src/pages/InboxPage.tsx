@@ -18,7 +18,7 @@ export default function InboxPage() {
       </div>
 
       {/* Page content */}
-      <div className="flex w-full h-full">
+      <div className="flex w-full h-full overflow-hidden lg:items-center">
         {/* Profile Stats (Desktop only) */}
         <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
           <ProfileStats />
@@ -40,7 +40,7 @@ export default function InboxPage() {
         </div>
 
         {/* Desktop right column */}
-        <div className="hidden lg:block lg:w-[50%] w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+        <div className="hidden lg:block lg:w-[50%]  w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
           <LiveChat
             caseId={selectedCase}
             onClose={() => setSelectedCase(null)}

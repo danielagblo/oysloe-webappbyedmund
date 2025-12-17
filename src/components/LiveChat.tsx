@@ -891,11 +891,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 ">
-      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col">
+      <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
 
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}
-          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 rounded-b-2xl bg-white shadow z-10 py-2">
+          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 rounded-2xl bg-white shadow z-10 py-2">
             <button
               onClick={onClose}
               aria-label="Back"

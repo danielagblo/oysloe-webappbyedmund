@@ -1,10 +1,11 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import type { ChatRoom } from "../services/chatService";
-import { listChatRooms } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
 import { formatReviewDate } from "../utils/formatReviewDate";
 import { splitRooms, getCaseId, getCaseStatus } from "../utils/chatFilters";
+import { useChatRooms } from "../hooks/useChatRooms";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -17,26 +18,21 @@ export default function SupportAndCases({
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
   const [chatUnread, setChatUnread] = useState<number>(0);
   const [supportActive, setSupportActive] = useState<number>(0);
-  const [allRooms, setAllRooms] = useState<ChatRoom[]>([]);
   const wsRef = useRef<WebSocketClient | null>(null);
+  const queryClient = useQueryClient();
+
+  console.log("🔵 [INBOX PAGE] Component mounted/rendered");
+
+  // Use React Query to fetch and cache chat rooms
+  const { data: allRooms = [], isLoading } = useChatRooms();
+
+  console.log(`📊 [INBOX PAGE] All rooms from React Query (${allRooms.length} total):`, allRooms);
+  console.log(`📊 [INBOX PAGE] Rooms with members:`, allRooms.filter(r => r.members?.length > 0).length);
+  console.log(`📊 [INBOX PAGE] Rooms WITHOUT members:`, allRooms.filter(r => !r.members || r.members.length === 0).length);
 
   useEffect(() => {
+    console.log("🟢 [INBOX PAGE] ENTERED - useEffect mount");
     let mounted = true;
-
-    // Fetch initial chatrooms from REST (includes members!)
-    const fetchInitialRooms = async () => {
-      try {
-        const rooms = await listChatRooms();
-        if (mounted) {
-          setAllRooms(rooms);
-          console.log("[REST] Fetched initial chatrooms with members:", rooms);
-        }
-      } catch (err) {
-        console.warn("Failed to fetch initial chatrooms:", err);
-      }
-    };
-
-    fetchInitialRooms();
 
     // Connect WebSocket to listen for room updates
 
@@ -54,14 +50,15 @@ export default function SupportAndCases({
 
       const client = new WebSocketClient(wsUrl, token, {
         onOpen: () => {
-          /* noop */
+          console.log("🔌 [INBOX PAGE] WebSocket connected");
         },
         onClose: () => {
-          /* noop */
+          console.log("🔌 [INBOX PAGE] WebSocket disconnected");
         },
-        onError: (ev) => console.warn("SupportAndCases ws error", ev),
+        onError: (ev) => console.warn("❌ [INBOX PAGE] WebSocket error", ev),
         onMessage: (payload: any) => {
           if (!mounted) return;
+          console.log("📨 [INBOX PAGE] WebSocket message received:", payload);
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
@@ -90,32 +87,56 @@ export default function SupportAndCases({
               payload.type === "chatrooms_list" &&
               Array.isArray(payload.chatrooms)
             ) {
-              setAllRooms(payload.chatrooms.map((r: any) => normalizeRoom(r)));
+              const normalized = payload.chatrooms.map((r: any) => normalizeRoom(r));
+              console.log(`📋 [INBOX PAGE] Received chatrooms_list (${normalized.length} rooms)`);
+              console.log(`📋 [INBOX PAGE] Rooms with members in WS payload:`, normalized.filter(r => r.members?.length > 0).length);
+             
+               // Merge with existing cache to preserve member data
+               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
+                 return normalized.map(wsRoom => {
+                   const existingRoom = prev.find(r => r.id === wsRoom.id);
+                 
+                   // If WS payload has no members but cache has members, preserve cached members
+                   if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
+                     console.log(`🔄 [INBOX PAGE] Preserving members for room ${wsRoom.id} from cache`);
+                     wsRoom.members = existingRoom.members;
+                   }
+                 
+                   return wsRoom;
+                 });
+               });
               return;
             }
 
             // Handle individual room updates
             if (payload && typeof payload === "object" && payload.id) {
               const normalized = normalizeRoom(payload);
-              // Update allRooms
-              setAllRooms((prev) => {
+              console.log(`📝 [INBOX PAGE] Room update for ID ${normalized.id}, members count: ${normalized.members?.length || 0}`);
+              // Update React Query cache instead of local state
+              queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
                 const idx = prev.findIndex(
                   (r) => String(r.id) === String(normalized.id),
                 );
-                if (idx === -1) return [normalized, ...prev];
+                if (idx === -1) {
+                  console.log(`➕ [INBOX PAGE] Adding new room ${normalized.id}`);
+                  return [normalized, ...prev];
+                }
                 const copy = [...prev];
                 // Merge with old room, but PRESERVE members if new payload doesn't have them
                 // (WebSocket updates don't always include the full members array)
                 const merged = { ...copy[idx], ...normalized };
                 if (normalized.members.length === 0 && copy[idx].members.length > 0) {
+                  console.log(`🔄 [INBOX PAGE] Preserving members for room ${normalized.id} (old: ${copy[idx].members.length}, new: 0)`);
                   merged.members = copy[idx].members;
+                } else {
+                  console.log(`🔄 [INBOX PAGE] Updating room ${normalized.id} members (old: ${copy[idx].members?.length || 0}, new: ${normalized.members.length})`);
                 }
                 copy[idx] = merged;
                 return copy;
               });
             }
           } catch (e) {
-            console.warn("Failed to handle room ws message", e);
+            console.warn("❌ [INBOX PAGE] Failed to handle room ws message", e);
           }
         },
       });
@@ -124,22 +145,26 @@ export default function SupportAndCases({
       try {
         client.connect();
       } catch (e) {
-        console.warn("SupportAndCases ws connect failed", e);
+        console.warn("❌ [INBOX PAGE] WebSocket connect failed", e);
       }
     } catch (err) {
-      console.warn("SupportAndCases: failed to create ws client", err);
+      console.warn("❌ [INBOX PAGE] Failed to create ws client", err);
     }
 
     return () => {
+      console.log("🔴 [INBOX PAGE] LEFT - useEffect cleanup (component unmounting)");
       mounted = false;
       wsRef.current?.close();
       wsRef.current = null;
     };
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
     // Calculate counts from all rooms received via WebSocket
     const { supportRooms, userRooms } = splitRooms(allRooms);
+    
+    console.log(`📊 [INBOX PAGE] Split results - Support: ${supportRooms.length}, User: ${userRooms.length}`);
+    console.log(`📊 [INBOX PAGE] Support rooms:`, supportRooms.map(r => ({ id: r.id, name: r.name, members: r.members?.length || 0 })));
     
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
@@ -430,8 +455,8 @@ export default function SupportAndCases({
   };
 
   return (
-    <div className="flex h-full">
-      <div className="rounded-2xl bg-white lg:px-5 py-3 h-full w-full flex flex-col ">
+    <div className="flex h-full lg:items-center">
+      <div className="rounded-2xl bg-white lg:h-[93vh] lg:px-5 py-3 h-full w-full flex flex-col ">
         <HeaderTabs />
         <div className="no-scrollbar overflow-y-auto mt-4 flex-1">
           {activeTab === "chat" ? (
