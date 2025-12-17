@@ -271,10 +271,10 @@ export default function SupportAndCases({
                 <img
                   src={member.avatar}
                   alt="chat"
-                  className="w-10 h-10 md:h-12 md:w-12 lg:h-[3.25vw] lg:w-[3.25vw] rounded-full object-cover"
+                  className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 md:h-12 md:w-12 lg:h-[3.25vw] lg:w-[3.25vw] rounded-full bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
+                <div className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
                   {initials}
                 </div>
               )}
@@ -294,8 +294,17 @@ export default function SupportAndCases({
                       : ""}
                   </span>
                 </div>
-                <p className="text-xs md:text-sm lg:text-[0.9vw] text-gray-500 truncate">
-                  {previewText || ""}
+                <p className={`text-xs md:text-sm lg:text-[0.9vw] ${r.total_unread && "font-semibold"} text-gray-500 truncate`}>
+                  {/* there's no logic to check if the chat is closed or not so i'll write this below just in case its implemented in the future */}
+                  {/* {r.is_closed ? (
+                    <span className="bg-red-400 text-white p-1">
+                      Closed
+                    </span>
+                  ) : (
+                    <span>{previewText || "No messages yet"}</span>
+                  )} */}
+                  {/* for now, we'll just show the preview text */}
+                  {previewText || "No messages yet"}
                 </p>
               </div>
             </button>
