@@ -1326,15 +1326,15 @@ export default function PostAdForm({
 
   return (
     <form
-      className="flex flex-col w-full h-dvh min-h-0 py-2"
+      className="flex flex-col lg:h-[96vh] w-full h-dvh min-h-0 py-2"
       onSubmit={handleSave}
     >
-      <div className="text-xs flex lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
+      <div className="text-xs flex lg:items-center lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
         {(!isMobile || mobileStep === "form") && (
-          <div className="flex flex-col w-full lg:w-3/5 lg:shadow-lg bg-white lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar">
+          <div className="flex flex-col w-full lg:h-[93vh] lg:w-3/5 bg-white lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar">
             <div className="grid grid-cols-1 gap-2">
               <div>
-                <label className="block mb-1">Product Category</label>
+                <label className="block mb-1 text-sm md:text-base lg:text-[0.85vw]">Product Category</label>
                 <DropdownPopup
                   triggerLabel={category}
                   supportsSubmenu
@@ -1357,7 +1357,7 @@ export default function PostAdForm({
                   }
                 />
                 <div className="mt-2">
-                  <label className="block mb-1">Subcategory (optional)</label>
+                  <label className="block mb-1 text-sm md:text-base lg:text-[0.85vw]">Subcategory (optional)</label>
                   <DropdownPopup
                     triggerLabel={
                       subcategoryId &&
@@ -1377,24 +1377,24 @@ export default function PostAdForm({
               </div>
 
               <div>
-                <label className="block mb-1">Title</label>
+                <label className="block mb-1  text-sm md:text-base lg:text-[0.85vw]">Title</label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   type="text"
                   placeholder="Add a title"
-                  className="w-full p-3 border rounded-xl border-[var(--div-border)]"
+                  className="w-full text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
                 />
               </div>
               <div>
-                <p className="mb-1 font-medium">Price</p>
+                <p className="mb-1 font-medium text-sm md:text-base lg:text-[0.85vw]">Price</p>
                 <div className="relative">
                   <input
                     value={price}
                     onChange={(e) => handlePriceChange(e)}
                     type="number"
                     placeholder="0.00"
-                    className="w-full border rounded-xl border-(--div-border) p-3 pl-7"
+                    className="w-full border  text-sm md:text-base lg:text-[0.85vw] rounded-xl border-(--div-border) p-3 pl-7"
                   />
                   <p className="absolute inline top-3.25 left-3">₵</p>
                 </div>
@@ -1402,8 +1402,8 @@ export default function PostAdForm({
             </div>
 
             <div>
-              <p className="mb-1">Declare ad purpose?</p>
-              <div className="flex gap-3">
+              <p className="mb-1 text-sm md:text-base lg:text-[0.85vw]">Declare ad purpose?</p>
+              <div className="flex gap-3 max-sm:grid max-sm:grid-cols-2 max-sm:gap-7 max-sm:pr-15">
                 {(
                   [
                     "Sale",
@@ -1413,7 +1413,7 @@ export default function PostAdForm({
                 ).map((option) => (
                   <label
                     key={option}
-                    className="relative flex items-center gap-1 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
+                    className="relative flex items-center gap-1 md:min-w-[100px] max-sm:py-4 text-sm md:text-base lg:text-[0.85vw] hover:bg-gray-100 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
                   >
                     <input
                       type="radio"
@@ -1427,7 +1427,7 @@ export default function PostAdForm({
                 ))}
               </div>
               {purpose === "Rent" && (
-                <p className="text-xs text-gray-600 mt-2 italic">
+                <p className="text-xs md:text-sm lg:text-[0.75vw] text-gray-600 mt-2 italic">
                   💡 Price will display as "per month" when users view your ad
                 </p>
               )}
@@ -1455,49 +1455,21 @@ export default function PostAdForm({
                   <button
                     key={`${loc.label}|${loc.place}`}
                     type="button"
-                    className="p-1 bg-gray-100 rounded-xs text-xs hover:bg-gray-200"
+                    className="p-1 bg-gray-100  text-xs md:text-sm lg:text-[0.65vw] rounded-xs hover:bg-gray-200"
                     onClick={() => applySavedLocation(loc)}
                   >
                     {loc.label}
                   </button>
                 ))}
               </div>
-              {/* 
-              <p className="text-[8px] text-[var(--bg-active)] mt-1 font-bold">
-                <svg
-                  className="inline"
-                  width="9"
-                  height="9"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <mask
-                    id="mask0_18425_111"
-                    maskUnits="userSpaceOnUse"
-                    x="0"
-                    y="0"
-                    width="12"
-                    height="12"
-                  >
-                    <path d="M12 0H0V12H12V0Z" fill="white" />
-                  </mask>
-                  <g mask="url(#mask0_18425_111)">
-                    <path
-                      d="M6 7.50123C5.8674 7.50123 5.74025 7.44621 5.64645 7.35621C5.5527 7.26121 5.5 7.13623 5.5 7.00123V3.00123C5.5 2.86623 5.5527 2.74125 5.64645 2.64625C5.74025 2.55625 5.8674 2.50123 6 2.50123C6.1326 2.50123 6.2598 2.55625 6.35355 2.64625C6.44735 2.74125 6.5 2.86623 6.5 3.00123V7.00123C6.5 7.13623 6.44735 7.26121 6.35355 7.35621C6.2598 7.44621 6.1326 7.50123 6 7.50123ZM6.3965 11.8812C7.4765 11.4462 11 9.74125 11 6.02125V3.43622C11.0006 2.91122 10.8353 2.4012 10.5277 1.9712C10.2201 1.5462 9.78595 1.23123 9.287 1.06623L6.1575 0.02625C6.05535 -0.00875 5.9447 -0.00875 5.8425 0.02625L2.713 1.06623C2.21405 1.23123 1.7799 1.5462 1.4723 1.9712C1.16475 2.4012 0.999451 2.91122 1 3.43622V6.02125C1 9.30625 4.5025 11.3112 5.5765 11.8462C5.71235 11.9112 5.8542 11.9662 6 12.0012C6.1356 11.9712 6.2683 11.9312 6.3965 11.8812ZM8.972 2.01124C9.2713 2.11124 9.53165 2.30122 9.7162 2.56122C9.90075 2.81622 10.0001 3.12122 10 3.43622V6.02125C10 9.11625 6.9565 10.5762 6.0235 10.9512C5.0795 10.4812 2 8.73125 2 6.02125V3.43622C1.99995 3.12122 2.09925 2.81622 2.2838 2.56122C2.46835 2.30122 2.72875 2.11124 3.028 2.01124L6 1.02625L8.972 2.01124ZM6 8.50123C5.9011 8.50123 5.80445 8.53125 5.72225 8.58625C5.64 8.64125 5.5759 8.71622 5.53805 8.81122C5.50025 8.90122 5.49035 9.0012 5.5096 9.1012C5.5289 9.1962 5.57655 9.28621 5.64645 9.35621C5.7164 9.42621 5.8055 9.47122 5.90245 9.49122C5.99945 9.51122 6.1 9.50125 6.19135 9.46125C6.2827 9.42625 6.3608 9.36126 6.41575 9.28126C6.4707 9.19626 6.5 9.10123 6.5 9.00123C6.5 8.86623 6.44735 8.74125 6.35355 8.64625C6.2598 8.55625 6.1326 8.50123 6 8.50123Z"
-                      fill="#374957"
-                    />
-                  </g>
-                </svg>
-                &nbsp; This is required only for verification and safety purpose
-              </p> */}
+             
             </div>
 
             <div>
               <div className="flex flex-col gap-2">
                 {featureDefinitions.length > 0 && (
                   <div className="mt-4">
-                    <label className="block mb-1 font-medium">
+                    <label className="block mb-1 font-medium  text-sm md:text-base lg:text-[0.85vw]">
                       Features for selected subcategory
                     </label>
 
@@ -1523,7 +1495,7 @@ export default function PostAdForm({
                                         [fd.id]: e.target.value,
                                       }))
                                     }
-                                    className="w-full p-3 border rounded-xl border-[var(--div-border)]"
+                                    className="w-full text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
                                   />
                                 </div>
                                 <datalist id={`feature-values-${fd.id}`}>
@@ -1544,7 +1516,7 @@ export default function PostAdForm({
                                       [fd.id]: e.target.value,
                                     }))
                                   }
-                                  className="flex-1 p-3 border rounded-xl border-[var(--div-border)]"
+                                  className="flex-1 text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
                                 />
                               </div>
                             )}
@@ -1555,12 +1527,12 @@ export default function PostAdForm({
                   </div>
                 )}
                 <div className="mt-4">
-                  <label className="block mb-1">Description</label>
+                  <label className="block mb-1  text-sm md:text-base lg:text-[0.85vw]">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your product"
-                    className="w-full p-3 border rounded-xl border-[var(--div-border)] h-32 resize-none"
+                    className="w-full outline-0 p-3 border text-sm md:text-base lg:text-[0.85vw] rounded-xl border-[var(--div-border)] h-32 resize-none"
                   />
                 </div>
               </div>
@@ -1585,7 +1557,7 @@ export default function PostAdForm({
         )}
 
         {(!isMobile || mobileStep === "images") && (
-          <div className="relative flex flex-col w-full lg:w-2/5 lg:bg-white lg:shadow-lg rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
+          <div className="relative flex flex-col lg:h-[93vh] w-full lg:w-2/5 lg:bg-white rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
             <div className="w-full">
               <label className="bg-gray-100 lg:bg-transparent border-1 border-dashed rounded-xl flex flex-col items-center justify-center h-25 cursor-pointer hover:bg-gray-50">
                 <p className="text-xs text-gray-500 mb-1 md:text-[1.2vw]">

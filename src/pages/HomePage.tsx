@@ -17,6 +17,8 @@ import ConditionalAds from "./home/ConditionalAds";
 import FilterButton from "./home/FilterButton";
 import HomePageHeader from "./home/HomePageHeader";
 import ScrollableAds from "./home/ScrollableAds";
+import MobileGridAds from "./home/MobileGridAds";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import SearchResults from "./home/SearchResults";
 import SelectACategory from "./home/SelectACategory";
 import ShowFilter from "./home/ShowFilter";
@@ -99,6 +101,9 @@ const HomePage = () => {
   const { data: products = [], isLoading: productsLoading } = useProducts({
     search: debouncedSearch || undefined,
   });
+
+  // Mobile-only breakpoint detection (<= 640px)
+  const isSmall = useIsSmallScreen(640);
 
   const categoriesWithCounts = categories.map((cat) => {
     const count = products.filter((p) => p.category === cat.id).length;
@@ -382,14 +387,22 @@ const HomePage = () => {
             </div>
 
             <div className="bg-(--div-active) w-screen">
-              <ScrollableAds
-                categories={categories}
-                productsByCategory={productsByCategory}
-                applyFilters={applyFilters}
-                productsLoading={productsLoading}
-                handleArrowClick={handleArrowClick}
-                handleAdClick={handleAdClick}
-              />
+              {isSmall ? (
+                <MobileGridAds
+                  products={applyFilters(products)}
+                  productsLoading={productsLoading}
+                  handleAdClick={handleAdClick}
+                />
+              ) : (
+                <ScrollableAds
+                  categories={categories}
+                  productsByCategory={productsByCategory}
+                  applyFilters={applyFilters}
+                  productsLoading={productsLoading}
+                  handleArrowClick={handleArrowClick}
+                  handleAdClick={handleAdClick}
+                />
+              )}
               <div className="h-35 lg:h-35" />
             </div>
           </>

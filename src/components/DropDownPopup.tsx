@@ -81,7 +81,7 @@ export default function DropdownPopup({
         }}
         className="relative w-full p-3 border rounded-xl border-[var(--div-border)] text-gray-600 text-left"
       >
-        <p className="block truncate pr-10">
+        <p className="block truncate pr-10 text-xs md:text-sm lg:text-[0.85vw]">
           {truncate ? finalLabel.split(" - ")[0] : finalLabel}
         </p>
         <div className="absolute right-3 top-3 py-1.5 px-1 bg-[var(--div-active)] rounded-full flex justify-center items-center">

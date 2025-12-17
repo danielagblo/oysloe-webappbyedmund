@@ -6,7 +6,7 @@ import RequireAuth from "../components/RequireAuth";
 
 function PostAdPage() {
   return (
-    <div className="flex flex-col no-scrollbar lg:flex-row w-full h-screen bg-[#ededed] max-md:bg-white text-[var(--dark-def)] overflow-hidden">
+    <div className="flex flex-col no-scrollbar items-center justify-center lg:flex-row w-full h-screen bg-[#ededed] max-md:bg-white text-[var(--dark-def)] overflow-hidden">
       <div className="lg:hidden w-full">
         <MobileBanner page="Post An Ad" />
       </div>
@@ -15,7 +15,7 @@ function PostAdPage() {
         <ProfileStats />
       </div>
 
-      <div className="flex items-center justify-center no-scrollbar w-full lg:w-[75vw] lg:h-full">
+      <div className="flex items-center justify-center no-scrollbar lg:h-[93vh] w-full lg:w-[75vw]">
         <RequireAuth>
           <PostAdForm />
         </RequireAuth>
