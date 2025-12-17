@@ -1,8 +1,10 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChatRoom } from "../services/chatService";
+import { listChatRooms } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import { splitRooms, getCaseId, getCaseStatus } from "../utils/chatFilters";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -21,7 +23,23 @@ export default function SupportAndCases({
   useEffect(() => {
     let mounted = true;
 
+    // Fetch initial chatrooms from REST (includes members!)
+    const fetchInitialRooms = async () => {
+      try {
+        const rooms = await listChatRooms();
+        if (mounted) {
+          setAllRooms(rooms);
+          console.log("[REST] Fetched initial chatrooms with members:", rooms);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch initial chatrooms:", err);
+      }
+    };
+
+    fetchInitialRooms();
+
     // Connect WebSocket to listen for room updates
+
     try {
       const apiBase =
         (import.meta.env.VITE_API_URL as string) ||
@@ -86,7 +104,13 @@ export default function SupportAndCases({
                 );
                 if (idx === -1) return [normalized, ...prev];
                 const copy = [...prev];
-                copy[idx] = { ...copy[idx], ...normalized };
+                // Merge with old room, but PRESERVE members if new payload doesn't have them
+                // (WebSocket updates don't always include the full members array)
+                const merged = { ...copy[idx], ...normalized };
+                if (normalized.members.length === 0 && copy[idx].members.length > 0) {
+                  merged.members = copy[idx].members;
+                }
+                copy[idx] = merged;
                 return copy;
               });
             }
@@ -115,32 +139,17 @@ export default function SupportAndCases({
 
   useEffect(() => {
     // Calculate counts from all rooms received via WebSocket
-    const userRooms = allRooms.filter((r) =>
-      r.members?.every((m) => !m.is_staff && !m.is_superuser),
-    );
+    const { supportRooms, userRooms } = splitRooms(allRooms);
+    
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
 
-    const staffRooms = allRooms.filter((r) =>
-      r.members?.some((m) => m.is_staff || m.is_superuser),
-    );
-    setSupportActive(staffRooms.length);
+    setSupportActive(supportRooms.length);
   }, [allRooms]);
 
   // Precompute filtered room lists and memoize to avoid nested effects
-  const userRoomsMemo = useMemo(
-    () =>
-      allRooms.filter((r) =>
-        r.members?.every((m) => !m.is_staff && !m.is_superuser),
-      ),
-    [allRooms],
-  );
-
-  const staffRoomsMemo = useMemo(
-    () =>
-      allRooms.filter((r) =>
-        r.members?.some((m) => m.is_staff || m.is_superuser),
-      ),
+  const { supportRooms: staffRoomsMemo, userRooms: userRoomsMemo } = useMemo(
+    () => splitRooms(allRooms),
     [allRooms],
   );
 
@@ -208,9 +217,16 @@ export default function SupportAndCases({
         );
     }
 
+    // Sort rooms by created_at descending (latest first)
+    const sortedRooms = [...rooms].sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+
     return (
       <div className="flex flex-col gap-2 my-3 lg:gap-3">
-        {rooms.map((r) => {
+        {sortedRooms.map((r) => {
           const lastMessage =
             r.messages && r.messages.length
               ? r.messages[r.messages.length - 1]
@@ -349,89 +365,65 @@ export default function SupportAndCases({
         </div>
       );
 
+    // Sort rooms by created_at descending (latest first)
+    const sortedRooms = [...supportRooms].sort((a, b) => {
+      const dateA = new Date(a.created_at || 0).getTime();
+      const dateB = new Date(b.created_at || 0).getTime();
+      return dateB - dateA;
+    });
+
     return (
       <div>
-        <h3 className="text-sm font-medium mb-2">Support Cases</h3>
+        <h3 className="text-sm font-medium mb-4">Support Cases</h3>
 
-        <div className="flex flex-col gap-2.5">
-          {supportRooms.length === 0 ? (
-            <p className="text-sm text-gray-500">No support cases</p>
-          ) : (
-            supportRooms.map((room) => {
-              const lastMessage =
-                room.messages && room.messages.length
-                  ? room.messages[room.messages.length - 1]
-                  : null;
-              const payloadLast =
-                (room as any).last_message ??
-                (room as any).lastMessage ??
-                (room as any).last;
-              const payloadLastContent = (() => {
-                if (!payloadLast) return null;
-                if (typeof payloadLast === "string") return payloadLast;
-                if (typeof payloadLast?.content === "string")
-                  return String(payloadLast.content);
-                if (typeof payloadLast?.text === "string")
-                  return String(payloadLast.text);
-                if (typeof payloadLast?.message === "string")
-                  return payloadLast.message;
-                if (typeof payloadLast?.message?.content === "string")
-                  return String(payloadLast.message.content);
-                return null;
-              })();
+        <div className="flex flex-col gap-2 my-3 lg:gap-3">
+          {sortedRooms.map((room) => {
+            const caseId = getCaseId(room);
+            const status = getCaseStatus(room);
+            const hasUnread = (room.total_unread ?? 0) > 0;
 
-              const lastContent =
-                lastMessage && typeof (lastMessage as any).content === "string"
-                  ? String((lastMessage as any).content)
-                  : (payloadLastContent ?? "");
-              const previewText = (() => {
-                if (!lastContent) return "";
-                if (lastContent.startsWith("data:")) {
-                  const semi = lastContent.indexOf(";", 5);
-                  const mime = semi === -1 ? lastContent.substring(5) : lastContent.substring(5, semi);
-                  if (mime.startsWith("audio/")) return "audio";
-                  if (mime.startsWith("image/")) return "picture";
-                  if (mime.startsWith("video/")) return "video";
-                  return "file";
-                }
-                return lastContent;
-              })();
-
-              return (
-                <button
-                  key={room.id}
-                  onClick={() => onSelectChat?.(String(room.id))}
-                  className="text-left p-2 rounded hover:bg-gray-50 focus:outline-none flex items-start gap-3"
-                >
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold">
-                    {room.name
-                      .split(" ")
-                      .map((s) => s[0])
-                      .slice(0, 2)
-                      .join("")}
+            return (
+              <button
+                key={room.id}
+                onClick={() => onSelectChat?.(String(room.id))}
+                className={`relative text-left p-3 cursor-pointer rounded-xl ${ (room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start justify-between gap-3`}
+              >
+                <div className="flex-1">
+                  {/* Date and Case Info */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs italic md:text-sm lg:text-[0.9vw] text-gray-400">
+                      {room.created_at ? formatReviewDate(room.created_at) : "Unknown"}
+                    </span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{room.name}</p>
-                      <span className="text-xs text-gray-400 flex items-center gap-2">
-                        {room.total_unread ? (
-                          <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                            {room.total_unread}
-                          </span>
-                        ) : null}
-                        {room.created_at
-                          ? new Date(room.created_at).toLocaleDateString()
-                          : ""}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-500 truncate">
-                      {previewText || "No messages"}
-                    </p>
+
+                  {/* Case Title */}
+                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-semibold">
+                    Support: {caseId}
+                  </p>
+
+                  {/* Status Badge */}
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span
+                      className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${
+                        status === "closed"
+                          ? "bg-red-300 text-red-700"
+                          : "bg-green-200 text-green-700"
+                      }`}
+                    >
+                      {status.toUpperCase() !== "ACTIVE" ? "Closed" : "Active"}
+                    </span>
                   </div>
-                </button>
-              );
-            })
-          )}
+                </div>
+
+                {/* Unread Count Badge */}
+                {!hasUnread && (
+                  <span className="ml-2 absolute bottom-2 right-2 bg-red-500 text-white text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
+                    {room.total_unread}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
     );
@@ -450,6 +442,8 @@ export default function SupportAndCases({
             <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetHelp />
               <OpenCases supportRooms={staffRoomsMemo} />
+
+              {/* check is superuser/staff */}
             </div>
           )}
           <div className="w-1 h-13" />

@@ -19,6 +19,10 @@ export type ChatRoom = {
   messages?: Message[];
   created_at: string;
   total_unread?: number;
+  // TODO: Backend will add these fields; for now use fallbacks below
+  // case_id?: string;
+  // status?: string;
+  // is_closed?: boolean;
 };
 
 export type Message = {
