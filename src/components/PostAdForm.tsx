@@ -1419,9 +1419,9 @@ export default function PostAdForm({
                     onChange={(e) => handlePriceChange(e)}
                     type="number"
                     placeholder="0.00"
-                    className="w-full border max-lg:bg-white text-sm md:text-base lg:text-[1vw] rounded-xl border-(--div-border) p-3 pl-7"
+                    className="w-full border max-lg:bg-white text-sm md:text-base lg:text-[1vw] rounded-xl border-(--div-border) p-3 pl-7 lg:pl-[5%]"
                   />
-                  <p className="absolute inline top-3.25 text-base md:text-base lg:text-[1vw] left-3 lg:left-2.5">₵</p>
+                  <p className="absolute inline top-3.25 text-base md:text-base lg:text-[1vw] left-3">₵</p>
                 </div>
               </div>
             </div>
@@ -1743,11 +1743,11 @@ export default function PostAdForm({
         {showSaveModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
             <div className="bg-gray-100 rounded-3xl shadow-xl pt-6 sm:pt-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
-              <h2 className="text-lg px-6 sm:px-8  font-semibold text-[var(--dark-def)] mb-2">
+              <h2 className="text-lg px-6 sm:px-8 md:text-xl lg:text-[1.5vw] font-semibold text-[var(--dark-def)] mb-2">
                 Would you want to save this location for future use?
               </h2>
 
-              <p className="text-sm px-6 sm:px-8  text-gray-600 mb-4 flex flex-row justify-center place-items-center">
+              <p className="text-sm md:text-base lg:text-[1vw] px-6 sm:px-8  text-gray-600 mb-4 flex flex-row justify-center place-items-center">
                 <svg
                   className="inline"
                   width="10"
@@ -1770,7 +1770,7 @@ export default function PostAdForm({
                 value={newLocationName}
                 onChange={(e) => setNewLocationName(e.target.value)}
                 placeholder="Name this location. Ex: Accra Shop"
-                className="w-4/5 text-sm md:text-base lg:text-[1.25vw] border outline-0 bg-white border-gray-300 rounded-xl px-4 py-5 mb-6"
+                className="w-4/5 text-sm md:text-base lg:text-[1.25vw] placeholder:text-sm placeholder:md:text-base placeholder:lg:text-[1vw] border outline-0 bg-white border-gray-300 rounded-xl px-4 py-5 mb-6 lg:mb-2"
               />
               <div className="w-full h-[1px] bg-gray-300 mt-4" />
 
@@ -1784,7 +1784,7 @@ export default function PostAdForm({
                       toast.error("Could not save location");
                     }
                   }}
-                  className="w-full rounded-bl-3xl hover:bg-gray-300 py-5 font-medium cursor-pointer transition"
+                  className="w-full rounded-bl-3xl text-base lg:text-[1.2vw] hover:bg-gray-300 py-5 font-medium cursor-pointer transition"
                   type="button"
                 >
                   Save Location
@@ -1796,7 +1796,7 @@ export default function PostAdForm({
                     setShowSaveLocationModal(false);
                   }}
                   type="button"
-                  className="w-full border-l-2 border-gray-300 py-3 rounded-br-3xl hover:bg-gray-300 py-5 font-medium cursor-pointer  transition"
+                  className="w-full border-l-2 text-base lg:text-[1.2vw] border-gray-300 py-3 rounded-br-3xl hover:bg-gray-300 py-5 font-medium cursor-pointer  transition"
                 >
                   Cancel
                 </button>
