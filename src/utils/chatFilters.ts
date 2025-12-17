@@ -56,5 +56,6 @@ export const getCaseStatus = (room: ChatRoom): 'active' | 'closed' => {
   // Otherwise treat as 'active'
   // A simple heuristic: if total_unread is 0 and there's an older message, might be closed
   // But for MVP, we'll keep it simple: always 'active' unless we have a closed indicator
+  console.log('getCaseStatus: defaulting to active for room', room);
   return 'active';
 };
