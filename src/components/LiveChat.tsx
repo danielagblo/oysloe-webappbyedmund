@@ -610,11 +610,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     let mounted = true;
     (async () => {
       try {
-        
+
         // chatService.getChatRoom will throw if the room does not exist
         await (await import("../services/chatService")).getChatRoom(caseId);
         if (!mounted) return;
-        
+
         setIsValidRoom(true);
         setValidatedRoomId(caseId);
       } catch (err) {
@@ -643,12 +643,12 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (!validatedRoomId) return;
     if (!isRoomConnected(validatedRoomId)) return;
     if (readMarkedRef.current[validatedRoomId]) return;
-    
+
     void markAsRead(String(validatedRoomId));
     readMarkedRef.current[validatedRoomId] = true;
   }, [validatedRoomId, isRoomConnected, markAsRead, messages]);
 
-  
+
 
   useEffect(() => {
     // Only auto-scroll on initial load for a room or when the last message is from the current user.
@@ -693,7 +693,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     void markAsRead(String(validatedRoomId));
   }, [messages, validatedRoomId, currentUser, markAsRead]);
 
-  
+
 
   if (!caseId) return null;
 
