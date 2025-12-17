@@ -593,7 +593,6 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   // Debug: show incoming caseId changes
   useEffect(() => {
-    console.log("LiveChat caseId:", caseId);
 
     // reset validation state and validated id whenever the incoming caseId changes
     setIsValidRoom(null);
@@ -604,11 +603,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     let mounted = true;
     (async () => {
       try {
-        console.log("LiveChat: validating room id on backend", caseId);
+        
         // chatService.getChatRoom will throw if the room does not exist
         await (await import("../services/chatService")).getChatRoom(caseId);
         if (!mounted) return;
-        console.log("LiveChat: room validated", caseId);
+        
         setIsValidRoom(true);
         setValidatedRoomId(caseId);
       } catch (err) {
@@ -636,27 +635,12 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (!validatedRoomId) return;
     if (!isRoomConnected(validatedRoomId)) return;
     if (readMarkedRef.current[validatedRoomId]) return;
-    console.debug("LiveChat: room connected, marking as read", {
-      room: validatedRoomId,
-    });
+    
     void markAsRead(String(validatedRoomId));
     readMarkedRef.current[validatedRoomId] = true;
   }, [validatedRoomId, isRoomConnected, markAsRead, messages]);
 
-  // Debug: log current room messages and read flags to help diagnose UI not updating
-  useEffect(() => {
-    if (!validatedRoomId) return;
-    const roomMsgs = messages[validatedRoomId] || [];
-    console.debug(
-      "LiveChat: messages for room",
-      validatedRoomId,
-      roomMsgs.map((m) => ({
-        id: m.id,
-        is_read: (m as unknown as { is_read?: boolean }).is_read,
-        __read_by_me: (m as unknown as { __read_by_me?: boolean }).__read_by_me,
-      })),
-    );
-  }, [messages, validatedRoomId]);
+  
 
   useEffect(() => {
     // Only auto-scroll on initial load for a room or when the last message is from the current user.
@@ -701,20 +685,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     void markAsRead(String(validatedRoomId));
   }, [messages, validatedRoomId, currentUser, markAsRead]);
 
-  // Debug: show websocket connection status
-  useEffect(() => {
-    const connected = validatedRoomId
-      ? isRoomConnected(validatedRoomId)
-      : false;
-    console.log(
-      "WebSocket connected:",
-      connected,
-      "validatedRoomId:",
-      validatedRoomId,
-      "isValidRoom:",
-      isValidRoom,
-    );
-  }, [isRoomConnected, validatedRoomId, isValidRoom, messages]);
+  
 
   if (!caseId) return null;
 

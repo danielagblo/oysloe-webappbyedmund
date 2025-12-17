@@ -21,17 +21,15 @@ export default function SupportAndCases({
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
-  console.log("🔵 [INBOX PAGE] Component mounted/rendered");
+  
 
   // Use React Query to fetch and cache chat rooms
-  const { data: allRooms = [], isLoading } = useChatRooms();
+  const { data: allRooms = [] } = useChatRooms();
 
-  console.log(`📊 [INBOX PAGE] All rooms from React Query (${allRooms.length} total):`, allRooms);
-  console.log(`📊 [INBOX PAGE] Rooms with members:`, allRooms.filter(r => r.members?.length > 0).length);
-  console.log(`📊 [INBOX PAGE] Rooms WITHOUT members:`, allRooms.filter(r => !r.members || r.members.length === 0).length);
+  
 
   useEffect(() => {
-    console.log("🟢 [INBOX PAGE] ENTERED - useEffect mount");
+    
     let mounted = true;
 
     // Connect WebSocket to listen for room updates
@@ -49,16 +47,12 @@ export default function SupportAndCases({
       const wsUrl = `${wsBase}/chatrooms/`;
 
       const client = new WebSocketClient(wsUrl, token, {
-        onOpen: () => {
-          console.log("🔌 [INBOX PAGE] WebSocket connected");
-        },
-        onClose: () => {
-          console.log("🔌 [INBOX PAGE] WebSocket disconnected");
-        },
+        onOpen: () => {},
+        onClose: () => {},
         onError: (ev) => console.warn("❌ [INBOX PAGE] WebSocket error", ev),
         onMessage: (payload: any) => {
           if (!mounted) return;
-          console.log("📨 [INBOX PAGE] WebSocket message received:", payload);
+          
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
@@ -88,17 +82,15 @@ export default function SupportAndCases({
               Array.isArray(payload.chatrooms)
             ) {
               const normalized = payload.chatrooms.map((r: any) => normalizeRoom(r));
-              console.log(`📋 [INBOX PAGE] Received chatrooms_list (${normalized.length} rooms)`);
-              console.log(`📋 [INBOX PAGE] Rooms with members in WS payload:`, normalized.filter(r => r.members?.length > 0).length);
+              
              
                // Merge with existing cache to preserve member data
                queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
-                 return normalized.map(wsRoom => {
+                 return normalized.map((wsRoom: ChatRoom) => {
                    const existingRoom = prev.find(r => r.id === wsRoom.id);
                  
                    // If WS payload has no members but cache has members, preserve cached members
                    if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
-                     console.log(`🔄 [INBOX PAGE] Preserving members for room ${wsRoom.id} from cache`);
                      wsRoom.members = existingRoom.members;
                    }
                  
@@ -111,14 +103,13 @@ export default function SupportAndCases({
             // Handle individual room updates
             if (payload && typeof payload === "object" && payload.id) {
               const normalized = normalizeRoom(payload);
-              console.log(`📝 [INBOX PAGE] Room update for ID ${normalized.id}, members count: ${normalized.members?.length || 0}`);
+              
               // Update React Query cache instead of local state
               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
                 const idx = prev.findIndex(
                   (r) => String(r.id) === String(normalized.id),
                 );
                 if (idx === -1) {
-                  console.log(`➕ [INBOX PAGE] Adding new room ${normalized.id}`);
                   return [normalized, ...prev];
                 }
                 const copy = [...prev];
@@ -126,10 +117,7 @@ export default function SupportAndCases({
                 // (WebSocket updates don't always include the full members array)
                 const merged = { ...copy[idx], ...normalized };
                 if (normalized.members.length === 0 && copy[idx].members.length > 0) {
-                  console.log(`🔄 [INBOX PAGE] Preserving members for room ${normalized.id} (old: ${copy[idx].members.length}, new: 0)`);
                   merged.members = copy[idx].members;
-                } else {
-                  console.log(`🔄 [INBOX PAGE] Updating room ${normalized.id} members (old: ${copy[idx].members?.length || 0}, new: ${normalized.members.length})`);
                 }
                 copy[idx] = merged;
                 return copy;
@@ -152,7 +140,7 @@ export default function SupportAndCases({
     }
 
     return () => {
-      console.log("🔴 [INBOX PAGE] LEFT - useEffect cleanup (component unmounting)");
+      
       mounted = false;
       wsRef.current?.close();
       wsRef.current = null;
@@ -163,8 +151,7 @@ export default function SupportAndCases({
     // Calculate counts from all rooms received via WebSocket
     const { supportRooms, userRooms } = splitRooms(allRooms);
     
-    console.log(`📊 [INBOX PAGE] Split results - Support: ${supportRooms.length}, User: ${userRooms.length}`);
-    console.log(`📊 [INBOX PAGE] Support rooms:`, supportRooms.map(r => ({ id: r.id, name: r.name, members: r.members?.length || 0 })));
+    
     
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
