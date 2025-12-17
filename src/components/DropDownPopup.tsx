@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -54,7 +54,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       if (!useBottomSheetOnMobile || typeof window === "undefined") return false;
       return window.matchMedia("(max-width: 640px)").matches;
     });
-    const [dragStartY, setDragStartY] = useState(0);
+    const dragStartYRef = useRef(0);
     const [dragOffset, setDragOffset] = useState(0);
 
     useImperativeHandle(ref, () => ({
@@ -214,22 +214,33 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
     };
 
     const handleSheetDragStart = (e: React.TouchEvent) => {
-      setDragStartY(e.touches[0].clientY);
+      dragStartYRef.current = e.touches[0].clientY;
+      setDragOffset(0);
     };
 
     const handleSheetDragMove = (e: React.TouchEvent) => {
-      if (!dragStartY) return;
-      const diff = Math.max(0, e.touches[0].clientY - dragStartY);
-      setDragOffset(diff);
+      if (dragStartYRef.current === 0) return;
+      const currentY = e.touches[0].clientY;
+      const diff = currentY - dragStartYRef.current;
+      
+      // Only allow dragging downward, not upward
+      if (diff > 0) {
+        setDragOffset(diff);
+        // Only prevent default if dragging significantly to avoid blocking other interactions
+        if (diff > 10) {
+          e.preventDefault();
+        }
+      }
     };
 
-    const handleSheetDragEnd = () => {
-      if (dragOffset > 80) {
+    const handleSheetDragEnd = (e: React.TouchEvent) => {
+      const finalDiff = e.changedTouches[0].clientY - dragStartYRef.current;
+      if (finalDiff > 40) {
         setOpen(false);
         setViewSub(false);
       }
       setDragOffset(0);
-      setDragStartY(0);
+      dragStartYRef.current = 0;
     };
 
   return (
@@ -278,63 +289,69 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                 }}
               />
               <div
-                className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl sm:hidden transition-transform duration-300 ease-out ${
-                  open ? "translate-y-0" : "translate-y-full"
-                }`}
+                className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl sm:hidden ${
+                  dragOffset ? "" : "transition-transform duration-300 ease-out"
+                } ${open ? "translate-y-0" : "translate-y-full"}`}
                 style={{ 
-                  transform: dragOffset ? `translateY(${dragOffset}px)` : undefined,
-                  transition: dragOffset ? "none" : undefined
+                  transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
+                  willChange: dragOffset ? "transform" : undefined
                 }}
                 onTouchStart={handleSheetDragStart}
                 onTouchMove={handleSheetDragMove}
                 onTouchEnd={handleSheetDragEnd}
               >
-                <div className="flex justify-center pt-3 pb-2">
-                  <div className="w-12 h-1 bg-gray-300 rounded-full" />
-                </div>
-
-                <div className="flex items-center justify-between px-4 pb-3">
-                  <div className="flex items-center gap-2">
-                    {viewSub ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setViewSub(false);
-                          onBack?.();
-                        }}
-                        className="bg-[var(--div-active)] hover:bg-gray-200 rounded-full p-2 flex justify-center items-center"
-                      >
-                        <svg
-                          width="12"
-                          height="11"
-                          viewBox="0 0 12 11"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5.09135 10.1816L0.000443935 5.09073L5.09135 -0.000177383L5.96635 0.863459L2.36408 4.46573H11.6936V5.71573H2.36408L5.96635 9.30664L5.09135 10.1816Z"
-                            fill="#646161"
-                            fillOpacity="0.81"
-                          />
-                        </svg>
-                      </button>
-                    ) : null}
-                    <h3 className="font-semibold text-lg text-gray-700">
-                      {viewSub ? subTitle ?? selectedMain : title}
-                    </h3>
+                <div 
+                  className="flex flex-col cursor-grab active:cursor-grabbing"
+                >
+                  {/* Drag Handle */}
+                  <div className="flex justify-center pt-3 pb-2">
+                    <div className="w-12 h-1 bg-gray-300 rounded-full" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpen(false);
-                      setViewSub(false);
-                    }}
-                    className="p-2"
-                  >
-                    <span className="text-[var(--dark-def)] font-bold text-3xl leading-none">
-                      ×
-                    </span>
-                  </button>
+
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 pb-3">
+                    <div className="flex items-center gap-2">
+                      {viewSub ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setViewSub(false);
+                            onBack?.();
+                          }}
+                          className="bg-[var(--div-active)] hover:bg-gray-200 rounded-full p-2 flex justify-center items-center"
+                        >
+                          <svg
+                            width="12"
+                            height="11"
+                            viewBox="0 0 12 11"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5.09135 10.1816L0.000443935 5.09073L5.09135 -0.000177383L5.96635 0.863459L2.36408 4.46573H11.6936V5.71573H2.36408L5.96635 9.30664L5.09135 10.1816Z"
+                              fill="#646161"
+                              fillOpacity="0.81"
+                            />
+                          </svg>
+                        </button>
+                      ) : null}
+                      <h3 className="font-semibold text-lg text-gray-700">
+                        {viewSub ? subTitle ?? selectedMain : title}
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpen(false);
+                        setViewSub(false);
+                      }}
+                      className="p-2"
+                    >
+                      <span className="text-[var(--dark-def)] font-bold text-3xl leading-none">
+                        ×
+                      </span>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="max-h-[70vh] overflow-y-auto px-4 pb-5 pt-1">

@@ -20,9 +20,13 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let isMounted = true;
+    let failures = 0;
+    let lastVisibleAt = Date.now();
+    let isVisible = document.visibilityState === "visible";
 
     const handleOnline = () => {
       if (isMounted) {
+        failures = 0;
         setIsOnline(true);
       }
     };
@@ -33,12 +37,29 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
+    const handleVisibilityChange = () => {
+      isVisible = document.visibilityState === "visible";
+      if (isVisible) {
+        lastVisibleAt = Date.now();
+        failures = 0; // Reset failures when tab becomes visible
+      }
+    };
+
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Heartbeat polling for real connectivity detection
     const ping = async () => {
       if (!isMounted) return;
+      
+      // Skip check if tab is hidden
+      if (!isVisible) return;
+      
+      // Grace period after returning to foreground (avoid false offline on mobile)
+      const GRACE_MS = 1500;
+      if (Date.now() - lastVisibleAt < GRACE_MS) return;
+
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 3000);
       try {
@@ -55,9 +76,18 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
         if (!res) {
           throw new Error("Ping failed");
         }
-        if (isMounted) setIsOnline(true);
+        if (isMounted) {
+          failures = 0;
+          setIsOnline(true);
+        }
       } catch {
-        if (isMounted) setIsOnline(false);
+        if (isMounted) {
+          failures++;
+          // Require 2 consecutive failures before declaring offline
+          if (failures >= 2) {
+            setIsOnline(false);
+          }
+        }
       } finally {
         clearTimeout(timeout);
       }
@@ -72,6 +102,7 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       clearInterval(pollInterval);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
