@@ -195,6 +195,7 @@ const AlertsPanel = ({
   } = useAlertsQuery();
   const [draggedAlert, setDraggedAlert] = useState<number | null>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleMarkAllRead = () => {
     markAllReadMutation.mutate();
@@ -203,11 +204,18 @@ const AlertsPanel = ({
   };
 
   const handleDeleteAll = () => {
-    if (confirm("Are you sure you want to delete all alerts?")) {
-      deleteAllMutation.mutate();
-      setShowMenu(false);
-      setShowMobileMenu(false);
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteAll = () => {
+    deleteAllMutation.mutate(alerts);
+    setShowDeleteConfirm(false);
+    setShowMenu(false);
+    setShowMobileMenu(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   // Group alerts by time period
@@ -328,8 +336,18 @@ const AlertsPanel = ({
                 </p>
               </div>
             ) : alerts.length === 0 ? (
-              <div className="w-full flex justify-center">
-                <p className="text-center">You have no alerts</p>
+              <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4">
+                <img src="/alert-bell.svg" alt="No alerts" />
+                <div className="flex flex-col items-center justify-center">
+                  <p className="font-semibold text-xl md:text-2xl lg:text-[1.5vw]">
+                    No notifications to show
+                  </p>
+                  <p className="text-center text-base max-lg:font-light md:text-xl lg:text-[1.2vw]">
+                    You currently do not have any notification yet.<br />
+                    we're going to notify you when
+                    something new happens
+                  </p>
+                </div>
               </div>
             ) : (
               <>
@@ -448,9 +466,19 @@ const AlertsPanel = ({
               </p>
             </div>
           ) : alerts.length === 0 ? (
-            <div className="w-full flex justify-center">
-              <p className="text-center">You have no alerts.</p>
-            </div>
+              <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4">
+                <img src="/alert-bell.svg" alt="No alerts" />
+                <div className="flex flex-col items-center justify-center">
+                  <p className="font-semibold text-xl md:text-2xl lg:text-[1.5vw]">
+                    No notifications to show
+                  </p>
+                  <p className="text-center text-base max-lg:font-light md:text-xl lg:text-[1.2vw]">
+                    You currently do not have any notification yet.<br />
+                    we're going to notify you when
+                    something new happens
+                  </p>
+                </div>
+              </div>
           ) : (
             <div className="space-y-6 w-full">
               {/* Today */}
@@ -592,6 +620,32 @@ const AlertsPanel = ({
               >
                 <X size={20} />
                 Delete all
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-2">Delete All Alerts?</h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete all alerts? This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelDelete}
+                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteAll}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Delete All
               </button>
             </div>
           </div>

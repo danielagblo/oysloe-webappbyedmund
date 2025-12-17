@@ -122,9 +122,11 @@ export function useAlertsQuery() {
 
   // Mutation for deleting all alerts
   const deleteAllMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (alertsToDelete: Alert[]) => {
+      if (alertsToDelete.length === 0) return;
+      
       await Promise.all(
-        alerts.map((alert) => apiClient.delete(`/alerts/${alert.id}/delete/`)),
+        alertsToDelete.map((alert) => apiClient.delete(`/alerts/${alert.id}/delete/`)),
       );
     },
     onMutate: async () => {

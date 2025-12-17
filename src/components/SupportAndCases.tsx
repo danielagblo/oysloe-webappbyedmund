@@ -374,7 +374,7 @@ export default function SupportAndCases({
 
     return (
       <div>
-        <h3 className="text-sm font-medium mb-4">Support Cases</h3>
+          <h3 className="text-sm md:text-base lg:text-[1.25vw] font-medium mb-4 lg:mb-0">Support Cases</h3>
 
         <div className="flex flex-col gap-2 my-3 lg:gap-3">
           {sortedRooms.map((room) => {
@@ -416,7 +416,7 @@ export default function SupportAndCases({
                 </div>
 
                 {/* Unread Count Badge */}
-                {!hasUnread && (
+                {hasUnread && (
                   <span className="ml-2 absolute bottom-2 right-2 bg-red-500 text-white text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
                     {room.total_unread}
                   </span>
