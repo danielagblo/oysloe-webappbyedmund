@@ -22,7 +22,7 @@ import {
   getSubcategory,
 } from "../services/subcategoryService";
 import type { LocationPayload, Region } from "../types/Location";
-import DropdownPopup from "./DropDownPopup";
+import DropdownPopup, { type DropdownPopupHandle } from "./DropDownPopup";
 
 // Module-level cache to persist possible-values requests across component
 // mounts. This prevents duplicate network calls when React StrictMode mounts
@@ -67,15 +67,29 @@ interface PostAdFormProps {
   editId?: string | null;
   onClose?: () => void;
   embedded?: boolean;
+  mobileBackRef?: React.MutableRefObject<(() => void) | null>;
 }
 
 export default function PostAdForm({
   editId: propEditId,
   onClose,
   embedded = false,
+  mobileBackRef,
 }: PostAdFormProps) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [mobileStep, setMobileStep] = useState("images");
+  const categoryDropdownRef = useRef<DropdownPopupHandle>(null);
+
+  // Set up mobile back button handler
+  useEffect(() => {
+    if (mobileBackRef) {
+      mobileBackRef.current = () => {
+        if (mobileStep === "form") {
+          setMobileStep("images");
+        }
+      };
+    }
+  }, [mobileStep, mobileBackRef]);
 
   // Handle responsive resize for mobile layout
   useEffect(() => {
@@ -92,6 +106,7 @@ export default function PostAdForm({
   const [subcategories, setSubcategories] = useState<
     Array<{ id: number; name: string }>
   >([]);
+  const [subcategoriesLoading, setSubcategoriesLoading] = useState(false);
   const { categories: fetchedCategories = [], loading: categoriesLoading } =
     useCategories();
   const [title, setTitle] = useState("");
@@ -110,6 +125,7 @@ export default function PostAdForm({
   const [featureDefinitions, setFeatureDefinitions] = useState<
     Array<{ id: number; name: string }>
   >([]);
+  const [featureDefsLoading, setFeatureDefsLoading] = useState(false);
   const [featureValues, setFeatureValues] = useState<Record<number, string>>(
     {},
   );
@@ -122,6 +138,7 @@ export default function PostAdForm({
     let mounted = true;
     (async () => {
       try {
+        if (mounted) setSubcategoriesLoading(true);
         if (typeof categoryId === "number" && !isNaN(categoryId)) {
           let subs = (await getSubcategories({ category: categoryId })) as any;
           if (!mounted) return;
@@ -158,6 +175,8 @@ export default function PostAdForm({
       } catch (e) {
         console.warn("Failed to fetch subcategories", e);
         setSubcategories([]);
+      } finally {
+        if (mounted) setSubcategoriesLoading(false);
       }
     })();
     return () => {
@@ -171,6 +190,7 @@ export default function PostAdForm({
 
     (async () => {
       try {
+        setFeatureDefsLoading(true);
         if (typeof subcategoryId === "number" && !isNaN(subcategoryId)) {
           if (import.meta.env.DEV)
             console.debug(
@@ -202,6 +222,8 @@ export default function PostAdForm({
       } catch (e) {
         console.warn("Failed to fetch feature definitions for subcategory", e);
         if (mounted) setFeatureDefinitions([]);
+      } finally {
+        if (mounted) setFeatureDefsLoading(false);
       }
     })();
 
@@ -1312,7 +1334,7 @@ export default function PostAdForm({
     <button
       disabled={isSubmitting}
       type="submit"
-      className={`w-full lg:w-[80%] bg-gray-100 hover:bg-gray-200 text-[var(--dark-def)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer lg:bg-[var(--div-active)]`}
+      className={`w-full lg:w-[80%] bg-gray-100 max-lg:bg-gray-200 max-lg:mt-5 hover:bg-gray-200 text-[var(--dark-def)] rounded-xl py-4 lg:py-7 md:text-[1.25vw] text-center cursor-pointer lg:bg-[var(--div-active)]`}
     >
       {isSubmitting
         ? effectiveEditId
@@ -1326,75 +1348,68 @@ export default function PostAdForm({
 
   return (
     <form
-      className="flex flex-col lg:h-[96vh] w-full h-dvh min-h-0 py-2"
+      className="flex flex-col lg:h-[96vh] max-lg:bg-[var(--div-active)] w-full h-dvh min-h-0 py-2"
       onSubmit={handleSave}
     >
       <div className="text-xs flex lg:items-center lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
         {(!isMobile || mobileStep === "form") && (
-          <div className="flex flex-col w-full lg:h-[93vh] lg:w-3/5 bg-white lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar">
+          <div className={`flex flex-col w-full lg:h-[93vh] lg:w-3/5 bg-white max-lg:bg-[var(--div)] lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar ${
+            isMobile && !embedded ? "bg-[var(--div-active)]" : ""
+          }`}>
             <div className="grid grid-cols-1 gap-2">
               <div>
-                <label className="block mb-1 text-sm md:text-base lg:text-[0.85vw]">Product Category</label>
+                <label className="block mb-1 text-sm md:text-base lg:text-[1vw]">Product Category</label>
                 <DropdownPopup
-                  triggerLabel={category}
-                  supportsSubmenu
+                  ref={categoryDropdownRef}
+                  triggerLabel={
+                    categoryId
+                      ? subcategoryId && subcategories.find((s) => s.id === subcategoryId)
+                        ? `${category} - ${subcategories.find((s) => s.id === subcategoryId)!.name}`
+                        : `${category} - Select Subcategory`
+                      : category
+                  }
                   options={fetchedCategories.map((c) => c.name)}
-                  onSelect={(opt) => {
+                  subOptions={subcategories.map((s) => s.name)}
+                  subLoading={subcategoriesLoading}
+                  supportsSubmenu
+                  title={categoriesLoading ? "Loading categories..." : "Select Category"}
+                  subTitle="Select Subcategory"
+                  initialSubView={!!categoryId}
+                  onMainSelect={(opt) => {
                     const match = fetchedCategories.find((c) => c.name === opt);
                     setCategory(opt);
                     setCategoryId(match ? Number(match.id) : null);
-                    console.log(
-                      "category chosen:",
-                      opt,
-                      "id:",
-                      match?.id ?? null,
-                    );
+                    setSubcategoryId("");
                   }}
-                  title={
-                    categoriesLoading
-                      ? "Loading categories..."
-                      : "Select Category"
-                  }
+                  onSubSelect={(opt) => {
+                    const m = subcategories.find((s) => s.name === opt);
+                    setSubcategoryId(m ? Number(m.id) : "");
+                  }}
+                  onSelect={() => {
+                    /* handled via onMainSelect/onSubSelect */
+                  }}
                 />
-                <div className="mt-2">
-                  <label className="block mb-1 text-sm md:text-base lg:text-[0.85vw]">Subcategory (optional)</label>
-                  <DropdownPopup
-                    triggerLabel={
-                      subcategoryId &&
-                        subcategories.find((s) => s.id === subcategoryId)
-                        ? subcategories.find((s) => s.id === subcategoryId)!
-                          .name
-                        : "Select subcategory"
-                    }
-                    options={subcategories.map((s) => s.name)}
-                    onSelect={(opt) => {
-                      const m = subcategories.find((s) => s.name === opt);
-                      setSubcategoryId(m ? Number(m.id) : "");
-                    }}
-                    title={"Select Subcategory"}
-                  />
-                </div>
               </div>
 
               <div>
-                <label className="block mb-1  text-sm md:text-base lg:text-[0.85vw]">Title</label>
+                <label className="block mb-1  text-sm md:text-base lg:text-[1vw]">Title</label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   type="text"
                   placeholder="Add a title"
-                  className="w-full text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
+                  className="w-full text-sm md:text-base max-lg:bg-white lg:text-[1vw] p-3 border rounded-xl border-[var(--div-border)]"
                 />
               </div>
               <div>
-                <p className="mb-1 font-medium text-sm md:text-base lg:text-[0.85vw]">Price</p>
+                <p className="mb-1 font-medium text-sm md:text-base lg:text-[1vw]">Price</p>
                 <div className="relative">
                   <input
                     value={price}
                     onChange={(e) => handlePriceChange(e)}
                     type="number"
                     placeholder="0.00"
-                    className="w-full border  text-sm md:text-base lg:text-[0.85vw] rounded-xl border-(--div-border) p-3 pl-7"
+                    className="w-full border max-lg:bg-white text-sm md:text-base lg:text-[1vw] rounded-xl border-(--div-border) p-3 pl-7"
                   />
                   <p className="absolute inline top-3.25 left-3">₵</p>
                 </div>
@@ -1402,7 +1417,7 @@ export default function PostAdForm({
             </div>
 
             <div>
-              <p className="mb-1 text-sm md:text-base lg:text-[0.85vw]">Declare ad purpose?</p>
+              <p className="mb-1 text-sm md:text-base lg:text-[1vw]">Declare ad purpose?</p>
               <div className="flex gap-3 max-sm:grid max-sm:grid-cols-2 max-sm:gap-7 max-sm:pr-15">
                 {(
                   [
@@ -1413,7 +1428,7 @@ export default function PostAdForm({
                 ).map((option) => (
                   <label
                     key={option}
-                    className="relative flex items-center gap-1 md:min-w-[100px] max-sm:py-4 text-sm md:text-base lg:text-[0.85vw] hover:bg-gray-100 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
+                    className="relative flex items-center gap-1 md:min-w-[100px] max-lg:shadow-xs max-sm:py-4 text-sm md:text-base lg:text-[0.85vw] max-lg:bg-white hover:bg-gray-100 bg-[var(--div-active)] rounded-lg px-4 py-2 pt-3.5 pr-4 max-md:pr-7 cursor-pointer"
                   >
                     <input
                       type="radio"
@@ -1455,7 +1470,7 @@ export default function PostAdForm({
                   <button
                     key={`${loc.label}|${loc.place}`}
                     type="button"
-                    className="p-1 bg-gray-100  text-xs md:text-sm lg:text-[0.65vw] rounded-xs hover:bg-gray-200"
+                    className="p-1 bg-gray-100  text-xs md:text-sm lg:text-[0.85vw] rounded-xs hover:bg-gray-200"
                     onClick={() => applySavedLocation(loc)}
                   >
                     {loc.label}
@@ -1467,86 +1482,75 @@ export default function PostAdForm({
 
             <div>
               <div className="flex flex-col gap-2">
-                {featureDefinitions.length > 0 && (
-                  <div className="mt-4">
-                    <label className="block mb-1 font-medium  text-sm md:text-base lg:text-[0.85vw]">
-                      Features for selected subcategory
-                    </label>
+                {(() => {
+                  const hasRenderableFeatures = featureDefinitions.some(
+                    (fd) => (possibleFeatureValues[fd.id] ?? []).length > 0,
+                  );
+                  const shouldShowBlock = featureDefsLoading || hasRenderableFeatures;
+                  if (!shouldShowBlock) return null;
 
-                    <div className="flex flex-col gap-2">
-                      {featureDefinitions.map((fd) => {
-                        const values = possibleFeatureValues[fd.id] ?? [];
-                        return (
-                          <div
-                            key={`def-${fd.id}`}
-                            className="flex items-center gap-2"
-                          >
-                            <div className="w-1/3 text-sm">{fd.name}</div>
-                            {values && values.length > 0 ? (
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    list={`feature-values-${fd.id}`}
-                                    placeholder={`Select or type ${fd.name}`}
-                                    value={featureValues[fd.id] ?? ""}
-                                    onChange={(e) =>
+                  return (
+                  <div className="mt-4">
+                    {hasRenderableFeatures && (
+                      <label className="block mb-1 font-medium  text-sm md:text-base lg:text-[0.85vw]">
+                        Features for selected subcategory
+                      </label>
+                    )}
+
+                    {featureDefsLoading ? (
+                      <p className="loading-dots text-sm md:text-base lg:text-[0.85vw]">
+                        Loading this subcategory's features
+                      </p>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {featureDefinitions
+                          .filter((fd) => (possibleFeatureValues[fd.id] ?? []).length > 0)
+                          .map((fd) => {
+                            const values = possibleFeatureValues[fd.id] ?? [];
+                            return (
+                              <div
+                                key={`def-${fd.id}`}
+                                className="flex items-center gap-2"
+                              >
+                                <div className="w-1/3 text-sm">{fd.name}</div>
+                                <div className="flex-1">
+                                  <DropdownPopup
+                                    triggerLabel={
+                                      featureValues[fd.id]
+                                        ? String(featureValues[fd.id])
+                                        : `Select ${fd.name}`
+                                    }
+                                    options={values}
+                                    onSelect={(opt) => {
                                       setFeatureValues((prev) => ({
                                         ...prev,
-                                        [fd.id]: e.target.value,
-                                      }))
-                                    }
-                                    className="w-full text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
+                                        [fd.id]: opt,
+                                      }));
+                                    }}
+                                    title={`Select ${fd.name}`}
                                   />
                                 </div>
-                                <datalist id={`feature-values-${fd.id}`}>
-                                  {values.map((v) => (
-                                    <option key={v} value={v} />
-                                  ))}
-                                </datalist>
                               </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  placeholder={`Value for ${fd.name}`}
-                                  value={featureValues[fd.id] ?? ""}
-                                  onChange={(e) =>
-                                    setFeatureValues((prev) => ({
-                                      ...prev,
-                                      [fd.id]: e.target.value,
-                                    }))
-                                  }
-                                  className="flex-1 text-sm md:text-base lg:text-[0.85vw] p-3 border rounded-xl border-[var(--div-border)]"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                            );
+                          })}
+                      </div>
+                    )}
                   </div>
-                )}
+                  );
+                })()}
                 <div className="mt-4">
-                  <label className="block mb-1  text-sm md:text-base lg:text-[0.85vw]">Description</label>
+                  <label className="block mb-1  text-sm md:text-base lg:text-[1vw]">Description</label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your product"
-                    className="w-full outline-0 p-3 border text-sm md:text-base lg:text-[0.85vw] rounded-xl border-[var(--div-border)] h-32 resize-none"
+                    className="w-full outline-0 max-lg:bg-white p-3 border text-sm md:text-base lg:text-[1vw] rounded-xl border-[var(--div-border)] h-32 resize-none"
                   />
                 </div>
               </div>
               {isMobile && (
                 <div className=" w-full flex items-center justify-center -ml-4 max-sm:ml-0">
                   <div className="w-full flex flex-col gap-3 items-center justify-center">
-                    <button
-                      onClick={() => setMobileStep("images")}
-                      type="button"
-                      className="flex items-center justify-center mt-4 border w-full border-gray-300 rounded-xl py-3 font-medium hover:bg-gray-100 transition"
-                    >
-                      <img src="/arrowleft.svg" alt="<" loading="eager" />
-                      <span>Back to Images</span>
-                    </button>
                     <SaveBtn />
                   </div>
                 </div>
@@ -1557,7 +1561,7 @@ export default function PostAdForm({
         )}
 
         {(!isMobile || mobileStep === "images") && (
-          <div className="relative flex flex-col lg:h-[93vh] w-full lg:w-2/5 lg:bg-white rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
+          <div className="relative flex flex-col lg:h-[93vh] z-0 max-lg:h-[80vh] w-full lg:w-2/5 lg:bg-white rounded-xl p-4 sm:p-6 mt-4 lg:mt-0">
             <div className="w-full">
               <label className="bg-gray-100 lg:bg-transparent border-1 border-dashed rounded-xl flex flex-col items-center justify-center h-25 cursor-pointer hover:bg-gray-50">
                 <p className="text-xs text-gray-500 mb-1 md:text-[1.2vw]">
@@ -1662,9 +1666,19 @@ export default function PostAdForm({
               <>
                 <div className="w-full flex justify-center items-center lg:hidden px-3">
                   <button
-                    onClick={() => setMobileStep("form")}
+                    onClick={() => {
+                      if (uploadedImages.length === 0) {
+                        toast.error("Please upload at least one image");
+                        return;
+                      }
+                      setMobileStep("form");
+                    }}
                     type="button"
-                    className="fixed bottom-20 sm:bottom-25 w-9/10 py-3.5 sm:py-7 bg-gray-100 text-[var(--dark-def)] text-sm hover:bg-gray-200 rounded-xl  transition"
+                    className={`fixed bottom-20 sm:bottom-25 w-9/10 py-3.5 max-lg:bg-gray-200 sm:py-7 text-sm rounded-xl transition z-50 cursor-pointer ${
+                      uploadedImages.length === 0
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-gray-100 text-[var(--dark-def)] hover:bg-gray-200"
+                    }`}
                   >
                     Next
                   </button>

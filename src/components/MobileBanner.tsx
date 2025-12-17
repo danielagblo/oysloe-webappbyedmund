@@ -5,6 +5,7 @@ interface MobileBannerProps {
   page: string;
   onMenuClick?: () => void;
   showMenuButton?: boolean;
+  onBackClick?: () => void;
 }
 
 export const MobileBanner: React.FC<MobileBannerProps> = ({
@@ -12,8 +13,17 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
   page = "",
   onMenuClick,
   showMenuButton = false,
+  onBackClick,
 }) => {
   const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBackClick) {
+      onBackClick();
+    } else {
+      navigate(-1);
+    }
+  };
 
   return (
     <>
@@ -22,7 +32,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
           className={`relative ${page === "Alerts" ? "bg-[var(--div-active)]" : "bg-white"} w-[100vw] flex lg:hidden items-center px-2 h-12 py-3 sticky top-0 z-50`}
         >
           <button
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
             className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-50 py-2 px-1"
           >
             <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
