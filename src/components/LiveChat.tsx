@@ -231,6 +231,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     addLocalMessage,
     isRoomConnected,
     connectToRoom,
+    leaveRoom,
     markAsRead,
   } = useWsChat();
   const [input, setInput] = useState("");
@@ -600,6 +601,12 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
     if (!caseId) return;
 
+    // Subscribe to room immediately to avoid missing realtime messages.
+    // History loading is handled by connectToRoom (REST history then WS connect).
+    void connectToRoom(caseId).catch((e) => {
+      console.debug("LiveChat: early connectToRoom failed", e);
+    });
+
     let mounted = true;
     (async () => {
       try {
@@ -615,20 +622,21 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         if (!mounted) return;
         setIsValidRoom(false);
         setValidatedRoomId(null);
+        try {
+          // If validation failed, ensure we leave the room to avoid listening to invalid rooms
+          leaveRoom(caseId);
+        } catch {
+          // ignore
+        }
       }
     })();
 
     return () => {
       mounted = false;
     };
-  }, [caseId]);
+  }, [caseId, connectToRoom, leaveRoom]);
 
-  // When we've validated the room id, initiate websocket connection for that room
-  useEffect(() => {
-    if (isValidRoom && validatedRoomId) {
-      void connectToRoom(validatedRoomId);
-    }
-  }, [isValidRoom, validatedRoomId, connectToRoom]);
+  // Note: we initiate websocket connection eagerly when `caseId` changes.
 
   // When the room's websocket becomes connected, ensure we mark messages read once.
   useEffect(() => {
@@ -758,6 +766,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         }
       }
 
+      // If websocket client still isn't open, abort to avoid REST/send endpoint fallback
+      if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
+        console.warn("Refusing to send: websocket not connected, aborting to avoid REST fallback", { validatedRoomId });
+        setSending(false);
+        // restore input so user can retry
+        setInput(text);
+        return;
+      }
+
       await sendMessage(String(validatedRoomId ?? caseId), text, tempId);
     } catch (e) {
       console.error("Failed to send message via ws/rest fallback", e);
@@ -794,6 +811,14 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         } catch (e) {
           console.debug("LiveChat: connectToRoom before file send failed", e);
         }
+      }
+
+      // Prevent REST fallback: require WS client open
+      if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
+        console.warn("Refusing to send file: websocket not connected, aborting to avoid REST fallback", { validatedRoomId });
+        // clear optimistic preview since we didn't send
+        setSending(false);
+        return;
       }
 
       await sendMessage(String(validatedRoomId ?? caseId), "", tempId, file);
@@ -837,6 +862,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         } catch (e) {
           console.debug("LiveChat: connectToRoom before recorded send failed", e);
         }
+      }
+
+      if (!roomToSend || !isRoomConnected(roomToSend)) {
+        console.warn("Refusing to send recorded file: websocket not connected, aborting to avoid REST fallback", { roomToSend });
+        return;
       }
 
       console.debug("LiveChat: sending recorded file", {

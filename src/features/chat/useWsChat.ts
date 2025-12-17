@@ -11,7 +11,8 @@ export type UseWsChatReturn = {
   messages: RoomMessages;
   chatrooms: ChatRoom[];
   unreadCount: number;
-  connectToRoom: (roomId: string) => Promise<void>;
+  connectToRoom: (roomId: string, opts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => Promise<void>;
+  leaveRoom: (roomId: string) => void;
   connectToChatroomsList: () => void;
   connectToUnreadCount: () => void;
   sendMessage: (
@@ -57,7 +58,7 @@ export default function useWsChat(): UseWsChatReturn {
     typeof window !== "undefined" ? localStorage.getItem("oysloe_token") : null;
 
   const ensureRoomClient = useCallback(
-    async (roomId: string) => {
+    async (roomId: string, joinOpts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => {
       const key = String(roomId);
 
       // If already connected or connecting, nothing to do
@@ -95,12 +96,21 @@ export default function useWsChat(): UseWsChatReturn {
       let triedAlternative = false;
       const altUrl = url.replace(/\/$/, "");
 
-      const createClient = (attemptUrl: string) =>
-        new WebSocketClient(attemptUrl, token, {
+      const createClient = (attemptUrl: string) => {
+        let instance: WebSocketClient | null = null;
+        instance = new WebSocketClient(attemptUrl, token, {
           onOpen: () => {
             console.log("useWsChat: socket open", { roomId: key, url: attemptUrl, clientId });
             // connected
             roomConnecting.current[key] = false;
+            // send a join payload (inform server of client's last-seen marker so server can replay missing messages)
+            try {
+              if (joinOpts && instance && instance.isOpen()) {
+                instance.send({ type: "join", last_seen: joinOpts.lastSeen ?? null, last_message_id: joinOpts.lastMessageId ?? null });
+              }
+            } catch (e) {
+              /* ignore */
+            }
           },
           onClose: (ev) => {
             console.log("useWsChat: socket closed", {
@@ -153,6 +163,15 @@ export default function useWsChat(): UseWsChatReturn {
             // If server sends an array of messages as history
             if (Array.isArray(data)) {
               setMessages((prev) => ({ ...prev, [key]: data }));
+              return;
+            }
+
+            // If server sends an explicit history object
+            if ((data as any).type === "room_history" || (data as any).type === "history") {
+              const msgs = (data as any).messages || (data as any).history || (data as any).data || [];
+              if (Array.isArray(msgs)) {
+                setMessages((prev) => ({ ...prev, [key]: msgs }));
+              }
               return;
             }
             // single message (server may send message frames without an `id` yet)
@@ -215,6 +234,9 @@ export default function useWsChat(): UseWsChatReturn {
           },
         });
 
+        return instance;
+      };
+
       const client = createClient(url);
       roomClients.current[key] = client;
       try {
@@ -227,16 +249,21 @@ export default function useWsChat(): UseWsChatReturn {
   );
 
   const connectToRoom = useCallback(
-    async (roomId: string) => {
+    async (roomId: string, opts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => {
       // load history first
+      const key = String(roomId);
       try {
-        const key = String(roomId);
         const history = await chatService.getChatRoomMessages(roomId);
         setMessages((prev) => ({ ...prev, [key]: history }));
+        // if caller didn't provide lastSeen/lastMessageId, derive from loaded history
+        if (!opts) {
+          const last = Array.isArray(history) && history.length > 0 ? history[history.length - 1] : null;
+          opts = { lastSeen: last?.created_at ?? null, lastMessageId: (last as any)?.id ?? null };
+        }
       } catch (err) {
         console.warn("useWsChat: failed to load history for", roomId, err);
       }
-      await ensureRoomClient(roomId);
+      await ensureRoomClient(roomId, opts);
     },
     [ensureRoomClient],
   );
@@ -734,6 +761,17 @@ export default function useWsChat(): UseWsChatReturn {
     unreadClient.current = null;
   }, []);
 
+  const leaveRoom = useCallback((roomId: string) => {
+    const k = String(roomId);
+    try {
+      roomClients.current[k]?.close();
+    } catch {
+      // ignore
+    }
+    roomClients.current[k] = null;
+    roomConnecting.current[k] = false;
+  }, []);
+
   return {
     messages,
     chatrooms,
@@ -746,6 +784,7 @@ export default function useWsChat(): UseWsChatReturn {
     markAsRead,
     isRoomConnected,
     addLocalMessage,
+    leaveRoom,
     closeAll,
   };
 }
