@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import type { Product } from "../../types/Product";
 import { Link } from "react-router-dom";
 import { formatMoney } from "../../utils/formatMoney";
@@ -22,76 +22,37 @@ const SkeletonCard = () => (
 );
 
 function LazyAdCard({ ad, handleAdClick }: { ad: Product; handleAdClick: Props["handleAdClick"] }) {
-  const [visible, setVisible] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      // Fallback for older browsers
-      setVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisible(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div ref={ref} className="w-full">
-      {!visible ? (
-        <SkeletonCard />
-      ) : (
-        <Link
-          key={ad.id}
-          to={`/ads/${ad.id}`}
-          state={{ adData: ad }}
-          onClick={(e) => handleAdClick(ad, e)}
-          className="inline-block rounded-2xl overflow-hidden w-full"
-        >
-          {!imgLoaded && <SkeletonCard />}
-          <img
-            src={ad.image || "/no-image.jpeg"}
-            alt={ad.name}
-            loading="lazy"
-            onLoad={() => setImgLoaded(true)}
-            className={`w-full h-[120px] sm:h-52 object-cover rounded-2xl ${imgLoaded ? "block" : "hidden"}`}
-          />
-          {imgLoaded && (
-            <>
-              <div className="flex items-center gap-1 px-2 py-0.5">
-                <img
-                  src="/location.svg"
-                  alt=""
-                  className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
-                />
-                <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
-                  {ad.location?.name ?? ad.location?.region ?? "Unknown"}
-                </p>
-              </div>
-              <p className="px-2 text-sm sm:text-xl lg:text-[1.2vw] truncate line-clamp-1 text-gray-600">
-                {ad.name}
-              </p>
-              <p className="px-2 text-xs sm:text-base lg:text-[1vw] font-medium text-gray-800">
-                {formatMoney(ad.price, "GHS")}
-              </p>
-            </>
-          )}
-        </Link>
-      )}
-    </div>
+    <Link
+      key={ad.id}
+      to={`/ads/${ad.id}`}
+      state={{ adData: ad }}
+      onClick={(e) => handleAdClick(ad, e)}
+      className="inline-block rounded-2xl overflow-hidden w-full"
+    >
+      <img
+        src={ad.image || "/no-image.jpeg"}
+        alt={ad.name}
+        loading="lazy"
+        className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+      />
+      <div className="flex items-center gap-1 px-2 py-0.5">
+        <img
+          src="/location.svg"
+          alt=""
+          className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
+        />
+        <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
+          {ad.location?.name ?? ad.location?.region ?? "Unknown"}
+        </p>
+      </div>
+      <p className="px-2 text-sm sm:text-xl lg:text-[1.2vw] truncate line-clamp-1 text-gray-600">
+        {ad.name}
+      </p>
+      <p className="px-2 text-xs sm:text-base lg:text-[1vw] font-medium text-gray-800">
+        {formatMoney(ad.price, "GHS")}
+      </p>
+    </Link>
   );
 }
 
