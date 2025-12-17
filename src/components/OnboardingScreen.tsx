@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import LottieJourneyBeginsNow from "./LottieJourneyBeginsNow";
 import LottieScaleToSuccess from "./LottieScaleToSuccess";
 import LottieUserSafetyGuarantee from "./LottieUserSafetyGuarantee";
+import LottieSecurityStatusSafe from "./LottieSecurityStatusSafe";
+import LottieScaleToSuccessMobile from "./LottieScaleToSuccessMobile";
+import LottieJourneyBeginsNowMobile from "./LottieJourneyBeginsNowMobile";
 
 type Props = {
   overlay?: boolean;
@@ -76,8 +79,8 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
       ) : clicked === 0 ? (
         <>
           <LottieUserSafetyGuarantee />
-          <div className="max-sm:flex max-sm:items-center max-sm:justify-center max-sm:mt-30 max-sm:flex-1">
-            <img src="/onboarding1.gif" alt="" className="h-55 w-55 sm:hidden" />
+          <div className="hidden max-sm:flex max-sm:items-center max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
+            <LottieSecurityStatusSafe />
           </div>
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
             <h2 className="text-4xl max-sm:px-4 font-medium text-center">
@@ -106,11 +109,10 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         </>
       ) : clicked === 1 ? (
         <>
-          <div className="hidden max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
-            <LottieScaleToSuccess />
-          </div>
           <LottieScaleToSuccess />
-
+          <div className="hidden max-sm:flex max-sm:items-center max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
+            <LottieScaleToSuccessMobile />
+          </div>
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
             <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
               Scale To Success
@@ -138,10 +140,10 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         </>
       ) : clicked === 2 ? (
         <>
-          <div className="hidden max-sm:flex max-sm:items-center  max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
-            <LottieJourneyBeginsNow />
-          </div>
           <LottieJourneyBeginsNow />
+          <div className="hidden max-sm:flex max-sm:items-center max-sm:mt-30 max-sm:justify-center max-sm:flex-1">
+            <LottieJourneyBeginsNowMobile />
+          </div>
           <div className="flex flex-col items-center justify-end gap-3 max-sm:pb-5 max-sm:mt-0">
             <h2 className="text-4xl  max-sm:px-4 font-medium text-center">
               Journey Begins Now

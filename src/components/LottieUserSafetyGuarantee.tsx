@@ -7,7 +7,7 @@ const LottieUserSafetyGuarantee = () => {
       animationData={BoardingScreen}
       loop={false}
       autoplay={true}
-      className="max-sm:hidden h-1/2 "
+      className="max-sm:hidden h-1/2"
     />
   );
 };
