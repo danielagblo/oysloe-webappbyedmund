@@ -54,11 +54,35 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       if (!useBottomSheetOnMobile || typeof window === "undefined") return false;
       return window.matchMedia("(max-width: 640px)").matches;
     });
-    const dragStartYRef = useRef(0);
+
+    const [isClosing, setIsClosing] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const sheetRef = useRef<HTMLDivElement | null>(null);
+    const closeTimeoutRef = useRef<number | null>(null);
+
+    const activePointerIdRef = useRef<number | null>(null);
+    const startYRef = useRef(0);
+    const startOffsetRef = useRef(0);
+    const dragOffsetRef = useRef(0);
+    const rafRef = useRef<number | null>(null);
+    const moveHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);
+    const upHandlerRef = useRef<((e: PointerEvent) => void) | null>(null);
     const [dragOffset, setDragOffset] = useState(0);
+
+    useEffect(() => {
+      dragOffsetRef.current = dragOffset;
+    }, [dragOffset]);
 
     useImperativeHandle(ref, () => ({
       open: (forceSubView?: boolean) => {
+        if (closeTimeoutRef.current) {
+          window.clearTimeout(closeTimeoutRef.current);
+          closeTimeoutRef.current = null;
+        }
+        setIsClosing(false);
+        setIsDragging(false);
+        setDragOffset(0);
         setViewSub(!!forceSubView);
         setOpen(true);
       },
@@ -67,6 +91,17 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
     useEffect(() => {
       setFinalLabel(triggerLabel);
     }, [triggerLabel]);
+
+    useEffect(() => {
+      // Prevent background scroll while the mobile sheet is open/closing.
+      if (!isMobileSheet) return;
+      if (!open && !isClosing) return;
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }, [isMobileSheet, open, isClosing]);
 
     useEffect(() => {
       if (!useBottomSheetOnMobile) {
@@ -80,6 +115,62 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       mql.addEventListener("change", update);
       return () => mql.removeEventListener("change", update);
     }, [useBottomSheetOnMobile]);
+
+    const cleanupGlobalPointerListeners = () => {
+      if (moveHandlerRef.current) {
+        window.removeEventListener("pointermove", moveHandlerRef.current);
+      }
+      if (upHandlerRef.current) {
+        window.removeEventListener("pointerup", upHandlerRef.current);
+        window.removeEventListener("pointercancel", upHandlerRef.current);
+      }
+      moveHandlerRef.current = null;
+      upHandlerRef.current = null;
+      activePointerIdRef.current = null;
+
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+
+    useEffect(() => {
+      return () => {
+        cleanupGlobalPointerListeners();
+        if (closeTimeoutRef.current) {
+          window.clearTimeout(closeTimeoutRef.current);
+          closeTimeoutRef.current = null;
+        }
+      };
+    }, []);
+
+    const requestClose = () => {
+      // Desktop modal: close immediately.
+      if (!isMobileSheet) {
+        setOpen(false);
+        setViewSub(false);
+        setDragOffset(0);
+        return;
+      }
+
+      if (isClosing) return;
+
+      cleanupGlobalPointerListeners();
+      setIsDragging(false);
+      setIsClosing(true);
+      setDragOffset(0);
+
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+      }
+      closeTimeoutRef.current = window.setTimeout(() => {
+        setOpen(false);
+        setViewSub(false);
+        setIsClosing(false);
+        setDragOffset(0);
+        closeTimeoutRef.current = null;
+      }, 280);
+    };
 
     const handleMainSelect = (mainOption: string) => {
       const hasSubOptionsProp = Array.isArray(subOptions);
@@ -98,7 +189,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
         setViewSub(true);
       } else {
         onSelect(mainOption);
-        setOpen(false);
+        requestClose();
         try {
           setLocation?.(mainOption);
         } catch {
@@ -120,13 +211,69 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
         setFinalLabel(subOption);
       }
 
-      setViewSub(false);
-      setOpen(false);
+      requestClose();
       try {
         setLocation?.(subOption);
       } catch {
         // ignore
       }
+    };
+
+    const handleHeaderPointerDown = (e: React.PointerEvent) => {
+      if (!isMobileSheet) return;
+      if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+      if (activePointerIdRef.current !== null) return;
+
+      // Don't start drag from interactive elements.
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button")) return;
+
+      if (closeTimeoutRef.current) {
+        window.clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
+      setIsClosing(false);
+
+      activePointerIdRef.current = e.pointerId;
+      startYRef.current = e.clientY;
+      startOffsetRef.current = dragOffsetRef.current;
+      setIsDragging(true);
+
+      moveHandlerRef.current = (ev: PointerEvent) => {
+        if (activePointerIdRef.current !== ev.pointerId) return;
+        const diff = ev.clientY - startYRef.current;
+        const next = Math.max(0, startOffsetRef.current + diff);
+
+        // Prevent pull-to-refresh / scroll-jank while dragging.
+        ev.preventDefault();
+
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        rafRef.current = requestAnimationFrame(() => {
+          setDragOffset(next);
+        });
+      };
+
+      upHandlerRef.current = (ev: PointerEvent) => {
+        if (activePointerIdRef.current !== ev.pointerId) return;
+
+        cleanupGlobalPointerListeners();
+        setIsDragging(false);
+
+        const sheetHeight = sheetRef.current?.getBoundingClientRect().height ?? window.innerHeight;
+        const current = dragOffsetRef.current;
+
+        // Close threshold: smaller of 120px or 20% of sheet height.
+        const threshold = Math.min(120, sheetHeight * 0.2);
+        if (current > threshold) {
+          requestClose();
+        } else {
+          setDragOffset(0);
+        }
+      };
+
+      window.addEventListener("pointermove", moveHandlerRef.current, { passive: false });
+      window.addEventListener("pointerup", upHandlerRef.current);
+      window.addEventListener("pointercancel", upHandlerRef.current);
     };
 
     const renderOptions = (isSubView: boolean) => {
@@ -213,42 +360,19 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       ));
     };
 
-    const handleSheetDragStart = (e: React.TouchEvent) => {
-      dragStartYRef.current = e.touches[0].clientY;
-      setDragOffset(0);
-    };
-
-    const handleSheetDragMove = (e: React.TouchEvent) => {
-      if (dragStartYRef.current === 0) return;
-      const currentY = e.touches[0].clientY;
-      const diff = currentY - dragStartYRef.current;
-      
-      // Only allow dragging downward, not upward
-      if (diff > 0) {
-        setDragOffset(diff);
-        // Only prevent default if dragging significantly to avoid blocking other interactions
-        if (diff > 10) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    const handleSheetDragEnd = (e: React.TouchEvent) => {
-      const finalDiff = e.changedTouches[0].clientY - dragStartYRef.current;
-      if (finalDiff > 40) {
-        setOpen(false);
-        setViewSub(false);
-      }
-      setDragOffset(0);
-      dragStartYRef.current = 0;
-    };
-
-  return (
+    return (
     <div className="relative">
       <button
         type="button"
         onClick={(e) => {
           e.stopPropagation();
+          if (closeTimeoutRef.current) {
+            window.clearTimeout(closeTimeoutRef.current);
+            closeTimeoutRef.current = null;
+          }
+          setIsClosing(false);
+          setIsDragging(false);
+          setDragOffset(0);
           setViewSub(initialSubView || false);
           setOpen(true);
         }}
@@ -275,33 +399,35 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
         </div>
       </button>
 
-      {open && (
+      {(open || isClosing) && (
         <>
           {isMobileSheet ? (
             <>
               <div
                 className={`fixed inset-0 bg-black/40 z-40 sm:hidden transition-opacity duration-300 ${
-                  open ? "opacity-100" : "opacity-0"
+                  isClosing ? "opacity-0" : "opacity-100"
                 }`}
                 onClick={() => {
-                  setOpen(false);
-                  setViewSub(false);
+                  requestClose();
                 }}
               />
               <div
+                ref={sheetRef}
                 className={`fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-3xl shadow-xl sm:hidden ${
-                  dragOffset ? "" : "transition-transform duration-300 ease-out"
-                } ${open ? "translate-y-0" : "translate-y-full"}`}
-                style={{ 
-                  transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
-                  willChange: dragOffset ? "transform" : undefined
-                }}
-                onTouchStart={handleSheetDragStart}
-                onTouchMove={handleSheetDragMove}
-                onTouchEnd={handleSheetDragEnd}
+                  isDragging ? "" : "transition-transform duration-300 ease-out"
+                } ${isDragging ? "" : isClosing ? "translate-y-full" : "translate-y-0"}`}
+                style={
+                  isDragging
+                    ? {
+                        transform: `translateY(${dragOffset}px)`,
+                        willChange: "transform",
+                      }
+                    : undefined
+                }
               >
                 <div 
-                  className="flex flex-col cursor-grab active:cursor-grabbing"
+                  className="flex flex-col cursor-grab active:cursor-grabbing touch-none select-none"
+                  onPointerDown={handleHeaderPointerDown}
                 >
                   {/* Drag Handle */}
                   <div className="flex justify-center pt-3 pb-2">
@@ -342,8 +468,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                     <button
                       type="button"
                       onClick={() => {
-                        setOpen(false);
-                        setViewSub(false);
+                        requestClose();
                       }}
                       className="p-2"
                     >
@@ -354,7 +479,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                   </div>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto px-4 pb-5 pt-1">
+                <div className="max-h-[70vh] overflow-y-auto overscroll-contain px-4 pb-5 pt-1">
                   {renderOptions(viewSub)}
                 </div>
               </div>
@@ -364,8 +489,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
               <div
                 className="fixed inset-0 bg-black/50 z-40"
                 onClick={() => {
-                  setOpen(false);
-                  setViewSub(false);
+                  requestClose();
                 }}
               />
 
@@ -403,8 +527,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                   <button
                     type="button"
                     onClick={() => {
-                      setOpen(false);
-                      setViewSub(false);
+                      requestClose();
                     }}
                   >
                     <p className="text-[var(--dark-def)] font-bold text-3xl">
@@ -425,6 +548,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
   );
 },
 );
+
 
 DropdownPopup.displayName = "DropdownPopup";
 export default DropdownPopup;

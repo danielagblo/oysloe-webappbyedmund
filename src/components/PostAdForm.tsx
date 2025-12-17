@@ -1366,7 +1366,7 @@ export default function PostAdForm({
           }`}>
             <div className="grid grid-cols-1 gap-2">
               <div>
-                <label className="block mb-1 text-sm md:text-base lg:text-[1vw]">Product Category</label>
+                <label className="block mb-1 max-sm:font-medium text-sm md:text-base lg:text-[1vw]">Product Category</label>
                 <DropdownPopup
                   ref={categoryDropdownRef}
                   triggerLabel={
@@ -1402,7 +1402,7 @@ export default function PostAdForm({
               </div>
 
               <div>
-                <label className="block mb-1  text-sm md:text-base lg:text-[1vw]">Title</label>
+                <label className="block mb-1 max-sm:font-medium text-sm md:text-base lg:text-[1vw]">Title</label>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -1412,7 +1412,7 @@ export default function PostAdForm({
                 />
               </div>
               <div>
-                <p className="mb-1 font-medium text-sm md:text-base lg:text-[1vw]">Price</p>
+                <p className="mb-1 text-sm md:text-base max-sm:font-medium lg:text-[1vw]">Price</p>
                 <div className="relative">
                   <input
                     value={price}
@@ -1421,13 +1421,13 @@ export default function PostAdForm({
                     placeholder="0.00"
                     className="w-full border max-lg:bg-white text-sm md:text-base lg:text-[1vw] rounded-xl border-(--div-border) p-3 pl-7"
                   />
-                  <p className="absolute inline top-3.25 left-3">₵</p>
+                  <p className="absolute inline top-3.25 text-base md:text-base lg:text-[1vw] left-3 lg:left-2.5">₵</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <p className="mb-1 text-sm md:text-base lg:text-[1vw]">Declare ad purpose?</p>
+              <p className="mb-1 text-sm md:text-base max-sm:font-medium lg:text-[1vw]">Declare ad purpose?</p>
               <div className="flex gap-3 max-sm:grid max-sm:grid-cols-2 max-sm:gap-7 max-sm:pr-15">
                 {(
                   [
@@ -1503,7 +1503,7 @@ export default function PostAdForm({
                   return (
                   <div className="mt-4">
                     {hasRenderableFeatures && (
-                      <label className="block mb-1 font-medium  text-sm md:text-base lg:text-[0.85vw]">
+                      <label className="block mb-1 font-medium max-sm:font-medium text-sm md:text-base lg:text-[0.85vw]">
                         Features for selected subcategory
                       </label>
                     )}
