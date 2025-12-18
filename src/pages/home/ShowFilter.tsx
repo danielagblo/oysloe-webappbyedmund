@@ -593,28 +593,30 @@ const ShowFilter = ({
                     return (
                       <div
                         key={`def-${fd.id}`}
-                        className="flex items-center gap-3"
+                        className="grid grid-cols-1 sm:grid-cols-[auto,1fr] items-start gap-2 sm:gap-3 min-w-0"
                       >
-                        <label className="text-sm font-medium text-gray-700 w-1/3 flex-shrink-0">
+                        <label className="text-sm sm:text-base font-medium text-gray-700 wrap-break-word sm:pr-2">
                           {fd.name}
                         </label>
-                        <select
-                          value={localSelectedFeatures[fd.id] ?? ""}
-                          onChange={(e) =>
-                            setLocalSelectedFeatures((prev) => ({
-                              ...prev,
-                              [fd.id]: e.target.value,
-                            }))
-                          }
-                          className="flex-1 p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base"
-                        >
-                          <option value="">Select {fd.name}</option>
-                          {values.map((v) => (
-                            <option key={v} value={v}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="w-full min-w-0">
+                          <select
+                            value={localSelectedFeatures[fd.id] ?? ""}
+                            onChange={(e) =>
+                              setLocalSelectedFeatures((prev) => ({
+                                ...prev,
+                                [fd.id]: e.target.value,
+                              }))
+                            }
+                            className="w-full min-w-0 p-2 sm:p-3 border border-(--div-border) rounded-lg text-sm sm:text-base truncate"
+                          >
+                            <option value="">Select {fd.name}</option>
+                            {values.map((v) => (
+                              <option key={v} value={v}>
+                                {v}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     );
                   })}
