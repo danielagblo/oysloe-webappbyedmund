@@ -894,6 +894,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     <div className="flex h-full border-gray-100 ">
       <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
 
+
+
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}
           <div className="absolute left-0 right-0 top-0 flex items-center gap-3 rounded-2xl bg-white shadow z-10 py-2">
@@ -905,11 +907,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3" />
             </button>
 
-            <img
-              src={headerProduct?.image ?? (avatarMap[Number(roomInfo?.members?.[0]?.id ?? currentUser?.id ?? 0)] || "/chat-default.png")}
-              alt={headerProduct?.name ?? "Chat"}
-              className="w-12 h-10 rounded-xl object-cover"
-            />
+            {headerProduct?.image ? (
+              <img
+                src={headerProduct.image}
+                alt={headerProduct.name ?? "Product"}
+                className="w-12 h-10 rounded-xl object-cover"
+              />
+            ) : (
+              <div className="w-12 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs">
+                {headerProduct?.name
+                  ? headerProduct.name
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((word) => word[0]?.toUpperCase())
+                      .join("")
+                  : "CH"}
+              </div>
+            )}
 
             <div className="flex-1">
               <div className="font-semibold text-sm">
@@ -993,7 +1007,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                             )}
                           </div>
                           <img
-                            src={avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/usePfp2.jpg"}
+                            src={avatarMap[Number(msg.sender?.id ?? currentUser?.id ?? 0)] || "/userPfp2.jpg"}
                             alt="You"
                             className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
                           />
