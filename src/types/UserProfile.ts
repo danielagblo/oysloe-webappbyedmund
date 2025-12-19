@@ -2,6 +2,8 @@ export interface UserProfile {
   id: number;
   active_ads: number;
   taken_ads: number;
+  total_ads?: number;
+  total_taken_ads?: number;
   last_login: string;
   created_at: string;
   updated_at: string;
@@ -20,6 +22,7 @@ export interface UserProfile {
   address?: string;
   avatar?: string;
   admin_verified: boolean;
+  id_verified?: boolean;
   deleted: boolean;
   level: Level;
   referral_points: number;
@@ -30,6 +33,8 @@ export interface UserProfile {
   created_from_app: boolean;
   phone_verified: boolean;
   email_verified: boolean;
+  wrong_coupon_attempts?: number;
+  can_redeem_coupon?: boolean;
   preferred_notification_email?: string;
   preferred_notification_phone?: string;
 }
