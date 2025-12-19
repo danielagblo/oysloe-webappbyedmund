@@ -50,15 +50,17 @@ const VerificationPage = () => {
       } else {
         // reset-password flow
         const resp = (await verifyOTP(phone, otpValue)) as Record<string, unknown>;
+        let token: string | null = null;
         try {
-          const token = resp?.token ?? resp?.reset_token ?? resp?.data?.token ?? resp?.data?.reset_token ?? null;
+          const data = (resp as any)?.data;
+          token = (resp as any)?.token ?? (resp as any)?.reset_token ?? data?.token ?? data?.reset_token ?? null;
           if (token && typeof window !== "undefined") {
             localStorage.setItem("oysloe_reset_token", String(token));
           }
         } catch (e) {
           void e;
         }
-        navigate("/resetpassword", { state: { phone, token: resp?.token ?? resp?.reset_token ?? null } });
+        navigate("/resetpassword", { state: { phone, token } });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
