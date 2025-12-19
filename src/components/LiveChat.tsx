@@ -521,21 +521,21 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
-  const formatDateHeader = (iso?: string | null) => {
-    if (!iso) return "";
-    try {
-      const d = new Date(iso);
-      const today = new Date();
-      const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const diff = Math.round((t0.getTime() - d0.getTime()) / (24 * 60 * 60 * 1000));
-      if (diff === 0) return "Today";
-      if (diff === 1) return "Yesterday";
-      return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-    } catch {
-      return "";
-    }
-  };
+  // const formatDateHeader = (iso?: string | null) => {
+  //   if (!iso) return "";
+  //   try {
+  //     const d = new Date(iso);
+  //     const today = new Date();
+  //     const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  //     const d0 = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  //     const diff = Math.round((t0.getTime() - d0.getTime()) / (24 * 60 * 60 * 1000));
+  //     if (diff === 0) return "Today";
+  //     if (diff === 1) return "Yesterday";
+  //     return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  //   } catch {
+  //     return "";
+  //   }
+  // };
 
   // Fetch room details and try to resolve a product for the chat header
   useEffect(() => {
