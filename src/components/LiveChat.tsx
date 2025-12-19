@@ -182,7 +182,7 @@ function ChatInput({
               onKeyDown={onKeyDown}
               type="text"
               placeholder="Start a chat"
-              className="rounded-2xl border-2 outline-0 border-gray-300 px-10 py-3 bg-no-repeat bg-white text-sm w-full"
+              className="rounded-2xl border-2 lg:rounded-[0.75vw] lg:border outline-0 border-gray-300 px-10 py-3 lg:pl-[3vw] bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
             />
             {!recording && (
               <button
@@ -190,7 +190,7 @@ function ChatInput({
                 className="absolute bottom-3 left-3"
                 type="button"
               >
-                <img src="/image.png" alt="Attach" className="w-5 h-auto" />
+                <img src="/image.png" alt="Attach" className="w-5 lg:w-[1.75vw] h-auto" />
               </button>
             )}
           </div>
@@ -199,18 +199,18 @@ function ChatInput({
             type="button"
             aria-label="Send"
             disabled={disabled}
-            className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            <img src="/send.svg" alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
           </button>
           <button
             onClick={() => startRecording()}
             type="button"
             aria-label={recording ? "Stop recording" : "Start recording"}
             disabled={disabled}
-            className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+            <img src="/audio.svg" alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
           </button>
         </div>
       )}
@@ -902,23 +902,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}
-          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 lg:shadow-sm rounded-b-2xl lg:rounded-2xl bg-white shadow z-10 py-2">
+          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 lg:shadow-sm rounded-b-2xl lg:py-5 lg:rounded-2xl bg-white shadow z-10 py-2">
             <button
               onClick={onClose}
               aria-label="Back"
               className="p-2 hover:bg-gray-100 curosor-pointer rounded-full ml-2"
             >
-              <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3" />
+              <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3 lg:w-[1.25vw] lg:h-[1.25vw] lg:mr-[1vw]" />
             </button>
 
             {headerProduct?.image ? (
               <img
                 src={headerProduct.image}
                 alt={headerProduct.name ?? "Product"}
-                className="w-12 h-10 rounded-xl object-cover"
+                className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
               />
             ) : (
-              <div className="w-12 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs">
+              <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
                 {headerProduct?.name
                   ? headerProduct.name
                       .split(" ")
@@ -930,7 +930,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             )}
 
             <div className="flex-1">
-              <div className="font-semibold text-sm">
+              <div className="font-semibold text-sm md:text-base lg:text-[1.25vw] lg:pl-[1vw]">
                 {roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
                   ? `Case #${validatedRoomId ?? caseId}`
                   : `${validatedRoomId ?? caseId}`}
@@ -953,7 +953,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               const dateKey = getDateKey(created);
               if (dateKey && dateKey !== lastKey) {
                 nodes.push(
-                  <div key={`date-${dateKey}`} className="text-center text-xs text-gray-400 my-2">
+                  <div key={`date-${dateKey}`} className="text-center text-xs md:text-sm lg:text-[0.8vw] text-gray-400 my-2 lg:my-[2vw]">
                     {formatReviewDate(created)}
                   </div>,
                 );
@@ -980,9 +980,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
 
               // For audio messages we want the bubble to expand so the player can show full controls
-              const bubbleBaseClass = "border border-gray-200 max-sm:border-gray-300 max-sm:border-2 p-3 rounded-xl min-w-0 wrap-break-word";
+              const bubbleBaseClass = "border border-gray-200 max-sm:border-gray-300 max-sm:border-2 p-3 lg:p-[1vw] rounded-xl min-w-0 wrap-break-word";
               const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
-              const bubbleColorClass = isMine ? "bg-green-100 max-w-[80%] text-black rounded-tr-none" : "flex-1 bg-white rounded-tl-none";
+              const bubbleColorClass = isMine ? "bg-green-100 max-w-[80%] text-black rounded-tr-none" : "flex-1 bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
               const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
 
               nodes.push(
@@ -990,7 +990,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                   <div className="flex flex-col">
                     {isMine ? (
                       <div className="flex flex-col items-end gap-1">
-                        <p className="text-sm font-medium text-gray-600 mr-7">You</p>
+                        <p className="text-sm md:text-base lg:text-[1.25vw] font-medium text-gray-600 mr-7 lg:mr-10">You</p>
 
                         <div className="relative flex items-end justify-end">
                           <div className={bubbleClass}>
@@ -1007,23 +1007,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
                           </div>
                           <img
                             src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
                             alt={msg.sender?.name ?? "You"}
-                            className="w-10 h-10 rounded-full object-cover absolute -top-7 -right-3 border-2 border-white shadow"
+                            className="w-10 h-10 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover absolute -top-7 -right-3 border-2 border-white max-sm:border-gray-200 shadow"
                           />
                         </div>
 
-                        <div className="text-[9px] text-gray-400 mt-1 text-right">
+                        <div className="text-[9px] md:text-xs lg:text-[0.75vw] text-gray-400 mt-1 text-right">
                           <span className="inline-flex items-center gap-1">
                             <span>{formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}</span>
                             {isMine && delivery && (
                               delivery === "received" ? (
                                 <svg
-                                  className="w-3 mr-3 h-auto"
+                                  className="w-3 lg:w-[1vw] lg:ml-[1vw] mr-3 h-auto"
                                   viewBox="0 0 9 8"
                                   fill="none"
                                   xmlns="http://www.w3.org/2000/svg"
@@ -1032,7 +1032,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                   <path d="M1.25775 5.15875L3.87385 7.08711L7.97808 2.94521" stroke="#374957" />
                                 </svg>
                               ) : (
-                                <svg className="text-gray-400 w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg className="text-gray-400 w-4 h-4 lg:mr-[1vw] lg:w-[1vw] lg:h-[1vw]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                   <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               )
@@ -1042,7 +1042,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                       </div>
                     ) : (
                       <div className="flex flex-col items-start gap-1">
-                        <p className="text-sm font-medium  ml-7">{msg.sender?.name ?? "User"}</p>
+                        <p className="text-sm font-medium lg:text-[1.25vw] lg:ml-10 ml-7">{msg.sender?.name ?? "User"}</p>
 
                         <div className="relative flex items-start justify-start">
                           <div className={bubbleClass}>
@@ -1059,17 +1059,17 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
                             )}
                           </div>
                           <img
                             src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
                             alt="User"
-                            className="w-10 h-10 rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
+                            className="w-10 h-10 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
                           />
                         </div>
 
-                        <div className="text-[9px] text-gray-400 mt-1 text-left">
+                        <div className="text-[9px] md:text-xs lg:text-[0.75vw] text-gray-400 mt-1 text-left">
                           {formatTime((msg as unknown as { created_at?: string }).created_at ?? null)}
                         </div>
                       </div>
