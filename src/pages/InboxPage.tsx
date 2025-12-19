@@ -40,7 +40,7 @@ export default function InboxPage() {
         </div>
 
         {/* Desktop right column */}
-        <div className="hidden lg:block lg:w-[50%]  w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+        <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
           <LiveChat
             caseId={selectedCase}
             onClose={() => setSelectedCase(null)}
