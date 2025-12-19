@@ -1,17 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  login,
-  logout as logoutService,
-  otpLogin,
-  register,
+    login,
+    logout as logoutService,
+    otpLogin,
+    register,
 } from "../../services/authService";
 import firebaseMessaging from "../../services/firebaseMessaging";
 import notificationService from "../../services/notificationService";
 import userProfileService from "../../services/userProfileService";
 import type {
-  LoginRequest,
-  OTPLoginRequest,
-  RegisterRequest,
+    LoginRequest,
+    OTPLoginRequest,
+    RegisterRequest,
 } from "../../types/Auth";
 
 const STORAGE_TOKEN_KEY = "oysloe_token";
