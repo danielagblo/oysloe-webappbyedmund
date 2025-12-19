@@ -8,6 +8,7 @@ import {
   useUserSubscriptions,
 } from "../features/subscriptions/useSubscriptions";
 import { initiatePaystackPayment } from "../services/paymentService";
+import { formatMoney } from "../utils/formatMoney";
 
 const SubscriptionPage = () => {
   const isSmall = useIsSmallScreen();
@@ -201,13 +202,12 @@ const SubscriptionPage = () => {
 
                 <div className="flex justify-start items-center gap-4">
                   <p className="font-bold">
-                    ₵ {Number(s.effective_price ?? s.price).toFixed(0)}
+                    {formatMoney(Number(s.effective_price ?? s.price), "GHS")}
                   </p>
                   {s.original_price && (
                     <p className="text-gray-500 text-sm">
-                      ₵{" "}
                       <span className="line-through">
-                        {Number(s.original_price).toFixed(0)}
+                        {formatMoney(Number(s.original_price), "GHS")}
                       </span>
                     </p>
                   )}
@@ -337,13 +337,12 @@ const SubscriptionPage = () => {
 
                   <div className="flex justify-start items-start gap-4 w-full">
                     <p className="font-bold text-sm">
-                      ₵ {Number(s.effective_price ?? s.price).toFixed(2)}
+                      {formatMoney(Number(s.effective_price ?? s.price), "GHS")}
                     </p>
                     {s.original_price && (
                       <p className="text-gray-500">
-                        ₵{" "}
                         <span className="line-through">
-                          {Number(s.original_price).toFixed(2)}
+                          {formatMoney(Number(s.original_price), "GHS")}
                         </span>
                       </p>
                     )}
