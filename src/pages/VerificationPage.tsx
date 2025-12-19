@@ -49,11 +49,16 @@ const VerificationPage = () => {
         navigate("/homepage");
       } else {
         // reset-password flow
-        // const resp =
-        await verifyOTP(phone, otpValue);
-        // localStorage.setItem("oysloe_token", resp.token);
-        // localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
-        navigate("/resetpassword", { state: { phone } });
+        const resp = (await verifyOTP(phone, otpValue)) as Record<string, unknown>;
+        try {
+          const token = resp?.token ?? resp?.reset_token ?? resp?.data?.token ?? resp?.data?.reset_token ?? null;
+          if (token && typeof window !== "undefined") {
+            localStorage.setItem("oysloe_reset_token", String(token));
+          }
+        } catch (e) {
+          void e;
+        }
+        navigate("/resetpassword", { state: { phone, token: resp?.token ?? resp?.reset_token ?? null } });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

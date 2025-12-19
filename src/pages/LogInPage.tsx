@@ -45,6 +45,38 @@ const LogInPage = () => {
     }
 
     setIsLoading(true);
+    // Ask the user on first login whether they want notifications.
+    try {
+      if (typeof window !== "undefined") {
+        const ASKED_KEY = "oysloe_notifications_asked";
+        const OPT_IN_KEY = "oysloe_notifications_opt_in";
+        const asked = localStorage.getItem(ASKED_KEY) === "true";
+        if (!asked) {
+          const allow = window.confirm(
+            "Would you like to enable push notifications? You can change this later in settings.",
+          );
+          try {
+            localStorage.setItem(ASKED_KEY, "true");
+            localStorage.setItem(OPT_IN_KEY, allow ? "true" : "false");
+          } catch {
+            // ignore storage errors
+          }
+          if (allow && typeof Notification !== "undefined" && Notification.permission !== "granted") {
+            // eslint-disable-next-line no-await-in-loop
+            await Notification.requestPermission();
+          }
+        } else {
+          // If previously opted-in but permission not yet granted, request again on gesture
+          const opted = localStorage.getItem("oysloe_notifications_opt_in") === "true";
+          if (opted && typeof Notification !== "undefined" && Notification.permission !== "granted") {
+            // eslint-disable-next-line no-await-in-loop
+            await Notification.requestPermission();
+          }
+        }
+      }
+    } catch (permErr) {
+      void permErr;
+    }
     try {
       await loginMutation.mutateAsync({
         email: formData.email,
@@ -106,7 +138,7 @@ const LogInPage = () => {
               onClick={() => {
                 try {
                   localStorage.setItem("oysloe_guest", "true");
-                } catch {}
+                } catch { }
                 navigate("/");
               }}
               className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition max-sm:fixed max-sm:top-4 max-sm:right-4 max-sm:bg-transparent max-sm:hover:bg-transparent"

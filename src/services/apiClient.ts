@@ -129,13 +129,15 @@ async function request<T>(
 
 export const apiClient = {
   get: <T>(url: string) => request<T>(url),
-  post: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "POST", body }),
-  patch: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "PATCH", body }),
-  put: <T>(url: string, body: unknown) =>
-    request<T>(url, { method: "PUT", body }),
-  delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
+  // Allow optional headers to be passed for requests that need custom headers
+  post: <T>(url: string, body: unknown, headers?: Record<string, string>) =>
+    request<T>(url, { method: "POST", body, headers }),
+  patch: <T>(url: string, body: unknown, headers?: Record<string, string>) =>
+    request<T>(url, { method: "PATCH", body, headers }),
+  put: <T>(url: string, body: unknown, headers?: Record<string, string>) =>
+    request<T>(url, { method: "PUT", body, headers }),
+  delete: <T>(url: string, headers?: Record<string, string>) =>
+    request<T>(url, { method: "DELETE", headers }),
 };
 
 export const ping = () => apiClient.get<{ message: string }>("/");

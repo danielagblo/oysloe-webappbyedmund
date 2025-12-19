@@ -34,7 +34,16 @@ export const updateUserProfile = async (
 
 // OTP Verification
 export const sendOTP = async (phone: string): Promise<MessageResponse> => {
-  return apiClient.get<MessageResponse>(endpoints.userProfile.sendOTP(phone));
+  const response = await apiClient.get<any>(endpoints.userProfile.sendOTP(phone));
+  try {
+    const token = response?.token ?? response?.reset_token ?? response?.data?.token ?? response?.data?.reset_token ?? null;
+    if (token && typeof window !== "undefined") {
+      localStorage.setItem("oysloe_reset_token", String(token));
+    }
+  } catch (e) {
+    void e;
+  }
+  return response as MessageResponse;
 };
 
 export const verifyOTP = async (

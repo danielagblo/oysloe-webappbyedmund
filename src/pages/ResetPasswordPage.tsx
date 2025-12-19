@@ -3,15 +3,21 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import LottieSuccess from "../components/LottieSuccess";
 import OnboardingScreen from "../components/OnboardingScreen";
-import { ResetDropdown } from "../components/ResetDropdown";
-import { resetPassword } from "../services/authService";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import PhoneInput from "../components/PhoneInput";
+import { ResetDropdown } from "../components/ResetDropdown";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { resetPassword } from "../services/authService";
 
 const ResetPasswordPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const phoneFromState = location.state?.phone ?? "";
+  // Token saved after OTP was sent. OTP flow should save this as
+  // localStorage.setItem('oysloe_reset_token', token) or pass via location.state
+  const tokenFromState =
+    (location.state as any)?.token ??
+    (typeof window !== "undefined" ? localStorage.getItem("oysloe_reset_token") : null) ??
+    "";
   const isSmall = useIsSmallScreen();
   const shouldShowOnboarding =
     typeof window !== "undefined"
@@ -38,22 +44,59 @@ const ResetPasswordPage = () => {
       setError("Both password fields are required");
       return;
     }
+
+    const validatePassword = (pw: string) => {
+      const errors: string[] = [];
+      if (!pw || pw.length < 12) {
+        errors.push("be at least 12 characters long");
+      }
+      if (!/[a-z]/.test(pw)) {
+        errors.push("include a lowercase letter");
+      }
+      if (!/[A-Z]/.test(pw)) {
+        errors.push("include an uppercase letter");
+      }
+      if (!/[0-9]/.test(pw)) {
+        errors.push("include a number");
+      }
+      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw)) {
+        errors.push("include a symbol (e.g. !@#$%)");
+      }
+      return errors;
+    };
+
+    const pwErrors = validatePassword(newPassword);
+    if (pwErrors.length > 0) {
+      setError(`Password must ${pwErrors.join(", ")}.`);
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters long");
+    // Ensure reset token (from OTP) is available to include with the update
+    const resetToken = tokenFromState;
+    if (!resetToken) {
+      setError("Reset token not found. Please request a new OTP.");
       return;
     }
 
     setLoading(true);
     try {
-      await resetPassword({
-        phone: phone,
-        new_password: newPassword,
-        confirm_password: confirmPassword,
-      });
+      await resetPassword(
+        {
+          phone: phone,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        },
+        // send reset token in Authorization header with 'Token ' prefix
+        { Authorization: `Token ${resetToken}` },
+      );
+      // remove stored token after successful password reset
+      try {
+        localStorage.removeItem("oysloe_reset_token");
+      } catch { }
       setShowModal(true);
     } catch (err) {
       const msg =
@@ -74,7 +117,7 @@ const ResetPasswordPage = () => {
               onClick={() => {
                 try {
                   localStorage.setItem("oysloe_guest", "true");
-                } catch {}
+                } catch { }
                 navigate("/");
               }}
               className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition max-sm:fixed max-sm:top-4 max-sm:right-4 max-sm:bg-transparent max-sm:hover:bg-transparent"
