@@ -21,6 +21,36 @@ export default function SupportAndCases({
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
+  // derive API origin for asset URL fallbacks (may include a path like /api-v1)
+  const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+  let apiOriginFallback = "";
+  try {
+    apiOriginFallback = new URL(_apiRaw).origin;
+  } catch {
+    apiOriginFallback = _apiRaw.replace(/\/+$/, "");
+  }
+
+  // Helper: convert data: URLs to object URLs (used for persisted ad images)
+  const dataUrlToObjectUrl = (dataUrl: string) => {
+    try {
+      const comma = dataUrl.indexOf(",");
+      if (comma === -1) return dataUrl;
+      const meta = dataUrl.substring(0, comma);
+      const base64 = dataUrl.substring(comma + 1);
+      const m = /data:([^;]+);base64/.exec(meta);
+      const mime = m ? m[1] : "application/octet-stream";
+      const binary = atob(base64);
+      const len = binary.length;
+      const u8 = new Uint8Array(len);
+      for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+      const blob = new Blob([u8], { type: mime });
+      const url = URL.createObjectURL(blob);
+      return url;
+    } catch {
+      return dataUrl;
+    }
+  };
+
 
 
   // Use React Query to fetch and cache chat rooms
@@ -71,6 +101,9 @@ export default function SupportAndCases({
                 // so UI can show previews (some payloads include `last_message`)
                 // keep the raw field names to remain compatible with usage
                 last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
+                // preserve ad metadata when present on chatrooms_list payloads
+                ad_name: raw.ad_name ?? raw.adName ?? null,
+                ad_image: raw.ad_image ?? raw.adImage ?? null,
               } as ChatRoom;
             };
 
@@ -286,11 +319,74 @@ export default function SupportAndCases({
           })();
 
           const member = r.members[0];
-          const initials = r.name
+          // Prefer ad_name initials for fallback if provided by the chatrooms_list
+          const adNamePayload = (r as any).ad_name ?? (r as any).adName ?? null;
+          const titleForInitials = adNamePayload ? String(adNamePayload) : (r.name ?? "");
+          const initials = titleForInitials
             ?.split(" ")
             .map(word => word[0])
             .join("")
             .toUpperCase();
+
+          // determine thumbnail source: prefer persisted ad metadata, then member/avatar
+          let thumbSrc: string | null = null;
+          // Prefer ad_image from websocket payload (normalized into room) first
+          try {
+            const adFromPayload = (r as any).ad_image ?? (r as any).adImage ?? null;
+            if (adFromPayload) {
+              const img = String(adFromPayload);
+              thumbSrc = img.startsWith("data:") ? dataUrlToObjectUrl(img) : img;
+            }
+          } catch {
+            /* ignore */
+          }
+          try {
+            if (typeof window !== "undefined") {
+              const raw = localStorage.getItem("oysloe_chatroom_meta");
+              if (raw) {
+                const map = JSON.parse(raw || "{}");
+                const meta = map[String(r.room_id ?? r.id)];
+                if (meta && meta.ad_image) {
+                  let img = String(meta.ad_image);
+                  if (img.startsWith("data:")) {
+                    thumbSrc = dataUrlToObjectUrl(img);
+                  } else if (img.startsWith("/")) {
+                    // prefer API origin for known asset paths
+                    if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                      thumbSrc = apiOriginFallback + img;
+                    } else {
+                      thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + img;
+                    }
+                  } else {
+                    thumbSrc = img;
+                  }
+                }
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          // fallback to member avatar or room other_user_avatar
+          if (!thumbSrc) {
+            try {
+              // If an `ad_name` exists prefer using ad-based thumbnail/initials
+              // and do not fall back to the member/current-user avatar.
+              const s = !adNamePayload ? (member?.avatar || (r as any).other_user_avatar) : ((r as any).other_user_avatar ?? null);
+              if (s) {
+                if (/^https?:\/\//i.test(s)) thumbSrc = s;
+                else if (s.startsWith("//")) thumbSrc = window.location.protocol + s;
+                else if (s.startsWith("/")) {
+                  if (/^\/assets\//i.test(s) || /^\/media\//i.test(s) || /^\/uploads\//i.test(s)) {
+                    thumbSrc = apiOriginFallback + s;
+                  } else {
+                    thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + s;
+                  }
+                } else thumbSrc = s;
+              }
+            } catch {
+              /* ignore */
+            }
+          }
 
           return (
             <button
@@ -298,23 +394,8 @@ export default function SupportAndCases({
               onClick={() => onSelectChat?.(String(r.room_id ?? r.id))}
               className={`relative text-left p-3 cursor-pointer rounded-xl ${(r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start gap-3`}
             >
-              {(member?.avatar || (r as any).other_user_avatar) ? (
-                <img
-                  src={(() => {
-                    try {
-                      const s = member?.avatar || (r as any).other_user_avatar;
-                      if (!s) return s;
-                      if (/^https?:\/\//i.test(s)) return s;
-                      if (s.startsWith("//")) return window.location.protocol + s;
-                      if (s.startsWith("/")) return (typeof window !== "undefined" ? window.location.origin : "") + s;
-                      return s;
-                    } catch {
-                      return member?.avatar || (r as any).other_user_avatar;
-                    }
-                  })()}
-                  alt="chat"
-                  className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover"
-                />
+              {thumbSrc ? (
+                <img src={thumbSrc} alt={String(r.name || "chat")} className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover" />
               ) : (
                 <div className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
                   {initials}
@@ -322,7 +403,7 @@ export default function SupportAndCases({
               )}
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{r.name}</p>
+                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{(r as any).ad_name ? (r as any).ad_name : r.name}</p>
                   {
                     r.total_unread ? (
                       <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
@@ -431,8 +512,8 @@ export default function SupportAndCases({
                   <div className="flex items-center gap-2 mt-0.5">
                     <span
                       className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${status === "closed"
-                          ? "bg-red-300 text-red-700"
-                          : "bg-green-200 text-green-700"
+                        ? "bg-red-300 text-red-700"
+                        : "bg-green-200 text-green-700"
                         }`}
                     >
                       {status.toUpperCase() !== "ACTIVE" ? "Closed" : "Active"}

@@ -706,6 +706,35 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
     setRoomInfo(null);
     setHeaderProduct(null);
+    // try to load persisted chatroom metadata (ad_name/ad_image) put there by the caller
+    try {
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (raw) {
+        const map = JSON.parse(raw || "{}");
+        const meta = map[String(validatedRoomId)];
+        if (meta) {
+          const prod: any = {};
+          if (meta.ad_name) prod.name = String(meta.ad_name);
+          if (meta.ad_image) {
+            let img = String(meta.ad_image);
+            if (img.startsWith("data:")) {
+              prod.image = dataUrlToObjectUrl(img);
+            } else if (img.startsWith("/")) {
+              if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                prod.image = apiOriginFallback + img;
+              } else {
+                prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+              }
+            } else {
+              prod.image = img;
+            }
+          }
+          if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
+        }
+      }
+    } catch {
+      // ignore
+    }
   }, [validatedRoomId]);
 
   // If the websocket provides a chatrooms list, use it to set roomInfo for the current room
@@ -727,6 +756,24 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
           } catch {
             setRoomAvatarMap((s) => ({ ...s, [roomKey]: String(otherAvatar) }));
           }
+        }
+        // If the chatrooms list contains ad metadata (ad_name/ad_image), prefer
+        // that for the header product information so the header shows the ad
+        // when available (this comes from `type: "chatrooms_list"`).
+        try {
+          const adName = (found as any).ad_name;
+          const adImage = (found as any).ad_image;
+          if (adName || adImage) {
+            const prod: any = {};
+            if (adName) prod.name = String(adName);
+            if (adImage) {
+              const img = String(adImage);
+              prod.image = img.startsWith("data:") ? dataUrlToObjectUrl(img) : (normalizeAvatarUrl(img) || img);
+            }
+            if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
+          }
+        } catch {
+          // ignore header product extraction errors
         }
       } catch {
         // ignore
@@ -1012,29 +1059,72 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3 lg:w-[1.25vw] lg:h-[1.25vw] lg:mr-[1vw]" />
             </button>
 
-            {headerProduct?.image ? (
-              <img
-                src={headerProduct.image}
-                alt={headerProduct.name ?? "Product"}
-                className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
-              />
-            ) : (
-              <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
-                {headerProduct?.name
-                  ? headerProduct.name
-                    .split(" ")
-                    .slice(0, 2)
-                    .map((word) => word[0]?.toUpperCase())
-                    .join("")
-                  : "CH"}
-              </div>
-            )}
+            {(() => {
+              try {
+                const headerProductImage = (() => {
+                  try {
+                    const img = headerProduct?.image;
+                    if (!img) return null;
+                    const s = String(img);
+                    if (s.startsWith("data:")) return dataUrlToObjectUrl(s);
+                    return normalizeAvatarUrl(s) || s;
+                  } catch {
+                    return headerProduct?.image ?? null;
+                  }
+                })();
+
+                if (headerProductImage) {
+                  return (
+                    <img
+                      src={headerProductImage}
+                      alt={headerProduct.name ?? "Product"}
+                      onError={(e) => {
+                        try {
+                          const el = e.target as HTMLImageElement;
+                          if (el.src && el.src.indexOf("/assets/") !== -1) {
+                            try {
+                              el.src = apiOriginFallback + new URL(el.src).pathname;
+                              return;
+                            } catch {
+                              // ignore URL parse errors
+                            }
+                          }
+                        } catch {
+                          // ignore
+                        }
+                        try {
+                          (e.target as HTMLImageElement).src = "/userPfp2.jpg";
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                      className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
+                    />
+                  );
+                }
+              } catch {
+                // ignore
+              }
+              return (
+                <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
+                  {headerProduct?.name
+                    ? headerProduct.name
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((word) => word[0]?.toUpperCase())
+                      .join("")
+                    : "CH"}
+                </div>
+              );
+            })()}
 
             <div className="flex-1">
               <div className="font-semibold text-sm md:text-base lg:text-[1.25vw] lg:pl-[1vw]">
-                {roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
-                  ? `Case #${validatedRoomId ?? caseId}`
-                  : `${validatedRoomId ?? caseId}`}
+                {headerProduct?.name
+                  ? headerProduct.name
+                  : roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
+                    ? `Case #${validatedRoomId ?? caseId}`
+                    : `${validatedRoomId ?? caseId}`}
               </div>
             </div>
             {headerAvatar && (
