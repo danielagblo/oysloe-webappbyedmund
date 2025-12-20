@@ -935,7 +935,7 @@ const AdsDetailsPage = () => {
         <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
       {openLiveChatRoomId && (
-        <div className="fixed bottom-4 right-4 z-50 w-[360px] h-[480px]">
+        <div className="fixed bottom-4 right-4 z-60 w-[360px] md:w-[440px] lg:w-[520px] xl:w-[620px] h-[480px] lg:h-[640px]">
           <LiveChat
             caseId={openLiveChatRoomId}
             onClose={() => setOpenLiveChatRoomId(null)}

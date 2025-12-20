@@ -61,6 +61,8 @@ export default function useWsChat(): UseWsChatReturn {
 
   const roomClients = useRef<Record<string, WebSocketClient | null>>({});
   const roomConnecting = useRef<Record<string, boolean>>({});
+  // track whether we've requested REST history for a room as a fallback
+  const roomHistoryRequested = useRef<Record<string, boolean>>({});
   const listClient = useRef<WebSocketClient | null>(null);
   const unreadClient = useRef<WebSocketClient | null>(null);
   useEffect(() => {
@@ -395,6 +397,44 @@ export default function useWsChat(): UseWsChatReturn {
       const client = createClient(url);
       roomClients.current[key] = client;
       try { client.connect(); } catch { /* ignore */ }
+
+      // If the websocket server does not emit history within a short window
+      // request recent messages via REST as a one-time fallback. This prevents
+      // the UI from waiting until the user sends a message to see history.
+      try {
+        setTimeout(() => {
+          (async () => {
+            try {
+              // already have messages? skip
+              const existing = (messages as any)[key];
+              if (Array.isArray(existing) && existing.length > 0) return;
+              if (roomHistoryRequested.current[key]) return;
+
+              // find a numeric DB id for this room if available from cached chatrooms
+              const found = chatrooms.find(
+                (r) => String(r.room_id) === String(key) || String(r.id) === String(key) || String(r.name) === String(key),
+              );
+              const idToFetch = found?.id ?? (String(roomId).match(/^[0-9]+$/) ? roomId : null);
+              if (!idToFetch) return;
+              roomHistoryRequested.current[key] = true;
+              try {
+                const msgs = await chatService.getChatRoomMessages(idToFetch);
+                if (Array.isArray(msgs) && msgs.length > 0) {
+                  const mapped = msgs.map(normalizeIncomingMessage);
+                  setMessages((prev) => ({ ...prev, [key]: mapped }));
+                }
+              } catch {
+                // ignore REST failures; server may push history shortly after
+              }
+            } catch {
+              // ignore
+            }
+          })();
+        }, 800);
+      } catch {
+        // ignore
+      }
+
       return key;
     },
     [token],

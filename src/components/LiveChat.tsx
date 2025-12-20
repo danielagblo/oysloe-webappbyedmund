@@ -141,7 +141,7 @@ function ChatInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div className="relative pb-18 md:pb-22 lg:pb-0 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
+    <div className="relative pb-4 md:pb-6 lg:pb-4 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
       {recording ? (
         <div className="flex items-center bg-white gap-2 w-full rounded-2xl px-10 py-3" style={{ border: "1px solid var(--div-border)", background: "white" }}>
           <div className="flex items-center gap-2">
@@ -174,8 +174,8 @@ function ChatInput({
           </div>
         </div>
       ) : (
-        <div className="flex lg:py-3 items-center justify-center max-lg:w-9/10 gap-2 w-full">
-          <div className="relative lg:flex-1 lg:max-w-7/10">
+        <div className="flex items-center gap-2 w-full py-2">
+          <div className="relative flex-1">
             <input
               value={value}
               onChange={(e) => {
@@ -205,7 +205,7 @@ function ChatInput({
               }}
               type="text"
               placeholder="Start a chat"
-              className="rounded-2xl border-2 lg:rounded-[0.75vw] lg:border outline-0 border-gray-300 px-10 py-3 lg:pl-[3vw] bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
+              className="rounded-2xl border-2 outline-0 border-gray-300 px-4 pl-12 py-3 bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
             />
             {!recording && (
               <button
@@ -217,24 +217,26 @@ function ChatInput({
               </button>
             )}
           </div>
-          <button
-            onClick={onSend}
-            type="button"
-            aria-label="Send"
-            disabled={disabled}
-            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            <img src="/send.svg" alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
-          </button>
-          <button
-            onClick={() => startRecording()}
-            type="button"
-            aria-label={recording ? "Stop recording" : "Start recording"}
-            disabled={disabled}
-            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            <img src="/audio.svg" alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onSend}
+              type="button"
+              aria-label="Send"
+              disabled={disabled}
+              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => startRecording()}
+              type="button"
+              aria-label={recording ? "Stop recording" : "Start recording"}
+              disabled={disabled}
+              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -331,7 +333,46 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
   const [roomAvatarMap, setRoomAvatarMap] = useState<Record<string, string>>({});
   const [roomInfo, setRoomInfo] = useState<any | null>(null);
-  const [headerProduct, setHeaderProduct] = useState<Product | null>(null);
+  const [headerProduct, setHeaderProduct] = useState<Product | null>(() => {
+    try {
+      if (!caseId) return null;
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (!raw) return null;
+      const map = JSON.parse(raw || "{}");
+      const meta = map[String(caseId)];
+      if (!meta) return null;
+      const prod: any = {};
+      if (meta.ad_name) prod.name = String(meta.ad_name);
+      if (meta.ad_image) {
+        let img = String(meta.ad_image);
+        if (img.startsWith("data:")) {
+          // dataUrlToObjectUrl is defined below but safe to call here because
+          // this initializer runs synchronously during module eval and the
+          // function declaration appears earlier in the file.
+          prod.image = dataUrlToObjectUrl(img);
+        } else if (img.startsWith("/")) {
+          // derive api origin fallback similar to normalizeAvatarUrl
+          const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+          let apiOriginFallbackLocal = "";
+          try {
+            apiOriginFallbackLocal = new URL(_apiRaw).origin;
+          } catch {
+            apiOriginFallbackLocal = _apiRaw.replace(/\/+$/, "");
+          }
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            prod.image = apiOriginFallbackLocal + img;
+          } else {
+            prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+          }
+        } else {
+          prod.image = img;
+        }
+      }
+      return Object.keys(prod).length > 0 ? (prod as Product) : null;
+    } catch {
+      return null;
+    }
+  });
   // cache for object URLs created from data: URLs to avoid recreating blobs repeatedly
   const dataUrlObjectUrlRef = useRef<Record<string, string>>({});
 
@@ -697,15 +738,13 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   // Fetch room details and try to resolve a product for the chat header
   useEffect(() => {
     // Without REST access we can't fetch room details here. Clear any previous
-    // room info and product header; room metadata should be provided via
-    // websocket messages if needed by the server-side implementation.
+    // room info but DO NOT clear headerProduct because persisted ad metadata
+    // should remain visible and must not flash to the room id.
     if (!validatedRoomId) {
       setRoomInfo(null);
-      setHeaderProduct(null);
       return;
     }
     setRoomInfo(null);
-    setHeaderProduct(null);
     // try to load persisted chatroom metadata (ad_name/ad_image) put there by the caller
     try {
       const raw = localStorage.getItem("oysloe_chatroom_meta");
@@ -729,13 +768,52 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               prod.image = img;
             }
           }
-          if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
+          if (Object.keys(prod).length > 0) {
+            // Do not overwrite any persisted headerProduct (ad_name) that was
+            // loaded from localStorage earlier. Prefer existing headerProduct
+            // with a name and only set when none exists.
+            setHeaderProduct((curr) => (curr && curr.name ? curr : (prod as Product)));
+          }
         }
       }
     } catch {
       // ignore
     }
   }, [validatedRoomId]);
+
+  // Ensure persisted `ad_name` is loaded immediately when `caseId` changes so the
+  // header shows the ad name right away (avoid flashing room id). This prefers
+  // persisted metadata over any websocket-provided values and should never be
+  // overwritten by later socket updates.
+  useEffect(() => {
+    try {
+      if (!caseId) return;
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (!raw) return;
+      const map = JSON.parse(raw || "{}");
+      const meta = map[String(caseId)];
+      if (!meta) return;
+      const prod: any = {};
+      if (meta.ad_name) prod.name = String(meta.ad_name);
+      if (meta.ad_image) {
+        let img = String(meta.ad_image);
+        if (img.startsWith("data:")) {
+          prod.image = dataUrlToObjectUrl(img);
+        } else if (img.startsWith("/")) {
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            prod.image = apiOriginFallback + img;
+          } else {
+            prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+          }
+        } else {
+          prod.image = img;
+        }
+      }
+      if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
+    } catch {
+      // ignore
+    }
+  }, [caseId]);
 
   // If the websocket provides a chatrooms list, use it to set roomInfo for the current room
   useEffect(() => {
@@ -857,10 +935,20 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (prev === 0 && now > 0) {
       el.scrollTop = el.scrollHeight;
     } else if (now > prev) {
-      // new messages appended: only scroll if last message is from current user
+      // new messages appended: scroll when either
+      // - last message is from current user (outgoing), or
+      // - user is already near the bottom (so incoming messages should auto-scroll)
       const last = roomMsgs[roomMsgs.length - 1];
-      if (last && currentUser && Number(last.sender?.id) === Number(currentUser.id)) {
-        el.scrollTop = el.scrollHeight;
+      try {
+        const lastIsMine = last && currentUser && Number(last.sender?.id) === Number(currentUser.id);
+        const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+        const nearBottomThreshold = 150; // px
+        const isNearBottom = distanceFromBottom <= nearBottomThreshold;
+        if (lastIsMine || isNearBottom) {
+          el.scrollTop = el.scrollHeight;
+        }
+      } catch {
+        // ignore scroll errors
       }
     }
 
@@ -1044,7 +1132,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 lg:items-center lg:justify-center lg:grow">
-      <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
+      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col shadow lg:shadow-2xl overflow-hidden max-w-full">
 
         <MenuButton />
 
@@ -1124,7 +1212,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                   ? headerProduct.name
                   : roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
                     ? `Case #${validatedRoomId ?? caseId}`
-                    : `${validatedRoomId ?? caseId}`}
+                    : `Chat`}
               </div>
             </div>
             {headerAvatar && (
@@ -1160,7 +1248,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         </div>
         <div
           ref={containerRef}
-          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-14"
+          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-20 lg:pt-24"
+          style={{ minHeight: 0 }}
         >
           <p className="text-xs md:text-sm lg:text-[0.8vw] text-gray-400 text-center mb-6">Chat</p>
 
