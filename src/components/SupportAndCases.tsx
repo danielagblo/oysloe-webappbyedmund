@@ -335,7 +335,21 @@ export default function SupportAndCases({
             const adFromPayload = (r as any).ad_image ?? (r as any).adImage ?? null;
             if (adFromPayload) {
               const img = String(adFromPayload);
-              thumbSrc = img.startsWith("data:") ? dataUrlToObjectUrl(img) : img;
+              if (img.startsWith("data:")) {
+                thumbSrc = dataUrlToObjectUrl(img);
+              } else if (/^https?:\/\//i.test(img)) {
+                thumbSrc = img;
+              } else if (img.startsWith("//")) {
+                thumbSrc = window.location.protocol + img;
+              } else if (img.startsWith("/")) {
+                if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                  thumbSrc = apiOriginFallback + img;
+                } else {
+                  thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + img;
+                }
+              } else {
+                thumbSrc = img;
+              }
             }
           } catch {
             /* ignore */

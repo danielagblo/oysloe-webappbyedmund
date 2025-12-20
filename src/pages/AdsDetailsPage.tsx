@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
-import LiveChat from "../components/LiveChat";
+// LiveChat intentionally not rendered on AdsDetailsPage
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import ReportModal from "../components/ReportModal";
@@ -659,6 +659,8 @@ const AdsDetailsPage = () => {
           } else {
             try {
               await sendMessage(String(roomKey), text, tempId);
+              // Inform the user the message was sent successfully
+              toast.success("Message sent");
             } catch (err) {
               console.warn("AdsDetailsPage: sendMessage failed after websocket connected", err);
               toast.error("Failed to send message via websocket");
@@ -934,14 +936,7 @@ const AdsDetailsPage = () => {
         <SimilarAds relatedProducts={relatedProducts} />
         <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
-      {openLiveChatRoomId && (
-        <div className="fixed bottom-4 right-4 z-60 w-[360px] md:w-[440px] lg:w-[520px] xl:w-[620px] h-[480px] lg:h-[640px]">
-          <LiveChat
-            caseId={openLiveChatRoomId}
-            onClose={() => setOpenLiveChatRoomId(null)}
-          />
-        </div>
-      )}
+      {/* LiveChat removed from AdsDetailsPage */}
       <MenuButton />
     </div>
   );

@@ -376,6 +376,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   // cache for object URLs created from data: URLs to avoid recreating blobs repeatedly
   const dataUrlObjectUrlRef = useRef<Record<string, string>>({});
 
+  // Drag feature removed: live chat is no longer draggable when shown in mobile overlays.
+
   // Helper: convert data:...;base64,... into a Blob and return an object URL (cached)
   const dataUrlToObjectUrl = (dataUrl: string) => {
     try {
@@ -1132,7 +1134,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 lg:items-center lg:justify-center lg:grow">
-      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col shadow lg:shadow-2xl overflow-hidden max-w-full">
+      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col shadow lg:shadow-2xl overflow-hidden max-w-full pb-12 sm:pb-0">
 
         <MenuButton />
 
@@ -1417,10 +1419,10 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
               const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
 
-              // For audio messages we want the bubble to expand so the player can show full controls
+              // Make every message bubble occupy 3/4 of the available width
               const bubbleBaseClass = "border border-gray-200 max-sm:border-gray-300 max-sm:border-2 p-3 lg:p-[1vw] rounded-xl min-w-0 wrap-break-word";
-              const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
-              const bubbleColorClass = isMine ? "bg-green-100 max-w-[80%] text-black rounded-tr-none" : "flex-1 bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
+              const bubbleSizeClass = "w-full";
+              const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
               const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
 
               const keyId = `msg-${(msg as any).id ?? "0"}-${(msg as any).__temp_id ?? (msg as any).temp_id ?? ""}`;
@@ -1446,7 +1448,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{content}</p>
                             )}
                           </div>
                           <img
@@ -1519,7 +1521,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{content}</p>
                             )}
                           </div>
                           <img

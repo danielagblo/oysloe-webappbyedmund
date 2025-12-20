@@ -212,7 +212,7 @@ export default function useWsChat(): UseWsChatReturn {
         if (roomClients.current[key]) {
           try {
             roomClients.current[key]?.close();
-          } catch (e) {
+          } catch {
             /* ignore */
           }
         }
