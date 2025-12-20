@@ -65,11 +65,11 @@ function ChatInput({
             const blob = new Blob(chunksRef.current || [], { type: "audio/webm" });
             chunksRef.current = [];
             const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
-              try {
-                onRecord?.(file);
-              } catch (e) {
-                void e;
-              }
+            try {
+              onRecord?.(file);
+            } catch (e) {
+              void e;
+            }
           } else {
             // discard
             chunksRef.current = [];
@@ -178,31 +178,31 @@ function ChatInput({
           <div className="relative lg:flex-1 lg:max-w-7/10">
             <input
               value={value}
-                  onChange={(e) => {
-                    onValueChange(e.target.value);
-                    try {
-                      onTyping?.(true);
-                    } catch {
-                      // ignore
-                    }
-                    if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
-                    typingTimeoutRef.current = window.setTimeout(() => {
-                      try { onTyping?.(false); } catch { /* ignore */ }
-                      typingTimeoutRef.current = null;
-                    }, 1500) as unknown as number;
-                  }}
-                  onKeyDown={(e) => {
-                    try {
-                      onKeyDown(e as unknown as KeyboardEvent<HTMLInputElement>);
-                    } catch {
-                      // ignore
-                    }
-                    if (e.key === "Enter") {
-                      try { onTyping?.(false); } catch { /* ignore */ }
-                      if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
-                      typingTimeoutRef.current = null;
-                    }
-                  }}
+              onChange={(e) => {
+                onValueChange(e.target.value);
+                try {
+                  onTyping?.(true);
+                } catch {
+                  // ignore
+                }
+                if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                typingTimeoutRef.current = window.setTimeout(() => {
+                  try { onTyping?.(false); } catch { /* ignore */ }
+                  typingTimeoutRef.current = null;
+                }, 1500) as unknown as number;
+              }}
+              onKeyDown={(e) => {
+                try {
+                  onKeyDown(e as unknown as KeyboardEvent<HTMLInputElement>);
+                } catch {
+                  // ignore
+                }
+                if (e.key === "Enter") {
+                  try { onTyping?.(false); } catch { /* ignore */ }
+                  if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                  typingTimeoutRef.current = null;
+                }
+              }}
               type="text"
               placeholder="Start a chat"
               className="rounded-2xl border-2 lg:rounded-[0.75vw] lg:border outline-0 border-gray-300 px-10 py-3 lg:pl-[3vw] bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"

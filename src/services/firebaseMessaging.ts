@@ -1,9 +1,9 @@
 import { initializeApp } from "firebase/app";
 import {
-    deleteToken,
-    getMessaging,
-    getToken,
-    onMessage,
+  deleteToken,
+  getMessaging,
+  getToken,
+  onMessage,
 } from "firebase/messaging";
 import notificationService from "./notificationService";
 
