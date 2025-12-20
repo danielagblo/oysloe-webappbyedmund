@@ -222,7 +222,7 @@ export default function useWsChat(): UseWsChatReturn {
       const encoded = encodeURIComponent(key);
       const url = `${wsBase}/chat/${encoded}/`;
 
-      const clientId = `${key}-${Date.now()}`;
+      const _clientId = `${key}-${Date.now()}`;
 
       // Try once with the given url; if server rejects immediately (close code 1006), try without trailing slash
       let triedAlternative = false;
@@ -716,14 +716,14 @@ export default function useWsChat(): UseWsChatReturn {
     try { client.connect(); } catch { /* ignore */ }
   }, [token]);
 
-  const sendMessage = useCallback(
+    const sendMessage = useCallback(
     async (
       roomId: string,
       text: string,
       tempId?: string,
       file?: File | Blob,
     ) => {
-      const key = normalizeRoomId(roomId);
+      // normalizeRoomId not needed here; avoid unused local
       const client = getClientForRoom(roomId);
 
       // If a file is provided, send it via websocket as a data URL payload.
@@ -762,11 +762,7 @@ export default function useWsChat(): UseWsChatReturn {
     [],
   );
 
-  const sendTyping = useCallback((roomId: string, typing: boolean) => {
-    const client = getClientForRoom(roomId);
-    if (!client || !client.isOpen()) return;
-    client.send({ type: "typing", typing });
-  }, []);
+  // Note: use `sendTypingOptimistic` which also updates local typing state.
 
   // enhanced sendTyping: update local typing map optimistically for current user
   const sendTypingOptimistic = useCallback((roomId: string, typing: boolean) => {

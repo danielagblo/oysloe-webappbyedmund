@@ -1165,7 +1165,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                   return (
                     <img
                       src={headerProductImage}
-                      alt={headerProduct.name ?? "Product"}
+                      alt={headerProduct?.name ?? "Product"}
                       onError={(e) => {
                         try {
                           const el = e.target as HTMLImageElement;
