@@ -222,8 +222,6 @@ export default function useWsChat(): UseWsChatReturn {
       const encoded = encodeURIComponent(key);
       const url = `${wsBase}/chat/${encoded}/`;
 
-      const _clientId = `${key}-${Date.now()}`;
-
       // Try once with the given url; if server rejects immediately (close code 1006), try without trailing slash
       let triedAlternative = false;
       const altUrl = url.replace(/\/$/, "");
