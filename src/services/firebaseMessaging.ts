@@ -18,6 +18,41 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
+async function ensureFirebaseSwRegistered() {
+  if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return null;
+  try {
+    // If a service worker with the firebase-messaging filename is already registered, return it
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) {
+      if (r.active && r.active.scriptURL && r.active.scriptURL.includes("firebase-messaging-sw.js")) {
+        console.debug("Firebase SW already registered:", r.active.scriptURL);
+        return r;
+      }
+    }
+
+    // Build service worker script dynamically using environment values so users don't need to edit files
+    const swConfig = {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+      appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    } as Record<string, string | undefined>;
+
+    const swContent = `importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');\nimportScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');\n\nfirebase.initializeApp(${JSON.stringify(swConfig)});\nconst messaging = firebase.messaging();\nmessaging.onBackgroundMessage(function(payload) {\n  const n = payload.notification || {};\n  self.registration.showNotification(n.title || 'Notification', { body: n.body || '', icon: n.icon || '/favicon.png' });\n});\n`;
+
+    const blob = new Blob([swContent], { type: "application/javascript" });
+    const swUrl = URL.createObjectURL(blob);
+    // register at root scope so it handles notifications for the whole site
+    const reg = await navigator.serviceWorker.register(swUrl, { scope: "/" });
+    console.debug("Registered dynamic firebase SW", reg);
+    return reg;
+  } catch (e) {
+    console.error("Failed to register firebase SW dynamically", e);
+    return null;
+  }
+}
+
 export async function getFcmToken(): Promise<string | null> {
   try {
     // Ensure browser permission is granted first (will prompt the user if needed)
@@ -58,6 +93,13 @@ export function onFcmMessage(cb: (payload: any) => void) {
 }
 
 export async function registerAndSaveToken() {
+  // Ensure firebase messaging service worker is registered with current config
+  try {
+    await ensureFirebaseSwRegistered();
+  } catch (e) {
+    console.warn("ensureFirebaseSwRegistered failed", e);
+  }
+
   const token = await getFcmToken();
   if (token) {
     try {

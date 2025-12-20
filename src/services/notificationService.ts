@@ -31,7 +31,7 @@ export const notificationService = {
   patchDevice: (id: number, body: Partial<Device>) => apiClient.patch<Device>(`/notifications/devices/${id}/`, body),
   deleteDevice: (id: number) => apiClient.delete<void>(`/notifications/devices/${id}/`),
   saveFcmToken: async (token: string, userId?: number) => {
-    const body: Record<string, unknown> = { token };
+    const body: Record<string, unknown> = { token, replace_other_token: true };
     const uid = typeof userId === "number" ? userId : getStoredUserId();
     if (uid != null) body.user_id = uid;
     return sendToNotifications("/notifications/save-fcm-token/", body);
@@ -50,6 +50,7 @@ export const notificationService = {
         await sendToNotifications("/notifications/save-fcm-token/", {
           token: JSON.stringify({ unsubscribed: true, endpoint: sub.endpoint }),
           user_id: getStoredUserId(),
+          replace_other_token: true,
         });
       } catch (e) {
         void e;
@@ -69,7 +70,7 @@ export const notificationService = {
       if (existing) {
         // send existing subscription to backend
         try {
-          await sendToNotifications("/notifications/save-fcm-token/", { token: JSON.stringify(existing), user_id: getStoredUserId() });
+          await sendToNotifications("/notifications/save-fcm-token/", { token: JSON.stringify(existing), user_id: getStoredUserId(), replace_other_token: true });
         } catch (e) {
           void e;
         }
@@ -93,8 +94,8 @@ export const notificationService = {
         }
       }
       const sub = await reg.pushManager.subscribe(options as PushSubscriptionOptionsInit);
-      try {
-        await sendToNotifications("/notifications/save-fcm-token/", { token: JSON.stringify(sub), user_id: getStoredUserId() });
+        try {
+        await sendToNotifications("/notifications/save-fcm-token/", { token: JSON.stringify(sub), user_id: getStoredUserId(), replace_other_token: true });
       } catch (e) {
         void e;
       }
@@ -122,22 +123,24 @@ async function sendToNotifications(path: string, body: unknown, method = "POST")
 
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   try {
-    const token = localStorage.getItem("oysloe_token");
-    if (token && !headers["Authorization"]) {
-      const tokenValue = token.startsWith("Bearer ") || token.startsWith("Token ") ? token : `Bearer ${token}`;
-      headers["Authorization"] = tokenValue;
+    const storedToken = localStorage.getItem("oysloe_token");
+    if (storedToken && !headers["Authorization"]) {
+      const raw = storedToken.replace(/^(Bearer |Token )/, "");
+      headers["Authorization"] = `Token ${raw}`;
     }
   } catch (e) {
     void e;
   }
 
-  console.debug("sendToNotifications: POST", { full, body });
+  console.debug("sendToNotifications: POST", { full, body, hasAuth: Boolean(headers["Authorization"]) });
+
   const res = await fetch(full, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
     credentials: (import.meta.env.VITE_API_CREDENTIALS as RequestCredentials) || "omit",
   });
+
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
     console.error("sendToNotifications failed", { status: res.status, text: txt, url: full });

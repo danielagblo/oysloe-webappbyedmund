@@ -1,11 +1,11 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useChatRooms } from "../hooks/useChatRooms";
 import type { ChatRoom } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
+import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import { splitRooms, getCaseId, getCaseStatus } from "../utils/chatFilters";
-import { useChatRooms } from "../hooks/useChatRooms";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -21,15 +21,15 @@ export default function SupportAndCases({
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
-  
+
 
   // Use React Query to fetch and cache chat rooms
   const { data: allRooms = [] } = useChatRooms();
 
-  
+
 
   useEffect(() => {
-    
+
     let mounted = true;
 
     // Connect WebSocket to listen for room updates
@@ -47,12 +47,12 @@ export default function SupportAndCases({
       const wsUrl = `${wsBase}/chatrooms/`;
 
       const client = new WebSocketClient(wsUrl, token, {
-        onOpen: () => {},
-        onClose: () => {},
+        onOpen: () => { },
+        onClose: () => { },
         onError: (ev) => console.warn("❌ [INBOX PAGE] WebSocket error", ev),
         onMessage: (payload: any) => {
           if (!mounted) return;
-          
+
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
@@ -82,28 +82,28 @@ export default function SupportAndCases({
               Array.isArray(payload.chatrooms)
             ) {
               const normalized = payload.chatrooms.map((r: any) => normalizeRoom(r));
-              
-             
-               // Merge with existing cache to preserve member data
-               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
-                 return normalized.map((wsRoom: ChatRoom) => {
-                   const existingRoom = prev.find(r => r.id === wsRoom.id);
-                 
-                   // If WS payload has no members but cache has members, preserve cached members
-                   if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
-                     wsRoom.members = existingRoom.members;
-                   }
-                 
-                   return wsRoom;
-                 });
-               });
+
+
+              // Merge with existing cache to preserve member data
+              queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
+                return normalized.map((wsRoom: ChatRoom) => {
+                  const existingRoom = prev.find(r => r.id === wsRoom.id);
+
+                  // If WS payload has no members but cache has members, preserve cached members
+                  if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
+                    wsRoom.members = existingRoom.members;
+                  }
+
+                  return wsRoom;
+                });
+              });
               return;
             }
 
             // Handle individual room updates
             if (payload && typeof payload === "object" && payload.id) {
               const normalized = normalizeRoom(payload);
-              
+
               // Update React Query cache instead of local state
               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
                 const idx = prev.findIndex(
@@ -140,7 +140,7 @@ export default function SupportAndCases({
     }
 
     return () => {
-      
+
       mounted = false;
       wsRef.current?.close();
       wsRef.current = null;
@@ -150,13 +150,16 @@ export default function SupportAndCases({
   useEffect(() => {
     // Calculate counts from all rooms received via WebSocket
     const { supportRooms, userRooms } = splitRooms(allRooms);
-    
-    
-    
+
+
+
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
 
     setSupportActive(supportRooms.length);
+    try {
+      console.debug("SupportAndCases: userRooms count", { count: userRooms.length, sample: userRooms.slice(0, 3) });
+    } catch { }
   }, [allRooms]);
 
   // Precompute filtered room lists and memoize to avoid nested effects
@@ -221,12 +224,12 @@ export default function SupportAndCases({
     if (rooms.length === 0) {
       return (
         <div>
-            <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
-              <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
-              <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
-            </div>
+          <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
+            <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+            <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
           </div>
-        );
+        </div>
+      );
     }
 
     // Sort rooms by created_at descending (latest first)
@@ -291,13 +294,24 @@ export default function SupportAndCases({
 
           return (
             <button
-              key={r.id}
-              onClick={() => onSelectChat?.(String(r.id))}
-              className={`relative text-left p-3 cursor-pointer rounded-xl ${ (r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start gap-3`}
+              key={String(r.room_id ?? r.id)}
+              onClick={() => onSelectChat?.(String(r.room_id ?? r.id))}
+              className={`relative text-left p-3 cursor-pointer rounded-xl ${(r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start gap-3`}
             >
-              {member?.avatar ? (
+              {(member?.avatar || (r as any).other_user_avatar) ? (
                 <img
-                  src={member.avatar}
+                  src={(() => {
+                    try {
+                      const s = member?.avatar || (r as any).other_user_avatar;
+                      if (!s) return s;
+                      if (/^https?:\/\//i.test(s)) return s;
+                      if (s.startsWith("//")) return window.location.protocol + s;
+                      if (s.startsWith("/")) return (typeof window !== "undefined" ? window.location.origin : "") + s;
+                      return s;
+                    } catch {
+                      return member?.avatar || (r as any).other_user_avatar;
+                    }
+                  })()}
                   alt="chat"
                   className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover"
                 />
@@ -309,13 +323,13 @@ export default function SupportAndCases({
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{r.name}</p>
-                    {
-                      r.total_unread ? (
-                        <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
-                          {r.total_unread}
-                        </span>
-                      ) : null
-                    }
+                  {
+                    r.total_unread ? (
+                      <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
+                        {r.total_unread}
+                      </span>
+                    ) : null
+                  }
                   <span className="text-xs italic md:text-sm lg:text-[0.9vw] text-gray-400 flex items-center gap-2">
                     {r.created_at
                       ? formatReviewDate(r.created_at)
@@ -386,7 +400,7 @@ export default function SupportAndCases({
 
     return (
       <div>
-          <h3 className="text-sm md:text-base lg:text-[1.25vw] font-medium mb-4 lg:mb-0">Support Cases</h3>
+        <h3 className="text-sm md:text-base lg:text-[1.25vw] font-medium mb-4 lg:mb-0">Support Cases</h3>
 
         <div className="flex flex-col gap-2 my-3 lg:gap-3">
           {sortedRooms.map((room) => {
@@ -398,7 +412,7 @@ export default function SupportAndCases({
               <button
                 key={room.id}
                 onClick={() => onSelectChat?.(String(room.id))}
-                className={`relative text-left p-3 cursor-pointer rounded-xl ${ (room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start justify-between gap-3`}
+                className={`relative text-left p-3 cursor-pointer rounded-xl ${(room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start justify-between gap-3`}
               >
                 <div className="flex-1">
                   {/* Date and Case Info */}
@@ -416,11 +430,10 @@ export default function SupportAndCases({
                   {/* Status Badge */}
                   <div className="flex items-center gap-2 mt-0.5">
                     <span
-                      className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${
-                        status === "closed"
+                      className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${status === "closed"
                           ? "bg-red-300 text-red-700"
                           : "bg-green-200 text-green-700"
-                      }`}
+                        }`}
                     >
                       {status.toUpperCase() !== "ACTIVE" ? "Closed" : "Active"}
                     </span>

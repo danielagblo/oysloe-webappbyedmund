@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build": "tsc -b && vite build",
+    "generate-sw": "node scripts/generate-fcm-sw.js",
+    "build": "npm run generate-sw && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate:api": "swagger-typescript-api -p ./src/api-spec/oysloe.yaml -o ./src/services/generated --axios"

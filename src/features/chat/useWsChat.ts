@@ -10,8 +10,10 @@ type RoomMessages = Record<string, Message[]>;
 export type UseWsChatReturn = {
   messages: RoomMessages;
   chatrooms: ChatRoom[];
+  roomUserMap: Record<string, { name?: string | null; avatar?: string | null }>;
   unreadCount: number;
-  connectToRoom: (roomId: string, opts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => Promise<void>;
+  typing: Record<string, number[]>;
+  connectToRoom: (roomId: string, opts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => Promise<string | void>;
   leaveRoom: (roomId: string) => void;
   connectToChatroomsList: () => void;
   connectToUnreadCount: () => void;
@@ -38,13 +40,29 @@ function getWsBase() {
 export default function useWsChat(): UseWsChatReturn {
   const [messages, setMessages] = useState<RoomMessages>({});
   const [chatrooms, setChatrooms] = useState<ChatRoom[]>([]);
+  // Load cached chatrooms from localStorage so UI can show avatars immediately
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("oysloe_chatrooms");
+      if (raw) {
+        const parsed = JSON.parse(raw) as ChatRoom[];
+        if (Array.isArray(parsed) && parsed.length > 0) setChatrooms(parsed);
+      }
+    } catch {
+      // ignore
+    }
+    // run only once on mount
+     
+  }, []);
+  const [roomUserMap, setRoomUserMap] = useState<Record<string, { name?: string | null; avatar?: string | null }>>({});
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  // typing map per room: array of user ids currently typing
+  const [typingMap, setTypingMap] = useState<Record<string, number[]>>({});
 
   const roomClients = useRef<Record<string, WebSocketClient | null>>({});
   const roomConnecting = useRef<Record<string, boolean>>({});
   const listClient = useRef<WebSocketClient | null>(null);
   const unreadClient = useRef<WebSocketClient | null>(null);
-
   useEffect(() => {
     return () => {
       // cleanup all clients on unmount
@@ -52,19 +70,137 @@ export default function useWsChat(): UseWsChatReturn {
       listClient.current?.close();
       unreadClient.current?.close();
     };
-  }, []);
+  }, [chatrooms]);
+
+  // keep a quick lookup map of room_id -> other user name/avatar for UI convenience
+  useEffect(() => {
+    try {
+      const map: Record<string, { name?: string | null; avatar?: string | null }> = {};
+      if (Array.isArray(chatrooms)) {
+        for (const r of chatrooms) {
+          try {
+            const roomKey = String((r as any).room_id ?? r.id ?? "");
+            if (!roomKey) continue;
+            const name = (r as any).other_user_name ?? (r as any).other_user ?? (r as any).name ?? null;
+            const avatar = (r as any).other_user_avatar ?? (r as any).other_avatar ?? null;
+            map[roomKey] = { name: name ?? null, avatar: avatar ?? null };
+          } catch {
+            // ignore per-room errors
+          }
+        }
+      }
+      setRoomUserMap(map);
+      // removed debug logging
+    } catch {
+      // ignore
+    }
+  }, [chatrooms]);
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("oysloe_token") : null;
 
+  const getStoredUserIdLocal = (): number | null => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem("oysloe_user") : null;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as any;
+      if (parsed == null) return null;
+      if (typeof parsed.id === "number") return parsed.id;
+      if (typeof parsed.user_id === "number") return parsed.user_id;
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  // Normalize a provided room identifier to the server-side `room_id` when possible.
+  // Many APIs accept either the DB primary key (`id`) or the string `room_id`.
+  const normalizeRoomId = (roomId: string) => {
+    const s = String(roomId);
+    const found = chatrooms.find(
+      (r) => String(r.id) === s || String(r.room_id) === s,
+    );
+    if (found && found.room_id) return String(found.room_id);
+    return s;
+  };
+
+  const normalizeIncomingMessage = (m: any): Message => {
+    const id = (m?.id ?? m?.message_id ?? 0) as number;
+    const content = m?.content ?? m?.text ?? m?.message ?? "";
+    const created_at = m?.created_at ?? m?.timestamp ?? new Date().toISOString();
+
+    // Normalize sender information from multiple possible shapes returned by backend
+    let sender: any = m?.sender ?? m?.user ?? m?.author ?? null;
+    if (!sender) {
+      const sid = m?.sender_id ?? m?.user_id ?? m?.author_id ?? m?.created_by ?? 0;
+      const sname = m?.sender_name ?? m?.name ?? m?.user_name ?? m?.author_name ?? m?.username ?? null;
+      sender = {
+        id: sid ?? 0,
+        name: sname,
+        email: m?.email ?? null,
+        avatar: m?.avatar ?? m?.user_avatar ?? null,
+      };
+    } else if (typeof sender === "string") {
+      sender = { id: 0, name: sender, email: m?.email ?? null, avatar: m?.avatar ?? null };
+    } else if (sender && typeof sender === "object" && (sender.id == null || sender.id === "")) {
+      // try to coerce common id fields
+      sender.id = sender.id ?? sender.user_id ?? sender.pk ?? 0;
+    }
+    // preserve any other_user avatar/name fields provided on the message so UI can use them
+    const other_user_avatar = m?.other_user_avatar ?? m?.other_avatar ?? m?.other_user?.avatar ?? null;
+    const other_user_name = m?.other_user ?? m?.other_user_name ?? m?.other_user?.name ?? null;
+    return {
+      id: Number(id),
+      room: (m?.room ?? m?.room_id ?? m?.chat_room ?? 0) as any,
+      sender: { ...sender, id: Number(sender?.id ?? 0) },
+      content: String(content ?? ""),
+      created_at: String(created_at),
+      // attach any other_user fields so downstream renderers can prefer them
+      other_user_avatar: other_user_avatar,
+      other_user_name: other_user_name,
+    } as Message;
+  };
+
+  const getClientForRoom = (roomId: string) => {
+    const key = normalizeRoomId(roomId);
+    if (roomClients.current[key]) return roomClients.current[key];
+    const alt = String(roomId);
+    const altClient = roomClients.current[alt];
+    if (altClient) {
+      // migrate existing client under the normalized key for future lookups
+      roomClients.current[key] = altClient;
+      delete roomClients.current[alt];
+      return roomClients.current[key];
+    }
+    return null;
+  };
+
   const ensureRoomClient = useCallback(
     async (roomId: string, joinOpts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => {
-      const key = String(roomId);
+      let key = normalizeRoomId(roomId);
+      // If we didn't find a room_id in local `chatrooms` and the provided id
+      // looks like a numeric primary key, try fetching the room detail to
+      // obtain the server `room_id` (backend only accepts room_id in WS path).
+      if (key === String(roomId) && /^[0-9]+$/.test(String(roomId))) {
+        try {
+          const fetched = await chatService.getChatRoom(roomId);
+          if (fetched && (fetched as any).room_id) {
+            key = String((fetched as any).room_id);
+            // cache/update chatrooms list so future lookups succeed
+            setChatrooms((prev) => {
+              const exists = prev.find((r) => String(r.room_id) === key || String(r.id) === String(fetched.id));
+              if (exists) return prev.map((r) => (String(r.id) === String(fetched.id) ? fetched : r));
+              return [fetched, ...prev];
+            });
+          }
+        } catch (err) {
+          // ignore fetch error
+        }
+      }
 
       // If already connected or connecting, nothing to do
       if (roomClients.current[key]?.isOpen()) return;
       if (roomConnecting.current[key]) {
-        console.debug("useWsChat.ensureRoomClient: already connecting", { roomId: key });
         return;
       }
       // mark as connecting to avoid races
@@ -85,12 +221,6 @@ export default function useWsChat(): UseWsChatReturn {
       const url = `${wsBase}/chat/${encoded}/`;
 
       const clientId = `${key}-${Date.now()}`;
-      console.log("useWsChat.ensureRoomClient: creating WebSocketClient", {
-        url,
-        tokenPresent: !!token,
-        roomId: key,
-        clientId,
-      });
 
       // Try once with the given url; if server rejects immediately (close code 1006), try without trailing slash
       let triedAlternative = false;
@@ -100,28 +230,32 @@ export default function useWsChat(): UseWsChatReturn {
         let instance: WebSocketClient | null = null;
         instance = new WebSocketClient(attemptUrl, token, {
           onOpen: () => {
-            console.log("useWsChat: socket open", { roomId: key, url: attemptUrl, clientId });
-            // connected
             roomConnecting.current[key] = false;
-            // send a join payload (inform server of client's last-seen marker so server can replay missing messages)
+            // Always send a join payload on open so servers that require an explicit
+            // join to emit room history will replay messages. Include any provided
+            // joinOpts when available.
             try {
-              if (joinOpts && instance && instance.isOpen()) {
-                instance.send({ type: "join", last_seen: joinOpts.lastSeen ?? null, last_message_id: joinOpts.lastMessageId ?? null });
+              if (instance && instance.isOpen()) {
+                instance.send({ type: "join", last_seen: joinOpts?.lastSeen ?? null, last_message_id: joinOpts?.lastMessageId ?? null });
               }
             } catch (e) {
               /* ignore */
             }
           },
           onClose: (ev) => {
-            console.log("useWsChat: socket closed", {
-              roomId: key,
-              code: ev?.code,
-              reason: ev?.reason,
-              url: attemptUrl,
-              clientId,
-            });
             // allow reconnect attempts later
             roomConnecting.current[key] = false;
+            try {
+              // clear typing state for this room on close
+              setTypingMap((prev) => {
+                const next = { ...prev };
+                delete next[key];
+                return next;
+              });
+            } catch {
+              // ignore
+            }
+            // If server closed immediately (1006) and we haven't tried the alt URL, try it once
             // If server closed immediately (1006) and we haven't tried the alt URL, try it once
             if (
               (ev?.code === 1006 || ev?.code === 1005) &&
@@ -129,40 +263,43 @@ export default function useWsChat(): UseWsChatReturn {
               attemptUrl !== altUrl
             ) {
               triedAlternative = true;
-              console.log("useWsChat: retrying with alternative URL", {
-                altUrl,
-                roomId: key,
-                clientId,
-              });
-              // create alt client and connect
               const altClient = createClient(altUrl);
               roomClients.current[key] = altClient;
               try {
                 altClient.connect();
               } catch (err) {
-                console.warn("useWsChat: alt client connect failed", err, {
-                  roomId: key,
-                  altUrl,
-                });
+                // ignore
               }
             }
           },
-          onError: (ev) => {
-            console.warn("useWsChat: socket error", {
-              roomId: key,
-              ev,
-              url: attemptUrl,
-              clientId,
-            });
-          },
+          onError: () => {},
           onMessage: (data) => {
             if (!data) return;
-            try {
-              console.debug("useWsChat.onMessage", { roomId: key, clientId, data });
-            } catch {}
-            // If server sends an array of messages as history
-            if (Array.isArray(data)) {
-              setMessages((prev) => ({ ...prev, [key]: data }));
+            // typing frames: { type: 'typing', user_id, typing: true/false }
+            if ((data as any).type === "typing") {
+              try {
+                const uid = (data as any).user_id ?? (data as any).sender?.id ?? (data as any).sender_id ?? null;
+                const isTyping = !!(data as any).typing;
+                if (uid != null) {
+                  setTypingMap((prev) => {
+                    const cur = new Set<number>(prev[key] || []);
+                    if (isTyping) cur.add(Number(uid)); else cur.delete(Number(uid));
+                    return { ...prev, [key]: Array.from(cur) };
+                  });
+                }
+              } catch {
+                // ignore
+              }
+              return;
+            }
+            // handle message
+            // If server sends an array of messages as history (or a raw chat_history payload)
+            if (Array.isArray(data) || (data as any)?.type === "chat_history") {
+              const raw = Array.isArray(data) ? data : (data as any).messages || (data as any).data || [];
+              if (Array.isArray(raw)) {
+                const msgs = raw.map(normalizeIncomingMessage);
+                setMessages((prev) => ({ ...prev, [key]: msgs }));
+              }
               return;
             }
 
@@ -170,13 +307,18 @@ export default function useWsChat(): UseWsChatReturn {
             if ((data as any).type === "room_history" || (data as any).type === "history") {
               const msgs = (data as any).messages || (data as any).history || (data as any).data || [];
               if (Array.isArray(msgs)) {
-                setMessages((prev) => ({ ...prev, [key]: msgs }));
+                const mapped = msgs.map(normalizeIncomingMessage);
+                setMessages((prev) => ({ ...prev, [key]: mapped }));
               }
               return;
             }
             // single message (server may send message frames without an `id` yet)
-            if ((data as any).id || (data as any).type === "message") {
-              const incoming = data as Message & { temp_id?: string };
+            if ((data as any).id || (data as any).type === "message" || (data as any).type === "chat_message") {
+              // Normalize the incoming shape to our canonical Message
+              const raw = data as any;
+              const incoming = normalizeIncomingMessage(raw) as Message & { temp_id?: string };
+              // preserve server temp id echo if present
+              if (raw?.temp_id) (incoming as any).temp_id = raw.temp_id;
               setMessages((prev) => {
                 const list = prev[key] || [];
 
@@ -228,6 +370,19 @@ export default function useWsChat(): UseWsChatReturn {
 
                 return { ...prev, [key]: [...list, incoming] };
               });
+              // on new message, clear typing for sender (they sent so not typing now)
+              try {
+                const sid = (incoming as any).sender?.id ?? null;
+                if (sid != null) {
+                  setTypingMap((prev) => {
+                    const cur = new Set<number>(prev[key] || []);
+                    cur.delete(Number(sid));
+                    return { ...prev, [key]: Array.from(cur) };
+                  });
+                }
+              } catch {
+                // ignore
+              }
               return;
             }
             // typing or other event types are passed through
@@ -239,31 +394,17 @@ export default function useWsChat(): UseWsChatReturn {
 
       const client = createClient(url);
       roomClients.current[key] = client;
-      try {
-        client.connect();
-      } catch (err) {
-        console.warn("useWsChat: failed to connect room client", err);
-      }
+      try { client.connect(); } catch { /* ignore */ }
+      return key;
     },
     [token],
   );
 
   const connectToRoom = useCallback(
     async (roomId: string, opts?: { lastSeen?: string | number | null; lastMessageId?: string | number | null }) => {
-      // load history first
-      const key = String(roomId);
-      try {
-        const history = await chatService.getChatRoomMessages(roomId);
-        setMessages((prev) => ({ ...prev, [key]: history }));
-        // if caller didn't provide lastSeen/lastMessageId, derive from loaded history
-        if (!opts) {
-          const last = Array.isArray(history) && history.length > 0 ? history[history.length - 1] : null;
-          opts = { lastSeen: last?.created_at ?? null, lastMessageId: (last as any)?.id ?? null };
-        }
-      } catch (err) {
-        console.warn("useWsChat: failed to load history for", roomId, err);
-      }
-      await ensureRoomClient(roomId, opts);
+      // Do NOT load history via REST. Rely on the websocket server to emit
+      // any history (e.g. a `room_history` or an array of messages) after connect.
+      return await ensureRoomClient(roomId, opts);
     },
     [ensureRoomClient],
   );
@@ -275,40 +416,242 @@ export default function useWsChat(): UseWsChatReturn {
     const url = `${wsBase}/chatrooms/`;
     const client = new WebSocketClient(url, token, {
       onMessage: (data) => {
+        // received chatrooms list
         if (!data) return;
+        // helper: normalize avatar paths to absolute URLs using VITE_API_URL origin
+        const normalizeAvatar = (src?: string | null) => {
+          try {
+            if (!src) return null;
+            if (/^https?:\/\//i.test(src)) return src;
+            if (src.startsWith("//")) return window.location.protocol + src;
+            const apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+            let apiOrigin = "";
+            try {
+              apiOrigin = new URL(apiRaw).origin;
+            } catch {
+              apiOrigin = apiRaw.replace(/\/+$/, "");
+            }
+            if (src.startsWith("/")) {
+              if (/^\/assets\/avatars\//i.test(src) || /^\/media\//i.test(src) || /^\/uploads\//i.test(src)) {
+                return apiOrigin + src;
+              }
+              return (typeof window !== "undefined" ? window.location.origin : "") + src;
+            }
+            return src;
+          } catch {
+            return src ?? null;
+          }
+        };
+        // helper: attempt to derive current stored user id (localStorage) so we can pick the "other" member
+        const getStoredUserId = (): number | null => {
+          try {
+            const raw = localStorage.getItem("oysloe_user");
+            if (!raw) return null;
+            const parsed = JSON.parse(raw) as any;
+            if (parsed == null) return null;
+            if (typeof parsed.id === "number") return parsed.id;
+            if (typeof parsed.user_id === "number") return parsed.user_id;
+            return null;
+          } catch (e) {
+            return null;
+          }
+        };
+
+        // helper: compute fallback other_user fields from members when backend doesn't provide them
+        const deriveOtherFromMembers = (r: any) => {
+          try {
+            if (!r) return r;
+            const curId = getStoredUserId();
+            const members = Array.isArray(r.members) ? r.members : [];
+            // prefer member whose id !== current user id
+            let other = members.find((m: any) => m && (curId == null || Number(m.id) !== Number(curId)));
+            if (!other && members.length > 0) other = members[0];
+            if (!other) return r;
+            const avatar = other.avatar ?? other.user_avatar ?? other.photo ?? other.image ?? null;
+            const name = other.name ?? other.full_name ?? other.username ?? other.display_name ?? null;
+            return {
+              ...r,
+              other_user_avatar: normalizeAvatar(avatar) || avatar || null,
+              other_user_name: name || null,
+            };
+          } catch {
+            return r;
+          }
+        };
         // If backend sends the full list
         if (Array.isArray(data)) {
-          setChatrooms(data as ChatRoom[]);
+          try {
+            const mapped = (data as ChatRoom[]).map((r) => {
+              const withOther = deriveOtherFromMembers(r as any);
+              return {
+                ...withOther,
+                other_user_avatar: normalizeAvatar((withOther as any).other_user_avatar) || (withOther as any).other_user_avatar || null,
+              };
+            });
+            setChatrooms(mapped as ChatRoom[]);
+            // Apply chatlist avatars to any existing messages so UI uses chat list avatar
+            try {
+              const avatarMap: Record<string, string> = {};
+              mapped.forEach((r) => {
+                const key = String(r.room_id ?? r.id ?? r.name ?? "");
+                if (!key) return;
+                const av = normalizeAvatar((r as any).other_user_avatar) || (r as any).other_user_avatar || null;
+                if (av) avatarMap[key] = av;
+              });
+              if (Object.keys(avatarMap).length > 0) {
+                const getStoredUserIdLocal = getStoredUserId;
+                setMessages((prev) => {
+                  const next: typeof prev = { ...prev };
+                  Object.keys(avatarMap).forEach((rk) => {
+                    const list = next[rk];
+                    if (!Array.isArray(list)) return;
+                    const curId = getStoredUserIdLocal();
+                    next[rk] = list.map((m) => {
+                      try {
+                        if (m && m.sender && m.sender.id != null) {
+                          if (curId == null || String(m.sender.id) !== String(curId)) {
+                            return { ...m, sender: { ...m.sender, avatar: avatarMap[rk] } } as any;
+                          }
+                          return m;
+                        }
+                        // fallback: set other_user_avatar field on message
+                        return { ...m, other_user_avatar: avatarMap[rk] } as any;
+                      } catch {
+                        return m;
+                      }
+                    });
+                  });
+                  return next;
+                });
+              }
+            } catch (e) {
+              void e;
+            }
+          } catch {
+            try {
+              setChatrooms(data as ChatRoom[]);
+            } catch {
+              // ignore
+            }
+          }
           return;
         }
         // If backend sends incremental updates
         if ((data as any).rooms) {
-          setChatrooms((_) => (data as any).rooms as ChatRoom[]);
+          try {
+            const mapped = ((data as any).rooms as ChatRoom[]).map((r) => {
+              const withOther = deriveOtherFromMembers(r as any);
+              return {
+                ...withOther,
+                other_user_avatar: normalizeAvatar((withOther as any).other_user_avatar) || (withOther as any).other_user_avatar || null,
+              };
+            });
+            setChatrooms((_) => mapped as ChatRoom[]);
+            // apply avatars to existing messages for updated rooms
+            try {
+              const avatarMap: Record<string, string> = {};
+              mapped.forEach((r) => {
+                const key = String(r.room_id ?? r.id ?? r.name ?? "");
+                if (!key) return;
+                const av = normalizeAvatar((r as any).other_user_avatar) || (r as any).other_user_avatar || null;
+                if (av) avatarMap[key] = av;
+              });
+              if (Object.keys(avatarMap).length > 0) {
+                const getStoredUserIdLocal = getStoredUserId;
+                setMessages((prev) => {
+                  const next: typeof prev = { ...prev };
+                  Object.keys(avatarMap).forEach((rk) => {
+                    const list = next[rk];
+                    if (!Array.isArray(list)) return;
+                    const curId = getStoredUserIdLocal();
+                    next[rk] = list.map((m) => {
+                      try {
+                        if (m && m.sender && m.sender.id != null) {
+                          if (curId == null || String(m.sender.id) !== String(curId)) {
+                            return { ...m, sender: { ...m.sender, avatar: avatarMap[rk] } } as any;
+                          }
+                          return m;
+                        }
+                        return { ...m, other_user_avatar: avatarMap[rk] } as any;
+                      } catch {
+                        return m;
+                      }
+                    });
+                  });
+                  return next;
+                });
+              }
+            } catch (e) {
+              void e;
+            }
+          } catch {
+            try {
+              setChatrooms((_) => (data as any).rooms as ChatRoom[]);
+            } catch {
+              // ignore
+            }
+          }
           return;
         }
         // If it's a single room update, merge/replace
         if ((data as any).room_id || (data as any).id) {
           const updated = data as ChatRoom;
-          setChatrooms((prev) => {
+          const updatedWithOther = deriveOtherFromMembers(updated as any);
+          const updatedNormalized = { ...updatedWithOther, other_user_avatar: ((): any => {
+            try {
+              const v = (updatedWithOther as any).other_user_avatar;
+              return normalizeAvatar(v) || v || null;
+            } catch {
+              return (updatedWithOther as any).other_user_avatar || null;
+            }
+          })() } as ChatRoom;
+            setChatrooms((prev) => {
             const found = prev.find(
               (r) =>
                 String(r.id) === String(updated.id) ||
                 r.room_id === (updated as any).room_id,
             );
-            if (!found) return [updated, ...prev];
-            return prev.map((r) =>
-              String(r.id) === String(updated.id) ? updated : r,
+            const next = (!found) ? [updatedNormalized, ...prev] : prev.map((r) =>
+              String(r.id) === String(updated.id) ? updatedNormalized : r,
             );
+            // apply avatar for this single updated room
+            try {
+              const key = String(updatedNormalized.room_id ?? updatedNormalized.id ?? updatedNormalized.name ?? "");
+              const av = normalizeAvatar((updatedNormalized as any).other_user_avatar) || (updatedNormalized as any).other_user_avatar || null;
+              if (key && av) {
+                const getStoredUserIdLocal = getStoredUserId;
+                setMessages((prevMsgs) => {
+                  const nextMsgs = { ...prevMsgs };
+                  const list = nextMsgs[key];
+                  if (Array.isArray(list)) {
+                    const curId = getStoredUserIdLocal();
+                    nextMsgs[key] = list.map((m) => {
+                      try {
+                        if (m && m.sender && m.sender.id != null) {
+                          if (curId == null || String(m.sender.id) !== String(curId)) {
+                            return { ...m, sender: { ...m.sender, avatar: av } } as any;
+                          }
+                          return m;
+                        }
+                        return { ...m, other_user_avatar: av } as any;
+                      } catch {
+                        return m;
+                      }
+                    });
+                  }
+                  return nextMsgs;
+                });
+              }
+            } catch (e) { void e; }
+
+            // persisted by wsClient; do not duplicate writes here
+            return next;
           });
         }
       },
     });
     listClient.current = client;
-    try {
-      client.connect();
-    } catch (err) {
-      console.warn("useWsChat: chatrooms list connect failed", err);
-    }
+    try { client.connect(); } catch { /* ignore */ }
   }, [token]);
 
   const connectToUnreadCount = useCallback(() => {
@@ -330,11 +673,7 @@ export default function useWsChat(): UseWsChatReturn {
       },
     });
     unreadClient.current = client;
-    try {
-      client.connect();
-    } catch (err) {
-      console.warn("useWsChat: unread_count connect failed", err);
-    }
+    try { client.connect(); } catch { /* ignore */ }
   }, [token]);
 
   const sendMessage = useCallback(
@@ -344,359 +683,102 @@ export default function useWsChat(): UseWsChatReturn {
       tempId?: string,
       file?: File | Blob,
     ) => {
-      const key = String(roomId);
-      const client = roomClients.current[key];
-      // If a file is provided, always use REST FormData upload (WS can't carry file reliably here)
+      const key = normalizeRoomId(roomId);
+      const client = getClientForRoom(roomId);
+
+      // If a file is provided, send it via websocket as a data URL payload.
       if (file) {
-        // If the file is reasonably small, try embedding it as a data URL in the JSON
-        // message first so the server will store the image URL/content directly on the
-        // Message.content field. This is a fallback for backends that don't return
-        // an attachment URL when accepting multipart uploads.
-        const tryEmbedAsDataUrl = async () => {
-          try {
-            // limit to ~1.5MB to avoid huge payloads
-            const MAX_EMBED = 1_500_000;
-            const size = (file as any).size || 0;
-            if (size > MAX_EMBED) return false;
-            const dataUrl = await new Promise<string>((resolve, reject) => {
-              const fr = new FileReader();
-              fr.onload = () => resolve(String(fr.result ?? ""));
-              fr.onerror = (e) => reject(e);
-              fr.readAsDataURL(file as Blob);
-            });
-
-            // send JSON with content set to data URL so server saves it in message.content
-            const body: any = { content: dataUrl };
-            if (tempId) body.temp_id = tempId;
-            const res = await chatService.sendMessageToRoom(roomId, body);
-            if (res && (res as any).id) {
-              const msg = res as Message & { temp_id?: string };
-              // ensure temp id is preserved
-              const returnedTemp = (msg as any).temp_id || tempId;
-              if (returnedTemp && !(msg as any).temp_id)
-                (msg as any).temp_id = returnedTemp;
-              // if server didn't set content but returned attachments, map them
-              const asAny = msg as any;
-              const possibleUrl =
-                asAny.content && String(asAny.content).startsWith("http")
-                  ? String(asAny.content)
-                  : asAny.image_url ||
-                    asAny.file_url ||
-                    asAny.image ||
-                    (asAny.attachments &&
-                      asAny.attachments[0] &&
-                      (asAny.attachments[0].url ||
-                        asAny.attachments[0].file)) ||
-                    null;
-              if (!asAny.content && possibleUrl)
-                asAny.content = String(possibleUrl);
-
-              setMessages((prev) => {
-                const list = prev[key] || [];
-                if (returnedTemp) {
-                  const idx = list.findIndex(
-                    (m) =>
-                      ((m as any).__temp_id || (m as any).temp_id) ===
-                      returnedTemp,
-                  );
-                  if (idx !== -1) {
-                    const newList = [...list];
-                    newList[idx] = msg;
-                    return { ...prev, [key]: newList };
-                  }
-                }
-                return { ...prev, [key]: [...list, msg] };
-              });
-              return true;
-            }
-          } catch (err) {
-            // ignore and fall back to multipart upload
-            console.debug(
-              "useWsChat: embed dataUrl send failed, falling back to multipart",
-              err,
-            );
-          }
-          return false;
-        };
-
-        const embedded = await tryEmbedAsDataUrl();
-        if (embedded) return;
-        try {
-          const form = new FormData();
-          // Some backends require a non-empty `message` field when a file is attached.
-          // If the caller didn't provide text, send the client tempId as the message so validation passes.
-          const messageText = text && text.length > 0 ? text : (tempId ?? "");
-          // Include both `content` and `message` for compatibility with different backends.
-          form.append("content", messageText);
-          form.append("message", messageText);
-          if (tempId) form.append("temp_id", String(tempId));
-          // backend may expect 'file' or 'image' or 'attachment' — include several keys to maximize compatibility
-          form.append("file", file);
-          form.append("image", file);
-          form.append("attachment", file);
-          // log for debugging
-          try {
-            console.debug("useWsChat: uploading file", {
-              roomId,
-              tempId,
-              fileName: (file as any).name,
-            });
-          } catch {}
-          const res = await chatService.sendMessageToRoom(
-            roomId,
-            form as unknown as any,
-          );
-          if (res && (res as any).id) {
-            const msg = res as Message & { temp_id?: string };
-            // Ensure we preserve a client temp id so optimistic placeholders reconcile
-            const returnedTemp = (msg as any).temp_id || tempId;
-            if (returnedTemp && !(msg as any).temp_id)
-              (msg as any).temp_id = returnedTemp;
-
-            // If server returned an attachment URL in a common field, prefer that as `content`
-            const asAny = msg as any;
-            const possibleUrl =
-              asAny.content && String(asAny.content).startsWith("http")
-                ? String(asAny.content)
-                : asAny.image_url ||
-                  asAny.file_url ||
-                  asAny.image ||
-                  (asAny.attachments &&
-                    asAny.attachments[0] &&
-                    (asAny.attachments[0].url || asAny.attachments[0].file)) ||
-                  null;
-            if (!asAny.content && possibleUrl) {
-              asAny.content = String(possibleUrl);
-            }
-
-            setMessages((prev) => {
-              const list = prev[key] || [];
-              if (returnedTemp) {
-                const idx = list.findIndex(
-                  (m) =>
-                    ((m as any).__temp_id || (m as any).temp_id) ===
-                    returnedTemp,
-                );
-                if (idx !== -1) {
-                  const newList = [...list];
-                  newList[idx] = msg;
-                  return { ...prev, [key]: newList };
-                }
-              }
-              return { ...prev, [key]: [...list, msg] };
-            });
-          }
-          return;
-        } catch (err) {
-          console.warn("useWsChat: sendMessage file upload failed", err);
-          throw err;
+        const MAX_EMBED = 5_000_000; // increase limit for WS but still reasonable
+        const size = (file as any).size || 0;
+        if (size > MAX_EMBED) throw new Error("File too large to send via websocket");
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const fr = new FileReader();
+          fr.onload = () => resolve(String(fr.result ?? ""));
+          fr.onerror = (e) => reject(e);
+          fr.readAsDataURL(file as Blob);
+        });
+        if (!client || !client.isOpen()) {
+          throw new Error("WebSocket not connected; cannot send file over websocket");
         }
-      }
-
-      if (client && client.isOpen()) {
-        // include client temp id so server can echo it back and we can reconcile optimistic UI
-        client.send({ type: "message", content: text, temp_id: tempId });
+        try { client.send({ type: "chat_message", message: dataUrl, temp_id: tempId }); } catch { throw new Error("WebSocket send failed"); }
         return;
       }
 
-      // If this is a temp chat room (created from email), resolve or create a real room via REST and send via WS/REST
+      // Text message path
+      if (client && client.isOpen()) {
+        client.send({ type: "chat_message", message: text, temp_id: tempId });
+        return;
+      }
+
+      // If this is a temp chat room (created from email), we do not auto-resolve here in websocket-only mode
       const isTempRoom = String(roomId).startsWith("temp_");
       if (isTempRoom) {
-        const possibleEmail = String(roomId).replace(/^temp_/, "");
-        // Try to resolve existing room by email
-        try {
-          const res = await chatService.resolveChatroomId({
-            email: possibleEmail,
-          } as any);
-          const resolved =
-            (res as any)?.room_id ??
-            (res as any)?.room ??
-            (res as any)?.id ??
-            null;
-          const rid = resolved != null ? String(resolved) : null;
-          if (rid) {
-            // ensure room client exists and try to send via websocket where possible
-            await ensureRoomClient(rid);
-            const ridKey = String(rid);
-            const clientForResolved = roomClients.current[ridKey];
-            if (clientForResolved && clientForResolved.isOpen()) {
-              clientForResolved.send({
-                type: "message",
-                content: text,
-                temp_id: tempId,
-              });
-              return;
-            }
-            // fallback to REST send for resolved room
-            await chatService.sendMessageToRoom(rid, {
-              content: text,
-              message: text,
-              temp_id: tempId,
-            } as any);
-            return;
-          }
-        } catch (err) {
-          console.debug(
-            "useWsChat: resolveChatroomId for temp email failed",
-            err,
-          );
-        }
-
-        // If resolve failed, try to create a room via REST using the email
-        try {
-          const created = await chatService.createChatRoom({
-            email: possibleEmail,
-          } as any);
-          const createdId =
-            (created as any)?.id ??
-            (created as any)?.room_id ??
-            (created as any)?.room ??
-            null;
-          const rid = createdId != null ? String(createdId) : null;
-          if (rid) {
-            await ensureRoomClient(rid);
-            const ridKey = String(rid);
-            const clientForResolved = roomClients.current[ridKey];
-            if (clientForResolved && clientForResolved.isOpen()) {
-              clientForResolved.send({
-                type: "message",
-                content: text,
-                temp_id: tempId,
-              });
-              return;
-            }
-            await chatService.sendMessageToRoom(rid, {
-              content: text,
-              message: text,
-              temp_id: tempId,
-            } as any);
-            return;
-          }
-        } catch (err) {
-          console.warn(
-            "useWsChat: failed to create chatroom for temp email",
-            err,
-          );
-        }
-
-        throw new Error("Unable to resolve or create chatroom for temp email");
+        throw new Error("Cannot send to temp rooms in websocket-only mode; server-side resolution required");
       }
 
-      // Fallback: send via REST if websocket not available for persistent rooms
-      try {
-        const body: any = { content: text, message: text };
-        if (tempId) body.temp_id = tempId;
-        const res = await chatService.sendMessageToRoom(roomId, body);
-        // If backend returns the created message, append it; otherwise caller may have optimistic UI
-        if (res && (res as any).id) {
-          const msg = res as Message & { temp_id?: string };
-          // ensure temp_id is present so we can match and replace optimistic items
-          const returnedTemp = (msg as any).temp_id || tempId;
-          if (returnedTemp && !(msg as any).temp_id)
-            (msg as any).temp_id = returnedTemp;
-
-          // map common file/url fields into content when content is empty
-          const asAny = msg as any;
-          const possibleUrl =
-            asAny.content && String(asAny.content).startsWith("http")
-              ? String(asAny.content)
-              : asAny.image_url ||
-                asAny.file_url ||
-                asAny.image ||
-                (asAny.attachments &&
-                  asAny.attachments[0] &&
-                  (asAny.attachments[0].url || asAny.attachments[0].file)) ||
-                null;
-          if (!asAny.content && possibleUrl) {
-            asAny.content = String(possibleUrl);
-          }
-
-          setMessages((prev) => {
-            const list = prev[key] || [];
-            // If server returned our temp_id, replace optimistic placeholder
-            if (returnedTemp) {
-              const idx = list.findIndex(
-                (m) =>
-                  ((m as any).__temp_id ||
-                    (m as any).tempId ||
-                    (m as any).temp_id) === returnedTemp,
-              );
-              if (idx !== -1) {
-                const newList = [...list];
-                newList[idx] = msg;
-                return { ...prev, [key]: newList };
-              }
-            }
-            // fallback: fuzzy match optimistic placeholder and replace if found
-            const msgTime = msg.created_at
-              ? new Date(msg.created_at).getTime()
-              : 0;
-            const likelyIndex = list.findIndex((m) => {
-              if (!m) return false;
-              if (
-                m.sender?.id &&
-                msg.sender?.id &&
-                m.sender.id !== msg.sender.id
-              )
-                return false;
-              if (m.content !== msg.content) return false;
-              const mTime = m.created_at ? new Date(m.created_at).getTime() : 0;
-              return (
-                Math.abs(mTime - msgTime) <= 5000 && (m as any).__optimistic
-              );
-            });
-            if (likelyIndex !== -1) {
-              const newList = [...list];
-              newList[likelyIndex] = msg;
-              return { ...prev, [key]: newList };
-            }
-            return { ...prev, [key]: [...list, msg] };
-          });
-        }
-        return;
-      } catch (err) {
-        console.warn("useWsChat: sendMessage REST fallback failed", err);
-        throw err;
-      }
+      // No REST fallback: require WebSocket to be available for websocket-only mode
+      throw new Error("WebSocket not connected; cannot send message via websocket-only mode");
     },
     [],
   );
 
   const sendTyping = useCallback((roomId: string, typing: boolean) => {
-    const k = String(roomId);
-    const client = roomClients.current[k];
+    const client = getClientForRoom(roomId);
     if (!client || !client.isOpen()) return;
     client.send({ type: "typing", typing });
   }, []);
 
+  // enhanced sendTyping: update local typing map optimistically for current user
+  const sendTypingOptimistic = useCallback((roomId: string, typing: boolean) => {
+    try {
+      const key = normalizeRoomId(roomId);
+      const uid = getStoredUserIdLocal();
+      if (uid != null) {
+        setTypingMap((prev) => {
+          const cur = new Set<number>(prev[key] || []);
+          if (typing) cur.add(Number(uid)); else cur.delete(Number(uid));
+          return { ...prev, [key]: Array.from(cur) };
+        });
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      const client = getClientForRoom(roomId);
+      if (!client || !client.isOpen()) return;
+      client.send({ type: "typing", typing });
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const markAsRead = useCallback(async (roomId: string) => {
     // Optimistically mark messages in this room as read locally so UI updates immediately
-    const k = String(roomId);
-    setMessages((prev) => {
-      const list = prev[k] || [];
-      if (list.length === 0) return prev;
-      const updated = list.map((m) =>
-        m.sender?.id !== undefined
-          ? { ...m, is_read: true, __read_by_me: true }
-          : m,
-      );
-      try {
-        console.debug("useWsChat.markAsRead: optimistic update", {
-          roomId: k,
-          updatedCount: updated.length,
-        });
-      } catch {}
-      return { ...prev, [k]: updated };
-    });
+    const k = normalizeRoomId(roomId);
+      setMessages((prev) => {
+        const list = prev[k] || [];
+        if (list.length === 0) return prev;
+        const updated = list.map((m) => (m.sender?.id !== undefined ? { ...m, is_read: true, __read_by_me: true } : m));
+        return { ...prev, [k]: updated };
+      });
 
     try {
-      await chatService.markChatRoomRead(roomId);
+      // Attempt to find a numeric DB id for this room from cached chatrooms
+      const found = chatrooms.find(
+        (r) => String(r.room_id) === String(k) || String(r.id) === String(roomId) || String(r.name) === String(k),
+      );
+      const idToSend = found?.id ?? (String(roomId).match(/^[0-9]+$/) ? roomId : null);
+      if (idToSend != null) {
+        await chatService.markChatRoomRead(idToSend);
+      } else {
+        // no numeric id; skip REST call
+      }
     } catch (err) {
-      console.warn("useWsChat: markChatRoomRead failed", err);
+      // ignore
     }
 
     // also notify ws (best-effort)
-    const client = roomClients.current[String(roomId)];
+    const client = getClientForRoom(roomId);
     try {
       client?.send({ type: "mark_read" });
     } catch {
@@ -705,13 +787,12 @@ export default function useWsChat(): UseWsChatReturn {
   }, []);
 
   const isRoomConnected = useCallback(
-    (roomId: string) =>
-      !!roomClients.current[String(roomId)] && roomClients.current[String(roomId)]!.isOpen(),
+    (roomId: string) => !!getClientForRoom(roomId) && getClientForRoom(roomId)!.isOpen(),
     [],
   );
 
   const addLocalMessage = useCallback((roomId: string, msg: Message) => {
-    const k = String(roomId);
+    const k = normalizeRoomId(roomId);
     setMessages((prev) => {
       const list = prev[k] || [];
       // dedupe by id
@@ -762,25 +843,30 @@ export default function useWsChat(): UseWsChatReturn {
   }, []);
 
   const leaveRoom = useCallback((roomId: string) => {
-    const k = String(roomId);
+    const key = normalizeRoomId(roomId);
+    const alt = String(roomId);
     try {
-      roomClients.current[k]?.close();
+      roomClients.current[key]?.close();
+      if (alt !== key) roomClients.current[alt]?.close();
     } catch {
       // ignore
     }
-    roomClients.current[k] = null;
-    roomConnecting.current[k] = false;
+    roomClients.current[key] = null;
+    if (alt !== key) roomClients.current[alt] = null;
+    roomConnecting.current[key] = false;
   }, []);
 
   return {
     messages,
     chatrooms,
+    roomUserMap,
     unreadCount,
+    typing: typingMap,
     connectToRoom,
     connectToChatroomsList,
     connectToUnreadCount,
     sendMessage,
-    sendTyping,
+    sendTyping: sendTypingOptimistic,
     markAsRead,
     isRoomConnected,
     addLocalMessage,
