@@ -5,7 +5,6 @@ import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
 import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
-import MenuButton from "./MenuButton";
 import { formatReviewDate } from "../utils/formatReviewDate";
 type LiveChatProps = {
   caseId: string | null;
@@ -141,7 +140,7 @@ function ChatInput({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div className="relative pb-18 md:pb-22 lg:pb-0 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
+    <div className="relative pb-2.5 lg:pb-0 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
       {recording ? (
         <div className="flex items-center bg-white gap-2 w-full rounded-2xl px-10 py-3" style={{ border: "1px solid var(--div-border)", background: "white" }}>
           <div className="flex items-center gap-2">
@@ -897,8 +896,6 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   return (
     <div className="flex h-full border-gray-100 lg:items-center lg:justify-center lg:grow">
       <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
-
-        <MenuButton />
 
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}

@@ -454,8 +454,6 @@ export default function SupportAndCases({
             <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetHelp />
               <OpenCases supportRooms={staffRoomsMemo} />
-
-              {/* check is superuser/staff */}
             </div>
           )}
           <div className="w-1 h-13" />
