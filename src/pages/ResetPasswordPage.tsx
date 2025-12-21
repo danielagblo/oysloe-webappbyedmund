@@ -67,7 +67,7 @@ const ResetPasswordPage = () => {
   return (
     <div className="h-screen max-sm:bg-(--bg) w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center">
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 max-sm:pb-20">
-        <div className="flex flex-col gap-5 max-sm:space-y-6 items-center justify-center">
+        <div className="flex sm:w-7/10 flex-col gap-5 max-sm:space-y-6 items-center justify-center">
           <div className="w-full flex mb-4 justify-center items-center">
             <button
               type="button"
@@ -260,7 +260,7 @@ const ResetPasswordPage = () => {
           <OnboardingScreen />
         </div>
       )}
-      {!showModal && (
+      {showModal && (
         <div className="h-2/5 w-2/7 max-md:w-9/10 max-lg:w-3/5 max-lg:mt-40 max-sm:p-4 max-sm:h-fit flex flex-col justify-center items-center bg-white border-2 border-gray-100 rounded-4xl shadow-lg absolute z-10">
           <LottieSuccess />
           <h2 className="text-2xl text-center">
