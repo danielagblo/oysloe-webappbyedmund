@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 type HomePageHeaderProps = {
   searchValue: string;
@@ -10,15 +10,15 @@ const HomePageHeader = ({
   setSearchValue,
 }: HomePageHeaderProps) => {
   const headerRef = useRef<HTMLDivElement>(null);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  // const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   // check screen size
-  useEffect(() => {
-    const checkScreen = () => setIsSmallScreen(window.innerWidth <= 640);
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
+  // useEffect(() => {
+  //   const checkScreen = () => setIsSmallScreen(window.innerWidth <= 640);
+  //   checkScreen();
+  //   window.addEventListener("resize", checkScreen);
+  //   return () => window.removeEventListener("resize", checkScreen);
+  // }, []);
 
   // removed condensed-on-scroll behavior — header stays static
 

@@ -1,14 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
-// These values should be replaced at build time or populated via a script.
-firebase.initializeApp({
-  apiKey: 'REPLACE_ME',
-  authDomain: 'REPLACE_ME',
-  projectId: 'REPLACE_ME',
-  messagingSenderId: 'REPLACE_ME',
-  appId: 'REPLACE_ME',
-});
+firebase.initializeApp({"apiKey":"","authDomain":"","projectId":"","messagingSenderId":"","appId":""});
 
 const messaging = firebase.messaging();
 

@@ -6,7 +6,6 @@ import userProfileService from "../services/userProfileService";
 import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import MenuButton from "./MenuButton";
 type LiveChatProps = {
   caseId: string | null;
   onClose: () => void;
@@ -174,7 +173,7 @@ function ChatInput({
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-2 w-full py-2">
+        <div className="flex items-center gap-2 w-9/10 max-sm:w-11/12 py-2">
           <div className="relative flex-1">
             <input
               value={value}
@@ -205,7 +204,7 @@ function ChatInput({
               }}
               type="text"
               placeholder="Start a chat"
-              className="rounded-2xl border-2 outline-0 border-gray-300 px-4 pl-12 py-3 bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
+              className="rounded-2xl border-2 lg:rounded-[0.75vw] lg:border outline-0 border-gray-300 px-10 py-3 lg:pl-[3vw] bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
             />
             {!recording && (
               <button
@@ -223,18 +222,18 @@ function ChatInput({
               type="button"
               aria-label="Send"
               disabled={disabled}
-              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+              <img src="/send.svg" alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
             </button>
             <button
               onClick={() => startRecording()}
               type="button"
               aria-label={recording ? "Stop recording" : "Start recording"}
               disabled={disabled}
-              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+              <img src="/audio.svg" alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
             </button>
           </div>
         </div>
@@ -1134,11 +1133,11 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 lg:items-center lg:justify-center lg:grow">
-      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col shadow lg:shadow-2xl overflow-hidden max-w-full pb-12 sm:pb-0">
+      <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
 
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}
-          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 lg:shadow-sm rounded-b-2xl lg:py-5 lg:rounded-2xl bg-white shadow z-10 py-2">
+          <div className="absolute left-0 right-0 top-0 flex items-center gap-3 lg:shadow-sm rounded-b-2xl lg:py-[0.25vw] lg:rounded-2xl bg-white shadow z-10 py-2">
             <button
               onClick={onClose}
               aria-label="Back"
@@ -1186,7 +1185,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                           // ignore
                         }
                       }}
-                      className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
+                      className="w-10 h-10 rounded-xl object-cover"
                     />
                   );
                 }
@@ -1194,7 +1193,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                 // ignore
               }
               return (
-                <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
+                <div className="w-10 h-10 rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
                   {headerProduct?.name
                     ? headerProduct.name
                       .split(" ")
@@ -1248,8 +1247,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         </div>
         <div
           ref={containerRef}
-          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-20 lg:pt-24"
-          style={{ minHeight: 0 }}
+          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-14"
         >
           <p className="text-xs md:text-sm lg:text-[0.8vw] text-gray-400 text-center mb-6">Chat</p>
 
