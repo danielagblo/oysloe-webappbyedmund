@@ -125,10 +125,32 @@ const SignInPage = () => {
       return;
     }
 
-    // Password validation
-    if (!data.password || data.password.length < 6) {
-      console.log("Password must be at least 6 characters long");
-      toast.error("Password must be at least 6 characters long");
+    // Strong password validation
+    const validatePassword = (pw: string) => {
+      const errors: string[] = [];
+      if (!pw || pw.length < 12) {
+        errors.push("be at least 12 characters long");
+      }
+      if (!/[a-z]/.test(pw)) {
+        errors.push("include a lowercase letter");
+      }
+      if (!/[A-Z]/.test(pw)) {
+        errors.push("include an uppercase letter");
+      }
+      if (!/[0-9]/.test(pw)) {
+        errors.push("include a number");
+      }
+      if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pw)) {
+        errors.push("include a symbol (e.g. !@#$%)");
+      }
+      return errors;
+    };
+
+    const pwErrors = validatePassword(data.password || "");
+    if (pwErrors.length > 0) {
+      const msg = `Password must ${pwErrors.join(", ")}.`;
+      console.log(msg);
+      toast.error(msg);
       return;
     }
 

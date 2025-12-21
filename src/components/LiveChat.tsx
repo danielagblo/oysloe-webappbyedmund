@@ -6,6 +6,7 @@ import userProfileService from "../services/userProfileService";
 import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import MenuButton from "./MenuButton";
 type LiveChatProps = {
   caseId: string | null;
   onClose: () => void;
@@ -19,6 +20,7 @@ type ChatInputProps = {
   disabled?: boolean;
   onAttach?: () => void;
   onRecord?: (recordingOrFile: boolean | File) => void;
+  onTyping?: (isTyping: boolean) => void;
   onRecorded?: (file: File) => void;
 };
 
@@ -30,8 +32,10 @@ function ChatInput({
   disabled,
   onAttach,
   onRecord,
+  onTyping,
 }: ChatInputProps) {
   const [recording, setRecording] = useState(false);
+  const typingTimeoutRef = useRef<number | null>(null);
 
   const mediaRecRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -44,9 +48,6 @@ function ChatInput({
   const startRecording = async () => {
     if (disabled) return;
     try {
-      // request microphone
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -65,7 +66,6 @@ function ChatInput({
             chunksRef.current = [];
             const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
             try {
-              console.debug("ChatInput: recorded file ready", { size: (file as any).size, type: file.type, name: file.name });
               onRecord?.(file);
             } catch (e) {
               void e;
@@ -136,6 +136,7 @@ function ChatInput({
       }
       if (mediaStreamRef.current) mediaStreamRef.current.getTracks().forEach((t) => t.stop());
       if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
+      if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -173,15 +174,38 @@ function ChatInput({
           </div>
         </div>
       ) : (
-        <div className="flex lg:py-3 items-center justify-center max-lg:w-9/10 gap-2 w-full">
-          <div className="relative lg:flex-1 lg:max-w-7/10">
+        <div className="flex items-center gap-2 w-full py-2">
+          <div className="relative flex-1">
             <input
               value={value}
-              onChange={(e) => onValueChange(e.target.value)}
-              onKeyDown={onKeyDown}
+              onChange={(e) => {
+                onValueChange(e.target.value);
+                try {
+                  onTyping?.(true);
+                } catch {
+                  // ignore
+                }
+                if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                typingTimeoutRef.current = window.setTimeout(() => {
+                  try { onTyping?.(false); } catch { /* ignore */ }
+                  typingTimeoutRef.current = null;
+                }, 1500) as unknown as number;
+              }}
+              onKeyDown={(e) => {
+                try {
+                  onKeyDown(e as unknown as KeyboardEvent<HTMLInputElement>);
+                } catch {
+                  // ignore
+                }
+                if (e.key === "Enter") {
+                  try { onTyping?.(false); } catch { /* ignore */ }
+                  if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                  typingTimeoutRef.current = null;
+                }
+              }}
               type="text"
               placeholder="Start a chat"
-              className="rounded-2xl border-2 lg:rounded-[0.75vw] lg:border outline-0 border-gray-300 px-10 py-3 lg:pl-[3vw] bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
+              className="rounded-2xl border-2 outline-0 border-gray-300 px-4 pl-12 py-3 bg-no-repeat bg-white text-sm md:text-base lg:text-[1.25vw] w-full"
             />
             {!recording && (
               <button
@@ -193,24 +217,26 @@ function ChatInput({
               </button>
             )}
           </div>
-          <button
-            onClick={onSend}
-            type="button"
-            aria-label="Send"
-            disabled={disabled}
-            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            <img src="/send.svg" alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
-          </button>
-          <button
-            onClick={() => startRecording()}
-            type="button"
-            aria-label={recording ? "Stop recording" : "Start recording"}
-            disabled={disabled}
-            className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            <img src="/audio.svg" alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onSend}
+              type="button"
+              aria-label="Send"
+              disabled={disabled}
+              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => startRecording()}
+              type="button"
+              aria-label={recording ? "Stop recording" : "Start recording"}
+              disabled={disabled}
+              className={`p-2 rounded-2xl border-2 outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+            >
+              <img src="/audio.svg" alt="Record" className="w-6 h-6" />
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -225,13 +251,74 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   // use the websocket hook (we call connectToRoom after validation)
   const {
     messages,
+    chatrooms,
+    roomUserMap,
     sendMessage,
     addLocalMessage,
     isRoomConnected,
     connectToRoom,
     leaveRoom,
     markAsRead,
+    connectToChatroomsList,
+    connectToUnreadCount,
+    typing,
+    sendTyping,
   } = useWsChat();
+  // ensure the chatrooms websocket is connected and log updates for debugging
+  useEffect(() => {
+    try {
+      connectToChatroomsList();
+    } catch (e) {
+      void e;
+    }
+  }, [connectToChatroomsList]);
+
+  useEffect(() => {
+    try {
+      try {
+        // If the websocket hook provided a roomUserMap prefer it as the source of truth
+        // but only short-circuit if it contains at least one non-empty avatar value.
+        if (
+          roomUserMap &&
+          Object.keys(roomUserMap).length > 0 &&
+          Object.keys(roomUserMap).some((k) => !!(roomUserMap[k]?.avatar))
+        ) {
+          const m: Record<string, string> = {};
+          for (const k of Object.keys(roomUserMap)) {
+            try {
+              const avatar = roomUserMap[k]?.avatar ?? null;
+              const url = normalizeAvatarUrl(avatar) || "";
+              if (url) m[k] = url;
+            } catch {
+              // ignore per-item
+            }
+          }
+          setRoomAvatarMap(m);
+          return;
+        }
+
+        const map: Record<string, string> = {};
+        if (Array.isArray(chatrooms)) {
+          for (const r of chatrooms) {
+            try {
+              const roomId = r?.room_id || r?.id || null;
+              if (!roomId) continue;
+              const rawAvatar = (r as any)?.other_user_avatar;
+              const url = normalizeAvatarUrl(rawAvatar) || "";
+              if (url) map[String(roomId)] = url;
+            } catch {
+              // ignore per-item errors
+            }
+          }
+        }
+        setRoomAvatarMap(map);
+      } catch {
+        // ignore mapping errors
+      }
+    } catch {
+      // ignore
+    }
+  }, [chatrooms, roomUserMap]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -239,14 +326,57 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [currentUser, setCurrentUser] = useState<{
     id?: number;
     name?: string;
+    avatar?: string | null;
   } | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [avatarMap, setAvatarMap] = useState<Record<number, string>>({});
+  const [roomAvatarMap, setRoomAvatarMap] = useState<Record<string, string>>({});
   const [roomInfo, setRoomInfo] = useState<any | null>(null);
-  const [headerProduct, setHeaderProduct] = useState<Product | null>(null);
+  const [headerProduct, setHeaderProduct] = useState<Product | null>(() => {
+    try {
+      if (!caseId) return null;
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (!raw) return null;
+      const map = JSON.parse(raw || "{}");
+      const meta = map[String(caseId)];
+      if (!meta) return null;
+      const prod: any = {};
+      if (meta.ad_name) prod.name = String(meta.ad_name);
+      if (meta.ad_image) {
+        let img = String(meta.ad_image);
+        if (img.startsWith("data:")) {
+          // dataUrlToObjectUrl is defined below but safe to call here because
+          // this initializer runs synchronously during module eval and the
+          // function declaration appears earlier in the file.
+          prod.image = dataUrlToObjectUrl(img);
+        } else if (img.startsWith("/")) {
+          // derive api origin fallback similar to normalizeAvatarUrl
+          const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+          let apiOriginFallbackLocal = "";
+          try {
+            apiOriginFallbackLocal = new URL(_apiRaw).origin;
+          } catch {
+            apiOriginFallbackLocal = _apiRaw.replace(/\/+$/, "");
+          }
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            prod.image = apiOriginFallbackLocal + img;
+          } else {
+            prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+          }
+        } else {
+          prod.image = img;
+        }
+      }
+      return Object.keys(prod).length > 0 ? (prod as Product) : null;
+    } catch {
+      return null;
+    }
+  });
   // cache for object URLs created from data: URLs to avoid recreating blobs repeatedly
   const dataUrlObjectUrlRef = useRef<Record<string, string>>({});
+
+  // Drag feature removed: live chat is no longer draggable when shown in mobile overlays.
 
   // Helper: convert data:...;base64,... into a Blob and return an object URL (cached)
   const dataUrlToObjectUrl = (dataUrl: string) => {
@@ -272,6 +402,60 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       return dataUrl;
     }
   };
+
+  // Helper: normalize avatar/source URLs that may be returned as relative paths like '/assets/avatars/..'
+  // Prefer serving avatar assets from API origin when configured (VITE_API_URL), otherwise use page origin.
+  const normalizeAvatarUrl = (src?: string | null) => {
+    if (!src) return null;
+    try {
+      // full URL -> return as-is
+      if (/^https?:\/\//i.test(src)) return src;
+      // protocol-relative -> use current protocol
+      if (src.startsWith("//")) return window.location.protocol + src;
+
+      // derive API origin from VITE_API_URL (may include a path like /api-v1)
+      const apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+      let apiOrigin = "";
+      try {
+        apiOrigin = new URL(apiRaw).origin;
+      } catch {
+        apiOrigin = apiRaw.replace(/\/+$/, "");
+      }
+
+      // If src is an absolute-root path, prefer API origin for known asset paths (avatars, media, uploads)
+      if (src.startsWith("/")) {
+        if (/^\/assets\/avatars\//i.test(src) || /^\/media\//i.test(src) || /^\/uploads\//i.test(src)) {
+          return apiOrigin + src;
+        }
+        return (typeof window !== "undefined" ? window.location.origin : "") + src;
+      }
+
+      return src;
+    } catch {
+      return src;
+    }
+  };
+
+  // compute a header avatar for the current room (prefer websocket-provided roomAvatarMap)
+  const headerAvatar = (() => {
+    try {
+      const key = String(validatedRoomId ?? caseId ?? "");
+      if (key && roomAvatarMap && roomAvatarMap[key]) return roomAvatarMap[key];
+      if (roomInfo && (roomInfo as any).other_user_avatar) return normalizeAvatarUrl((roomInfo as any).other_user_avatar) || null;
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Precompute API origin for use in onError fallbacks and debugging
+  const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+  let apiOriginFallback = "";
+  try {
+    apiOriginFallback = new URL(_apiRaw).origin;
+  } catch {
+    apiOriginFallback = _apiRaw.replace(/\/+$/, "");
+  }
 
   // Small helper audio player to guarantee visible controls (play/pause, progress, times)
   function AudioPlayer({ src }: { src: string }) {
@@ -454,7 +638,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       try {
         const p: UserProfile = await userProfileService.getUserProfile();
         if (!mounted) return;
-        setCurrentUser({ id: p.id, name: p.name });
+        setCurrentUser({ id: p.id, name: p.name, avatar: p.avatar ?? null });
       } catch {
         // ignore if unauthenticated
       }
@@ -462,6 +646,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     return () => {
       mounted = false;
     };
+  }, []);
+
+  // Ensure we request the chatrooms list (websocket) when the LiveChat mounts so
+  // the `chatrooms` array is populated by the websocket server. Also open unread count.
+  useEffect(() => {
+    try {
+      connectToChatroomsList();
+    } catch {
+      // ignore
+    }
+    try {
+      connectToUnreadCount();
+    } catch {
+      // ignore
+    }
+    // only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Prefetch avatars for message senders using product data if sender.avatar missing
@@ -538,48 +739,127 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   // Fetch room details and try to resolve a product for the chat header
   useEffect(() => {
+    // Without REST access we can't fetch room details here. Clear any previous
+    // room info but DO NOT clear headerProduct because persisted ad metadata
+    // should remain visible and must not flash to the room id.
     if (!validatedRoomId) {
       setRoomInfo(null);
-      setHeaderProduct(null);
       return;
     }
-    let mounted = true;
-    (async () => {
-      try {
-        const room = await (await import("../services/chatService")).getChatRoom(validatedRoomId);
-        if (!mounted) return;
-        setRoomInfo(room as any);
-
-        // If room includes staff members, treat this as an admin/case chat
-        const isAdminChat = Array.isArray((room as any).members) && (room as any).members.some((m: any) => m?.is_staff || m?.is_superuser);
-        if (isAdminChat) {
-          setHeaderProduct(null);
-          return;
+    setRoomInfo(null);
+    // try to load persisted chatroom metadata (ad_name/ad_image) put there by the caller
+    try {
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (raw) {
+        const map = JSON.parse(raw || "{}");
+        const meta = map[String(validatedRoomId)];
+        if (meta) {
+          const prod: any = {};
+          if (meta.ad_name) prod.name = String(meta.ad_name);
+          if (meta.ad_image) {
+            let img = String(meta.ad_image);
+            if (img.startsWith("data:")) {
+              prod.image = dataUrlToObjectUrl(img);
+            } else if (img.startsWith("/")) {
+              if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                prod.image = apiOriginFallback + img;
+              } else {
+                prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+              }
+            } else {
+              prod.image = img;
+            }
+          }
+          if (Object.keys(prod).length > 0) {
+            // Do not overwrite any persisted headerProduct (ad_name) that was
+            // loaded from localStorage earlier. Prefer existing headerProduct
+            // with a name and only set when none exists.
+            setHeaderProduct((curr) => (curr && curr.name ? curr : (prod as Product)));
+          }
         }
+      }
+    } catch {
+      // ignore
+    }
+  }, [validatedRoomId]);
 
-        // Try to fetch a product using the room's product_id field, or room id if it's a numeric id
-        try {
-          const productId = (room as any).product_id || (Number.isInteger(Number(validatedRoomId)) ? Number(validatedRoomId) : null);
-          if (productId) {
-            const prod = await productService.getProduct(Number(productId));
-            if (!mounted) return;
-            setHeaderProduct(prod as Product);
+  // Ensure persisted `ad_name` is loaded immediately when `caseId` changes so the
+  // header shows the ad name right away (avoid flashing room id). This prefers
+  // persisted metadata over any websocket-provided values and should never be
+  // overwritten by later socket updates.
+  useEffect(() => {
+    try {
+      if (!caseId) return;
+      const raw = localStorage.getItem("oysloe_chatroom_meta");
+      if (!raw) return;
+      const map = JSON.parse(raw || "{}");
+      const meta = map[String(caseId)];
+      if (!meta) return;
+      const prod: any = {};
+      if (meta.ad_name) prod.name = String(meta.ad_name);
+      if (meta.ad_image) {
+        let img = String(meta.ad_image);
+        if (img.startsWith("data:")) {
+          prod.image = dataUrlToObjectUrl(img);
+        } else if (img.startsWith("/")) {
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            prod.image = apiOriginFallback + img;
           } else {
-            setHeaderProduct(null);
+            prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
+          }
+        } else {
+          prod.image = img;
+        }
+      }
+      if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
+    } catch {
+      // ignore
+    }
+  }, [caseId]);
+
+  // If the websocket provides a chatrooms list, use it to set roomInfo for the current room
+  useEffect(() => {
+    // use chatrooms payload if available
+    if (!chatrooms || !Array.isArray(chatrooms)) return;
+    const idToMatch = validatedRoomId ?? caseId;
+    if (!idToMatch) return;
+    const found = chatrooms.find((r: any) => String(r.room_id) === String(idToMatch) || String(r.id) === String(idToMatch) || String(r.name) === String(idToMatch));
+    if (found) {
+      setRoomInfo(found);
+      try {
+        const roomKey = String(found.room_id ?? found.name ?? found.id ?? idToMatch);
+        const otherAvatar = (found as any).other_user_avatar;
+        if (otherAvatar) {
+          try {
+            const normalized = normalizeAvatarUrl(String(otherAvatar)) || String(otherAvatar);
+            setRoomAvatarMap((s) => ({ ...s, [roomKey]: normalized }));
+          } catch {
+            setRoomAvatarMap((s) => ({ ...s, [roomKey]: String(otherAvatar) }));
+          }
+        }
+        // If the chatrooms list contains ad metadata (ad_name/ad_image), prefer
+        // that for the header product information so the header shows the ad
+        // when available (this comes from `type: "chatrooms_list"`).
+        try {
+          const adName = (found as any).ad_name;
+          const adImage = (found as any).ad_image;
+          if (adName || adImage) {
+            const prod: any = {};
+            if (adName) prod.name = String(adName);
+            if (adImage) {
+              const img = String(adImage);
+              prod.image = img.startsWith("data:") ? dataUrlToObjectUrl(img) : (normalizeAvatarUrl(img) || img);
+            }
+            if (Object.keys(prod).length > 0) setHeaderProduct(prod as Product);
           }
         } catch {
-          // fallback: no product found
-          setHeaderProduct(null);
+          // ignore header product extraction errors
         }
       } catch {
-        if (mounted) setRoomInfo(null);
+        // ignore
       }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [validatedRoomId]);
+    }
+  }, [chatrooms, validatedRoomId, caseId]);
 
   // cleanup any created object URLs when component unmounts
   useEffect(() => {
@@ -604,29 +884,20 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
     if (!caseId) return;
 
-    // Subscribe to room immediately to avoid missing realtime messages.
-    // History loading is handled by connectToRoom (REST history then WS connect).
-    void connectToRoom(caseId).catch((e) => {
-      console.debug("LiveChat: early connectToRoom failed", e);
-    });
-
-    let mounted = true;
+    // Try to connect via websocket only. If connection succeeds we treat the room
+    // as valid. We avoid any REST validation/fallback entirely.
+    let cancelled = false;
     (async () => {
       try {
-
-        // chatService.getChatRoom will throw if the room does not exist
-        await (await import("../services/chatService")).getChatRoom(caseId);
-        if (!mounted) return;
-
+        const normalized = await connectToRoom(caseId);
+        if (cancelled) return;
         setIsValidRoom(true);
-        setValidatedRoomId(caseId);
+        setValidatedRoomId(normalized ?? caseId);
       } catch (err) {
-        console.warn("LiveChat: room validation failed", caseId, err);
-        if (!mounted) return;
+        if (cancelled) return;
         setIsValidRoom(false);
         setValidatedRoomId(null);
         try {
-          // If validation failed, ensure we leave the room to avoid listening to invalid rooms
           leaveRoom(caseId);
         } catch {
           // ignore
@@ -635,7 +906,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     })();
 
     return () => {
-      mounted = false;
+      cancelled = true;
     };
   }, [caseId, connectToRoom, leaveRoom]);
 
@@ -666,10 +937,20 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (prev === 0 && now > 0) {
       el.scrollTop = el.scrollHeight;
     } else if (now > prev) {
-      // new messages appended: only scroll if last message is from current user
+      // new messages appended: scroll when either
+      // - last message is from current user (outgoing), or
+      // - user is already near the bottom (so incoming messages should auto-scroll)
       const last = roomMsgs[roomMsgs.length - 1];
-      if (last && currentUser && last.sender?.id === currentUser.id) {
-        el.scrollTop = el.scrollHeight;
+      try {
+        const lastIsMine = last && currentUser && Number(last.sender?.id) === Number(currentUser.id);
+        const distanceFromBottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
+        const nearBottomThreshold = 150; // px
+        const isNearBottom = distanceFromBottom <= nearBottomThreshold;
+        if (lastIsMine || isNearBottom) {
+          el.scrollTop = el.scrollHeight;
+        }
+      } catch {
+        // ignore scroll errors
       }
     }
 
@@ -717,19 +998,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   const handleSend = async () => {
     // Only allow sending to validated, existing rooms
-    if (isValidRoom !== true) {
-      console.warn("Refusing to send: room is not validated or unknown", {
-        isValidRoom,
-        caseId,
-      });
-      return;
-    }
-    if (!validatedRoomId) {
-      console.warn("Refusing to send: missing validatedRoomId", {
-        validatedRoomId,
-      });
-      return;
-    }
+    if (isValidRoom !== true) return;
+    if (!validatedRoomId) return;
 
     if (sending) return;
     setSending(true);
@@ -753,8 +1023,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     // attach a client-generated temp id so we can reconcile server echo
     (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
     (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
-    // optimistic UI immediately
-    addLocalMessage(String(caseId), optimistic as ChatMessage);
+    // optimistic UI immediately (use validatedRoomId if available)
+    addLocalMessage(String(validatedRoomId ?? caseId), optimistic as ChatMessage);
     // ensure we scroll to the bottom when the user sends a message
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -762,18 +1032,12 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     try {
       // ensure the websocket room client is connected before sending
       if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
-        try {
-          await connectToRoom(validatedRoomId);
-        } catch (e) {
-          console.debug("LiveChat: connectToRoom before send failed", e);
-        }
+        try { await connectToRoom(validatedRoomId); } catch { }
       }
 
       // If websocket client still isn't open, abort to avoid REST/send endpoint fallback
       if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
-        console.warn("Refusing to send: websocket not connected, aborting to avoid REST fallback", { validatedRoomId });
         setSending(false);
-        // restore input so user can retry
         setInput(text);
         return;
       }
@@ -803,23 +1067,17 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
     (optimistic as unknown as Record<string, unknown>).image_url =
       URL.createObjectURL(file);
-    addLocalMessage(String(caseId), optimistic as ChatMessage);
+    addLocalMessage(String(validatedRoomId ?? caseId), optimistic as ChatMessage);
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
     try {
       // ensure connection for files as well
       if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
-        try {
-          await connectToRoom(validatedRoomId);
-        } catch (e) {
-          console.debug("LiveChat: connectToRoom before file send failed", e);
-        }
+        try { await connectToRoom(validatedRoomId); } catch { }
       }
 
       // Prevent REST fallback: require WS client open
       if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
-        console.warn("Refusing to send file: websocket not connected, aborting to avoid REST fallback", { validatedRoomId });
-        // clear optimistic preview since we didn't send
         setSending(false);
         return;
       }
@@ -837,10 +1095,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const handleRecordedFile = async (file: File) => {
     // Choose a room id to send to: prefer validatedRoomId, fall back to incoming caseId
     const roomToSend = validatedRoomId ?? caseId;
-    if (!roomToSend) {
-      console.warn("Refusing to send recorded file: missing room id", { validatedRoomId, caseId });
-      return;
-    }
+    if (!roomToSend) return;
 
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimistic: Partial<ChatMessage> = {
@@ -860,25 +1115,9 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
     try {
       if (roomToSend && !isRoomConnected(roomToSend)) {
-        try {
-          await connectToRoom(roomToSend);
-        } catch (e) {
-          console.debug("LiveChat: connectToRoom before recorded send failed", e);
-        }
+        try { await connectToRoom(roomToSend); } catch { }
       }
-
-      if (!roomToSend || !isRoomConnected(roomToSend)) {
-        console.warn("Refusing to send recorded file: websocket not connected, aborting to avoid REST fallback", { roomToSend });
-        return;
-      }
-
-      console.debug("LiveChat: sending recorded file", {
-        roomToSend,
-        tempId,
-        fileName: file.name,
-        fileSize: (file as any).size,
-        fileType: file.type,
-      });
+      if (!roomToSend || !isRoomConnected(roomToSend)) return;
 
       // Prefer uploading via the REST `/send` endpoint so audio is sent as multipart/form-data.
       // If that fails, fall back to the existing `sendMessage` hook which may use REST/WS.
@@ -895,7 +1134,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   return (
     <div className="flex h-full border-gray-100 lg:items-center lg:justify-center lg:grow">
-      <div className="relative rounded-2xl lg:h-[93vh] bg-white px-0 py-0 h-full w-full flex flex-col">
+      <div className="relative rounded-2xl bg-white px-0 py-0 h-full w-full flex flex-col shadow lg:shadow-2xl overflow-hidden max-w-full pb-12 sm:pb-0">
 
         <div className="mb-2 w-full relative">
           {/* Header: product or chat title / case number (edge-to-edge) */}
@@ -908,36 +1147,109 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3 lg:w-[1.25vw] lg:h-[1.25vw] lg:mr-[1vw]" />
             </button>
 
-            {headerProduct?.image ? (
-              <img
-                src={headerProduct.image}
-                alt={headerProduct.name ?? "Product"}
-                className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
-              />
-            ) : (
-              <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
-                {headerProduct?.name
-                  ? headerProduct.name
+            {(() => {
+              try {
+                const headerProductImage = (() => {
+                  try {
+                    const img = headerProduct?.image;
+                    if (!img) return null;
+                    const s = String(img);
+                    if (s.startsWith("data:")) return dataUrlToObjectUrl(s);
+                    return normalizeAvatarUrl(s) || s;
+                  } catch {
+                    return headerProduct?.image ?? null;
+                  }
+                })();
+
+                if (headerProductImage) {
+                  return (
+                    <img
+                      src={headerProductImage}
+                      alt={headerProduct?.name ?? "Product"}
+                      onError={(e) => {
+                        try {
+                          const el = e.target as HTMLImageElement;
+                          if (el.src && el.src.indexOf("/assets/") !== -1) {
+                            try {
+                              el.src = apiOriginFallback + new URL(el.src).pathname;
+                              return;
+                            } catch {
+                              // ignore URL parse errors
+                            }
+                          }
+                        } catch {
+                          // ignore
+                        }
+                        try {
+                          (e.target as HTMLImageElement).src = "/userPfp2.jpg";
+                        } catch {
+                          // ignore
+                        }
+                      }}
+                      className="w-12 h-10 lg:w-[2.5vw] lg:h-[2.5vw] rounded-xl object-cover"
+                    />
+                  );
+                }
+              } catch {
+                // ignore
+              }
+              return (
+                <div className="w-12 h-10  lg:w-[2.5vw] lg:h-[2.5vw]  rounded-xl bg-gray-200 flex items-center justify-center text-gray-700 font-semibold text-xs md:text-sm lg:text-[1.2vw]">
+                  {headerProduct?.name
+                    ? headerProduct.name
                       .split(" ")
                       .slice(0, 2)
                       .map((word) => word[0]?.toUpperCase())
                       .join("")
-                  : "CH"}
-              </div>
-            )}
+                    : "CH"}
+                </div>
+              );
+            })()}
 
             <div className="flex-1">
               <div className="font-semibold text-sm md:text-base lg:text-[1.25vw] lg:pl-[1vw]">
-                {roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
-                  ? `Case #${validatedRoomId ?? caseId}`
-                  : `${validatedRoomId ?? caseId}`}
+                {headerProduct?.name
+                  ? headerProduct.name
+                  : roomInfo && Array.isArray(roomInfo.members) && roomInfo.members.some((m: any) => m?.is_staff || m?.is_superuser)
+                    ? `Case #${validatedRoomId ?? caseId}`
+                    : `Chat`}
               </div>
             </div>
+            {headerAvatar && (
+              <div className="pr-3">
+                <img
+                  src={headerAvatar}
+                  alt={(roomInfo as any)?.other_user ?? "User"}
+                  onError={(e) => {
+                    try {
+                      const el = e.target as HTMLImageElement;
+                      if (el.src && el.src.indexOf("/assets/") !== -1) {
+                        try {
+                          el.src = apiOriginFallback + new URL(el.src).pathname;
+                          return;
+                        } catch {
+                          // ignore URL parse errors
+                        }
+                      }
+                    } catch {
+                      // ignore
+                    }
+                    try {
+                      (e.target as HTMLImageElement).src = "/userPfp2.jpg";
+                    } catch {
+                      // ignore
+                    }
+                  }}
+                  className="w-10 h-10 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover border-2 border-white shadow"
+                />
+              </div>
+            )}
           </div>
         </div>
         <div
           ref={containerRef}
-          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-14"
+          className="flex-1 p-3 max-sm:bg-gray-200 px-6 overflow-y-auto space-y-6 no-scrollbar pt-20 lg:pt-24"
+          style={{ minHeight: 0 }}
         >
           <p className="text-xs md:text-sm lg:text-[0.8vw] text-gray-400 text-center mb-6">Chat</p>
 
@@ -957,8 +1269,137 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                 lastKey = dateKey;
               }
 
-              const isMine = currentUser && msg.sender?.id === currentUser?.id;
+              const isMine =
+                Boolean(currentUser) &&
+                (Number(msg.sender?.id) === Number(currentUser?.id) ||
+                  (currentUser?.name && String(msg.sender?.name) === String(currentUser?.name)));
+
+              // Prefer lightweight local cache first (written by `wsClient`), then
+              // fall back to `roomAvatarMap` or the live `chatrooms` payload.
+              const idToMatch = validatedRoomId ?? caseId;
+              let roomOtherAvatarFromList: string | null = null;
+              try {
+                // Try localStorage cache (fast, available before hook state may populate)
+                if (typeof window !== "undefined" && window.localStorage && idToMatch) {
+                  try {
+                    const raw = localStorage.getItem("oysloe_chatrooms");
+                    if (raw) {
+                      const cached = JSON.parse(raw);
+                      if (Array.isArray(cached) && cached.length > 0) {
+                        const foundCached = (cached as any[]).find((r) =>
+                          String(r.room_id) === String(idToMatch) || String(r.id) === String(idToMatch) || String(r.name) === String(idToMatch),
+                        );
+                        if (foundCached && (foundCached as any).other_user_avatar) {
+                          roomOtherAvatarFromList = normalizeAvatarUrl((foundCached as any).other_user_avatar) || null;
+                        }
+                      }
+                    }
+                  } catch {
+                    // ignore parse/storage errors and continue to other sources
+                    roomOtherAvatarFromList = null;
+                  }
+                }
+
+                // still not found? prefer roomAvatarMap then live chatrooms payload
+                if (!roomOtherAvatarFromList) {
+                  if (idToMatch && roomAvatarMap[String(idToMatch)]) {
+                    roomOtherAvatarFromList = roomAvatarMap[String(idToMatch)];
+                  } else if (Array.isArray(chatrooms) && idToMatch) {
+                    const foundRoom = (chatrooms as any[]).find((r) =>
+                      String(r.room_id) === String(idToMatch) || String(r.id) === String(idToMatch) || String(r.name) === String(idToMatch),
+                    );
+                    if (foundRoom && (foundRoom as any).other_user_avatar) {
+                      // ensure we normalize any raw avatar path here as a fallback
+                      try {
+                        roomOtherAvatarFromList = normalizeAvatarUrl((foundRoom as any).other_user_avatar) || null;
+                      } catch {
+                        roomOtherAvatarFromList = (foundRoom as any).other_user_avatar || null;
+                      }
+                    }
+                  }
+                }
+              } catch {
+                roomOtherAvatarFromList = null;
+              }
+
+              // Resolve avatar with a clear preference order and handle several common fields.
+              // Priority (other user): msg.sender.avatar -> avatarMap[senderId] -> msg.other_user_avatar -> roomInfo.other_user_avatar
+              // Priority (mine): currentUser.avatar -> msg.sender.avatar -> avatarMap[senderId]
+              let avatarCandidate: string | null = null;
+              try {
+                if (isMine) {
+                  avatarCandidate =
+                    (currentUser && currentUser.avatar) ||
+                    (msg && (msg.sender as any)?.avatar) ||
+                    null;
+                } else {
+                  // PRIORITIZE websocket-provided chatrooms list avatar (roomOtherAvatarFromList)
+                  // then roomInfo.other_user_avatar, then any explicit per-message other_user_avatar,
+                  // then sender.avatar or avatarMap entries.
+                  avatarCandidate =
+                    roomOtherAvatarFromList ||
+                    (roomInfo && normalizeAvatarUrl((roomInfo as any).other_user_avatar)) ||
+                    ((msg as any)?.other_user_avatar as string) ||
+                    (msg && (msg.sender as any)?.avatar) ||
+                    null;
+                }
+              } catch {
+                avatarCandidate = null;
+              }
+
+              // If avatarCandidate is a data: URL, convert it to an object URL for the img src
+              if (typeof avatarCandidate === "string" && avatarCandidate.startsWith("data:")) {
+                avatarCandidate = dataUrlToObjectUrl(avatarCandidate);
+              }
+
+              // Normalize relative URLs like '/assets/..' to absolute URLs.
+              // Use distinct fallback chains for messages authored by current user vs other user
+              let normAvatar: string | null = null;
+              if (isMine) {
+                normAvatar =
+                  normalizeAvatarUrl(currentUser?.avatar ?? undefined) ||
+                  null;
+              } else {
+                normAvatar =
+                  normalizeAvatarUrl(avatarCandidate ?? undefined) ||
+                  (roomInfo && (roomInfo as any).other_user_avatar ? normalizeAvatarUrl((roomInfo as any).other_user_avatar) || null : null) ||
+                  null;
+              }
+              // Ensure normAvatar is populated from any available chatrooms list mapping
+              // IMPORTANT: do NOT consult room/chatrooms mappings for messages authored by the
+              // current user — otherwise the other user's avatar can leak into "my" avatar.
+              if (!normAvatar && !isMine) {
+                try {
+                  const idToMatchLocal = String(validatedRoomId ?? caseId ?? "");
+                  if (idToMatchLocal) {
+                    // direct lookup on roomAvatarMap
+                    const direct = roomAvatarMap && roomAvatarMap[idToMatchLocal];
+                    if (direct) {
+                      normAvatar = direct;
+                    } else if (roomAvatarMap) {
+                      // fuzzy match: try keys that contain or are contained by id
+                      const k = Object.keys(roomAvatarMap).find((kk) => kk === idToMatchLocal || kk.includes(idToMatchLocal) || idToMatchLocal.includes(kk));
+                      if (k) normAvatar = roomAvatarMap[k];
+                    }
+                    // final attempt: search chatrooms payload for a matching room and use its other_user_avatar
+                    if (!normAvatar && Array.isArray(chatrooms)) {
+                      const found = (chatrooms as any[]).find((r) =>
+                        String(r.room_id) === idToMatchLocal || String(r.id) === idToMatchLocal || String(r.name) === idToMatchLocal,
+                      );
+                      if (found && (found as any).other_user_avatar) {
+                        normAvatar = normalizeAvatarUrl((found as any).other_user_avatar) || null;
+                      }
+                    }
+                  }
+                } catch {
+                  // ignore
+                }
+
+              }
               const delivery = getMessageDelivery(msg as unknown);
+              const DEFAULT_AVATAR = "/userPfp2.jpg";
+
+              // avatar resolution completed
 
               // Determine image source from common fields or from content if it's a data URL or an image URL
               const asAny = msg as unknown as Record<string, unknown>;
@@ -976,14 +1417,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               // prefer explicitAudio; if content is a data:audio URL convert to object URL for playback
               const maybeAudioSrc = explicitAudio || (isAudioDataUrl ? dataUrlToObjectUrl(content) : (looksLikeAudioUrl ? content : null));
 
-              // For audio messages we want the bubble to expand so the player can show full controls
+              // Make every message bubble occupy 3/4 of the available width
               const bubbleBaseClass = "border border-gray-200 max-sm:border-gray-300 max-sm:border-2 p-3 lg:p-[1vw] rounded-xl min-w-0 wrap-break-word";
-              const bubbleSizeClass = maybeAudioSrc ? "max-w-full" : "max-w-[80%]";
-              const bubbleColorClass = isMine ? "bg-green-100 max-w-[80%] text-black rounded-tr-none" : "flex-1 bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
+              const bubbleSizeClass = "w-full";
+              const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
               const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
 
+              const keyId = `msg-${(msg as any).id ?? "0"}-${(msg as any).__temp_id ?? (msg as any).temp_id ?? ""}`;
               nodes.push(
-                <div key={msg.id} className={isMine ? "flex justify-end" : "flex justify-start"}>
+                <div key={keyId} className={isMine ? "flex justify-end" : "flex justify-start"}>
                   <div className="flex flex-col">
                     {isMine ? (
                       <div className="flex flex-col items-end gap-1">
@@ -1004,12 +1446,33 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{content}</p>
                             )}
                           </div>
                           <img
-                            src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
+                            src={normAvatar || DEFAULT_AVATAR}
                             alt={msg.sender?.name ?? "You"}
+                            onError={(e) => {
+                              try {
+                                const el = e.target as HTMLImageElement;
+                                // If the src contains an assets path, try API origin fallback first
+                                if (el.src && el.src.indexOf("/assets/") !== -1) {
+                                  try {
+                                    el.src = apiOriginFallback + new URL(el.src).pathname;
+                                    return;
+                                  } catch {
+                                    // ignore URL parse errors
+                                  }
+                                }
+                              } catch {
+                                // ignore
+                              }
+                              try {
+                                // image load failed; no fallback replacement
+                              } catch {
+                                // ignore
+                              }
+                            }}
                             className="w-10 h-10 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover absolute -top-7 -right-3 border-2 border-white max-sm:border-gray-200 shadow"
                           />
                         </div>
@@ -1056,12 +1519,32 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                                 <AudioPlayer src={String(maybeAudioSrc)} />
                               </div>
                             ) : (
-                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{msg.content}</p>
+                              <p className="text-sm md:text-base lg:text-[1.25vw] break-words whitespace-pre-wrap">{content}</p>
                             )}
                           </div>
                           <img
-                            src={avatarMap[Number(msg.sender?.id ?? 0)] || "/userPfp2.jpg"}
-                            alt="User"
+                            src={normAvatar || DEFAULT_AVATAR}
+                            alt={msg.sender?.name ?? "User"}
+                            onError={(e) => {
+                              try {
+                                const el = e.target as HTMLImageElement;
+                                if (el.src && el.src.indexOf("/assets/") !== -1) {
+                                  try {
+                                    el.src = apiOriginFallback + new URL(el.src).pathname;
+                                    return;
+                                  } catch {
+                                    // ignore
+                                  }
+                                }
+                              } catch {
+                                // ignore
+                              }
+                              try {
+                                // image failed to load; no fallback
+                              } catch {
+                                // ignore
+                              }
+                            }}
                             className="w-10 h-10 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover absolute -top-6 -left-3 border-2 border-white shadow"
                           />
                         </div>
@@ -1078,6 +1561,26 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             return nodes;
           })()}
         </div>
+        {
+          (() => {
+            try {
+              const roomKey = String(validatedRoomId ?? caseId ?? "");
+              const typingUsers = (typing && typing[roomKey]) || [];
+              const otherTyping = typingUsers.filter((id) => Number(id) !== Number(currentUser?.id));
+              if (otherTyping.length > 0) {
+                const name = (roomInfo && (roomInfo as any).other_user_name) || (roomUserMap && roomUserMap[roomKey] && roomUserMap[roomKey].name) || "User";
+                return (
+                  <div className="px-6 pb-2">
+                    <div className="text-sm text-gray-500">{`${name} is typing…`}</div>
+                  </div>
+                );
+              }
+            } catch {
+              // ignore
+            }
+            return null;
+          })()
+        }
         <div className="flex items-center gap-2">
           <input
             ref={fileInputRef}
@@ -1101,6 +1604,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
             onRecord={(f) => {
               if (f instanceof File) {
                 void handleRecordedFile(f);
+              }
+            }}
+            onTyping={(isTyping) => {
+              try {
+                const roomToNotify = String(validatedRoomId ?? caseId ?? "");
+                if (!roomToNotify) return;
+                sendTyping(String(roomToNotify), !!isTyping);
+              } catch {
+                // ignore
               }
             }}
           />

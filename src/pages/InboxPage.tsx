@@ -49,7 +49,7 @@ export default function InboxPage() {
 
         {/* Mobile full-screen chat overlay */}
         {selectedCase && (
-          <div className="lg:hidden fixed inset-0 z-400 bg-white">
+          <div className="lg:hidden fixed inset-0 z-400 bg-white overflow-hidden">
             <div className="h-full w-full">
               <LiveChat
                 caseId={selectedCase}

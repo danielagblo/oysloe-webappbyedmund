@@ -13,7 +13,7 @@ export interface GenericMessage {
 
 export async function sendOTP(phone: string): Promise<GenericMessage> {
   try {
-    const response = await apiClient.get<GenericMessage>(
+    const response = await apiClient.get<any>(
       endpoints.verifyOTP.send(phone),
     );
 
@@ -21,7 +21,20 @@ export async function sendOTP(phone: string): Promise<GenericMessage> {
       throw new Error("Unexpected response format");
     }
 
-    return response;
+    // If backend returned a token (e.g., { token } or { reset_token } or inside data),
+    // persist it so subsequent password reset requests can include it.
+    try {
+      const token =
+        response.token ?? response.reset_token ?? response.data?.token ?? response.data?.reset_token ?? null;
+      if (token && typeof window !== "undefined") {
+        localStorage.setItem("oysloe_reset_token", String(token));
+      }
+    } catch (e) {
+      // ignore localStorage errors
+      void e;
+    }
+
+    return response as GenericMessage;
   } catch (err: unknown) {
     if (err instanceof Error) {
       const responseText = (err as { responseText?: string }).responseText;
@@ -39,8 +52,14 @@ export async function sendOTP(phone: string): Promise<GenericMessage> {
 export async function verifyOTP(
   payload: VerifyOTPRequest,
 ): Promise<{ phone: string }> {
-  return apiClient.post<{ phone: string }>(
-    endpoints.verifyOTP.verify(),
-    payload,
-  );
+  const response = await apiClient.post<any>(endpoints.verifyOTP.verify(), payload);
+  try {
+    const token = response?.token ?? response?.reset_token ?? response?.data?.token ?? response?.data?.reset_token ?? null;
+    if (token && typeof window !== "undefined") {
+      localStorage.setItem("oysloe_reset_token", String(token));
+    }
+  } catch (e) {
+    void e;
+  }
+  return response as { phone: string };
 }

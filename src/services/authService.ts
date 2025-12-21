@@ -1,12 +1,12 @@
 import type {
-  LoginRequest,
-  LoginResponse,
-  LogoutRequest,
-  LogoutResponse,
-  OTPLoginRequest,
-  RegisterRequest,
-  ResetPasswordRequest,
-  ResetPasswordResponse,
+    LoginRequest,
+    LoginResponse,
+    LogoutRequest,
+    LogoutResponse,
+    OTPLoginRequest,
+    RegisterRequest,
+    ResetPasswordRequest,
+    ResetPasswordResponse,
 } from "../types/Auth";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
@@ -31,10 +31,12 @@ export const register = async (
 
 export const resetPassword = async (
   data: ResetPasswordRequest,
+  headers?: Record<string, string>,
 ): Promise<ResetPasswordResponse> => {
   return apiClient.post<ResetPasswordResponse>(
     endpoints.auth.resetPassword(),
     data,
+    headers,
   );
 };
 

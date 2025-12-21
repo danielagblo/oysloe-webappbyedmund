@@ -84,7 +84,7 @@ export default function ProfileStats() {
       </div>
       <div className="text-center bg-(--div-active) p-2 rounded-lg flex-1 whitespace-nowrap">
         <p className="font-medium md:text-[1.5vw]">
-          {(user?.taken_ads ?? 0).toLocaleString()}
+          {((user?.total_taken_ads ?? user?.taken_ads) ?? 0).toLocaleString()}
         </p>
         <p className="text-(--some-other-gray) text-xs md:text-[1.125vw]">
           Sold Ads

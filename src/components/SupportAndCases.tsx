@@ -1,11 +1,11 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useEffect, useMemo, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useChatRooms } from "../hooks/useChatRooms";
 import type { ChatRoom } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
+import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
-import { splitRooms, getCaseId, getCaseStatus } from "../utils/chatFilters";
-import { useChatRooms } from "../hooks/useChatRooms";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
@@ -21,15 +21,45 @@ export default function SupportAndCases({
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
-  
+  // derive API origin for asset URL fallbacks (may include a path like /api-v1)
+  const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+  let apiOriginFallback = "";
+  try {
+    apiOriginFallback = new URL(_apiRaw).origin;
+  } catch {
+    apiOriginFallback = _apiRaw.replace(/\/+$/, "");
+  }
+
+  // Helper: convert data: URLs to object URLs (used for persisted ad images)
+  const dataUrlToObjectUrl = (dataUrl: string) => {
+    try {
+      const comma = dataUrl.indexOf(",");
+      if (comma === -1) return dataUrl;
+      const meta = dataUrl.substring(0, comma);
+      const base64 = dataUrl.substring(comma + 1);
+      const m = /data:([^;]+);base64/.exec(meta);
+      const mime = m ? m[1] : "application/octet-stream";
+      const binary = atob(base64);
+      const len = binary.length;
+      const u8 = new Uint8Array(len);
+      for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+      const blob = new Blob([u8], { type: mime });
+      const url = URL.createObjectURL(blob);
+      return url;
+    } catch {
+      return dataUrl;
+    }
+  };
+
+
 
   // Use React Query to fetch and cache chat rooms
   const { data: allRooms = [] } = useChatRooms();
 
-  
+
 
   useEffect(() => {
-    
+
     let mounted = true;
 
     // Connect WebSocket to listen for room updates
@@ -47,12 +77,12 @@ export default function SupportAndCases({
       const wsUrl = `${wsBase}/chatrooms/`;
 
       const client = new WebSocketClient(wsUrl, token, {
-        onOpen: () => {},
-        onClose: () => {},
+        onOpen: () => { },
+        onClose: () => { },
         onError: (ev) => console.warn("❌ [INBOX PAGE] WebSocket error", ev),
         onMessage: (payload: any) => {
           if (!mounted) return;
-          
+
           try {
             // Normalize rooms received from websocket to expected ChatRoom shape
             const normalizeRoom = (raw: any): ChatRoom => {
@@ -71,6 +101,9 @@ export default function SupportAndCases({
                 // so UI can show previews (some payloads include `last_message`)
                 // keep the raw field names to remain compatible with usage
                 last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
+                // preserve ad metadata when present on chatrooms_list payloads
+                ad_name: raw.ad_name ?? raw.adName ?? null,
+                ad_image: raw.ad_image ?? raw.adImage ?? null,
               } as ChatRoom;
             };
 
@@ -82,28 +115,28 @@ export default function SupportAndCases({
               Array.isArray(payload.chatrooms)
             ) {
               const normalized = payload.chatrooms.map((r: any) => normalizeRoom(r));
-              
-             
-               // Merge with existing cache to preserve member data
-               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
-                 return normalized.map((wsRoom: ChatRoom) => {
-                   const existingRoom = prev.find(r => r.id === wsRoom.id);
-                 
-                   // If WS payload has no members but cache has members, preserve cached members
-                   if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
-                     wsRoom.members = existingRoom.members;
-                   }
-                 
-                   return wsRoom;
-                 });
-               });
+
+
+              // Merge with existing cache to preserve member data
+              queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
+                return normalized.map((wsRoom: ChatRoom) => {
+                  const existingRoom = prev.find(r => r.id === wsRoom.id);
+
+                  // If WS payload has no members but cache has members, preserve cached members
+                  if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
+                    wsRoom.members = existingRoom.members;
+                  }
+
+                  return wsRoom;
+                });
+              });
               return;
             }
 
             // Handle individual room updates
             if (payload && typeof payload === "object" && payload.id) {
               const normalized = normalizeRoom(payload);
-              
+
               // Update React Query cache instead of local state
               queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
                 const idx = prev.findIndex(
@@ -140,7 +173,7 @@ export default function SupportAndCases({
     }
 
     return () => {
-      
+
       mounted = false;
       wsRef.current?.close();
       wsRef.current = null;
@@ -150,13 +183,16 @@ export default function SupportAndCases({
   useEffect(() => {
     // Calculate counts from all rooms received via WebSocket
     const { supportRooms, userRooms } = splitRooms(allRooms);
-    
-    
-    
+
+
+
     const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
 
     setSupportActive(supportRooms.length);
+    try {
+      console.debug("SupportAndCases: userRooms count", { count: userRooms.length, sample: userRooms.slice(0, 3) });
+    } catch { }
   }, [allRooms]);
 
   // Precompute filtered room lists and memoize to avoid nested effects
@@ -221,12 +257,12 @@ export default function SupportAndCases({
     if (rooms.length === 0) {
       return (
         <div>
-            <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
-              <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
-              <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
-            </div>
+          <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
+            <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+            <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
           </div>
-        );
+        </div>
+      );
     }
 
     // Sort rooms by created_at descending (latest first)
@@ -283,24 +319,97 @@ export default function SupportAndCases({
           })();
 
           const member = r.members[0];
-          const initials = r.name
+          // Prefer ad_name initials for fallback if provided by the chatrooms_list
+          const adNamePayload = (r as any).ad_name ?? (r as any).adName ?? null;
+          const titleForInitials = adNamePayload ? String(adNamePayload) : (r.name ?? "");
+          const initials = titleForInitials
             ?.split(" ")
             .map(word => word[0])
             .join("")
             .toUpperCase();
 
+          // determine thumbnail source: prefer persisted ad metadata, then member/avatar
+          let thumbSrc: string | null = null;
+          // Prefer ad_image from websocket payload (normalized into room) first
+          try {
+            const adFromPayload = (r as any).ad_image ?? (r as any).adImage ?? null;
+            if (adFromPayload) {
+              const img = String(adFromPayload);
+              if (img.startsWith("data:")) {
+                thumbSrc = dataUrlToObjectUrl(img);
+              } else if (/^https?:\/\//i.test(img)) {
+                thumbSrc = img;
+              } else if (img.startsWith("//")) {
+                thumbSrc = window.location.protocol + img;
+              } else if (img.startsWith("/")) {
+                if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                  thumbSrc = apiOriginFallback + img;
+                } else {
+                  thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + img;
+                }
+              } else {
+                thumbSrc = img;
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          try {
+            if (typeof window !== "undefined") {
+              const raw = localStorage.getItem("oysloe_chatroom_meta");
+              if (raw) {
+                const map = JSON.parse(raw || "{}");
+                const meta = map[String(r.room_id ?? r.id)];
+                if (meta && meta.ad_image) {
+                  let img = String(meta.ad_image);
+                  if (img.startsWith("data:")) {
+                    thumbSrc = dataUrlToObjectUrl(img);
+                  } else if (img.startsWith("/")) {
+                    // prefer API origin for known asset paths
+                    if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+                      thumbSrc = apiOriginFallback + img;
+                    } else {
+                      thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + img;
+                    }
+                  } else {
+                    thumbSrc = img;
+                  }
+                }
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          // fallback to member avatar or room other_user_avatar
+          if (!thumbSrc) {
+            try {
+              // If an `ad_name` exists prefer using ad-based thumbnail/initials
+              // and do not fall back to the member/current-user avatar.
+              const s = !adNamePayload ? (member?.avatar || (r as any).other_user_avatar) : ((r as any).other_user_avatar ?? null);
+              if (s) {
+                if (/^https?:\/\//i.test(s)) thumbSrc = s;
+                else if (s.startsWith("//")) thumbSrc = window.location.protocol + s;
+                else if (s.startsWith("/")) {
+                  if (/^\/assets\//i.test(s) || /^\/media\//i.test(s) || /^\/uploads\//i.test(s)) {
+                    thumbSrc = apiOriginFallback + s;
+                  } else {
+                    thumbSrc = (typeof window !== "undefined" ? window.location.origin : "") + s;
+                  }
+                } else thumbSrc = s;
+              }
+            } catch {
+              /* ignore */
+            }
+          }
+
           return (
             <button
-              key={r.id}
-              onClick={() => onSelectChat?.(String(r.id))}
-              className={`relative text-left p-3 cursor-pointer rounded-xl ${ (r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start gap-3`}
+              key={String(r.room_id ?? r.id)}
+              onClick={() => onSelectChat?.(String(r.room_id ?? r.id))}
+              className={`relative text-left p-3 cursor-pointer rounded-xl ${(r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start gap-3`}
             >
-              {member?.avatar ? (
-                <img
-                  src={member.avatar}
-                  alt="chat"
-                  className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover"
-                />
+              {thumbSrc ? (
+                <img src={thumbSrc} alt={String(r.name || "chat")} className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover" />
               ) : (
                 <div className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
                   {initials}
@@ -308,14 +417,14 @@ export default function SupportAndCases({
               )}
               <div className="flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{r.name}</p>
-                    {
-                      r.total_unread ? (
-                        <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
-                          {r.total_unread}
-                        </span>
-                      ) : null
-                    }
+                  <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{(r as any).ad_name ? (r as any).ad_name : r.name}</p>
+                  {
+                    r.total_unread ? (
+                      <span className="ml-2 absolute bottom-2 right-2 bg-(--green) text-green-700 text-xs md:text-sm lg:text-[0.8vw] px-2 py-0.5 rounded-full">
+                        {r.total_unread}
+                      </span>
+                    ) : null
+                  }
                   <span className="text-xs italic md:text-sm lg:text-[0.9vw] text-gray-400 flex items-center gap-2">
                     {r.created_at
                       ? formatReviewDate(r.created_at)
@@ -386,7 +495,7 @@ export default function SupportAndCases({
 
     return (
       <div>
-          <h3 className="text-sm md:text-base lg:text-[1.25vw] font-medium mb-4 lg:mb-0">Support Cases</h3>
+        <h3 className="text-sm md:text-base lg:text-[1.25vw] font-medium mb-4 lg:mb-0">Support Cases</h3>
 
         <div className="flex flex-col gap-2 my-3 lg:gap-3">
           {sortedRooms.map((room) => {
@@ -398,7 +507,7 @@ export default function SupportAndCases({
               <button
                 key={room.id}
                 onClick={() => onSelectChat?.(String(room.id))}
-                className={`relative text-left p-3 cursor-pointer rounded-xl ${ (room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100" }  focus:outline-none flex items-start justify-between gap-3`}
+                className={`relative text-left p-3 cursor-pointer rounded-xl ${(room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start justify-between gap-3`}
               >
                 <div className="flex-1">
                   {/* Date and Case Info */}
@@ -416,11 +525,10 @@ export default function SupportAndCases({
                   {/* Status Badge */}
                   <div className="flex items-center gap-2 mt-0.5">
                     <span
-                      className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${
-                        status === "closed"
-                          ? "bg-red-300 text-red-700"
-                          : "bg-green-200 text-green-700"
-                      }`}
+                      className={`text-xs md:text-sm lg:text-[0.9vw] font-medium px-2 py-0.5 rounded-lg whitespace-nowrap ${status === "closed"
+                        ? "bg-red-300 text-red-700"
+                        : "bg-green-200 text-green-700"
+                        }`}
                     >
                       {status.toUpperCase() !== "ACTIVE" ? "Closed" : "Active"}
                     </span>

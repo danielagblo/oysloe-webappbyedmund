@@ -4,7 +4,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
-import LiveChat from "../components/LiveChat";
+// LiveChat intentionally not rendered on AdsDetailsPage
 import MenuButton from "../components/MenuButton";
 import RatingReviews from "../components/RatingsReviews";
 import ReportModal from "../components/ReportModal";
@@ -22,7 +22,7 @@ import useReviews from "../features/reviews/useReviews";
 import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Message as ChatMessage } from "../services/chatService";
-import { resolveChatroomId } from "../services/chatService";
+import { createChatRoom, resolveChatroomId } from "../services/chatService";
 import { likeReview } from "../services/reviewService";
 import type { Product } from "../types/Product";
 import type { Review } from "../types/Review";
@@ -66,7 +66,7 @@ const AdsDetailsPage = () => {
   const activeUserSubscription =
     (userSubscriptions as any[]).find((us) => us?.is_active) || null;
 
-  const { sendMessage, addLocalMessage, connectToRoom } = useWsChat();
+  const { sendMessage, addLocalMessage, connectToRoom, isRoomConnected } = useWsChat();
   const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(
     null,
   );
@@ -226,11 +226,11 @@ const AdsDetailsPage = () => {
       const mutatePromise = (reportProduct as any).mutateAsync
         ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
         : new Promise((resolve, reject) => {
-            reportProduct.mutate(
-              { id: pid, body: payload },
-              { onSuccess: resolve, onError: reject },
-            );
-          });
+          reportProduct.mutate(
+            { id: pid, body: payload },
+            { onSuccess: resolve, onError: reject },
+          );
+        });
 
       await toast.promise(mutatePromise, {
         loading: "Reporting ad...",
@@ -260,8 +260,8 @@ const AdsDetailsPage = () => {
     ownerIdCandidate as number | undefined,
   );
 
-  const sellerProducts = (ownerProductsQuery.data)?.filter(ad => 
-    !ad.is_taken && ad.status === "ACTIVE" ) ?? [];
+  const sellerProducts = (ownerProductsQuery.data)?.filter(ad =>
+    !ad.is_taken && ad.status === "ACTIVE") ?? [];
 
   const { data: relatedProducts = [] } = useRelatedProducts(
     numericId ?? undefined,
@@ -424,7 +424,7 @@ const AdsDetailsPage = () => {
               "┗( T﹏T )┛",
               "(┬┬﹏┬┬)"
             ][
-              Math.floor(Math.random() * 11)
+            Math.floor(Math.random() * 11)
             ]
           }
         </span>
@@ -475,7 +475,32 @@ const AdsDetailsPage = () => {
     if (list.length === 0 && mainImage) return [mainImage];
 
     const deduped = Array.from(new Set(list.filter(Boolean)));
-    return deduped.length > 0 ? deduped : [];
+
+    const resolveAssetUrl = (img: string) => {
+      try {
+        if (!img) return img;
+        if (img.startsWith("data:")) return img;
+        if (img.startsWith("/")) {
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            const apiRaw = import.meta.env.VITE_API_URL ?? "";
+            try {
+              const origin = new URL(String(apiRaw)).origin;
+              return origin + img;
+            } catch {
+              const fallback = String(apiRaw).replace(/\/+$/, "") || (typeof window !== "undefined" ? window.location.origin : "");
+              return fallback + img;
+            }
+          }
+          return (typeof window !== "undefined" ? window.location.origin : "") + img;
+        }
+        return img;
+      } catch {
+        return img;
+      }
+    };
+
+    const resolved = deduped.map(resolveAssetUrl);
+    return resolved.length > 0 ? resolved : [];
   })();
 
   const imageCount = pageImages.length;
@@ -506,20 +531,73 @@ const AdsDetailsPage = () => {
     try {
       // Ask the API for the chatroom id by email (GET /chatroomid/?email=...), which returns existing room or creates one
       let roomKey: string | null = null;
+      const pid = numericId ?? currentAdData?.id ?? (currentAdData as any)?.pid ?? undefined;
+      let chatroomMeta: Record<string, unknown> = {};
       try {
-        const res = await resolveChatroomId({ email: owner.email } as any);
+        const params: Record<string, unknown> = { email: owner.email };
+        if (pid != null) params.product_id = String(pid);
+        const res = await resolveChatroomId(params as any);
         const roomKeyRaw =
+          (res as any)?.chatroom_id ??
           (res as any)?.room_id ??
           (res as any)?.room ??
           (res as any)?.id ??
           null;
         roomKey = roomKeyRaw != null ? String(roomKeyRaw) : null;
+        // capture ad meta if provided by API
+        try {
+          chatroomMeta = {
+            ad_name: (res as any)?.ad_name ?? (res as any)?.product_name ?? undefined,
+            ad_image: (res as any)?.ad_image ?? (res as any)?.product_image ?? undefined,
+          };
+        } catch {
+          chatroomMeta = {};
+        }
       } catch (resolveErr) {
-        console.debug(
-          "resolveChatroomId by email failed; will try creating room via REST",
-          resolveErr,
-        );
-        roomKey = null;
+        console.debug("resolveChatroomId by email failed; will try creating room via REST", resolveErr);
+        // Attempt to create a chatroom via POST /chatrooms/ with email and product_id
+        try {
+          const body: Record<string, unknown> = { email: owner.email };
+          if (pid != null) body.product_id = String(pid);
+          const created = await createChatRoom(body as any);
+          const createdId =
+            (created as any)?.chatroom_id ??
+            (created as any)?.id ??
+            (created as any)?.room_id ??
+            (created as any)?.room ??
+            null;
+          roomKey = createdId != null ? String(createdId) : null;
+          // capture ad meta from creation response
+          try {
+            chatroomMeta = {
+              ad_name: (created as any)?.ad_name ?? (created as any)?.product_name ?? undefined,
+              ad_image: (created as any)?.ad_image ?? (created as any)?.product_image ?? undefined,
+            };
+          } catch {
+            /* ignore */
+          }
+        } catch (createErr) {
+          console.debug("createChatRoom failed", createErr);
+          roomKey = null;
+        }
+      }
+
+      // Require a persistent REST-created room id. Do not continue with a temp_ websocket room.
+      if (!roomKey) {
+        console.warn("AdsDetailsPage: unable to resolve or create chatroom via REST for", owner?.email);
+        toast.error("Unable to start chat. Could not create chatroom.");
+        return;
+      }
+
+      // persist chatroom metadata (ad_name/ad_image) for LiveChat header to consume
+      try {
+        const key = String(roomKey);
+        const raw = localStorage.getItem("oysloe_chatroom_meta") || "{}";
+        const map = JSON.parse(raw || "{}") as Record<string, any>;
+        map[key] = { ...(map[key] || {}), ...(chatroomMeta || {}) };
+        localStorage.setItem("oysloe_chatroom_meta", JSON.stringify(map));
+      } catch {
+        // ignore storage errors
       }
 
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -539,44 +617,60 @@ const AdsDetailsPage = () => {
 
       try {
         // Ensure websocket room client is connected where possible so sendMessage uses WS (wss/chat/<room>)
-        if (roomKey) {
-          try {
-            await connectToRoom(roomKey);
-          } catch (e) {
-            console.debug("connectToRoom failed, will still attempt send", e);
-          }
-        }
-        const targetRoom = roomKey ?? `temp_${owner?.email ?? "anon"}`;
+        const targetRoom = String(roomKey);
+
+        // Open the in-page LiveChat immediately so it can validate/connect
+        if (roomKey) setOpenLiveChatRoomId(String(roomKey));
+
         addLocalMessage(String(targetRoom), tempMsg as ChatMessage);
 
         // Always prefer websocket for sending messages (persistent rooms use wss/chat/<id>/)
         if (roomKey) {
+          // Open the in-page LiveChat so it can validate/connect
+          setOpenLiveChatRoomId(String(roomKey));
+
+          // Ensure the websocket client attempts to connect to the room
           try {
             await connectToRoom(roomKey);
           } catch (e) {
-            console.debug("connectToRoom failed for persistent room", e);
+            console.debug("connectToRoom attempt failed (will poll):", e);
           }
-          try {
-            await sendMessage(String(roomKey), text, tempId);
-            // Open in-page chat for persistent rooms
-            setOpenLiveChatRoomId(String(roomKey));
-          } catch (err) {
-            console.warn(
-              "AdsDetailsPage: sendMessage via websocket failed for persistent room",
-              err,
-            );
-            toast.error("Failed to send message via websocket");
+
+          // Wait for the WS client to become connected (polling with timeout)
+          const waitForConnected = async (timeoutMs = 10000, intervalMs = 200) => {
+            const start = Date.now();
+            while (Date.now() - start < timeoutMs) {
+              try {
+                if (isRoomConnected(String(roomKey))) return true;
+              } catch {
+                // ignore
+              }
+              // small delay
+              // eslint-disable-next-line no-await-in-loop
+              await new Promise((r) => setTimeout(r, intervalMs));
+            }
+            return false;
+          };
+
+          const connected = await waitForConnected(10000, 200);
+          if (!connected) {
+            console.warn("AdsDetailsPage: websocket did not connect within timeout for room", roomKey);
+            toast.error("Unable to connect to chat. Message will be delivered when connection is available.");
+          } else {
+            try {
+              await sendMessage(String(roomKey), text, tempId);
+              // Inform the user the message was sent successfully
+              toast.success("Message sent");
+            } catch (err) {
+              console.warn("AdsDetailsPage: sendMessage failed after websocket connected", err);
+              toast.error("Failed to send message via websocket");
+            }
           }
         } else {
-          try {
-            await sendMessage(String(targetRoom), text, tempId);
-          } catch (err) {
-            console.warn(
-              "AdsDetailsPage: sendMessage via websocket failed for temp room",
-              err,
-            );
-            toast.error("Failed to send message via websocket");
-          }
+          // No persistent room id returned. We'll open a temporary chat view and show the optimistic message.
+          // When the backend creates a room and the websocket list updates, LiveChat will resolve it.
+          setOpenLiveChatRoomId(String(targetRoom));
+          // Do not attempt REST fallback; wait for websocket resolution as requested.
         }
       } catch (err) {
         console.warn("AdsDetailsPage: addLocalMessage/send flow failed", err);
@@ -842,14 +936,7 @@ const AdsDetailsPage = () => {
         <SimilarAds relatedProducts={relatedProducts} />
         <div className="p-8 sm:p-10 bg-(--div-active)" />
       </div>
-      {openLiveChatRoomId && (
-        <div className="fixed bottom-4 right-4 z-50 w-[360px] h-[480px]">
-          <LiveChat
-            caseId={openLiveChatRoomId}
-            onClose={() => setOpenLiveChatRoomId(null)}
-          />
-        </div>
-      )}
+      {/* LiveChat removed from AdsDetailsPage */}
       <MenuButton />
     </div>
   );

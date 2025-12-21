@@ -12,7 +12,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
   openChatWithOwnerAndSend,
 }) => (
   <div className="w-full">
-    <div className="pt-4 w-full">
+    <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:p-4 lg:p-6 shadow sm:shadow-none">
       <div className="flex items-center gap-2 mb-3">
         <img src="/quick chat.svg" alt="" className="w-5 h-5" />
         <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
@@ -59,20 +59,20 @@ const QuickChat: React.FC<QuickChatProps> = ({
             value={quickChatInput}
             onChange={(e) => setQuickChatInput(e.target.value)}
             style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 py-3 bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
+            className="rounded-2xl px-3 pr-12 py-3 bg-no-repeat sm:bg-white text-sm lg:text-base md:text-[1.125vw] w-full sm:border-(--dark-def)"
           />
-          <img
-            src="/send.svg"
-            alt="Send"
-            className="w-6 h-6 absolute top-3 right-2 cursor-pointer"
-            role="button"
-            tabIndex={0}
+          <button
+            type="button"
+            aria-label="Send quick chat"
+            className="absolute top-1/2 -translate-y-1/2 right-2 p-1.5 rounded-md hover:bg-gray-100 active:opacity-80"
             onClick={async () => {
               if (!quickChatInput || quickChatInput.trim().length === 0) return;
               await openChatWithOwnerAndSend(quickChatInput.trim());
               setQuickChatInput("");
             }}
-          />
+          >
+            <img src="/send.svg" alt="Send" className="w-5 h-5" />
+          </button>
         </div>
 
         <button
