@@ -260,8 +260,8 @@ const ResetPasswordPage = () => {
           <OnboardingScreen />
         </div>
       )}
-      {showModal && (
-        <div className="h-2/5 w-2/7 flex flex-col justify-center items-center bg-white border-2 border-gray-100 rounded-4xl shadow-lg absolute z-10">
+      {!showModal && (
+        <div className="h-2/5 w-2/7 max-md:w-9/10 max-lg:w-3/5 max-lg:mt-40 max-sm:p-4 max-sm:h-fit flex flex-col justify-center items-center bg-white border-2 border-gray-100 rounded-4xl shadow-lg absolute z-10">
           <LottieSuccess />
           <h2 className="text-2xl text-center">
             Password successfully
