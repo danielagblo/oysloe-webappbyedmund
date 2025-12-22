@@ -1543,6 +1543,8 @@ export default function PostAdForm({
                                     title={`Select ${fd.name}`}
                                     truncate
                                     useBottomSheetOnMobile
+                                    isFeatureDropdown
+                                    subcategoryId={Number(subcategoryId) || 0}
                                   />
                                 </div>
                               </div>

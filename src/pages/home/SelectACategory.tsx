@@ -47,11 +47,11 @@ const SelectACategory = ({
   if (categoriesError || !categories || categories.length === 0) {
     if (categoriesError) {
       console.log("Failed to load categories.", categoriesError);
-      toast.error("You are viewing an offline version of this page.");
+      // toast.error("You are viewing an offline version of this page.");
     }
     if (!categories || categories.length === 0) {
       console.log("No categories were found.");
-      toast.error("No categories were found.");
+      // toast.error("No categories were found.");
     }
 
     return (
