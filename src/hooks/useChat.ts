@@ -166,6 +166,7 @@ export function useChat(roomId: string | null): UseChatReturn {
           console.log("useChat.sendMessage.ws onOpen", { room: newRid });
           setConnected(true);
         },
+        //fix check
         onClose: () => {
           console.log("useChat.sendMessage.ws onClose", { room: newRid });
           setConnected(false);
