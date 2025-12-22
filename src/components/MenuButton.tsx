@@ -137,6 +137,12 @@ const MobileFooter = ({
     typeof document !== 'undefined' &&
       (document.querySelector('[aria-modal="true"]') || document.querySelector('[role="dialog"]') || document.querySelector('.fixed.inset-0.z-50')),
   );
+  // debug logging when enabled
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).__DEBUG_SCROLL_DIRECTION) {
+      console.log(`[scroll-debug] MenuButton MobileFooter direction=${direction} modalOpen=${modalOpen}`);
+    }
+  }, [direction, modalOpen]);
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20 transition-transform duration-300 ease-in-out ${
