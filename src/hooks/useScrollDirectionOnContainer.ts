@@ -57,7 +57,7 @@ function findScrollableContainersAll(max = 8): Array<HTMLElement | Window> {
  */
 export function useScrollDirectionOnContainer(containerRef?: React.RefObject<HTMLElement> | null, { threshold = 2 } = {}) {
   const [direction, setDirection] = useState<'up' | 'down'>('up');
-  const lastScroll = useRef(0);
+
   const lastDirection = useRef<'up' | 'down'>('up');
   const attachedRef = useRef<HTMLElement | Window | null>(null);
   const debug = typeof window !== 'undefined' && (
@@ -93,7 +93,7 @@ export function useScrollDirectionOnContainer(containerRef?: React.RefObject<HTM
     const lastPos: number[] = candidates.map((c) => getPosFor(c as any));
 
       if (debug) {
-        const descs = candidates.map((c, idx) => {
+        const descs = candidates.map((c) => {
           if (c === window) return 'window';
           try {
             const el = c as HTMLElement;
@@ -200,6 +200,7 @@ export function useScrollDirectionOnContainer(containerRef?: React.RefObject<HTM
 
     // polling fallback: sample positions every 150ms for up to 5s
     let polling = true;
+    console.log(`[scroll-debug] ${polling ? "started" : "ended"} polling for scroll position changes`);
     const pollInterval = setInterval(() => {
       try {
         candidates.forEach((c, i) => {
