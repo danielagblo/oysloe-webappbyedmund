@@ -27,3 +27,5 @@ Api.ts
 *.sln
 *.sw?
 .env
+.env
+public/firebase-messaging-sw.js
