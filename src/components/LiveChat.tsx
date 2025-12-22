@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState, type JSX, type KeyboardEvent } from "react";
-import useWsChat from "../features/chat/useWsChat";
+import { type UseWsChatReturn } from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
@@ -10,6 +10,7 @@ import { formatReviewDate } from "../utils/formatReviewDate";
 type LiveChatProps = {
   caseId: string | null;
   onClose: () => void;
+  ws: UseWsChatReturn;
 };
 
 type ChatInputProps = {
@@ -284,7 +285,7 @@ function ChatInput({
   );
 }
 
-export default function LiveChat({ caseId, onClose }: LiveChatProps) {
+export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
   // validatedRoomId will be set to `caseId` only after we confirm the room exists on the backend
   const [validatedRoomId, setValidatedRoomId] = useState<string | null>(null);
   const [isValidRoom, setIsValidRoom] = useState<boolean | null>(null); // null = unknown/loading
@@ -304,7 +305,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     connectToUnreadCount,
     typing,
     sendTyping,
-  } = useWsChat();
+   } = ws;;
 
   const queryClient = useQueryClient();
 
@@ -1944,3 +1945,4 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     </div>
   );
 }
+

@@ -6,12 +6,16 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import useWsChat from "../features/chat/useWsChat";
 
 export default function InboxPage() {
   const isSmallScreen = useIsSmallScreen(1024);
   const location = useLocation();
   const initialOpen = (location.state as any)?.openRoom ?? null;
   const [selectedCase, setSelectedCase] = useState<string | null>(initialOpen);
+
+  // Keep WebSocket store alive while InboxPage is mounted
+  const ws = useWsChat();
 
   return (
     <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">
@@ -41,25 +45,27 @@ export default function InboxPage() {
           />
         </div>
 
-        {(selectedCase && isSmallScreen) 
-          ? (
-              <div className="lg:hidden fixed inset-0 z-40 bg-white overflow-hidden">
-                <div className="h-full w-full">
-                  <LiveChat
-                    caseId={selectedCase}
-                    onClose={() => setSelectedCase(null)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+        {selectedCase && (
+          isSmallScreen ? (
+            <div className="lg:hidden fixed inset-0 z-40 bg-white overflow-hidden">
+              <div className="h-full w-full">
                 <LiveChat
                   caseId={selectedCase}
                   onClose={() => setSelectedCase(null)}
+                  ws={ws}
                 />
               </div>
-            )
-        }
+            </div>
+          ) : (
+            <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+              <LiveChat
+                caseId={selectedCase}
+                onClose={() => setSelectedCase(null)}
+                ws={ws}
+              />
+            </div>
+          )
+        )}
 
 
 
@@ -69,3 +75,4 @@ export default function InboxPage() {
     </div>
   );
 }
+
