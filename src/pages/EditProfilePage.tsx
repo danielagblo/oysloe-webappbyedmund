@@ -528,7 +528,7 @@ const EditProfilePage = () => {
 
         {/* business details */}
         <div className="lg:w-1/2">
-          <div className="bg-white lg:overflow-auto no-scrollbarw-full mt-2 sm:mt-0 flex flex-col justify-center items-center h-fit md:h-[93vh] gap-4 px-3 py-3 pb-0 sm:pb-3 sm:rounded-2xl text-xs max-lg:mb-10">
+          <div className="bg-white lg:overflow-auto no-scrollbarw-full mt-2 sm:mt-0 flex flex-col justify-center items-center h-fit md:h-[93vh] gap-4 px-3 py-3 pb-0 sm:pb-3 sm:rounded-2xl text-xs max-lg:mb-10 max-sm:mb-0">
             {/* {!selectedUser?.emailVerified && !linkSent && (
               <div className="flex flex-col justify-start items-center gap-2 p-4 w-[90%] bg-gray-50 rounded-2xl">
                 <p className="text-lg text-center">Please verify your email*</p>

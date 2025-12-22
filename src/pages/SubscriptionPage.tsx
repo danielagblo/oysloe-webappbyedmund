@@ -219,7 +219,7 @@ const SubscriptionPage = () => {
           <button
             onClick={handlePayNow}
             disabled={selectedSubId === null || subscribingId !== null}
-            className="w-full bg-gray-200  font-medium py-3 rounded-xl mt-8 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="w-full bg-gray-200  font-medium py-3 rounded-xl mt-8 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
           >
             {subscribingId !== null ? "Processing..." : "Pay Now"}
           </button>

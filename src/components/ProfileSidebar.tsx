@@ -331,7 +331,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 { key: "ads", label: "Ads", icon: "/ads.svg" },
                 {
                   key: "favorite",
-                  label: "Favourite",
+                  label: "Favourites",
                   icon: "/favorite.svg",
                 },
                 {

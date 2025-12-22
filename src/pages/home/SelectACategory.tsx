@@ -45,21 +45,28 @@ const SelectACategory = ({
     );
   }
   if (categoriesError || !categories || categories.length === 0) {
-    if (categoriesError)
+    if (categoriesError) {
       console.log("Failed to load categories.", categoriesError);
-    if (!categories || categories.length === 0)
+      toast.error("You are viewing an offline version of this page.");
+    }
+    if (!categories || categories.length === 0) {
       console.log("No categories were found.");
+      toast.error("No categories were found.");
+    }
 
     return (
       <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
         <div
           className="
-                        grid 
-                        grid-cols-5 
-                        gap-2 sm:gap-4 
-                        place-items-center
-                        justify-items-center
-                        max-w-full
+                    grid 
+                    grid-cols-5 
+                    gap-2 sm:gap-4 
+                    place-items-center
+                    justify-items-center
+                    max-w-full w-full sm:max-w-4/5
+
+                    max-sm:flex max-sm:flex-wrap max-sm:w-screen
+                    max-sm:items-center max-sm:justify-center
                     "
           style={{
             gridAutoRows: "1fr",
@@ -85,11 +92,14 @@ const SelectACategory = ({
                   toast("Data is currently unavailable for " + category)
                 }
                 className="
-                                flex flex-col items-center justify-center
-                                w-[12vw] h-[12vw] min-h-[75px] min-w-[75px] 
-                                bg-(--div-active) rounded-lg 
-                                p-2 sm:p-3 cursor-pointer 
-                                hover:bg-gray-300
+                              flex flex-col items-center justify-center
+                              w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
+                              bg-(--div-active) rounded-lg 
+                              p-0 sm:p-3 cursor-pointer 
+                              hover:bg-gray-300
+
+                              max-sm:w-[20vw] max-sm:h-[20vw]
+                              max-sm:min-w-[75px] max-sm:min-h-[75px]
                             "
               >
                 <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">

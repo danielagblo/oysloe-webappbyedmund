@@ -24,7 +24,7 @@ const ConditionalAds = ({
   const filteredProducts = applyFilters(categoryProducts);
 
   return (
-    <div className="bg-(--div-active) w-full flex justify-center -mb-4">
+    <div className="bg-(--div-active) w-full flex justify-center -mb-4 min-h-screen">
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-[95vw] pb-45">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((ad) => (
@@ -59,7 +59,7 @@ const ConditionalAds = ({
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center col-span-full">
+          <div className="flex flex-col items-center justify-start col-span-full w-full">
             <img
               src="/nothing-to-show.png"
               alt="nothing to show"

@@ -937,7 +937,7 @@ const AdsDetailsPage = () => {
       </div>
       <div className="w-screen p-0 lg:mt-15">
         <SimilarAds relatedProducts={relatedProducts} />
-        <div className="p-8 sm:p-10 bg-(--div-active)" />
+        <div className=" max-sm:hidden p-8 sm:p-10 bg-(--div-active)" />
       </div>
       {/* LiveChat removed from AdsDetailsPage */}
       <MenuButton />

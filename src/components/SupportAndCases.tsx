@@ -553,7 +553,7 @@ export default function SupportAndCases({
     <div className="flex h-full lg:items-center">
       <div className="rounded-2xl bg-white lg:h-[93vh] lg:px-5 py-3 h-full w-full flex flex-col ">
         <HeaderTabs />
-        <div className="no-scrollbar overflow-y-auto mt-4 flex-1">
+        <div className="no-scrollbar overflow-y-auto mt-4 flex-1 max-sm:bg-(--div-active) max-sm:rounded-2xl max-sm:pb-4">
           {activeTab === "chat" ? (
             <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetChats />

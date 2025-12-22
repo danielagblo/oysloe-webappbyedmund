@@ -444,7 +444,7 @@ const AlertsPanel = ({
         </div>
 
         {/* Mobile alerts */}
-        <div className="flex lg:hidden flex-col w-screen md:w-screen p-4 bg-white h-[87vh] overflow-y-auto no-scrollbar relative">
+        <div className="flex lg:hidden flex-col w-screen md:w-screen p-4 bg-white h-[96vh] overflow-y-auto no-scrollbar relative">
           {loading ? (
             <div className="flex flex-col gap-2 p-2 w-screen justify-center items-center">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -572,7 +572,7 @@ const AlertsPanel = ({
           )}
         </div>
 
-        <div className="h-15" />
+        <div className=" max-sm:hidden h-15" />
       </div>
 
       {/* Mobile menu popup */}
