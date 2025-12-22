@@ -1,4 +1,6 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
+import { toast } from "sonner";
+import { useCreatePossibleFeatureValue } from "../features/productFeatures/useProductFeatures";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -9,14 +11,16 @@ interface DropdownPopupProps {
   subTitle?: string;
   subOptions?: string[];
   subLoading?: boolean;
-  onMainSelect?: (option: string) => void; // optional callback when main option selected
-  onSubSelect?: (option: string, mainOption?: string) => void; // optional callback when sub option selected
-  initialSubView?: boolean; // open directly to sub view when true
+  onMainSelect?: (option: string) => void;
+  onSubSelect?: (option: string, mainOption?: string) => void;
+  initialSubView?: boolean;
   truncate?: boolean;
   setLocation?: React.Dispatch<React.SetStateAction<string | null>>;
-  onBack?: () => void; // optional back action for parent-driven navigation
-  useBottomSheetOnMobile?: boolean; // render as bottom sheet on max-sm breakpoints
-  getMainOptionIcon?: (option: string) => string | null; // optional icon resolver for main options
+  onBack?: () => void;
+  useBottomSheetOnMobile?: boolean;
+  getMainOptionIcon?: (option: string) => string | null;
+  isFeatureDropdown?: boolean;
+  subcategoryId?: number;
 }
 
 export interface DropdownPopupHandle {
@@ -42,6 +46,8 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       onBack,
       useBottomSheetOnMobile = false,
       getMainOptionIcon,
+      isFeatureDropdown = false,
+      subcategoryId,
     },
     ref,
   ) => {
@@ -296,88 +302,142 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       window.addEventListener("pointercancel", upHandlerRef.current);
     };
 
+    const [customValue, setCustomValue] = useState("");
+    const [customError, setCustomError] = useState("");
     const renderOptions = (isSubView: boolean) => {
-      if (isSubView) {
-        if (subLoading) {
-          return <p className="py-2 px-2 text-sm text-gray-500">Loading...</p>;
+      // Only show custom value input for feature dropdowns and not in subview
+      const showCustomInput = isFeatureDropdown && !isSubView && Array.isArray(options);
+
+      const handleCustomValueSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!customValue.trim()) {
+          toast.error("Please enter a value");
+          return;
         }
-        const list = (subOptions ?? submenuOptions) || [];
-        if (!list.length)
-          return <p className="py-2 px-2 text-sm text-gray-500">No options available.</p>;
+        if ((Array.isArray(options) && options.some(opt => opt.toLowerCase() === customValue.trim().toLowerCase()))) {
+          setCustomError("This value already exists as an option");
+          return;
+        }
+        
+        setOpen(false);
+        setCustomError("");
+        onSelect(customValue.trim());
+        setCustomValue("");
+        try {
+          useCreatePossibleFeatureValue().mutateAsync({ 
+            feature: 0,
+            value: customValue.trim(),
+            subcategory: subcategoryId,
+           });
+        } catch {
+          // ignore
+        }
+      };
 
-        return list.map((opt, i) => (
-          <button
-            type="button"
-            key={i}
-            onClick={() => handleSubSelect(opt)}
-            className={`w-full text-left py-2 px-2 max-sm:py-3 text-sm hover:bg-gray-100 relative ${
-              i !== list.length - 1
-                ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                : ""
-            }`}
-          >
-            {opt}
-          </button>
-        ));
-      }
-
-      if (Array.isArray(options)) {
-        return options.map((opt, i) => (
-          <button
-            type="button"
-            key={i}
-            onClick={() => handleMainSelect(opt)}
-            className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
-              i !== options.length - 1
-                ? "after:content-[''] after:absolute  max-sm:py-3 after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-                : ""
-            }`}
-          >
-            <span className="flex items-center gap-3">
-              {!isSubView && getMainOptionIcon ? (
-                <img
-                  src={getMainOptionIcon(opt) || ""}
-                  alt=""
-                  className="w-6 h-6 object-contain"
-                  onError={(e) => {
-                    const target = e.currentTarget;
-                    target.style.display = "none";
-                  }}
-                />
-              ) : null}
-              {opt}
-            </span>
-          </button>
-        ));
-      }
-
-      return Object.keys(options).map((main, i) => (
-        <button
-          type="button"
-          key={i}
-          onClick={() => handleMainSelect(main)}
-          className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
-            i !== Object.keys(options).length - 1
-              ? "after:content-[''] after:absolute  max-sm:py-3 after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
-              : ""
-          }`}
-        >
-          <span className="flex items-center gap-3">
-            {!isSubView && getMainOptionIcon ? (
-              <img
-                src={getMainOptionIcon(main) || ""}
-                alt=""
-                className="w-6 h-6 object-contain"
-                onError={(e) => {
-                  const target = e.currentTarget;
-                  target.style.display = "none";
-                }}
+      return (
+        <>
+          {showCustomInput && (
+            <div className="mb-2 relative">
+              <input
+                type="text"
+                className="w-full border text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
+                placeholder="Enter custom value..."
+                value={customValue}
+                onChange={e => setCustomValue(e.target.value)}
               />
-            ) : null}
-            {main}
-          </span>
-        </button>
-      ));
+              {customError && <div className="text-red-500 text-xs mb-1">{customError}</div>}
+              <button 
+                type="button" 
+                onClick={handleCustomValueSubmit}
+                className="absolute right-1 top-1 cursor-pointer text-sm bg-gray-200 text-(--dark-def) px-3 py-1 rounded hover:bg-gray-300"
+              >
+                Add
+              </button>
+            </div>
+          )}
+          {isSubView ? (
+            (() => {
+              if (subLoading) {
+                return <p className="py-2 px-2 text-sm text-gray-500">Loading...</p>;
+              }
+              const list = (subOptions ?? submenuOptions) || [];
+              if (!list.length)
+                return <p className="py-2 px-2 text-sm text-gray-500">No options available.</p>;
+              return list.map((opt, i) => (
+                <button
+                  type="button"
+                  key={i}
+                  onClick={() => handleSubSelect(opt)}
+                  className={`w-full text-left py-2 px-2 max-sm:py-3 text-sm hover:bg-gray-100 relative ${
+                    i !== list.length - 1
+                      ? "after:content-[''] after:absolute after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                      : ""
+                  }`}
+                >
+                  {opt}
+                </button>
+              ));
+            })()
+          ) : Array.isArray(options) ? (
+            options.map((opt, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => handleMainSelect(opt)}
+                className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
+                  i !== options.length - 1
+                    ? "after:content-[''] after:absolute  max-sm:py-3 after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                    : ""
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  {!isSubView && getMainOptionIcon ? (
+                    <img
+                      src={getMainOptionIcon(opt) || ""}
+                      alt=""
+                      className="w-6 h-6 object-contain"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                      }}
+                    />
+                  ) : null}
+                  {opt}
+                </span>
+              </button>
+            ))
+          ) : (
+            Object.keys(options).map((main, i) => (
+              <button
+                type="button"
+                key={i}
+                onClick={() => handleMainSelect(main)}
+                className={`w-full text-left py-2 px-2 text-sm hover:bg-gray-100 relative ${
+                  i !== Object.keys(options).length - 1
+                    ? "after:content-[''] after:absolute  max-sm:py-3 after:right-0 after:bottom-0 after:h-[1px] after:w-full after:bg-[var(--div-border)]"
+                    : ""
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  {!isSubView && getMainOptionIcon ? (
+                    <img
+                      src={getMainOptionIcon(main) || ""}
+                      alt=""
+                      className="w-6 h-6 object-contain"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                      }}
+                    />
+                  ) : null}
+                  {main}
+                </span>
+              </button>
+            ))
+          )}
+        </>
+      );
     };
 
     return (
