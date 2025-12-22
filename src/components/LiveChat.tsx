@@ -893,20 +893,29 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     const mainList = messages[uiRoomKey] || [];
     const fallbackList = messages[rawId] || [];
 
-    if (uiRoomKey !== rawId && fallbackList.length > 0) {
-      const combined = [...mainList];
-      fallbackList.forEach((m) => {
+    // Always consider messages from both the UI key and the original caseId key
+    // when they differ. This makes the UI resilient to the websocket hook
+    // returning a different normalized room key (common on mobile/network).
+    if (uiRoomKey === rawId) return mainList;
+
+    const combined = [...mainList];
+    // append fallback items if they don't already exist in `combined`
+    for (const m of fallbackList) {
+      try {
         const mid = (m as any)?.id ?? (m as any)?.temp_id ?? (m as any)?.__temp_id;
         const exists = combined.some((em: any) => {
           const eid = (em as any)?.id ?? (em as any)?.temp_id ?? (em as any)?.__temp_id;
           return mid != null && eid != null && String(eid) === String(mid);
         });
         if (!exists) combined.push(m as any);
-      });
-      return combined.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      } catch {
+        // ignore per-item merge errors
+        combined.push(m as any);
+      }
     }
 
-    return mainList;
+    // Sort by created_at to preserve chronological order
+    return combined.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   }, [messages, validatedRoomId, caseId]);
 
   // const formatDateHeader = (iso?: string | null) => {
