@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
@@ -6,10 +6,25 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 
+function useIsLg() {
+  const [isLg, setIsLg] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const onChange = () => setIsLg(mq.matches);
+    onChange();
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+
+  return isLg;
+}
+
 export default function InboxPage() {
   const location = useLocation();
   const initialOpen = (location.state as any)?.openRoom ?? null;
   const [selectedCase, setSelectedCase] = useState<string | null>(initialOpen);
+  const isLg = useIsLg();
 
   return (
     <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">
@@ -39,17 +54,19 @@ export default function InboxPage() {
           />
         </div>
 
-        {/* Desktop right column */}
-        <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
-          <LiveChat
-            caseId={selectedCase}
-            onClose={() => setSelectedCase(null)}
-          />
-        </div>
+        {/* Desktop LiveChat */}
+        {isLg && selectedCase && (
+          <div className="flex w-[50%] grow justify-center items-center w-full h-screen overflow-y-auto py-5 px-1.5 mr-1">
+            <LiveChat
+              caseId={selectedCase}
+              onClose={() => setSelectedCase(null)}
+            />
+          </div>
+        )}
 
-        {/* Mobile full-screen chat overlay */}
-        {selectedCase && (
-          <div className="lg:hidden fixed inset-0 z-400 bg-white overflow-hidden">
+        {/* Mobile LiveChat overlay */}
+        {!isLg && selectedCase && (
+          <div className="fixed inset-0 z-400 bg-white overflow-hidden">
             <div className="h-full w-full">
               <LiveChat
                 caseId={selectedCase}
