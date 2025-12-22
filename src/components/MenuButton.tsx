@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../App.css";
 import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
 import chatService from "../services/chatService";
+import { useScrollDirection } from "../hooks/useScrollDirection";
 
 type RouteKey = "home" | "alerts" | "post" | "inbox" | "profile";
 
@@ -116,7 +117,7 @@ const MenuBar = ({
   </div>
 );
 
-// Mobile footer bar
+// Mobile footer bar with hide-on-scroll
 const MobileFooter = ({
   active,
   onClick,
@@ -127,52 +128,62 @@ const MobileFooter = ({
   onClick: (id: RouteKey) => void;
   alertCount?: number;
   inboxCount?: number;
-}) => (
-  <div className="fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20">
-    {Object.entries(icons).map(([id, icon]) => {
-      const key = id as RouteKey;
-      const count =
-        key === "alerts"
-          ? alertCount
-          : key === "inbox"
-            ? inboxCount
-            : undefined;
-      return (
-        <button
-          key={id}
-          onClick={() => onClick(key)}
-          className={`relative flex flex-col items-center justify-center gap-1 text-xs transition-colors`}
-        >
-          {/* Active top bar for mobile */}
-          {active === key && (
-            <div className="absolute top-[-7px] left-1/2 transform -translate-x-1/2 w-12 h-[7px] bg-[var(--dark-def)] rounded-[0_0_20px_20px]"></div>
-          )}
-          <div className="relative mt-2">
-            <img
-              src={icon}
-              alt={id}
-              className={`w-6 h-6 transition-all ${
-                active === key ? "opacity-100 scale-110" : "opacity-70"
-              }`}
-            />
-            {count !== undefined && count > 0 && (
-              <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {count > 99 ? "99+" : count}
-              </div>
-            )}
-          </div>
-          <span
-            className={`text-[11px] font-medium ${
-              active === key ? "text-[var(--dark-def)]" : "text-gray-500"
-            }`}
+}) => {
+  const direction = useScrollDirection();
+  // Only hide on scroll down, show on scroll up
+  // Only on mobile (sm:hidden)
+  return (
+    <div
+      className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20 transition-transform duration-300 ease-in-out ${
+        direction === 'down' ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+      }`}
+      aria-hidden={direction === 'down'}
+    >
+      {Object.entries(icons).map(([id, icon]) => {
+        const key = id as RouteKey;
+        const count =
+          key === "alerts"
+            ? alertCount
+            : key === "inbox"
+              ? inboxCount
+              : undefined;
+        return (
+          <button
+            key={id}
+            onClick={() => onClick(key)}
+            className={`relative flex flex-col items-center justify-center gap-1 text-xs transition-colors`}
           >
-            {id.charAt(0).toUpperCase() + id.slice(1)}
-          </span>
-        </button>
-      );
-    })}
-  </div>
-);
+            {/* Active top bar for mobile */}
+            {active === key && (
+              <div className="absolute top-[-7px] left-1/2 transform -translate-x-1/2 w-12 h-[7px] bg-[var(--dark-def)] rounded-[0_0_20px_20px]"></div>
+            )}
+            <div className="relative mt-2">
+              <img
+                src={icon}
+                alt={id}
+                className={`w-6 h-6 transition-all ${
+                  active === key ? "opacity-100 scale-110" : "opacity-70"
+                }`}
+              />
+              {count !== undefined && count > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {count > 99 ? "99+" : count}
+                </div>
+              )}
+            </div>
+            <span
+              className={`text-[11px] font-medium ${
+                active === key ? "text-[var(--dark-def)]" : "text-gray-500"
+              }`}
+            >
+              {id.charAt(0).toUpperCase() + id.slice(1)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 // Main responsive navigation component
 export default function ResponsiveMenu() {
