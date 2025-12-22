@@ -122,18 +122,13 @@ export default function InboxPage() {
   };
 
   // Wrapper to open a case only after prefetching its messages. Toggles closed when same id selected.
-  const [prefetchingRoom, setPrefetchingRoom] = useState<string | null>(null);
-
   const openCase = async (caseId: string | null) => {
     if (!caseId) return setSelectedCase(null);
     if (selectedCase === caseId) return setSelectedCase(null);
-    setPrefetchingRoom(caseId);
     try {
       await prefetchRoomMessages(caseId);
     } catch {
       // ignore prefetch errors and still open the chat
-    } finally {
-      setPrefetchingRoom(null);
     }
     setSelectedCase(caseId);
   };
@@ -144,14 +139,10 @@ export default function InboxPage() {
     let cancelled = false;
     (async () => {
       try {
-        setPrefetchingRoom(initialOpen as string);
         await prefetchRoomMessages(initialOpen as string);
         if (!cancelled) setSelectedCase(initialOpen as string);
       } catch {
         if (!cancelled) setSelectedCase(initialOpen as string);
-      }
-      finally {
-        if (!cancelled) setPrefetchingRoom(null);
       }
     })();
     return () => { cancelled = true; };
@@ -160,17 +151,6 @@ export default function InboxPage() {
 
   return (
     <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">
-      {prefetchingRoom && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
-          <div className="flex flex-col items-center gap-3 p-4 bg-white rounded-lg shadow">
-            <svg className="animate-spin w-8 h-8 text-gray-700" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-            </svg>
-            <div className="text-gray-700">Loading chat…</div>
-          </div>
-        </div>
-      )}
       <div className="lg:hidden w-full">
         <MobileBanner page="Inbox" />
       </div>
@@ -188,8 +168,12 @@ export default function InboxPage() {
           className={`lg:w-[50vw] w-full h-screen overflow-y-auto no-scrollbar lg:py-5 lg:pr-1 ${selectedCase ? "hidden lg:block" : ""}`}
         >
           <SupportAndCases
-            onSelectCase={(caseId) => void openCase(caseId)}
-            onSelectChat={(chatId) => void openCase(chatId)}
+            onSelectCase={(caseId) =>
+              setSelectedCase((prev) => (prev === caseId ? null : caseId))
+            }
+            onSelectChat={(chatId) =>
+              setSelectedCase((prev) => (prev === chatId ? null : chatId))
+            }
           />
         </div>
 
