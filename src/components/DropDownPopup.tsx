@@ -341,7 +341,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
             <div className="mb-2 relative">
               <input
                 type="text"
-                className="w-full border text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
+                className="w-full border border-gray-300 text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
                 placeholder="Enter custom value..."
                 value={customValue}
                 onChange={e => setCustomValue(e.target.value)}
