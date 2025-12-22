@@ -18,6 +18,7 @@ export default function SupportAndCases({
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
   const [chatUnread, setChatUnread] = useState<number>(0);
   const [supportActive, setSupportActive] = useState<number>(0);
+  const [newCaseOpen, setNewCaseOpen] = useState<boolean>(false);
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
@@ -461,7 +462,9 @@ export default function SupportAndCases({
       <div className="w-full flex items-center justify-center">
         <button
           className="flex items-center justify-center gap-3 bg-(--div-active) max-lg:bg-white max-lg:hover:bg-green-100/50 cursor-pointer text-(--dark-def) lg:font-medium max-lg:py-4 lg:px-4 max-lg:px-6 lg:w-[5vw] lg:h-[3vw] lg:max-w-[150px] lg:max-h-[60px] lg:min-h-[50px] lg:min-w-[125px] rounded-2xl hover:bg-gray-200"
-          onClick={() => onSelectChat?.("new")}
+          onClick={() => {
+            setNewCaseOpen(true);
+          }}
         >
           <p className="text-base lg:text-[1vw] whitespace-nowrap">Add case</p>
           <div
@@ -549,6 +552,26 @@ export default function SupportAndCases({
     );
   };
 
+  const NewCaseContent = () => {
+    return (
+      <div className="bg-white flex flex-col items-center justify-center gap-4 z-[60]">
+        <p>Need Help? Send a message to our support team.</p>
+        <div className="w-full flex items-center justify-center mt-2">
+          <textarea className="w-11/12 min-h-[20vh] border border-gray-300 outline-0 rounded-lg p-2" />
+        </div>
+        <p>Please provide at least 10 characters.</p>
+        <button
+          onClick={() => {
+            onSelectChat?.("new");
+          }}
+          className="bg-gray-100 cursor-pointer hover:bg-gray-200 rounded-lg hover:scale-95 transition w-11/12 p-3"
+          >
+            Send to Admin
+            </button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full lg:items-center">
       <div className="rounded-2xl bg-white lg:h-[93vh] lg:px-5 py-3 h-full w-full flex flex-col ">
@@ -566,6 +589,15 @@ export default function SupportAndCases({
           )}
           <div className="w-1 h-13" />
         </div>
+        {newCaseOpen && (
+          <div onClick={() => setNewCaseOpen(false)} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="relative bg-white rounded-lg p-6 w-11/12 max-w-md text-(--dark-def)">
+              <p className="absolute -top-2 -right-2 inline rotate-45 font-bold text-3xl">+</p>
+
+              <NewCaseContent />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

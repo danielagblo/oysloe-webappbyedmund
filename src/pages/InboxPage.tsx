@@ -45,8 +45,7 @@ export default function InboxPage() {
           />
         </div>
 
-        {selectedCase && (
-          isSmallScreen ? (
+        {(selectedCase && isSmallScreen) ? ( //dev note to whoever changed this logic: the logic has to be like this bc PC's initial render doesnt have selectedCase but mobile does
             <div className="lg:hidden fixed inset-0 z-40 bg-white overflow-hidden">
               <div className="h-full w-full">
                 <LiveChat
@@ -65,7 +64,7 @@ export default function InboxPage() {
               />
             </div>
           )
-        )}
+        }
 
 
 

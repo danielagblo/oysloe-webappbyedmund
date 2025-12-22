@@ -1,6 +1,5 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { toast } from "sonner";
-import { useCreatePossibleFeatureValue } from "../features/productFeatures/useProductFeatures";
 import { createPossibleFeatureValue } from "../services/featureService";
 
 interface DropdownPopupProps {
@@ -83,8 +82,6 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
     useEffect(() => {
       dragOffsetRef.current = dragOffset;
     }, [dragOffset]);
-
-    const createNewValueMutation = useCreatePossibleFeatureValue();
 
     useImperativeHandle(ref, () => ({
       open: (forceSubView?: boolean) => {
