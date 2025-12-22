@@ -1545,6 +1545,7 @@ export default function PostAdForm({
                                     useBottomSheetOnMobile
                                     isFeatureDropdown
                                     subcategoryId={Number(subcategoryId) || 0}
+                                    featureId={Number(fd.id)}
                                   />
                                 </div>
                               </div>

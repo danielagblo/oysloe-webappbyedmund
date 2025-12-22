@@ -1,6 +1,7 @@
 import { useEffect, useState, forwardRef, useImperativeHandle, useRef } from "react";
 import { toast } from "sonner";
 import { useCreatePossibleFeatureValue } from "../features/productFeatures/useProductFeatures";
+import { createPossibleFeatureValue } from "../services/featureService";
 
 interface DropdownPopupProps {
   triggerLabel: string;
@@ -21,6 +22,7 @@ interface DropdownPopupProps {
   getMainOptionIcon?: (option: string) => string | null;
   isFeatureDropdown?: boolean;
   subcategoryId?: number;
+  featureId?: number;
 }
 
 export interface DropdownPopupHandle {
@@ -48,6 +50,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       getMainOptionIcon,
       isFeatureDropdown = false,
       subcategoryId,
+      featureId
     },
     ref,
   ) => {
@@ -80,6 +83,8 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
     useEffect(() => {
       dragOffsetRef.current = dragOffset;
     }, [dragOffset]);
+
+    const createNewValueMutation = useCreatePossibleFeatureValue();
 
     useImperativeHandle(ref, () => ({
       open: (forceSubView?: boolean) => {
@@ -325,13 +330,14 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
         onSelect(customValue.trim());
         setCustomValue("");
         try {
-          useCreatePossibleFeatureValue().mutateAsync({ 
-            feature: 0,
-            value: customValue.trim(),
+          createPossibleFeatureValue({ 
+            feature: featureId!,
             subcategory: subcategoryId,
+            value: customValue.trim(),
            });
+           toast.success("New value saved");
         } catch {
-          // ignore
+          toast.error("Failed to create new value");
         }
       };
 
@@ -341,7 +347,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
             <div className="mb-2 relative">
               <input
                 type="text"
-                className="w-full border border-gray-300 text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
+                className="w-full border max-sm:p-1 border-gray-300 text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
                 placeholder="Enter custom value..."
                 value={customValue}
                 onChange={e => setCustomValue(e.target.value)}
