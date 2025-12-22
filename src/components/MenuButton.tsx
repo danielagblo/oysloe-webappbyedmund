@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../App.css";
 import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
 import chatService from "../services/chatService";
-import { useRef, useLayoutEffect } from "react";
+// import { useRef, useLayoutEffect } from "react";
 import { useScrollDirectionOnContainer } from "../hooks/useScrollDirectionOnContainer";
 
 type RouteKey = "home" | "alerts" | "post" | "inbox" | "profile";
