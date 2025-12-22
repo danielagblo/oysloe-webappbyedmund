@@ -130,21 +130,19 @@ const MobileFooter = ({
   alertCount?: number;
   inboxCount?: number;
 }) => {
-  // Try to find the main scrollable container (commonly used patterns)
-  const mainRef = useRef<HTMLElement | null>(null);
-  useLayoutEffect(() => {
-    // Try to find a main scrollable container by id or tag
-    const main = document.getElementById('main-scroll') || document.querySelector('main');
-    if (main) mainRef.current = main as HTMLElement;
-    else mainRef.current = null;
-  }, []);
-  const direction = useScrollDirectionOnContainer(mainRef);
+  // Use auto-detected scroll container inside hook (no ref required)
+  const direction = useScrollDirectionOnContainer(null);
+  // If a modal/dialog is open (BottomSheet etc.) keep menu visible
+  const modalOpen = Boolean(
+    typeof document !== 'undefined' &&
+      (document.querySelector('[aria-modal="true"]') || document.querySelector('[role="dialog"]') || document.querySelector('.fixed.inset-0.z-50')),
+  );
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20 transition-transform duration-300 ease-in-out ${
-        direction === 'down' ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+        direction === 'down' && !modalOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
       }`}
-      aria-hidden={direction === 'down'}
+      aria-hidden={direction === 'down' && !modalOpen}
     >
       {Object.entries(icons).map(([id, icon]) => {
         const key = id as RouteKey;
