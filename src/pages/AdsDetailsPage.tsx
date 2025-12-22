@@ -714,6 +714,7 @@ const AdsDetailsPage = () => {
         owner={owner}
       />
       <div
+        id="main-scroll"
         style={{ color: "var(--dark-def)" }}
         className="flex flex-col items-center w-full sm:w-full min-h-screen px-0 max-sm:pt-10 sm:px-12 gap-6 sm:gap-2 bg-(--div-active) sm:bg-white"
       >
