@@ -12,7 +12,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
   openChatWithOwnerAndSend,
 }) => (
   <div className="w-full">
-    <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:p-4 lg:p-6 shadow sm:shadow-none">
+    <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:p-4 lg:p-6 sm:shadow-none">
       <div className="flex items-center gap-2 mb-3">
         <img src="/quick chat.svg" alt="" className="w-5 h-5" />
         <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>

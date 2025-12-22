@@ -130,7 +130,8 @@ body {
 
   .search-input {
     width: 65vw;
-    font-size: 0.95rem;
+    /* Ensure >=16px to prevent iOS zoom-on-focus */
+    font-size: 16px;
     /* padding-left: 52px; */
     padding-left: 17%;
     padding-right: 22.5px;
@@ -234,7 +235,8 @@ body {
 
   .search-input {
     width: 82vw;
-    font-size: 0.95rem;
+    /* Ensure >=16px to prevent iOS zoom-on-focus */
+    font-size: 16px;
   }
 }
 
@@ -257,6 +259,20 @@ body {
 
   .search-input::placeholder {
     text-align: center;
+  }
+}
+
+/* iOS Safari: prevent zoom on input focus by enforcing >=16px */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 

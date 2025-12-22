@@ -26,3 +26,4 @@ Api.ts
 *.njsproj
 *.sln
 *.sw?
+.env
