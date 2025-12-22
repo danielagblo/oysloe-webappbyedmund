@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type JSX, type KeyboardEvent } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState, type JSX, type KeyboardEvent } from "react";
 import useWsChat from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
@@ -32,9 +33,11 @@ function ChatInput({
   onAttach,
   onRecord,
   onTyping,
+  onRecorded,
 }: ChatInputProps) {
   const [recording, setRecording] = useState(false);
   const typingTimeoutRef = useRef<number | null>(null);
+  const isTypingRef = useRef(false);
 
   const mediaRecRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -57,7 +60,7 @@ function ChatInput({
       mr.ondataavailable = (e: any) => {
         if (e?.data) chunksRef.current.push(e.data);
       };
-      mr.onstop = () => {
+      mr.onstop = async () => {
         try {
           const send = sendOnStopRef.current !== false;
           if (send && (chunksRef.current || []).length > 0) {
@@ -65,13 +68,15 @@ function ChatInput({
             chunksRef.current = [];
             const file = new File([blob], `recording-${Date.now()}.webm`, { type: blob.type });
             try {
-              onRecord?.(file);
+              try { onRecord?.(file); } catch { /* ignore */ }
+              try { onRecorded?.(file); } catch { /* ignore */ }
             } catch (e) {
               void e;
             }
           } else {
-            // discard
             chunksRef.current = [];
+            try { onRecord?.(false); } catch { /* ignore */ }
+            try { onRecorded?.(null as any); } catch { /* ignore */ }
           }
         } finally {
           if (mediaStreamRef.current) {
@@ -85,44 +90,40 @@ function ChatInput({
             window.clearInterval(elapsedIntervalRef.current);
             elapsedIntervalRef.current = null;
           }
-          try {
-            onRecord?.(false);
-          } catch {
-            // ignore
-          }
         }
       };
-      mr.start();
+
+      try {
+        mr.start();
+      } catch {
+        /* ignore start errors */
+      }
       setRecording(true);
       startTimeRef.current = Date.now();
-      setElapsed(0);
-      if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
-      elapsedIntervalRef.current = window.setInterval(() => {
-        if (startTimeRef.current) setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
-      }, 500) as unknown as number;
-      try {
-        onRecord?.(true);
-      } catch {
-        // ignore
+      if (elapsedIntervalRef.current) {
+        window.clearInterval(elapsedIntervalRef.current);
+        elapsedIntervalRef.current = null;
       }
-    } catch (err) {
-      console.error("Recording start failed", err);
+      elapsedIntervalRef.current = window.setInterval(() => {
+        try {
+          const st = startTimeRef.current ?? Date.now();
+          setElapsed(Math.floor((Date.now() - st) / 1000));
+        } catch {
+          // ignore
+        }
+      }, 1000) as unknown as number;
+    } catch (e) {
+      try { console.warn("startRecording failed", e); } catch { /* ignore */ }
+      setRecording(false);
     }
   };
 
-  const stopRecording = (send = true) => {
+  const stopRecording = (send: boolean) => {
+    sendOnStopRef.current = send;
     try {
-      sendOnStopRef.current = send;
       mediaRecRef.current?.stop();
-    } catch (e) {
-      void e;
-      setRecording(false);
-      setElapsed(0);
-      try {
-        onRecord?.(false);
-      } catch {
-        // ignore
-      }
+    } catch {
+      // ignore
     }
   };
 
@@ -136,9 +137,28 @@ function ChatInput({
       if (mediaStreamRef.current) mediaStreamRef.current.getTracks().forEach((t) => t.stop());
       if (elapsedIntervalRef.current) window.clearInterval(elapsedIntervalRef.current);
       if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+      try { onTyping?.(false); } catch { /* ignore */ }
+      isTypingRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // If the `value` prop is cleared externally, ensure we emit typing:stop
+  useEffect(() => {
+    try {
+      if (!value && isTypingRef.current) {
+        try { onTyping?.(false); } catch { /* ignore */ }
+        isTypingRef.current = false;
+        if (typingTimeoutRef.current) {
+          window.clearTimeout(typingTimeoutRef.current as unknown as number);
+          typingTimeoutRef.current = null;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [value, onTyping]);
+
   return (
     <div className="relative pb-2.5 lg:pb-0 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
       {recording ? (
@@ -178,17 +198,22 @@ function ChatInput({
             <input
               value={value}
               onChange={(e) => {
-                onValueChange(e.target.value);
+                const v = e.target.value;
+                onValueChange(v);
                 try {
-                  onTyping?.(true);
+                  if (!isTypingRef.current) {
+                    try { onTyping?.(true); } catch { /* ignore */ }
+                    isTypingRef.current = true;
+                  }
                 } catch {
                   // ignore
                 }
                 if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
                 typingTimeoutRef.current = window.setTimeout(() => {
                   try { onTyping?.(false); } catch { /* ignore */ }
+                  isTypingRef.current = false;
                   typingTimeoutRef.current = null;
-                }, 1500) as unknown as number;
+                }, 2000) as unknown as number;
               }}
               onKeyDown={(e) => {
                 try {
@@ -198,7 +223,16 @@ function ChatInput({
                 }
                 if (e.key === "Enter") {
                   try { onTyping?.(false); } catch { /* ignore */ }
+                  isTypingRef.current = false;
                   if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                  typingTimeoutRef.current = null;
+                }
+              }}
+              onBlur={() => {
+                try { onTyping?.(false); } catch { /* ignore */ }
+                isTypingRef.current = false;
+                if (typingTimeoutRef.current) {
+                  window.clearTimeout(typingTimeoutRef.current as unknown as number);
                   typingTimeoutRef.current = null;
                 }
               }}
@@ -218,7 +252,15 @@ function ChatInput({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={onSend}
+              onClick={() => {
+                try { onTyping?.(false); } catch { /* ignore */ }
+                isTypingRef.current = false;
+                if (typingTimeoutRef.current) {
+                  window.clearTimeout(typingTimeoutRef.current as unknown as number);
+                  typingTimeoutRef.current = null;
+                }
+                onSend();
+              }}
               type="button"
               aria-label="Send"
               disabled={disabled}
@@ -263,6 +305,128 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     typing,
     sendTyping,
   } = useWsChat();
+
+  const queryClient = useQueryClient();
+
+  const currentRoomKey = String(validatedRoomId ?? caseId ?? "");
+
+  useEffect(() => {
+    try {
+      // debug: log message map keys and current room key to diagnose render issues
+      // remove or silence in production
+      // eslint-disable-next-line no-console
+      console.debug("LiveChat: messages keys", Object.keys(messages || {}), "currentRoomKey", currentRoomKey, "roomLen", (messages && messages[currentRoomKey] ? messages[currentRoomKey].length : 0));
+    } catch {
+      // ignore
+    }
+  }, [messages, currentRoomKey]);
+
+  // When leaving/unmounting or switching rooms, ensure we emit typing:stop for the previous room
+  useEffect(() => {
+    const roomOnMount = String(validatedRoomId ?? caseId ?? "");
+    return () => {
+      try {
+        if (roomOnMount) sendTyping(roomOnMount, false);
+      } catch {
+        // ignore
+      }
+    };
+  }, [validatedRoomId, caseId, sendTyping]);
+
+  // Persist messages to localStorage and restore cached messages on open.
+  // Storage key holds a map: { [roomKey]: Message[] }
+  useEffect(() => {
+    try {
+      const KEY = "oysloe_chat_messages";
+      // Persist entire messages map but trim arrays to last 200 items to avoid huge storage
+      const toStore: Record<string, unknown> = {};
+      for (const k of Object.keys(messages || {})) {
+        try {
+          const arr = (messages as Record<string, any>)[k] || [];
+          if (!Array.isArray(arr)) continue;
+          const trimmed = arr.slice(Math.max(0, arr.length - 200));
+          toStore[k] = trimmed;
+          try {
+            // also persist per-room into react-query cache
+            try { queryClient.setQueryData(["chatMessages", k], trimmed); } catch { /* ignore */ }
+          } catch {
+            /* ignore cache errors */
+          }
+        } catch {
+          // ignore per-room serialization errors
+        }
+      }
+      try {
+        localStorage.setItem(KEY, JSON.stringify(toStore));
+      } catch {
+        // ignore quota errors
+      }
+    } catch {
+      // ignore
+    }
+  }, [messages]);
+
+  // On mount / when caseId changes, restore cached messages for the room if websocket hasn't populated them yet
+  useEffect(() => {
+    try {
+      const KEY = "oysloe_chat_messages";
+      const roomKey = String(validatedRoomId ?? caseId ?? "");
+      if (!roomKey) return;
+      let raw: string | null = null;
+      try {
+        raw = localStorage.getItem(KEY);
+      } catch {
+        raw = null;
+      }
+      if (!raw) raw = null;
+      // Prefer react-query cache first
+      try {
+        const cachedFromQ = queryClient.getQueryData(["chatMessages", roomKey]) as any[] | undefined;
+        if (Array.isArray(cachedFromQ) && cachedFromQ.length > 0) {
+          const existing = (messages && messages[roomKey]) || [];
+          if (!(Array.isArray(existing) && existing.length > 0)) {
+            for (const m of cachedFromQ) {
+              try { addLocalMessage(roomKey, m as ChatMessage); } catch { /* ignore */ }
+            }
+          }
+          return;
+        }
+      } catch {
+        // ignore cache read errors and fall back to localStorage
+      }
+
+      let map: Record<string, any> = {};
+      try {
+        map = JSON.parse(raw || "{}") || {};
+      } catch {
+        return;
+      }
+      const cached = map[roomKey];
+      if (!Array.isArray(cached) || cached.length === 0) return;
+
+      // If websocket already has messages for this room, do not restore to avoid duplicates
+      const existing = (messages && messages[roomKey]) || [];
+      if (Array.isArray(existing) && existing.length > 0) return;
+
+      // Add cached messages locally (preserve ordering)
+      for (const m of cached) {
+        try {
+          // Avoid adding duplicates: check for id or temp id
+          const id = (m as any).id ?? (m as any).__temp_id ?? (m as any).temp_id ?? null;
+          const already = Array.isArray(existing) && existing.some((em: any) => {
+            const eid = em?.id ?? em?.__temp_id ?? em?.temp_id ?? null;
+            return eid != null && id != null && String(eid) === String(id);
+          });
+          if (already) continue;
+          addLocalMessage(roomKey, m as ChatMessage);
+        } catch {
+          // ignore per-message errors
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, [caseId, validatedRoomId]);
   // ensure the chatrooms websocket is connected and log updates for debugging
   useEffect(() => {
     try {
@@ -322,6 +486,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   const [sending, setSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // guard against duplicate send calls (e.g. rapid double-invoke from UI)
+  const recentlySentRef = useRef<Set<string>>(new Set());
   const [currentUser, setCurrentUser] = useState<{
     id?: number;
     name?: string;
@@ -720,6 +886,29 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     }
   };
 
+  // Stable merged message list to avoid folder switching wipeouts
+  const roomMsgsMemo = useMemo(() => {
+    const uiRoomKey = String(validatedRoomId ?? caseId ?? "");
+    const rawId = String(caseId ?? "");
+    const mainList = messages[uiRoomKey] || [];
+    const fallbackList = messages[rawId] || [];
+
+    if (uiRoomKey !== rawId && fallbackList.length > 0) {
+      const combined = [...mainList];
+      fallbackList.forEach((m) => {
+        const mid = (m as any)?.id ?? (m as any)?.temp_id ?? (m as any)?.__temp_id;
+        const exists = combined.some((em: any) => {
+          const eid = (em as any)?.id ?? (em as any)?.temp_id ?? (em as any)?.__temp_id;
+          return mid != null && eid != null && String(eid) === String(mid);
+        });
+        if (!exists) combined.push(m as any);
+      });
+      return combined.sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    }
+
+    return mainList;
+  }, [messages, validatedRoomId, caseId]);
+
   // const formatDateHeader = (iso?: string | null) => {
   //   if (!iso) return "";
   //   try {
@@ -753,6 +942,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
         const map = JSON.parse(raw || "{}");
         const meta = map[String(validatedRoomId)];
         if (meta) {
+          // Compute apiOriginFallback locally to avoid dependency issues
+          const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+          let apiOriginFallbackLocal = "";
+          try {
+            apiOriginFallbackLocal = new URL(_apiRaw).origin;
+          } catch {
+            apiOriginFallbackLocal = _apiRaw.replace(/\/+$/, "");
+          }
+
           const prod: any = {};
           if (meta.ad_name) prod.name = String(meta.ad_name);
           if (meta.ad_image) {
@@ -761,7 +959,7 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
               prod.image = dataUrlToObjectUrl(img);
             } else if (img.startsWith("/")) {
               if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
-                prod.image = apiOriginFallback + img;
+                prod.image = apiOriginFallbackLocal + img;
               } else {
                 prod.image = (typeof window !== "undefined" ? window.location.origin : "") + img;
               }
@@ -874,38 +1072,42 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     };
   }, []);
 
-  // Debug: show incoming caseId changes
+  // Connect to the room immediately when caseId changes.
+  // Set validatedRoomId right away so the UI can render messages without waiting for server validation.
   useEffect(() => {
+    if (!caseId) {
+      setIsValidRoom(null);
+      setValidatedRoomId(null);
+      return;
+    }
 
-    // reset validation state and validated id whenever the incoming caseId changes
-    setIsValidRoom(null);
-    setValidatedRoomId(null);
+    // Set the ID immediately so the UI knows which room's messages to render
+    setValidatedRoomId(caseId);
+    setIsValidRoom(true);
 
-    if (!caseId) return;
-
-    // Try to connect via websocket only. If connection succeeds we treat the room
-    // as valid. We avoid any REST validation/fallback entirely.
-    let cancelled = false;
-    (async () => {
+    // Fire the connection in the background and capture the normalized key
+    // The hook may return a different key (e.g., a room_id UUID) than the input caseId
+    const initConnection = async () => {
       try {
-        const normalized = await connectToRoom(caseId);
-        if (cancelled) return;
-        setIsValidRoom(true);
-        setValidatedRoomId(normalized ?? caseId);
-      } catch (err) {
-        if (cancelled) return;
-        setIsValidRoom(false);
-        setValidatedRoomId(null);
-        try {
-          leaveRoom(caseId);
-        } catch {
-          // ignore
+        const normalizedKey = await connectToRoom(caseId);
+        // If the server uses a different key (UUID or room_id), update our state
+        // so we look at the correct messages key
+        if (normalizedKey && String(normalizedKey) !== String(caseId)) {
+          setValidatedRoomId(String(normalizedKey));
         }
+      } catch (err) {
+        console.error("Connection failed", err);
       }
-    })();
+    };
+
+    initConnection();
 
     return () => {
-      cancelled = true;
+      try {
+        leaveRoom(caseId);
+      } catch {
+        // ignore
+      }
     };
   }, [caseId, connectToRoom, leaveRoom]);
 
@@ -913,23 +1115,29 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
   // When the room's websocket becomes connected, ensure we mark messages read once.
   useEffect(() => {
-    if (!validatedRoomId) return;
-    if (!isRoomConnected(validatedRoomId)) return;
-    if (readMarkedRef.current[validatedRoomId]) return;
+    const idKey = String(validatedRoomId ?? caseId ?? "");
+    if (!idKey) return;
+    try {
+      if (!isRoomConnected(idKey)) return;
+    } catch {
+      // ignore
+    }
+    if (readMarkedRef.current[idKey]) return;
 
-    void markAsRead(String(validatedRoomId));
-    readMarkedRef.current[validatedRoomId] = true;
-  }, [validatedRoomId, isRoomConnected, markAsRead, messages]);
+    void markAsRead(idKey);
+    readMarkedRef.current[idKey] = true;
+  }, [validatedRoomId, caseId, isRoomConnected, markAsRead, messages]);
 
 
 
   useEffect(() => {
     // Only auto-scroll on initial load for a room or when the last message is from the current user.
     const el = containerRef.current;
-    if (!el || !validatedRoomId) return;
+    if (!el || !(validatedRoomId ?? caseId)) return;
 
-    const roomMsgs = messages[validatedRoomId] || [];
-    const prev = prevCounts.current[validatedRoomId] ?? 0;
+    const idKey = String(validatedRoomId ?? caseId ?? "");
+    const roomMsgs = messages[idKey] || [];
+    const prev = prevCounts.current[idKey] ?? 0;
     const now = roomMsgs.length;
 
     // initial load: scroll to bottom
@@ -953,14 +1161,15 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       }
     }
 
-    prevCounts.current[validatedRoomId] = now;
-  }, [messages, validatedRoomId, currentUser]);
+    prevCounts.current[idKey] = now;
+  }, [messages, validatedRoomId, currentUser, caseId]);
 
   // Mark messages as read when the user is viewing the room and there are unread incoming messages
   useEffect(() => {
-    if (!validatedRoomId) return;
+    if (!(validatedRoomId ?? caseId)) return;
     if (!currentUser) return;
-    const roomMsgs = messages[validatedRoomId] || [];
+    const idKey = String(validatedRoomId ?? caseId ?? "");
+    const roomMsgs = messages[idKey] || [];
     if (roomMsgs.length === 0) return;
 
     // Find any incoming messages not authored by current user and not marked read
@@ -973,8 +1182,8 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     if (!hasUnread) return;
 
     // Tell the hook to mark the room as read (hook will optimistically update local state and call backend)
-    void markAsRead(String(validatedRoomId));
-  }, [messages, validatedRoomId, currentUser, markAsRead]);
+    void markAsRead(idKey);
+  }, [messages, validatedRoomId, currentUser, markAsRead, caseId]);
 
 
 
@@ -996,54 +1205,62 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
   }
 
   const handleSend = async () => {
-    // Only allow sending to validated, existing rooms
-    if (isValidRoom !== true) return;
-    if (!validatedRoomId) return;
-
-    if (sending) return;
-    setSending(true);
-
     const text = input.trim();
-    if (!text) {
+    if (!text || sending) return;
+    const stringKey = String(validatedRoomId ?? "");
+    const numericKey = String(caseId ?? "");
+    if (!stringKey && !numericKey) return;
+
+    setSending(true);
+    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    // Prevent accidental double-send if this handler is invoked twice quickly
+    if (recentlySentRef.current.has(tempId)) {
       setSending(false);
       return;
     }
-    setInput("");
+    recentlySentRef.current.add(tempId);
+    // forget after 10s
+    setTimeout(() => recentlySentRef.current.delete(tempId), 10000);
 
-    // optimistic UI (do NOT set a stable `id` locally; use a temp id instead)
-    const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    // 1. Create the optimistic message object
     const optimistic: Partial<ChatMessage> = {
-      id: 0, // temporary id for optimistic UI
+      id: 0,
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: text,
       created_at: new Date().toISOString(),
     };
-    // attach a client-generated temp id so we can reconcile server echo
-    (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
-    (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
-    // optimistic UI immediately (use validatedRoomId if available)
-    addLocalMessage(String(validatedRoomId ?? caseId), optimistic as ChatMessage);
-    // ensure we scroll to the bottom when the user sends a message
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.__temp_id = tempId;
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.temp_id = tempId;
+
+    // 2. Clear input and render the message IMMEDIATELY in the UI on both possible keys
+    setInput("");
+    // write to numeric key first (DB id) then to string key (private_xxx) to ensure UI stays sticky
+    if (numericKey) addLocalMessage(numericKey, optimistic as ChatMessage);
+    if (stringKey && stringKey !== numericKey) addLocalMessage(stringKey, optimistic as ChatMessage);
+
+    // Scroll to bottom immediately
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
 
     try {
-      // ensure the websocket room client is connected before sending
-      if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
-        try { await connectToRoom(validatedRoomId); } catch { }
+      // Attempt send using the most specific known id first (stringKey), fall back to numericKey
+      const sendTarget = stringKey || numericKey;
+      if (!sendTarget) throw new Error("No send target available");
+      if (isRoomConnected(sendTarget)) {
+        void sendMessage(sendTarget, text, tempId);
+      } else {
+        console.warn("Socket not connected for room", sendTarget, "message might be delayed");
+        // Still attempt to send (ensureRoomClient will try to connect inside sendMessage)
+        try { void sendMessage(sendTarget, text, tempId); } catch { /* ignore */ }
       }
-
-      // If websocket client still isn't open, abort to avoid REST/send endpoint fallback
-      if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
-        setSending(false);
-        setInput(text);
-        return;
-      }
-
-      await sendMessage(String(validatedRoomId ?? caseId), text, tempId);
     } catch (e) {
-      console.error("Failed to send message via ws/rest fallback", e);
+      console.error("Send failed", e);
+      // Restore input on hard error
+      setInput(text);
     } finally {
       setSending(false);
     }
@@ -1054,34 +1271,45 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
     const fileInput = fileInputRef.current;
     if (!fileInput || !fileInput.files || fileInput.files.length === 0) return;
     const file = fileInput.files[0];
+    const uiRoomKey = String(validatedRoomId ?? caseId ?? "");
+    if (!uiRoomKey) return;
+
     const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const optimistic: Partial<ChatMessage> = {
-      id: 0, // temporary id for optimistic UI
+      id: 0,
       room: Number(caseId),
       sender: { id: currentUser?.id ?? 0, name: currentUser?.name ?? "Me" },
       content: "",
       created_at: new Date().toISOString(),
     };
-    (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
-    (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
-    (optimistic as unknown as Record<string, unknown>).image_url =
-      URL.createObjectURL(file);
-    addLocalMessage(String(validatedRoomId ?? caseId), optimistic as ChatMessage);
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.__temp_id = tempId;
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.temp_id = tempId;
+    // @ts-expect-error - adding image_url property
+    optimistic.image_url = URL.createObjectURL(file);
+
+    // Prevent accidental double-send
+    if (recentlySentRef.current.has(tempId)) {
+      // clear file input and bail
+      if (fileInput) fileInput.value = "";
+      return;
+    }
+    recentlySentRef.current.add(tempId);
+    setTimeout(() => recentlySentRef.current.delete(tempId), 10000);
+
+    // Add to UI immediately
+    addLocalMessage(uiRoomKey, optimistic as ChatMessage);
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
+
     try {
-      // ensure connection for files as well
-      if (validatedRoomId && !isRoomConnected(validatedRoomId)) {
-        try { await connectToRoom(validatedRoomId); } catch { }
+      // Fire the message send without awaiting connection
+      if (isRoomConnected(uiRoomKey)) {
+        void sendMessage(uiRoomKey, "", tempId, file);
+      } else {
+        console.warn("Socket not connected, file message might be delayed");
       }
-
-      // Prevent REST fallback: require WS client open
-      if (!validatedRoomId || !isRoomConnected(validatedRoomId)) {
-        setSending(false);
-        return;
-      }
-
-      await sendMessage(String(validatedRoomId ?? caseId), "", tempId, file);
     } catch (err) {
       console.error("Image send failed", err);
     } finally {
@@ -1104,27 +1332,26 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
       content: "",
       created_at: new Date().toISOString(),
     };
-    (optimistic as unknown as Record<string, unknown>).__temp_id = tempId;
-    (optimistic as unknown as Record<string, unknown>).temp_id = tempId;
-    // expose audio preview URL for optimistic UI
-    (optimistic as unknown as Record<string, unknown>).audio_url = URL.createObjectURL(file);
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.__temp_id = tempId;
+    // @ts-expect-error - adding temp keys for reconciliation
+    optimistic.temp_id = tempId;
+    // @ts-expect-error - adding audio_url property
+    optimistic.audio_url = URL.createObjectURL(file);
+    // Prevent accidental double-send
+    if (recentlySentRef.current.has(tempId)) return;
+    recentlySentRef.current.add(tempId);
+    setTimeout(() => recentlySentRef.current.delete(tempId), 10000);
+
     addLocalMessage(String(roomToSend), optimistic as ChatMessage);
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
 
     try {
-      if (roomToSend && !isRoomConnected(roomToSend)) {
-        try { await connectToRoom(roomToSend); } catch { }
-      }
-      if (!roomToSend || !isRoomConnected(roomToSend)) return;
-
-      // Prefer uploading via the REST `/send` endpoint so audio is sent as multipart/form-data.
-      // If that fails, fall back to the existing `sendMessage` hook which may use REST/WS.
-      try {
-        // Use sendMessage hook which handles file uploads correctly
-        await sendMessage(String(roomToSend), "", tempId, file);
-      } catch (err) {
-        console.error("Recorded file send failed", err);
+      if (isRoomConnected(String(roomToSend))) {
+        void sendMessage(String(roomToSend), "", tempId, file);
+      } else {
+        console.warn("Socket not connected for audio, message might be delayed");
       }
     } catch (err) {
       console.error("Recorded send failed", err);
@@ -1253,7 +1480,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
 
           {(() => {
             const nodes: JSX.Element[] = [];
-            const roomMsgs = (messages[validatedRoomId ?? ""] || []) as any[];
+            let roomMsgs = roomMsgsMemo;
+
+            // If websocket hasn't populated messages yet, try to read cached messages from localStorage
+            if ((!roomMsgs || roomMsgs.length === 0) && typeof window !== "undefined") {
+              try {
+                const raw = localStorage.getItem("oysloe_chat_messages");
+                if (raw) {
+                  const map = JSON.parse(raw || "{}") || {};
+                  const cached = map[String(validatedRoomId ?? caseId ?? "")];
+                  if (Array.isArray(cached) && cached.length > 0) {
+                    roomMsgs = cached as any[];
+                  }
+                }
+              } catch {
+                // ignore parse/localStorage errors
+              }
+            }
             let lastKey = "";
             for (const msg of roomMsgs) {
               const created = (msg as any).created_at ?? null;
@@ -1556,6 +1799,35 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                 </div>,
               );
             }
+            // If remote users are typing, show a placeholder bubble inside the message list
+            try {
+              const roomKeyLocal = String(validatedRoomId ?? caseId ?? "");
+              const typingUsersLocal = (typing && typing[roomKeyLocal]) || [];
+              const otherTypingLocal = typingUsersLocal.filter((id) => Number(id) !== Number(currentUser?.id));
+              if (otherTypingLocal.length > 0) {
+                const name = (roomInfo && (roomInfo as any).other_user_name) || (roomUserMap && roomUserMap[roomKeyLocal] && roomUserMap[roomKeyLocal].name) || "User";
+                const typingKey = `typing-${roomKeyLocal}-${otherTypingLocal.join("-")}`;
+                nodes.push(
+                  <div key={typingKey} className="flex justify-start">
+                    <div className="flex flex-col items-start gap-1">
+                      <p className="text-sm font-medium lg:text-[1.25vw] lg:ml-10 ml-7">{name}</p>
+                      <div className="border border-gray-200 p-3 rounded-xl bg-white lg:pl-[2vw] lg:pt-[1.75vw] w-full max-w-[60%]">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Typing</span>
+                          <span className="inline-flex gap-1 items-center" aria-hidden="true">
+                            <span className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
+                            <span className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-150" />
+                            <span className="w-2 h-2 rounded-full bg-gray-400 animate-pulse delay-300" />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>,
+                );
+              }
+            } catch {
+              // ignore typing UI errors
+            }
             return nodes;
           })()}
         </div>
@@ -1569,7 +1841,23 @@ export default function LiveChat({ caseId, onClose }: LiveChatProps) {
                 const name = (roomInfo && (roomInfo as any).other_user_name) || (roomUserMap && roomUserMap[roomKey] && roomUserMap[roomKey].name) || "User";
                 return (
                   <div className="px-6 pb-2">
-                    <div className="text-sm text-gray-500">{`${name} is typing…`}</div>
+                    <style>{`
+                      @keyframes livechat-typing {0%{transform:translateY(0);opacity:.35}30%{transform:translateY(-4px);opacity:1}60%{transform:translateY(0);opacity:.35}100%{opacity:.35}}
+                      .livechat-typing-dots{display:inline-flex;gap:6px;align-items:center;margin-left:8px}
+                      .livechat-typing-dots span{width:7px;height:7px;border-radius:9999px;background:#9ca3af;display:inline-block;animation:livechat-typing 1s infinite}
+                      .livechat-typing-dots span:nth-child(1){animation-delay:0s}
+                      .livechat-typing-dots span:nth-child(2){animation-delay:0.15s}
+                      .livechat-typing-dots span:nth-child(3){animation-delay:0.3s}
+                    `}</style>
+
+                    <div className="text-sm text-gray-500 flex items-center">
+                      <span>{name} is typing</span>
+                      <span className="livechat-typing-dots" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                      </span>
+                    </div>
                   </div>
                 );
               }
