@@ -1671,7 +1671,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
               // Make every message bubble occupy 3/4 of the available width
               const bubbleBaseClass = "border border-gray-200 max-sm:border-gray-300 max-sm:border-2 p-3 lg:p-[1vw] rounded-xl min-w-0 wrap-break-word";
               const bubbleSizeClass = "w-full";
-              const bubbleColorClass = isMine ? "bg-green-700 text-black rounded-tr-none" : "bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
+              const bubbleColorClass = isMine ? "bg-green-100 text-black rounded-tr-none" : "bg-white rounded-tl-none lg:pl-[2vw] lg:pt-[1.75vw]";
               const bubbleClass = `${bubbleBaseClass} ${bubbleSizeClass} ${bubbleColorClass}`;
 
               const keyId = `msg-${(msg as any).id ?? "0"}-${(msg as any).__temp_id ?? (msg as any).temp_id ?? ""}`;
