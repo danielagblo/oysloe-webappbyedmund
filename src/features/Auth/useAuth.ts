@@ -69,6 +69,33 @@ export function useRegister() {
       localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
       localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
       qc.setQueryData(["currentUser"], data.user);
+      // Best-effort: register push subscription after successful registration
+      try {
+        const opted = (() => {
+          try {
+            return localStorage.getItem("oysloe_notifications_opt_in") === "true";
+          } catch (e) {
+            return false;
+          }
+        })();
+        if (opted) {
+          // prefer FCM token path
+          firebaseMessaging.registerAndSaveToken()
+            .then((t) => console.debug("registerAndSaveToken result", t))
+            .catch((err) => console.error("registerAndSaveToken error", err));
+        } else {
+          console.debug("User did not opt-in to notifications; skipping registration");
+        }
+      } catch (e) {
+        // fallback to PushSubscription flow
+        try {
+          notificationService.registerLocalSubscription()
+            .then((r) => console.debug("registerLocalSubscription result", r))
+            .catch((err) => console.error("registerLocalSubscription error", err));
+        } catch (e2) {
+          void e2;
+        }
+      }
     },
   });
 }
@@ -85,6 +112,33 @@ export function useOTPLogin() {
       localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
       localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
       qc.setQueryData(["currentUser"], data.user);
+      // Best-effort: register push subscription after successful OTP login
+      try {
+        const opted = (() => {
+          try {
+            return localStorage.getItem("oysloe_notifications_opt_in") === "true";
+          } catch (e) {
+            return false;
+          }
+        })();
+        if (opted) {
+          // prefer FCM token path
+          firebaseMessaging.registerAndSaveToken()
+            .then((t) => console.debug("registerAndSaveToken result", t))
+            .catch((err) => console.error("registerAndSaveToken error", err));
+        } else {
+          console.debug("User did not opt-in to notifications; skipping registration");
+        }
+      } catch (e) {
+        // fallback to PushSubscription flow
+        try {
+          notificationService.registerLocalSubscription()
+            .then((r) => console.debug("registerLocalSubscription result", r))
+            .catch((err) => console.error("registerLocalSubscription error", err));
+        } catch (e2) {
+          void e2;
+        }
+      }
     },
   });
 }
