@@ -223,7 +223,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         />
                         <span className="text-sm">Caller 1</span>
                       </div>
-                      <a
+                      {/* <a
                         href={`tel:${caller1}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2 text-sm"
@@ -238,11 +238,27 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <span className="border border-gray-200 px-2.5 py-1.5">
                           {caller1}
                         </span>
+                      </a> */}
+                      <a
+                        href={`tel:${caller1}`}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                        }}
+                        className="flex items-center sm:w-full gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
+                      >
+                        <span className="text-lg sm:text-xl font-medium text-gray-800 flex-1">
+                          {caller1}
+                        </span>
+                        <div 
+                          className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
+                        >
+                          <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                        </div>
                       </a>
                       <div className="w-full flex justify-end">
                         <button
                           onClick={() => setOpenPanel(null)}
-                          className="mt-2 px-3 py-1 rounded bg-gray-100"
+                          className="mt-2 px-3 py-1 cursor-pointer hover:bg-gray-200 rounded bg-gray-100"
                         >
                           Close
                         </button>
@@ -340,7 +356,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         />
                         <span className="text-sm">Caller 2</span>
                       </div>
-                      <a
+                      {/* <a
                         href={`tel:${caller2}`}
                         onClick={(ev) => ev.stopPropagation()}
                         className="font-normal flex items-center gap-2 text-sm"
@@ -355,6 +371,22 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <span className="border border-gray-200 px-2.5 py-1.5">
                           {caller2}
                         </span>
+                      </a> */}
+                      <a
+                        href={`tel:${caller2}`}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                        }}
+                        className="flex items-center sm:w-full gap-3 px-4 py-1.5 border border-gray-200 rounded-2xl hover:bg-gray-50 transition"
+                      >
+                        <span className="text-lg sm:text-xl font-medium text-gray-800 flex-1">
+                          {caller2}
+                        </span>
+                        <div 
+                          className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
+                        >
+                          <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                        </div>
                       </a>
                       <div className="w-full flex justify-end">
                         <button

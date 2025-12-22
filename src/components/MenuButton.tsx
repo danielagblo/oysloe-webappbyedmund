@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../App.css";
 import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
 import chatService from "../services/chatService";
-import { useScrollDirection } from "../hooks/useScrollDirection";
+import { useRef, useLayoutEffect } from "react";
+import { useScrollDirectionOnContainer } from "../hooks/useScrollDirectionOnContainer";
 
 type RouteKey = "home" | "alerts" | "post" | "inbox" | "profile";
 
@@ -129,9 +130,15 @@ const MobileFooter = ({
   alertCount?: number;
   inboxCount?: number;
 }) => {
-  const direction = useScrollDirection();
-  // Only hide on scroll down, show on scroll up
-  // Only on mobile (sm:hidden)
+  // Try to find the main scrollable container (commonly used patterns)
+  const mainRef = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    // Try to find a main scrollable container by id or tag
+    const main = document.getElementById('main-scroll') || document.querySelector('main');
+    if (main) mainRef.current = main as HTMLElement;
+    else mainRef.current = null;
+  }, []);
+  const direction = useScrollDirectionOnContainer(mainRef);
   return (
     <div
       className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-20 transition-transform duration-300 ease-in-out ${
