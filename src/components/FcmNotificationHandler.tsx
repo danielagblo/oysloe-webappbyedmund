@@ -56,7 +56,10 @@ export default function FcmNotificationHandler() {
         const title = notification.title || "New Alert";
         const body = notification.body || "";
         const icon = notification.icon || "/favicon.png";
-        const tag = payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined;
+        const tag =
+          (payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined) ||
+          (payload as any)?.messageId ||
+          `alert-${Date.now()}`;
 
         // Prefer showing via service worker registration (works even if window Notification is blocked)
         try {
@@ -68,9 +71,11 @@ export default function FcmNotificationHandler() {
                     body,
                     icon,
                     badge: "/favicon.png",
-                    tag,
-                    requireInteraction: false,
-                    data: payload.data ?? {},
+                  tag,
+                  requireInteraction: false,
+                  renotify: true,
+                  silent: false,
+                  data: payload.data ?? {},
                   })
                   .then(() => console.debug("Foreground notification shown via SW", { tag, title, body }))
                   .catch((err) => console.debug("Foreground notification showNotification failed", err));
