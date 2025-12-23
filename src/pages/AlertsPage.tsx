@@ -466,15 +466,15 @@ const AlertsPanel = ({
               </p>
             </div>
           ) : alerts.length === 0 ? (
-              <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4">
+              <div className="w-full h-full flex justify-center text-(--dark-def) flex-col items-center gap-4 max-sm:-mt-25">
                 <img className="h-25 w-25 md:h-35 md:w-35 lg:h-40 lg:w-40" src="/alert-bell.svg" alt="No alerts" />
                 <div className="flex flex-col items-center justify-center">
-                  <p className="font-semibold text-xl md:text-2xl lg:text-[1.5vw]">
+                  <p className="font-semibold text-sm md:text-lg lg:text-[1.5vw]">
                     No notifications to show
                   </p>
-                  <p className="text-center text-base max-lg:font-light md:text-xl lg:text-[1.2vw]">
-                    You currently do not have any notification yet.<br />
-                    we're going to notify you when
+                  <p className="text-center text-xs max-lg:font-light md:text-sm lg:text-[1.2vw]">
+                    You currently do not have any notifications yet.<br />
+                    we're going to notify you when<br />
                     something new happens
                   </p>
                 </div>
