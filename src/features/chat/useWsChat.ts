@@ -722,7 +722,8 @@ export default function useWsChat(): UseWsChatReturn {
       file?: File | Blob,
     ) => {
       // normalizeRoomId not needed here; avoid unused local
-      const client = getClientForRoom(roomId);
+      let client = getClientForRoom(roomId);
+      console.debug("sendMessage: attempt", { roomId, hasClient: !!client, isOpen: !!client?.isOpen?.() });
 
       // If a file is provided, send it via websocket as a data URL payload.
       if (file) {
@@ -736,7 +737,17 @@ export default function useWsChat(): UseWsChatReturn {
           fr.readAsDataURL(file as Blob);
         });
         if (!client || !client.isOpen()) {
-          throw new Error("WebSocket not connected; cannot send file over websocket");
+          // attempt to connect to the room then retry once
+          try {
+            console.debug("sendMessage: no open client for file, attempting connectToRoom", { roomId });
+            await connectToRoom(roomId);
+            client = getClientForRoom(roomId);
+          } catch (e) {
+            console.error("sendMessage: connectToRoom failed for file", e, { roomId });
+          }
+          if (!client || !client.isOpen()) {
+            throw new Error("WebSocket not connected; cannot send file over websocket");
+          }
         }
         try { client.send({ type: "chat_message", message: dataUrl, temp_id: tempId }); } catch { throw new Error("WebSocket send failed"); }
         return;
@@ -744,8 +755,27 @@ export default function useWsChat(): UseWsChatReturn {
 
       // Text message path
       if (client && client.isOpen()) {
-        client.send({ type: "chat_message", message: text, temp_id: tempId });
-        return;
+        try {
+          console.debug("sendMessage: sending via websocket", { roomId, tempId, textSnippet: String(text).slice(0, 200) });
+          client.send({ type: "chat_message", message: text, temp_id: tempId });
+          return;
+        } catch (err) {
+          console.error("sendMessage: websocket.send threw", err, { roomId, tempId });
+          throw new Error("WebSocket send failed");
+        }
+      }
+
+      // If there's no client or it's not open, try to establish connection then send once
+      try {
+        console.debug("sendMessage: client not open, attempting connectToRoom then retry", { roomId });
+        await connectToRoom(roomId);
+        client = getClientForRoom(roomId);
+        if (client && client.isOpen()) {
+          client.send({ type: "chat_message", message: text, temp_id: tempId });
+          return;
+        }
+      } catch (e) {
+        console.error("sendMessage: retry after connectToRoom failed", e, { roomId });
       }
 
       // If this is a temp chat room (created from email), we do not auto-resolve here in websocket-only mode

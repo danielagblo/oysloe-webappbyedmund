@@ -583,8 +583,8 @@ export default function SupportAndCases({
 
             return (
               <button
-                key={room.id}
-                onClick={() => onSelectChat?.(String(room.id))}
+                key={String(room.room_id ?? room.id)}
+                onClick={() => onSelectChat?.(String(room.room_id ?? room.id))}
                 className={`relative text-left p-3 cursor-pointer rounded-xl ${(room.total_unread && room.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start justify-between gap-3`}
               >
                 <div className="flex-1">
