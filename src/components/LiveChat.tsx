@@ -268,6 +268,8 @@ function ChatInput({
               }}
               type="button"
               aria-label="Send"
+              onMouseDown={(e) => e.preventDefault()}
+              onTouchStart={(e) => e.preventDefault()}
               disabled={disabled}
               className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
