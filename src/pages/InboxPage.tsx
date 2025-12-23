@@ -122,16 +122,16 @@ export default function InboxPage() {
   };
 
   // Wrapper to open a case only after prefetching its messages. Toggles closed when same id selected.
-  const openCase = async (caseId: string | null) => {
-    if (!caseId) return setSelectedCase(null);
-    if (selectedCase === caseId) return setSelectedCase(null);
-    try {
-      await prefetchRoomMessages(caseId);
-    } catch {
-      // ignore prefetch errors and still open the chat
-    }
-    setSelectedCase(caseId);
-  };
+  // const openCase = async (caseId: string | null) => {
+  //   if (!caseId) return setSelectedCase(null);
+  //   if (selectedCase === caseId) return setSelectedCase(null);
+  //   try {
+  //     await prefetchRoomMessages(caseId);
+  //   } catch {
+  //     // ignore prefetch errors and still open the chat
+  //   }
+  //   setSelectedCase(caseId);
+  // };
 
   // If navigation opened the Inbox with an initial room to open, prefetch first
   useEffect(() => {
