@@ -28,4 +28,3 @@ Api.ts
 *.sw?
 .env
 .env
-public/firebase-messaging-sw.js
