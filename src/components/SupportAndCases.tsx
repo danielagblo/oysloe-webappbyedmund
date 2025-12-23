@@ -14,13 +14,15 @@ type SupportAndCasesProps = {
   onSelectChat?: (chatId: string) => void;
 };
 
-const NewCaseContent = ({setText, text, isSendable, setIsSendable} : {
+const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat} : {
   setText: (value: string) => void,
   text: string,
   isSendable: boolean,
   setIsSendable: (value: boolean) => void,
-  // onSelectChat?: (chatId: string) => void;
+  onSelectChat?: (chatId: string) => void,
 }) => {
+  // Touch optional prop to satisfy TS; actual uses are optional chaining where passed
+  void onSelectChat;
   return (
     <div className=" max-sm:px-4 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
       <p className="sm:hidden max-sm:pt-2 font-semibold text-lg">Request Support</p>
