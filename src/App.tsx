@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import RequireAuth from "./components/RequireAuth";
 import ScrollToTop from "./components/ScrollToTop";
+import FcmNotificationHandler from "./components/FcmNotificationHandler";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
 import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
@@ -23,6 +24,7 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen w-full">
       <ScrollToTop />
+      <FcmNotificationHandler />
       <Routes>
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
