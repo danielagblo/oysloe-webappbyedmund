@@ -57,10 +57,8 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
 
 
 export default function SupportAndCases({
-  onSelectChat: _onSelectChat,
+  onSelectChat,
 }: SupportAndCasesProps) {
-  // Alias to avoid TypeScript unused parameter error (parameter IS used via optional chaining)
-  const onSelectChat = _onSelectChat;
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
   const [chatUnread, setChatUnread] = useState<number>(0);
   const [supportActive, setSupportActive] = useState<number>(0);

@@ -15,7 +15,6 @@ ingress:
   - component:
       name: oysloe-webappbyedmund
     match:
-      authority: {}
       path:
         prefix: /
 name: oysloe
@@ -44,28 +43,28 @@ static_sites:
     scope: BUILD_TIME
     value: https://api.oysloe.com
   - key: VITE_FIREBASE_API_KEY
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: AIzaSyBxeua-AU_WOpNS2ECM4owYxbOTFoKDFOA
   - key: VITE_FIREBASE_AUTH_DOMAIN
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: oysloe-45292.firebaseapp.com
   - key: VITE_FIREBASE_PROJECT_ID
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: oysloe-45292
   - key: VITE_FIREBASE_STORAGE_BUCKET
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: oysloe-45292.firebasestorage.app
   - key: VITE_FIREBASE_MESSAGING_SENDER_ID
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: "473482750146"
   - key: VITE_FIREBASE_APP_ID
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: 1:473482750146:web:070c9347e8964a7003f35b
   - key: VITE_FIREBASE_MEASUREMENT_ID
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: G-MVPHXFTGWD
   - key: VITE_FIREBASE_VAPID_KEY
-    scope: BUILD_TIME
+    scope: RUN_AND_BUILD_TIME
     value: BLVZZeWKBodftfYErb5CLwYddVGcTT8u7tQ9ot38UIZg-OXtED1B1s2l5HoF9cb8r1vHW7ybox7mDb6vXXdIrtk
   github:
     branch: main
