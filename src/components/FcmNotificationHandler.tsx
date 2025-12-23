@@ -40,6 +40,12 @@ export default function FcmNotificationHandler() {
         data: payload.data,
         raw: payload,
       });
+      // Expose last payload globally for quick inspection in DevTools
+      if (typeof window !== "undefined") {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        window.__lastFcmPayload = payload;
+      }
 
       // Refresh alerts query to show new alert
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
@@ -50,21 +56,42 @@ export default function FcmNotificationHandler() {
         const title = notification.title || "New Alert";
         const body = notification.body || "";
         const icon = notification.icon || "/favicon.png";
+        const tag = payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined;
 
-        // Show notification
-        const browserNotification = new Notification(title, {
-          body,
-          icon,
-          badge: "/favicon.png",
-          tag: payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined,
-          requireInteraction: false,
-        });
-
-        // Handle notification click - focus the window
-        browserNotification.onclick = () => {
-          window.focus();
-          browserNotification.close();
-        };
+        // Prefer showing via service worker registration (works even if window Notification is blocked)
+        try {
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.getRegistration().then((reg) => {
+              if (reg && reg.showNotification) {
+                reg.showNotification(title, {
+                  body,
+                  icon,
+                  badge: "/favicon.png",
+                  tag,
+                  requireInteraction: false,
+                  data: payload.data ?? {},
+                });
+                return;
+              }
+              // Fallback to window Notification
+              const browserNotification = new Notification(title, {
+                body,
+                icon,
+                badge: "/favicon.png",
+                tag,
+                requireInteraction: false,
+              });
+              browserNotification.onclick = () => {
+                window.focus();
+                browserNotification.close();
+              };
+            });
+          }
+        } catch (err) {
+          console.debug("Failed to show foreground notification", err);
+        }
+      } else {
+        console.debug("Notification permission not granted; skipping foreground toast", Notification?.permission);
       }
     });
 
