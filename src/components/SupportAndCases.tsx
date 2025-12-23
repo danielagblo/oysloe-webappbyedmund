@@ -57,6 +57,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
 
 
 export default function SupportAndCases({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onSelectChat,
 }: SupportAndCasesProps) {
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
