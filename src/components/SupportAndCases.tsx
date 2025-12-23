@@ -45,7 +45,6 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
           }
           else {
             toast.success("Your message has been sent to an admin.")
-            onSelectChat?.("new");
           }
         }}
         className={`hover:bg-gray-200 max-sm:text-lg rounded-xl transition w-11/12 p-3 ${!isSendable ? "cursor-not-allowed opacity-50 bg-gray-200" : "cursor-pointer bg-gray-100 hover:scale-95 text-(--dark-def)"}`}
