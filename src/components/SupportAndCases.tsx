@@ -8,12 +8,13 @@ import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
 import MobileBanner from "./MobileBanner";
 import { toast } from "sonner";
-
+import useFeedbacks, {
+  useCreateFeedback,
+} from "../features/feedback/useFeedback";
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
   onSelectChat?: (chatId: string) => void;
 };
-
 const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat, setNewCaseOpen} : {
   setText: (value: string) => void,
   text: string,
@@ -22,6 +23,8 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
   onSelectChat?: (chatId: string) => void,
   setNewCaseOpen: (value: boolean) => void,
 }) => {
+  useFeedbacks();
+  const create = useCreateFeedback();
   // Touch optional prop to satisfy TS; actual uses are optional chaining where passed
   void onSelectChat;
   return (
@@ -41,7 +44,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
       </div>
       <p>Please provide at least 10 characters.</p>
       <button
-        onClick={() => {
+        onClick={async () => {
           if (!isSendable) {
             toast.error("Please provide more details before sending.")
             setNewCaseOpen(false);
@@ -49,6 +52,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
           }
           else {
             //add logic to send message to admin - currently, endpoint does not exist
+            await create.mutateAsync({ rating: 0, message: text });
             toast.success("Your message has been sent to an admin.")
           }
         }}
