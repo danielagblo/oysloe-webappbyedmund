@@ -121,18 +121,41 @@ async function sendToNotifications(path: string, body: unknown, method = "POST")
 
   const full = `${base}${path.startsWith("/") ? "" : "/"}${path}`;
 
+  // Use same auth scheme as apiClient
+  const AUTH_SCHEME =
+    (import.meta.env.VITE_API_AUTH_SCHEME as string) || "Bearer";
+
   const headers: Record<string, string> = { "Content-Type": "application/json" };
+  
+  // Get token and add Authorization header (matching apiClient behavior)
   try {
-    const storedToken = localStorage.getItem("oysloe_token");
-    if (storedToken && !headers["Authorization"]) {
-      const raw = storedToken.replace(/^(Bearer |Token )/, "");
-      headers["Authorization"] = `Token ${raw}`;
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("oysloe_token");
+      // Only add Authorization if not already provided and we have a token
+      if (token && !headers["Authorization"] && !headers["authorization"]) {
+        const tokenValue =
+          token.startsWith("Bearer ") || token.startsWith("Token ")
+            ? token
+            : `${AUTH_SCHEME} ${token}`;
+        headers["Authorization"] = tokenValue;
+      }
     }
   } catch (e) {
+    // ignore localStorage errors (e.g., private mode) and continue without auth header
     void e;
   }
 
-  console.debug("sendToNotifications: POST", { full, body, hasAuth: Boolean(headers["Authorization"]) });
+  // Check if we have auth token before making request
+  if (!headers["Authorization"] && !headers["authorization"]) {
+    console.warn("sendToNotifications: No auth token found, request may fail");
+  }
+
+  console.debug("sendToNotifications: POST", { 
+    full, 
+    body, 
+    hasAuth: Boolean(headers["Authorization"] || headers["authorization"]),
+    authScheme: AUTH_SCHEME 
+  });
 
   const res = await fetch(full, {
     method,
@@ -143,7 +166,12 @@ async function sendToNotifications(path: string, body: unknown, method = "POST")
 
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    console.error("sendToNotifications failed", { status: res.status, text: txt, url: full });
+    console.error("sendToNotifications failed", { 
+      status: res.status, 
+      text: txt, 
+      url: full,
+      hasAuth: Boolean(headers["Authorization"] || headers["authorization"])
+    });
     throw new Error(txt || `Request failed (${res.status})`);
   }
   if (res.status === 204) return undefined;
