@@ -18,23 +18,40 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-async function ensureFirebaseSwRegistered() {
+// Cache the service worker registration to avoid re-registering
+let swRegistration: ServiceWorkerRegistration | null = null;
+
+async function ensureFirebaseSwRegistered(): Promise<ServiceWorkerRegistration | null> {
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return null;
+  
+  // Return cached registration if available
+  if (swRegistration) {
+    return swRegistration;
+  }
+
   try {
-    // If a service worker with the firebase-messaging filename is already registered, return it
+    // Check if a service worker with the firebase-messaging filename is already registered
     const regs = await navigator.serviceWorker.getRegistrations();
     for (const r of regs) {
       if (r.active && r.active.scriptURL && r.active.scriptURL.includes("firebase-messaging-sw.js")) {
         console.debug("Firebase SW already registered:", r.active.scriptURL);
+        swRegistration = r;
         return r;
       }
     }
 
-
-    // Service workers cannot be registered from blob URLs
+    // Register the service worker if not already registered
+    // Use root scope to ensure it can handle all Firebase messaging requests
     try {
-      const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/" });
+      const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { 
+        scope: "/" 
+      });
+      
+      // Wait for the service worker to be ready
+      await reg.update();
+      
       console.debug("Registered firebase-messaging-sw.js", reg);
+      swRegistration = reg;
       return reg;
     } catch (swError) {
       // If the static file doesn't exist, log a helpful error
@@ -67,8 +84,50 @@ export async function getFcmToken(): Promise<string | null> {
       }
     }
 
+    // CRITICAL: Register service worker BEFORE calling getToken
+    // This prevents Firebase from trying to create a blob URL service worker
+    const registration = await ensureFirebaseSwRegistered();
+    if (!registration) {
+      console.error("Service worker registration failed, cannot get FCM token");
+      return null;
+    }
+
+    // Wait for service worker to be active
+    if (registration.installing) {
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error("Service worker installation timeout"));
+        }, 10000); // 10 second timeout
+        
+        registration.installing!.addEventListener("statechange", () => {
+          if (registration.installing!.state === "activated") {
+            clearTimeout(timeout);
+            resolve();
+          } else if (registration.installing!.state === "redundant") {
+            clearTimeout(timeout);
+            reject(new Error("Service worker installation failed"));
+          }
+        });
+      });
+    } else if (registration.waiting) {
+      // If waiting, skip waiting to activate it
+      registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      // Reload to activate the waiting service worker
+      await registration.update();
+    }
+    
+    // Ensure we have an active service worker
+    if (!registration.active) {
+      throw new Error("Service worker is not active");
+    }
+
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
-    const token = await getToken(messaging, { vapidKey });
+    
+    // Pass the service worker registration to getToken to prevent blob URL creation
+    const token = await getToken(messaging, { 
+      vapidKey,
+      serviceWorkerRegistration: registration 
+    });
     return token ?? null;
   } catch (e) {
     console.error("getFcmToken error", e);
@@ -78,6 +137,9 @@ export async function getFcmToken(): Promise<string | null> {
 
 export async function removeFcmToken(): Promise<boolean> {
   try {
+    // Ensure service worker is registered before deleting token
+    await ensureFirebaseSwRegistered();
+    
     const result = await deleteToken(messaging);
     return Boolean(result);
   } catch (e) {
