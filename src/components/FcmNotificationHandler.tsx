@@ -73,19 +73,28 @@ export default function FcmNotificationHandler() {
           if ("serviceWorker" in navigator) {
             navigator.serviceWorker.getRegistration().then((reg) => {
               if (reg && reg.showNotification) {
+                const swOptions = {
+                  body,
+                  icon: iconUrl,
+                  badge: badgeUrl,
+                  tag,
+                  requireInteraction: true,
+                  // The following fields are supported in modern browsers but may not be in TS lib dom types.
+                  // Cast to allow them without TS errors.
+                  renotify: true,
+                  silent: false,
+                  vibrate: [200, 100, 200],
+                  timestamp: Date.now(),
+                  data: payload.data ?? {},
+                } as NotificationOptions & {
+                  renotify?: boolean;
+                  silent?: boolean;
+                  vibrate?: number[];
+                  timestamp?: number;
+                };
+
                 reg
-                  .showNotification(title, {
-                    body,
-                    icon: iconUrl,
-                    badge: badgeUrl,
-                    tag,
-                    requireInteraction: true,
-                    renotify: true,
-                    silent: false,
-                    vibrate: [200, 100, 200],
-                    timestamp: Date.now(),
-                    data: payload.data ?? {},
-                  })
+                  .showNotification(title, swOptions)
                   .then(() =>
                     console.debug("Foreground notification shown via SW", {
                       tag,
@@ -97,7 +106,7 @@ export default function FcmNotificationHandler() {
                 return;
               }
               // Fallback to window Notification
-              const browserNotification = new Notification(title, {
+              const winOptions = {
                 body,
                 icon: iconUrl,
                 badge: badgeUrl,
@@ -107,7 +116,14 @@ export default function FcmNotificationHandler() {
                 silent: false,
                 vibrate: [200, 100, 200],
                 timestamp: Date.now(),
-              });
+              } as NotificationOptions & {
+                renotify?: boolean;
+                silent?: boolean;
+                vibrate?: number[];
+                timestamp?: number;
+              };
+
+              const browserNotification = new Notification(title, winOptions);
               browserNotification.onclick = () => {
                 window.focus();
                 browserNotification.close();
