@@ -65,8 +65,15 @@ export const markChatRoomRead = async (id: number | string) =>
 
 export const getChatRoomMessages = async (
   id: number | string,
-): Promise<Message[]> =>
-  apiClient.get<Message[]>(endpoints.chat.chatroomMessages(id));
+  opts?: { limit?: number; before?: string | number | null },
+): Promise<Message[]> => {
+  const qs = new URLSearchParams();
+  if (opts?.limit != null) qs.set("limit", String(opts.limit));
+  if (opts?.before != null) qs.set("before", String(opts.before));
+  const url =
+    endpoints.chat.chatroomMessages(id) + (qs.size > 0 ? `?${qs.toString()}` : "");
+  return apiClient.get<Message[]>(url);
+};
 
 // Create a chatroom. Payload depends on backend; send minimal object and allow caller to include participants or initial message.
 export const createChatRoom = async (body: Record<string, unknown>) =>

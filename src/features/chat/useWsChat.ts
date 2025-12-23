@@ -72,7 +72,7 @@ export default function useWsChat(): UseWsChatReturn {
       listClient.current?.close();
       unreadClient.current?.close();
     };
-  }, [chatrooms]);
+  }, []);
 
   // keep a quick lookup map of room_id -> other user name/avatar for UI convenience
   useEffect(() => {
@@ -98,8 +98,17 @@ export default function useWsChat(): UseWsChatReturn {
     }
   }, [chatrooms]);
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("oysloe_token") : null;
+  const getAuthToken = () => {
+    try {
+      return typeof window !== "undefined"
+        ? localStorage.getItem("oysloe_token")
+        : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const HISTORY_LIMIT = 50;
 
   const getStoredUserIdLocal = (): number | null => {
     try {
@@ -227,6 +236,7 @@ export default function useWsChat(): UseWsChatReturn {
       const altUrl = url.replace(/\/$/, "");
 
       const createClient = (attemptUrl: string) => {
+        const token = getAuthToken();
         let instance: WebSocketClient | null = null;
         instance = new WebSocketClient(attemptUrl, token, {
           onOpen: () => {
@@ -416,7 +426,7 @@ export default function useWsChat(): UseWsChatReturn {
               if (!idToFetch) return;
               roomHistoryRequested.current[key] = true;
               try {
-                const msgs = await chatService.getChatRoomMessages(idToFetch);
+                const msgs = await chatService.getChatRoomMessages(idToFetch, { limit: HISTORY_LIMIT });
                 if (Array.isArray(msgs) && msgs.length > 0) {
                   const mapped = msgs.map(normalizeIncomingMessage);
                   setMessages((prev) => ({ ...prev, [key]: mapped }));
@@ -428,14 +438,14 @@ export default function useWsChat(): UseWsChatReturn {
               // ignore
             }
           })();
-        }, 800);
+        }, 350);
       } catch {
         // ignore
       }
 
       return key;
     },
-    [token],
+    [chatrooms],
   );
 
   const connectToRoom = useCallback(
@@ -452,7 +462,7 @@ export default function useWsChat(): UseWsChatReturn {
     listClient.current?.close();
     const wsBase = getWsBase();
     const url = `${wsBase}/chatrooms/`;
-    const client = new WebSocketClient(url, token, {
+    const client = new WebSocketClient(url, getAuthToken(), {
       onMessage: (data) => {
         // received chatrooms list
         if (!data) return;
@@ -690,14 +700,14 @@ export default function useWsChat(): UseWsChatReturn {
     });
     listClient.current = client;
     try { client.connect(); } catch { /* ignore */ }
-  }, [token]);
+  }, []);
 
   const connectToUnreadCount = useCallback(() => {
     if (unreadClient.current?.isOpen()) return;
     unreadClient.current?.close();
     const wsBase = getWsBase();
     const url = `${wsBase}/unread_count/`;
-    const client = new WebSocketClient(url, token, {
+    const client = new WebSocketClient(url, getAuthToken(), {
       onMessage: (data) => {
         if (!data) return;
         // expect { unread: number } or a raw number
@@ -712,7 +722,7 @@ export default function useWsChat(): UseWsChatReturn {
     });
     unreadClient.current = client;
     try { client.connect(); } catch { /* ignore */ }
-  }, [token]);
+  }, []);
 
     const sendMessage = useCallback(
     async (
