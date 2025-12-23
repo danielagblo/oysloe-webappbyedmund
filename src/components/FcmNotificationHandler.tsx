@@ -55,8 +55,18 @@ export default function FcmNotificationHandler() {
         const notification = payload.notification || {};
         const title = notification.title || "New Alert";
         const body = notification.body || "";
-        const icon = notification.icon || "/favicon.png";
-        const tag = payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined;
+        const iconUrl =
+          typeof window !== "undefined"
+            ? new URL(notification.icon || "/favicon.png", window.location.href).href
+            : notification.icon || "/favicon.png";
+        const badgeUrl =
+          typeof window !== "undefined"
+            ? new URL("/favicon.png", window.location.href).href
+            : "/favicon.png";
+        const tag =
+          (payload.data?.alert_id ? `alert-${payload.data.alert_id}` : undefined) ||
+          (payload as any)?.messageId ||
+          `alert-${Date.now()}`;
 
         // Prefer showing via service worker registration (works even if window Notification is blocked)
         try {
@@ -66,29 +76,47 @@ export default function FcmNotificationHandler() {
                 reg
                   .showNotification(title, {
                     body,
-                    icon,
-                    badge: "/favicon.png",
+                    icon: iconUrl,
+                    badge: badgeUrl,
                     tag,
-                    requireInteraction: false,
+                    requireInteraction: true,
+                    renotify: true,
+                    silent: false,
+                    vibrate: [200, 100, 200],
+                    timestamp: Date.now(),
                     data: payload.data ?? {},
                   })
-                  .then(() => console.debug("Foreground notification shown via SW", { tag, title, body }))
+                  .then(() =>
+                    console.debug("Foreground notification shown via SW", {
+                      tag,
+                      title,
+                      body,
+                    })
+                  )
                   .catch((err) => console.debug("Foreground notification showNotification failed", err));
                 return;
               }
               // Fallback to window Notification
               const browserNotification = new Notification(title, {
                 body,
-                icon,
-                badge: "/favicon.png",
+                icon: iconUrl,
+                badge: badgeUrl,
                 tag,
-                requireInteraction: false,
+                requireInteraction: true,
+                renotify: true,
+                silent: false,
+                vibrate: [200, 100, 200],
+                timestamp: Date.now(),
               });
               browserNotification.onclick = () => {
                 window.focus();
                 browserNotification.close();
               };
-              console.debug("Foreground notification shown via window Notification", { tag, title, body });
+              console.debug("Foreground notification shown via window Notification", {
+                tag,
+                title,
+                body,
+              });
             });
           }
         } catch (err) {
