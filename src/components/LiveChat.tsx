@@ -159,6 +159,7 @@ function ChatInput({
       // ignore
     }
   }, [value, onTyping]);
+  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
     <div className="relative pb-2.5 lg:pb-0 max-sm:bg-gray-200 items-center justify-center flex gap-2 w-full">
@@ -261,6 +262,9 @@ function ChatInput({
                   typingTimeoutRef.current = null;
                 }
                 onSend();
+                if (inputRef.current) {
+                  inputRef.current.focus();
+                }
               }}
               type="button"
               aria-label="Send"

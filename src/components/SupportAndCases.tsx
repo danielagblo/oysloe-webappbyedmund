@@ -592,7 +592,7 @@ export default function SupportAndCases({
         {newCaseOpen && (
           <div onClick={() => setNewCaseOpen(false)} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
             <div className="relative bg-white rounded-lg p-6 w-11/12 max-w-md text-(--dark-def)">
-              <p className="absolute -top-2 -right-2 inline rotate-45 font-bold text-3xl">+</p>
+              <p className="absolute -top-4 -right-2 inline rotate-45 font-bold text-3xl">+</p>
 
               <NewCaseContent />
             </div>
