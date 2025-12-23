@@ -14,12 +14,12 @@ type SupportAndCasesProps = {
   onSelectChat?: (chatId: string) => void;
 };
 
-const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat} : {
+const NewCaseContent = ({setText, text, isSendable, setIsSendable} : {
   setText: (value: string) => void,
   text: string,
   isSendable: boolean,
   setIsSendable: (value: boolean) => void,
-  onSelectChat?: (chatId: string) => void;
+  // onSelectChat?: (chatId: string) => void;
 }) => {
   return (
     <div className=" max-sm:px-4 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
