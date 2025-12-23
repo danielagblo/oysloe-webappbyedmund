@@ -14,12 +14,13 @@ type SupportAndCasesProps = {
   onSelectChat?: (chatId: string) => void;
 };
 
-const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat} : {
+const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat, setNewCaseOpen} : {
   setText: (value: string) => void,
   text: string,
   isSendable: boolean,
   setIsSendable: (value: boolean) => void,
   onSelectChat?: (chatId: string) => void,
+  setNewCaseOpen: (value: boolean) => void,
 }) => {
   // Touch optional prop to satisfy TS; actual uses are optional chaining where passed
   void onSelectChat;
@@ -43,6 +44,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
         onClick={() => {
           if (!isSendable) {
             toast.error("Please provide more details before sending.")
+            setNewCaseOpen(false);
             return;
           }
           else {
@@ -701,6 +703,7 @@ export default function SupportAndCases({
                 isSendable={isSendable}
                 setIsSendable={setIsSendable}
                 onSelectChat={onSelectChat}
+                setNewCaseOpen={setNewCaseOpen}
               />
             </div>
           </div>
@@ -710,7 +713,7 @@ export default function SupportAndCases({
             <div onClick={() => {setNewCaseOpen(false)}} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10"/>
             <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
               <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
-              <NewCaseContent setText={setText} text={text} isSendable={isSendable} setIsSendable={setIsSendable} onSelectChat={onSelectChat} />
+              <NewCaseContent setText={setText} text={text} isSendable={isSendable} setIsSendable={setIsSendable} onSelectChat={onSelectChat} setNewCaseOpen={setNewCaseOpen} />
             </div>
           </div>
       </div>
