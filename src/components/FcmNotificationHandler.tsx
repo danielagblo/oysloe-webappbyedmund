@@ -63,14 +63,17 @@ export default function FcmNotificationHandler() {
           if ("serviceWorker" in navigator) {
             navigator.serviceWorker.getRegistration().then((reg) => {
               if (reg && reg.showNotification) {
-                reg.showNotification(title, {
-                  body,
-                  icon,
-                  badge: "/favicon.png",
-                  tag,
-                  requireInteraction: false,
-                  data: payload.data ?? {},
-                });
+                reg
+                  .showNotification(title, {
+                    body,
+                    icon,
+                    badge: "/favicon.png",
+                    tag,
+                    requireInteraction: false,
+                    data: payload.data ?? {},
+                  })
+                  .then(() => console.debug("Foreground notification shown via SW", { tag, title, body }))
+                  .catch((err) => console.debug("Foreground notification showNotification failed", err));
                 return;
               }
               // Fallback to window Notification
@@ -85,6 +88,7 @@ export default function FcmNotificationHandler() {
                 window.focus();
                 browserNotification.close();
               };
+              console.debug("Foreground notification shown via window Notification", { tag, title, body });
             });
           }
         } catch (err) {
