@@ -149,7 +149,19 @@ export async function removeFcmToken(): Promise<boolean> {
 }
 
 export function onFcmMessage(cb: (payload: any) => void): () => void {
-  return onMessage(messaging, cb);
+  return onMessage(messaging, (payload) => {
+    // Store last payload globally for quick inspection in DevTools
+    try {
+      if (typeof window !== "undefined") {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        window.__lastFcmPayload = payload;
+      }
+    } catch {
+      // ignore
+    }
+    cb(payload);
+  });
 }
 
 export async function registerAndSaveToken() {
