@@ -28,18 +28,19 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
   // Touch optional prop to satisfy TS; actual uses are optional chaining where passed
   void onSelectChat;
   return (
-    <div className=" max-sm:px-4 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
-      <p className="sm:hidden max-sm:pt-2 font-semibold text-lg">Request Support</p>
+    <div className=" max-sm:px-1 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
+      <p className="sm:hidden max-sm:pt-2 text-xl font-medium text-gray-700 w-full text-left">Request Support</p>
       <p className="max-sm:pt-1 max-sm:text-lg"><span className="font-medium">Need Help?</span> Send a message to our support team.</p>
       <div className="w-full flex items-center justify-center mt-2">
-        <textarea 
+        <textarea
+          placeholder="Let us know how we can help you..."
           value={text}
           onChange={(e) => {
             const value = e.target.value
             setText(value)
             setIsSendable(value.length >= 10)
           }}
-          className="w-11/12 max-sm:text-lg min-h-[20vh] border border-gray-300 outline-0 rounded-lg p-2" 
+          className="w-11/12 max-sm:text-base min-h-[20vh] border-2 border-gray-300 max-sm:w-full h-40 rounded-2xl text-base resize-none p-4  outline-0" 
         />
       </div>
       <p>Please provide at least 10 characters.</p>
@@ -53,10 +54,12 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
             //add logic to send message to admin - currently, endpoint does not exist
             await create.mutateAsync({ rating: 0, message: text });
             setNewCaseOpen(false);
+            setText("");
+            setIsSendable(false);
             toast.success("Your message has been sent to an admin.")
           }
         }}
-        className={`hover:bg-gray-200 max-sm:text-lg rounded-xl transition w-11/12 p-3 ${!isSendable ? "cursor-not-allowed opacity-50 bg-gray-200" : "cursor-pointer bg-gray-100 hover:scale-95 text-(--dark-def)"}`}
+        className={`hover:bg-gray-200 max-sm:text-lg rounded-xl transition w-11/12 max-sm:w-full p-3 ${!isSendable ? "cursor-not-allowed opacity-50 bg-gray-200" : "cursor-pointer bg-gray-100 hover:scale-95 text-(--dark-def)"}`}
         >
           Send to Admin
           </button>
@@ -694,13 +697,6 @@ export default function SupportAndCases({
               }}
             >
               <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300 cursor-pointer active:bg-gray-400" />
-              <button
-                onClick={() => setNewCaseOpen(false)}
-                className="absolute right-4 top-4 text-3xl text-gray-400 hover:text-gray-600 focus:outline-none"
-                aria-label="Close"
-              >
-                &times;
-              </button>
               <NewCaseContent
                 setText={setText}
                 text={text}
