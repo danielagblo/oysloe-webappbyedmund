@@ -341,22 +341,26 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
       return (
         <>
           {showCustomInput && (
-            <div className="mb-2 relative">
-              <input
-                type="text"
-                className="w-full border max-sm:p-1 border-gray-300 text-base lg:text-lg outline-0 rounded px-2 py-1 mb-1"
-                placeholder="Enter custom value..."
-                value={customValue}
-                onChange={e => setCustomValue(e.target.value)}
-              />
-              {customError && <div className="text-red-500 text-xs mb-1">{customError}</div>}
-              <button 
-                type="button" 
-                onClick={handleCustomValueSubmit}
-                className="absolute right-1 top-1 cursor-pointer text-sm bg-gray-200 text-(--dark-def) px-3 py-1 rounded hover:bg-gray-300"
-              >
-                Add
-              </button>
+            <div className="mb-2 sticky top-0 bg-white py-1 z-10">
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full border max-sm:p-2 border-gray-300 text-base lg:text-lg outline-0 rounded p-2 mb-1"
+                  placeholder="Enter custom value..."
+                  value={customValue}
+                  onChange={e => setCustomValue(e.target.value)}
+                />
+                {customError && <div className="text-red-500 text-xs mb-1">{customError}</div>}
+                <div className="h-full flex items-center justify-center absolute right-2 top-0 ">
+                  <button 
+                    type="button" 
+                    onClick={handleCustomValueSubmit}
+                    className="cursor-pointer text-sm bg-gray-200 text-(--dark-def) px-3 py-1 rounded hover:bg-gray-300"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
             </div>
           )}
           {isSubView ? (
