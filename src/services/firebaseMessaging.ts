@@ -30,25 +30,23 @@ async function ensureFirebaseSwRegistered() {
       }
     }
 
-    // Build service worker script dynamically using environment values so users don't need to edit files
-    const swConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    } as Record<string, string | undefined>;
 
-    const swContent = `importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');\nimportScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');\n\nfirebase.initializeApp(${JSON.stringify(swConfig)});\nconst messaging = firebase.messaging();\nmessaging.onBackgroundMessage(function(payload) {\n  const n = payload.notification || {};\n  self.registration.showNotification(n.title || 'Notification', { body: n.body || '', icon: n.icon || '/favicon.png' });\n});\n`;
-
-    const blob = new Blob([swContent], { type: "application/javascript" });
-    const swUrl = URL.createObjectURL(blob);
-    // register at root scope so it handles notifications for the whole site
-    const reg = await navigator.serviceWorker.register(swUrl, { scope: "/" });
-    console.debug("Registered dynamic firebase SW", reg);
-    return reg;
+    // Service workers cannot be registered from blob URLs
+    try {
+      const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/" });
+      console.debug("Registered firebase-messaging-sw.js", reg);
+      return reg;
+    } catch (swError) {
+      // If the static file doesn't exist, log a helpful error
+      console.error(
+        "Failed to register firebase-messaging-sw.js. Make sure to run 'npm run generate-sw' before building, or ensure the file exists in the public directory.",
+        swError
+      );
+      // Don't throw - allow the app to continue, Firebase messaging just won't work
+      return null;
+    }
   } catch (e) {
-    console.error("Failed to register firebase SW dynamically", e);
+    console.error("Failed to register firebase SW", e);
     return null;
   }
 }
@@ -88,11 +86,23 @@ export async function removeFcmToken(): Promise<boolean> {
   }
 }
 
-export function onFcmMessage(cb: (payload: any) => void) {
-  onMessage(messaging, cb);
+export function onFcmMessage(cb: (payload: any) => void): () => void {
+  return onMessage(messaging, cb);
 }
 
 export async function registerAndSaveToken() {
+  // Check if user is authenticated before proceeding
+  try {
+    const authToken = localStorage.getItem("oysloe_token");
+    if (!authToken) {
+      console.debug("No auth token found; skipping FCM token registration");
+      return null;
+    }
+  } catch (e) {
+    console.warn("Failed to check auth token", e);
+    return null;
+  }
+
   // Ensure firebase messaging service worker is registered with current config
   try {
     await ensureFirebaseSwRegistered();
@@ -112,6 +122,7 @@ export async function registerAndSaveToken() {
       console.debug("FCM token obtained and sent to backend", token);
     } catch (e) {
       console.error("Failed saving FCM token to backend", e);
+      // Don't throw - allow app to continue
     }
     return token;
   }
