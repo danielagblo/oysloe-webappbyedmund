@@ -151,9 +151,9 @@ export default function InboxPage() {
 
   return (
     <div className="relative bg-[#ededed] min-h-screen h-screen w-full overflow-hidden">
-      <div className="lg:hidden w-full">
-        <MobileBanner page="Inbox" />
-      </div>
+      {/* <div className="lg:hidden w-full">
+        <MobileBanner page="Inbox" /> 
+      </div> */}
 
       {/* Page content */}
       <div className="flex w-full h-full overflow-hidden lg:items-center">

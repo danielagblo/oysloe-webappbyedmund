@@ -15,7 +15,7 @@ export function useCategory(id: number) {
     queryFn: () => categoryService.getCategory(id),
     enabled: !!id,
     retry: 1,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
   });
 }
 
@@ -29,7 +29,7 @@ export function useCategories(params?: { ordering?: string; search?: string }) {
     queryFn: () => categoryService.getCategories(params),
     placeholderData: (prev) => prev,
     retry: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 10, // 10 minutes
   });
 
   // create category

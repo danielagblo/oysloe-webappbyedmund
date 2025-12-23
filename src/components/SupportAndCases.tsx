@@ -6,11 +6,54 @@ import type { ChatRoom } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
 import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import MobileBanner from "./MobileBanner";
+import { toast } from "sonner";
 
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
-  onSelectChat?: (chatId: string) => void; // added prop for chats
+  onSelectChat?: (chatId: string) => void;
 };
+
+const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat} : {
+  setText: (value: string) => void,
+  text: string,
+  isSendable: boolean,
+  setIsSendable: (value: boolean) => void,
+  onSelectChat?: (chatId: string) => void;
+}) => {
+  return (
+    <div className=" max-sm:px-4 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
+      <p className="max-sm:pt-7 max-sm:text-lg"><span className="font-medium">Need Help?</span> Send a message to our support team.</p>
+      <div className="w-full flex items-center justify-center mt-2">
+        <textarea 
+          value={text}
+          onChange={(e) => {
+            const value = e.target.value
+            setText(value)
+            setIsSendable(value.length >= 10)
+          }}
+          className="w-11/12 max-sm:text-lg min-h-[20vh] border border-gray-300 outline-0 rounded-lg p-2" 
+        />
+      </div>
+      <p>Please provide at least 10 characters.</p>
+      <button
+        onClick={() => {
+          if (!isSendable) {
+            toast.error("Please provide more details before sending.")
+            return;
+          }
+          else {
+            toast.success("Your message has been sent to an admin.")
+            onSelectChat?.("new");
+          }
+        }}
+        className={`hover:bg-gray-200 max-sm:text-lg rounded-xl transition w-11/12 p-3 ${!isSendable ? "cursor-not-allowed opacity-50 bg-gray-200" : "cursor-pointer bg-gray-100 hover:scale-95 text-(--dark-def)"}`}
+        >
+          Send to Admin
+          </button>
+    </div>
+  );
+}
 
 export default function SupportAndCases({
   onSelectChat,
@@ -19,6 +62,8 @@ export default function SupportAndCases({
   const [chatUnread, setChatUnread] = useState<number>(0);
   const [supportActive, setSupportActive] = useState<number>(0);
   const [newCaseOpen, setNewCaseOpen] = useState<boolean>(false);
+  const [text, setText] = useState("");
+  const [isSendable, setIsSendable] = useState<boolean>(false);
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
 
@@ -552,29 +597,12 @@ export default function SupportAndCases({
     );
   };
 
-  const NewCaseContent = () => {
-    return (
-      <div className="bg-white flex flex-col items-center justify-center gap-4 z-[60]">
-        <p>Need Help? Send a message to our support team.</p>
-        <div className="w-full flex items-center justify-center mt-2">
-          <textarea className="w-11/12 min-h-[20vh] border border-gray-300 outline-0 rounded-lg p-2" />
-        </div>
-        <p>Please provide at least 10 characters.</p>
-        <button
-          onClick={() => {
-            onSelectChat?.("new");
-          }}
-          className="bg-gray-100 cursor-pointer hover:bg-gray-200 rounded-lg hover:scale-95 transition w-11/12 p-3"
-          >
-            Send to Admin
-            </button>
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full lg:items-center">
-      <div className="rounded-2xl bg-white lg:h-[93vh] lg:px-5 py-3 h-full w-full flex flex-col ">
+      <div className="lg-hidden">
+        <MobileBanner page="Inbox" />
+      </div>
+      <div className="lg:rounded-2xl max-lg:mt-10 bg-white lg:h-[93vh] lg:px-5 py-3 h-full w-full flex flex-col ">
         <HeaderTabs />
         <div className="no-scrollbar overflow-y-auto mt-4 flex-1 max-sm:bg-(--div-active) max-sm:rounded-2xl max-sm:pb-4">
           {activeTab === "chat" ? (
@@ -589,15 +617,14 @@ export default function SupportAndCases({
           )}
           <div className="w-1 h-13" />
         </div>
-        {newCaseOpen && (
-          <div onClick={() => setNewCaseOpen(false)} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-50">
-            <div className="relative bg-white rounded-lg p-6 w-11/12 max-w-md text-(--dark-def)">
-              <p className="absolute -top-4 -right-2 inline rotate-45 font-bold text-3xl">+</p>
-
-              <NewCaseContent />
+        
+          <div className={`${newCaseOpen ? "block" : "hidden"} flex items-center justify-center fixed inset-0 z-20`}>
+            <div onClick={() => {setNewCaseOpen(false)}} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10"/>
+            <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
+              <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
+              <NewCaseContent setText={setText} text={text} isSendable={isSendable} setIsSendable={setIsSendable} onSelectChat={onSelectChat} />
             </div>
           </div>
-        )}
       </div>
     </div>
   );
