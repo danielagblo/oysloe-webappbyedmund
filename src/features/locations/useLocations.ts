@@ -9,7 +9,7 @@ export default function useLocations() {
   const q = useQuery<Location[], Error>({
     queryKey: [QUERY_KEY],
     queryFn: () => locationService.getLocations(),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
     retry: 1,
   });
 

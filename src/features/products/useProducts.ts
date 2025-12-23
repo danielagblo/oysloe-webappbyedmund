@@ -106,7 +106,7 @@ export const useProductReportCount = (productId?: number) =>
     queryKey: productKeys.reports(productId),
     queryFn: () => getProductReportCount(productId as number),
     enabled: productId != null,
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 60 * 10, // 10 minute
   });
 
 // useCreateProduct
@@ -253,7 +253,7 @@ export const useOwnerProducts = (ownerId?: number | null) => {
     // only run when ownerId is not null/undefined (allow 0)
     enabled: ownerId != null,
     queryFn: () => getProductsForOwner(ownerId as number),
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 10,
   });
 };
 

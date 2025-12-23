@@ -10,7 +10,7 @@ export default function useFavourites() {
   const query = useQuery({
     queryKey: FAVOURITES_QUERY_KEY,
     queryFn: productService.getFavourites,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 60 * 10,
     refetchOnWindowFocus: false,
   });
 

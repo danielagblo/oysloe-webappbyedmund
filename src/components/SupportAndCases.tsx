@@ -23,7 +23,8 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
 }) => {
   return (
     <div className=" max-sm:px-4 bg-white flex flex-col items-center justify-center gap-4 z-[60]">
-      <p className="max-sm:pt-7 max-sm:text-lg"><span className="font-medium">Need Help?</span> Send a message to our support team.</p>
+      <p className="sm:hidden max-sm:pt-2 font-semibold text-lg">Request Support</p>
+      <p className="max-sm:pt-1 max-sm:text-lg"><span className="font-medium">Need Help?</span> Send a message to our support team.</p>
       <div className="w-full flex items-center justify-center mt-2">
         <textarea 
           value={text}
@@ -55,6 +56,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat}
   );
 }
 
+
 export default function SupportAndCases({
   onSelectChat,
 }: SupportAndCasesProps) {
@@ -66,6 +68,31 @@ export default function SupportAndCases({
   const [isSendable, setIsSendable] = useState<boolean>(false);
   const wsRef = useRef<WebSocketClient | null>(null);
   const queryClient = useQueryClient();
+
+  // --- Mobile bottom sheet drag state ---
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const startY = useRef<number | null>(null);
+  const lastY = useRef<number>(0);
+  const dragging = useRef(false);
+  const [translate, setTranslate] = useState(0);
+
+  // Prevent pull-to-refresh while open (mobile only)
+  useEffect(() => {
+    if (!newCaseOpen) return;
+    const prevent = (e: TouchEvent) => {
+      if (sheetRef.current && e.touches[0]?.clientY < 80) {
+        e.preventDefault();
+      }
+    };
+    document.body.style.overscrollBehavior = 'contain';
+    window.addEventListener('touchmove', prevent, { passive: false });
+    return () => {
+      document.body.style.overscrollBehavior = '';
+      window.removeEventListener('touchmove', prevent);
+    };
+  }, [newCaseOpen]);
+
+  // --- End mobile drag state ---
 
   // derive API origin for asset URL fallbacks (may include a path like /api-v1)
   const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
@@ -618,7 +645,7 @@ export default function SupportAndCases({
           <div className="w-1 h-13" />
         </div>
         
-          {/* Mobile bottom sheet modal */}
+          {/* Mobile bottom sheet modal with drag-to-close */}
           <div
             className={
               `${newCaseOpen ? "block" : "hidden"} fixed inset-0 z-20 sm:hidden flex items-end justify-center`
@@ -628,8 +655,37 @@ export default function SupportAndCases({
               onClick={() => setNewCaseOpen(false)}
               className="fixed inset-0 bg-black/40 bg-opacity-50 z-10"
             />
-            <div className="relative z-20 w-full rounded-t-2xl bg-white p-4 pt-2 pb-6 animate-[slideUp_0.3s_ease-out] min-h-[30vh] max-sm:pb-20">
-              <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300" />
+            <div
+              ref={sheetRef}
+              className="relative z-20 w-full rounded-t-2xl bg-white p-4 pt-2 pb-6 animate-[slideUp_0.3s_ease-out] min-h-[30vh] max-sm:pb-20"
+              style={{ transform: `translateY(${translate}px)`, touchAction: 'none' }}
+              onTouchStart={(e) => {
+                if (e.touches.length !== 1) return;
+                dragging.current = true;
+                startY.current = e.touches[0].clientY;
+                lastY.current = 0;
+              }}
+              onTouchMove={(e) => {
+                if (!dragging.current || startY.current === null) return;
+                const delta = e.touches[0].clientY - startY.current;
+                if (delta > 0) {
+                  setTranslate(delta);
+                  lastY.current = delta;
+                }
+              }}
+              onTouchEnd={() => {
+                dragging.current = false;
+                if (lastY.current > 80) {
+                  setTranslate(0);
+                  setNewCaseOpen(false);
+                } else {
+                  setTranslate(0);
+                }
+                startY.current = null;
+                lastY.current = 0;
+              }}
+            >
+              <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300 cursor-pointer active:bg-gray-400" />
               <button
                 onClick={() => setNewCaseOpen(false)}
                 className="absolute right-4 top-4 text-3xl text-gray-400 hover:text-gray-600 focus:outline-none"
