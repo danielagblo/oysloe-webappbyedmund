@@ -34,7 +34,12 @@ export default function FcmNotificationHandler() {
     // Set up listener for foreground FCM messages
     // When app is in foreground, Firebase SDK calls this callback
     const unsubscribe = firebaseMessaging.onFcmMessage((payload) => {
-      console.debug("FCM message received (foreground):", payload);
+      // Log full payload for troubleshooting missing browser notifications
+      console.debug("FCM foreground payload:", {
+        notification: payload.notification,
+        data: payload.data,
+        raw: payload,
+      });
 
       // Refresh alerts query to show new alert
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
