@@ -707,7 +707,7 @@ export default function SupportAndCases({
           </div>
 
           {/* Desktop modal (unchanged) */}
-          <div className={`${newCaseOpen ? "block" : "hidden"} sm:${newCaseOpen ? "flex" : "hidden"} items-center justify-center fixed inset-0 z-20`}>
+          <div className={`${newCaseOpen ? "block" : "hidden"} sm:hidden items-center justify-center fixed inset-0 z-20`}>
             <div onClick={() => {setNewCaseOpen(false)}} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10"/>
             <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
               <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
