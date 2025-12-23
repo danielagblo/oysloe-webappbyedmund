@@ -121,7 +121,12 @@ const messaging = firebase.messaging();
 
 // Handle background messages
 messaging.onBackgroundMessage(function(payload) {
-  console.log('[firebase-messaging-sw.js] Received background message:', payload);
+  // Verbose log to help inspect incoming payloads
+  console.log('[firebase-messaging-sw.js] Received background message:', {
+    notification: payload.notification,
+    data: payload.data,
+    raw: payload,
+  });
   
   const notification = payload.notification || {};
   const title = notification.title || 'Notification';
