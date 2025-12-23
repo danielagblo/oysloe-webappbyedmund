@@ -7,6 +7,7 @@ import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import firebaseMessaging from "../services/firebaseMessaging";
 
 const VerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -46,6 +47,12 @@ const VerificationPage = () => {
         // store token and user
         localStorage.setItem("oysloe_token", resp.token);
         localStorage.setItem("oysloe_user", JSON.stringify(resp.user));
+        // Attempt to register and save FCM token now that user is authenticated
+        try {
+          await firebaseMessaging.registerAndSaveToken();
+        } catch (e) {
+          console.warn("FCM registration failed after OTP login", e);
+        }
         navigate("/homepage");
       } else {
         // reset-password flow
