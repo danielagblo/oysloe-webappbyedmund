@@ -19,7 +19,10 @@ function parseEnv(file) {
 }
 
 const envPath = path.resolve(process.cwd(), '.env');
-const env = parseEnv(envPath);
+const envFile = parseEnv(envPath);
+
+// Check both .env file and process.env (for Heroku/CI environments)
+const env = { ...envFile, ...process.env };
 
 const cfg = {
   apiKey: env.VITE_FIREBASE_API_KEY || '',
@@ -41,9 +44,18 @@ if (missingFields.length > 0) {
     const envVar = `VITE_FIREBASE_${field.toUpperCase().replace(/([A-Z])/g, '_$1').replace(/^_/, '')}`;
     console.error(`  - ${envVar}`);
   });
-  if (process.env.CI || process.env.HEROKU_APP_NAME) {
-    console.error('\nFor Heroku: Set these as Config Vars in your Heroku dashboard');
-    console.error('For CI/CD: Ensure these environment variables are set in your build environment');
+  if (process.env.CI || process.env.HEROKU_APP_NAME || process.env.DO_APP_ID) {
+    if (process.env.DO_APP_ID) {
+      console.error('\nFor DigitalOcean Apps Platform:');
+      console.error('1. Go to your App in DigitalOcean dashboard');
+      console.error('2. Navigate to Settings → App-Level Environment Variables');
+      console.error('3. Add the Firebase environment variables listed above');
+      console.error('4. Redeploy your app');
+    } else if (process.env.HEROKU_APP_NAME) {
+      console.error('\nFor Heroku: Set these as Config Vars in your Heroku dashboard');
+    } else {
+      console.error('\nFor CI/CD: Ensure these environment variables are set in your build environment');
+    }
     process.exit(1);
   } else {
     console.warn('Continuing with empty values (service worker may not work correctly)');
