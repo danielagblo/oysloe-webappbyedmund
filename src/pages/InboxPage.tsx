@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
-import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
