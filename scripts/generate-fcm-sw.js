@@ -33,9 +33,21 @@ const outPath = path.resolve(process.cwd(), 'public', 'firebase-messaging-sw.js'
 
 // Validate that all required config values are present
 const requiredFields = ['apiKey', 'authDomain', 'projectId', 'messagingSenderId', 'appId'];
-const missingFields = requiredFields.filter(field => !cfg[field]);
+const missingFields = requiredFields.filter(field => !cfg[field] || cfg[field].trim() === '');
 if (missingFields.length > 0) {
-  console.warn(`Warning: Missing Firebase config fields: ${missingFields.join(', ')}`);
+  console.error(`Error: Missing Firebase config fields: ${missingFields.join(', ')}`);
+  console.error('Please set the following environment variables:');
+  missingFields.forEach(field => {
+    const envVar = `VITE_FIREBASE_${field.toUpperCase().replace(/([A-Z])/g, '_$1').replace(/^_/, '')}`;
+    console.error(`  - ${envVar}`);
+  });
+  if (process.env.CI || process.env.HEROKU_APP_NAME) {
+    console.error('\nFor Heroku: Set these as Config Vars in your Heroku dashboard');
+    console.error('For CI/CD: Ensure these environment variables are set in your build environment');
+    process.exit(1);
+  } else {
+    console.warn('Continuing with empty values (service worker may not work correctly)');
+  }
 }
 
 const content = `// Firebase Cloud Messaging Service Worker
