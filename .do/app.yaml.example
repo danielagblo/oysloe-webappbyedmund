@@ -1,0 +1,61 @@
+name: oysloe-webapp
+region: nyc
+services:
+  - name: web
+    github:
+      repo: danielagblo/oysloe-webappbyedmund
+      branch: main
+      deploy_on_push: true
+    build_command: npm run build
+    run_command: npm run preview
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 4173
+    routes:
+      - path: /
+    envs:
+      - key: VITE_API_URL
+        value: https://api.oysloe.com/api-v1
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_WS_URL
+        value: wss://api.oysloe.com/ws
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_API_CREDENTIALS
+        value: omit
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_API_AUTH_SCHEME
+        value: Token
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_USE_MOCKS
+        value: "false"
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_MEDIA_URL
+        value: https://api.oysloe.com
+        scope: RUN_AND_BUILD_TIME
+      # Firebase Configuration - REQUIRED for service worker generation
+      - key: VITE_FIREBASE_API_KEY
+        value: AIzaSyBxeua-AU_WOpNS2ECM4owYxbOTFoKDFOA
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        value: oysloe-45292.firebaseapp.com
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_PROJECT_ID
+        value: oysloe-45292
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_STORAGE_BUCKET
+        value: oysloe-45292.firebasestorage.app
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_MESSAGING_SENDER_ID
+        value: "473482750146"
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_APP_ID
+        value: 1:473482750146:web:070c9347e8964a7003f35b
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_MEASUREMENT_ID
+        value: G-MVPHXFTGWD
+        scope: RUN_AND_BUILD_TIME
+      - key: VITE_FIREBASE_VAPID_KEY
+        value: BLVZZeWKBodftfYErb5CLwYddVGcTT8u7tQ9ot38UIZg-OXtED1B1s2l5HoF9cb8r1vHW7ybox7mDb6vXXdIrtk
+        scope: RUN_AND_BUILD_TIME
+

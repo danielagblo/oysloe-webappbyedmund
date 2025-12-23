@@ -19,23 +19,84 @@ function parseEnv(file) {
 }
 
 const envPath = path.resolve(process.cwd(), '.env');
-const env = parseEnv(envPath);
+const envFile = parseEnv(envPath);
+
+// Check both .env file and process.env (for Heroku/CI/DigitalOcean environments)
+// Prioritize process.env over .env file to ensure CI/CD env vars take precedence
+const env = { ...envFile, ...process.env };
+
+// Helper to get env var, preferring process.env, then .env file, then empty string
+const getEnvVar = (key) => {
+  // Check process.env first (for CI/CD platforms like DigitalOcean Apps Platform)
+  const processValue = process.env[key];
+  if (processValue && String(processValue).trim() !== '') {
+    return String(processValue).trim();
+  }
+  // Fall back to .env file
+  const fileValue = envFile[key];
+  if (fileValue && String(fileValue).trim() !== '') {
+    return String(fileValue).trim();
+  }
+  return '';
+};
 
 const cfg = {
-  apiKey: env.VITE_FIREBASE_API_KEY || '',
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: env.VITE_FIREBASE_PROJECT_ID || '',
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: env.VITE_FIREBASE_APP_ID || '',
+  apiKey: getEnvVar('VITE_FIREBASE_API_KEY'),
+  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN'),
+  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID'),
+  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: getEnvVar('VITE_FIREBASE_APP_ID'),
 };
 
 const outPath = path.resolve(process.cwd(), 'public', 'firebase-messaging-sw.js');
 
+// Debug: Log environment variable availability (helpful for troubleshooting)
+// Check for DigitalOcean Apps Platform environment
+const isDO = process.env.DO_APP_ID || process.env.DO_APP_PLATFORM || process.env.DO_APP_NAME;
+if (isDO || process.env.CI) {
+  console.log('Environment check:');
+  console.log(`  Platform: ${isDO ? 'DigitalOcean Apps Platform' : 'CI/CD'}`);
+  console.log(`  VITE_FIREBASE_API_KEY: ${process.env.VITE_FIREBASE_API_KEY ? `SET (${String(process.env.VITE_FIREBASE_API_KEY).substring(0, 20)}...)` : 'NOT SET'}`);
+  console.log(`  VITE_FIREBASE_PROJECT_ID: ${process.env.VITE_FIREBASE_PROJECT_ID ? `SET (${process.env.VITE_FIREBASE_PROJECT_ID})` : 'NOT SET'}`);
+  console.log(`  VITE_FIREBASE_AUTH_DOMAIN: ${process.env.VITE_FIREBASE_AUTH_DOMAIN ? `SET (${process.env.VITE_FIREBASE_AUTH_DOMAIN})` : 'NOT SET'}`);
+  console.log(`  Config values:`, {
+    apiKey: cfg.apiKey ? `${cfg.apiKey.substring(0, 20)}...` : 'EMPTY',
+    projectId: cfg.projectId || 'EMPTY',
+    authDomain: cfg.authDomain || 'EMPTY'
+  });
+}
+
 // Validate that all required config values are present
 const requiredFields = ['apiKey', 'authDomain', 'projectId', 'messagingSenderId', 'appId'];
-const missingFields = requiredFields.filter(field => !cfg[field]);
+const missingFields = requiredFields.filter(field => !cfg[field] || String(cfg[field]).trim() === '');
 if (missingFields.length > 0) {
-  console.warn(`Warning: Missing Firebase config fields: ${missingFields.join(', ')}`);
+  console.error(`Error: Missing Firebase config fields: ${missingFields.join(', ')}`);
+  console.error('Please set the following environment variables:');
+  missingFields.forEach(field => {
+    const envVar = `VITE_FIREBASE_${field.toUpperCase().replace(/([A-Z])/g, '_$1').replace(/^_/, '')}`;
+    console.error(`  - ${envVar}`);
+  });
+  
+  // Check if we're in a CI/CD environment
+  const isCI = process.env.CI || process.env.HEROKU_APP_NAME || isDO;
+  
+  if (isCI) {
+    if (isDO) {
+      console.error('\nFor DigitalOcean Apps Platform:');
+      console.error('1. Go to your App in DigitalOcean dashboard');
+      console.error('2. Navigate to Settings → App-Level Environment Variables');
+      console.error('3. Ensure all Firebase variables are set with scope: RUN_AND_BUILD_TIME');
+      console.error('4. Verify the variable names match exactly (case-sensitive)');
+      console.error('5. Redeploy your app');
+    } else if (process.env.HEROKU_APP_NAME) {
+      console.error('\nFor Heroku: Set these as Config Vars in your Heroku dashboard');
+    } else {
+      console.error('\nFor CI/CD: Ensure these environment variables are set in your build environment');
+    }
+    process.exit(1);
+  } else {
+    console.warn('Continuing with empty values (service worker may not work correctly)');
+  }
 }
 
 const content = `// Firebase Cloud Messaging Service Worker
