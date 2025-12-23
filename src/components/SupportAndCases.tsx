@@ -618,7 +618,37 @@ export default function SupportAndCases({
           <div className="w-1 h-13" />
         </div>
         
-          <div className={`${newCaseOpen ? "block" : "hidden"} flex items-center justify-center fixed inset-0 z-20`}>
+          {/* Mobile bottom sheet modal */}
+          <div
+            className={
+              `${newCaseOpen ? "block" : "hidden"} fixed inset-0 z-20 sm:hidden flex items-end justify-center`
+            }
+          >
+            <div
+              onClick={() => setNewCaseOpen(false)}
+              className="fixed inset-0 bg-black/40 bg-opacity-50 z-10"
+            />
+            <div className="relative z-20 w-full rounded-t-2xl bg-white p-4 pt-2 pb-6 animate-[slideUp_0.3s_ease-out] min-h-[30vh] max-sm:pb-20">
+              <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300" />
+              <button
+                onClick={() => setNewCaseOpen(false)}
+                className="absolute right-4 top-4 text-3xl text-gray-400 hover:text-gray-600 focus:outline-none"
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <NewCaseContent
+                setText={setText}
+                text={text}
+                isSendable={isSendable}
+                setIsSendable={setIsSendable}
+                onSelectChat={onSelectChat}
+              />
+            </div>
+          </div>
+
+          {/* Desktop modal (unchanged) */}
+          <div className={`${newCaseOpen ? "block" : "hidden"} sm:flex hidden items-center justify-center fixed inset-0 z-20`}>
             <div onClick={() => {setNewCaseOpen(false)}} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10"/>
             <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
               <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
