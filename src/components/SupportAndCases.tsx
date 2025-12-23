@@ -47,12 +47,12 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
         onClick={async () => {
           if (!isSendable) {
             toast.error("Please provide more details before sending.")
-            setNewCaseOpen(false);
             return;
           }
           else {
             //add logic to send message to admin - currently, endpoint does not exist
             await create.mutateAsync({ rating: 0, message: text });
+            setNewCaseOpen(false);
             toast.success("Your message has been sent to an admin.")
           }
         }}
