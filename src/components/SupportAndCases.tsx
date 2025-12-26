@@ -1,21 +1,21 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import useFeedbacks, {
+  useCreateFeedback,
+} from "../features/feedback/useFeedback";
 import { useChatRooms } from "../hooks/useChatRooms";
 import type { ChatRoom } from "../services/chatService";
 import WebSocketClient from "../services/wsClient";
 import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
 import MobileBanner from "./MobileBanner";
-import { toast } from "sonner";
-import useFeedbacks, {
-  useCreateFeedback,
-} from "../features/feedback/useFeedback";
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
   onSelectChat?: (chatId: string) => void;
 };
-const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat, setNewCaseOpen} : {
+const NewCaseContent = ({ setText, text, isSendable, setIsSendable, onSelectChat, setNewCaseOpen }: {
   setText: (value: string) => void,
   text: string,
   isSendable: boolean,
@@ -40,7 +40,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
             setText(value)
             setIsSendable(value.length >= 10)
           }}
-          className="w-11/12 max-sm:text-base min-h-[20vh] border-2 border-gray-300 max-sm:w-full h-40 rounded-2xl text-base resize-none p-4  outline-0" 
+          className="w-11/12 max-sm:text-base min-h-[20vh] border-2 border-gray-300 max-sm:w-full h-40 rounded-2xl text-base resize-none p-4  outline-0"
         />
       </div>
       <p>Please provide at least 10 characters.</p>
@@ -52,7 +52,7 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
           }
           else {
             //add logic to send message to admin - currently, endpoint does not exist
-            await create.mutateAsync({ rating: 0, message: text });
+            await create.mutateAsync({ rating: 20, message: text });
             setNewCaseOpen(false);
             setText("");
             setIsSendable(false);
@@ -60,9 +60,9 @@ const NewCaseContent = ({setText, text, isSendable, setIsSendable, onSelectChat,
           }
         }}
         className={`hover:bg-gray-200 max-sm:text-lg rounded-xl transition w-11/12 max-sm:w-full p-3 ${!isSendable ? "cursor-not-allowed opacity-50 bg-gray-200" : "cursor-pointer bg-gray-100 hover:scale-95 text-(--dark-def)"}`}
-        >
-          Send to Admin
-          </button>
+      >
+        Send to Admin
+      </button>
     </div>
   );
 }
@@ -108,7 +108,7 @@ export default function SupportAndCases({
   // --- End mobile drag state ---
 
   // derive API origin for asset URL fallbacks (may include a path like /api-v1)
-  const _apiRaw = (import.meta.env.VITE_API_URL as string) || "https://api.oysloe.com/api-v1";
+  const _apiRaw = (import.meta.env.VITE_API_URL as string);
   let apiOriginFallback = "";
   try {
     apiOriginFallback = new URL(_apiRaw).origin;
@@ -140,7 +140,27 @@ export default function SupportAndCases({
 
 
   // Use React Query to fetch and cache chat rooms
-  const { data: allRooms = [] } = useChatRooms();
+  // Keep raw `data` so we can detect when the initial fetch completes
+  const { data } = useChatRooms();
+  const allRooms: ChatRoom[] = data ?? [];
+
+  // Persist a snapshot of fetched rooms (split into user/support) so
+  // the UI renders from the saved lists instead of directly from
+  // websocket-updated feed.
+  const [savedUserRooms, setSavedUserRooms] = useState<ChatRoom[] | null>(null);
+  const [savedSupportRooms, setSavedSupportRooms] = useState<ChatRoom[] | null>(null);
+  const initialSavedRef = useRef(false);
+
+  // Save the first fetched snapshot (runs once after fetch finishes)
+  useEffect(() => {
+    if (initialSavedRef.current) return;
+    // wait until `data` is defined (query finished at least once)
+    if (typeof data === "undefined") return;
+    const { supportRooms, userRooms } = splitRooms(allRooms);
+    setSavedUserRooms(userRooms);
+    setSavedSupportRooms(supportRooms);
+    initialSavedRef.current = true;
+  }, [data, allRooms]);
 
   useEffect(() => {
 
@@ -265,25 +285,24 @@ export default function SupportAndCases({
   }, [queryClient]);
 
   useEffect(() => {
-    // Calculate counts from all rooms received via WebSocket
-    const { supportRooms, userRooms } = splitRooms(allRooms);
+    // Use the saved lists for counts if available, otherwise fall back
+    // to the live rooms until the first snapshot is taken.
+    const userRoomsForCounts = savedUserRooms ?? splitRooms(allRooms).userRooms;
+    const supportRoomsForCounts = savedSupportRooms ?? splitRooms(allRooms).supportRooms;
 
-
-
-    const unread = userRooms.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
+    const unread = userRoomsForCounts.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
     setChatUnread(unread);
 
-    setSupportActive(supportRooms.length);
+    setSupportActive(supportRoomsForCounts.length);
     try {
-      console.debug("SupportAndCases: userRooms count", { count: userRooms.length, sample: userRooms.slice(0, 3) });
+      console.debug("SupportAndCases: userRooms count", { count: userRoomsForCounts.length, sample: userRoomsForCounts.slice(0, 3) });
     } catch { }
-  }, [allRooms]);
+  }, [allRooms, savedUserRooms, savedSupportRooms]);
 
-  // Precompute filtered room lists and memoize to avoid nested effects
-  const { supportRooms: staffRoomsMemo, userRooms: userRoomsMemo } = useMemo(
-    () => splitRooms(allRooms),
-    [allRooms],
-  );
+  // Display lists: prefer saved snapshot (taken after initial fetch),
+  // otherwise use live rooms until snapshot exists.
+  const displayUserRooms = savedUserRooms ?? splitRooms(allRooms).userRooms;
+  const displaySupportRooms = savedSupportRooms ?? splitRooms(allRooms).supportRooms;
 
   const HeaderTabs = () => (
     <div className="flex items-center justify-center lg:mt-4 max-lg:mb-3 max-sm:px-5 w-full md:gap-10 gap-7.5">
@@ -333,7 +352,7 @@ export default function SupportAndCases({
   const GetChats = () => (
     <div className="mb-6">
       <h2 className="text-xl md:text-2xl lg:text-[1.5vw] font-medium mt-3 mb-1 text-(--dark-def)">Recent Chats</h2>
-      <ChatsList rooms={userRoomsMemo} />
+      <ChatsList rooms={displayUserRooms} />
     </div>
   );
 
@@ -650,72 +669,72 @@ export default function SupportAndCases({
           ) : (
             <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetHelp />
-              <OpenCases supportRooms={staffRoomsMemo} />
+              <OpenCases supportRooms={displaySupportRooms} />
             </div>
           )}
           <div className="w-1 h-13" />
         </div>
-        
-          {/* Mobile bottom sheet modal with drag-to-close */}
-          <div
-            className={
-              `${newCaseOpen ? "block" : "hidden"} fixed inset-0 z-20 sm:hidden flex items-end justify-center`
-            }
-          >
-            <div
-              onClick={() => setNewCaseOpen(false)}
-              className="fixed inset-0 bg-black/40 bg-opacity-50 z-10"
-            />
-            <div
-              ref={sheetRef}
-              className="relative z-20 w-full rounded-t-2xl bg-white p-4 pt-2 pb-6 animate-[slideUp_0.3s_ease-out] min-h-[30vh] max-sm:pb-20"
-              style={{ transform: `translateY(${translate}px)`, touchAction: 'none' }}
-              onTouchStart={(e) => {
-                if (e.touches.length !== 1) return;
-                dragging.current = true;
-                startY.current = e.touches[0].clientY;
-                lastY.current = 0;
-              }}
-              onTouchMove={(e) => {
-                if (!dragging.current || startY.current === null) return;
-                const delta = e.touches[0].clientY - startY.current;
-                if (delta > 0) {
-                  setTranslate(delta);
-                  lastY.current = delta;
-                }
-              }}
-              onTouchEnd={() => {
-                dragging.current = false;
-                if (lastY.current > 80) {
-                  setTranslate(0);
-                  setNewCaseOpen(false);
-                } else {
-                  setTranslate(0);
-                }
-                startY.current = null;
-                lastY.current = 0;
-              }}
-            >
-              <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300 cursor-pointer active:bg-gray-400" />
-              <NewCaseContent
-                setText={setText}
-                text={text}
-                isSendable={isSendable}
-                setIsSendable={setIsSendable}
-                onSelectChat={onSelectChat}
-                setNewCaseOpen={setNewCaseOpen}
-              />
-            </div>
-          </div>
 
-          {/* Desktop modal (unchanged) */}
-          <div className={`${newCaseOpen ? "flex" : "hidden"} max-sm:hidden items-center justify-center fixed inset-0 z-20`}>
-            <div onClick={() => {setNewCaseOpen(false)}} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10"/>
-            <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
-              <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
-              <NewCaseContent setText={setText} text={text} isSendable={isSendable} setIsSendable={setIsSendable} onSelectChat={onSelectChat} setNewCaseOpen={setNewCaseOpen} />
-            </div>
+        {/* Mobile bottom sheet modal with drag-to-close */}
+        <div
+          className={
+            `${newCaseOpen ? "block" : "hidden"} fixed inset-0 z-20 sm:hidden flex items-end justify-center`
+          }
+        >
+          <div
+            onClick={() => setNewCaseOpen(false)}
+            className="fixed inset-0 bg-black/40 bg-opacity-50 z-10"
+          />
+          <div
+            ref={sheetRef}
+            className="relative z-20 w-full rounded-t-2xl bg-white p-4 pt-2 pb-6 animate-[slideUp_0.3s_ease-out] min-h-[30vh] max-sm:pb-20"
+            style={{ transform: `translateY(${translate}px)`, touchAction: 'none' }}
+            onTouchStart={(e) => {
+              if (e.touches.length !== 1) return;
+              dragging.current = true;
+              startY.current = e.touches[0].clientY;
+              lastY.current = 0;
+            }}
+            onTouchMove={(e) => {
+              if (!dragging.current || startY.current === null) return;
+              const delta = e.touches[0].clientY - startY.current;
+              if (delta > 0) {
+                setTranslate(delta);
+                lastY.current = delta;
+              }
+            }}
+            onTouchEnd={() => {
+              dragging.current = false;
+              if (lastY.current > 80) {
+                setTranslate(0);
+                setNewCaseOpen(false);
+              } else {
+                setTranslate(0);
+              }
+              startY.current = null;
+              lastY.current = 0;
+            }}
+          >
+            <div className="mx-auto mb-3 mt-2 h-1.5 w-12 rounded-full bg-gray-300 cursor-pointer active:bg-gray-400" />
+            <NewCaseContent
+              setText={setText}
+              text={text}
+              isSendable={isSendable}
+              setIsSendable={setIsSendable}
+              onSelectChat={onSelectChat}
+              setNewCaseOpen={setNewCaseOpen}
+            />
           </div>
+        </div>
+
+        {/* Desktop modal (unchanged) */}
+        <div className={`${newCaseOpen ? "flex" : "hidden"} max-sm:hidden items-center justify-center fixed inset-0 z-20`}>
+          <div onClick={() => { setNewCaseOpen(false) }} className="fixed inset-0 bg-black/40 bg-opacity-50 flex items-center justify-center z-10" />
+          <div className="relative bg-white z-20 rounded-xl p-6 w-11/12 max-w-md text-(--dark-def)">
+            <button onClick={() => setNewCaseOpen(false)} className="cursor-pointer absolute -top-14 -right-10 inline rotate-45 font-bold text-6xl">+</button>
+            <NewCaseContent setText={setText} text={text} isSendable={isSendable} setIsSendable={setIsSendable} onSelectChat={onSelectChat} setNewCaseOpen={setNewCaseOpen} />
+          </div>
+        </div>
       </div>
     </div>
   );

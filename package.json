@@ -13,12 +13,12 @@
     "generate:api": "swagger-typescript-api -p ./src/api-spec/oysloe.yaml -o ./src/services/generated --axios"
   },
   "dependencies": {
-    "firebase": "^9.23.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.14",
     "@tanstack/react-query": "^5.90.10",
     "@tanstack/react-query-devtools": "^5.91.1",
+    "firebase": "^12.7.0",
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.552.0",

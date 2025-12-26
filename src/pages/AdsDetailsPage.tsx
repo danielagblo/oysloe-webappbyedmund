@@ -69,7 +69,7 @@ const AdsDetailsPage = () => {
   const { sendMessage, addLocalMessage, connectToRoom, isRoomConnected } = useWsChat();
   const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(
     null,
-  ); 
+  );
   console.log("AdsDetailsPage: openLiveChatRoomId", openLiveChatRoomId);
   //only logged it to remove a build error about unused vars
 
