@@ -23,7 +23,9 @@ export function usePushNotifications() {
   const registerServiceWorker = useCallback(async () => {
     if (!supported) throw new Error("Push not supported in this browser");
     try {
-      const reg = await navigator.serviceWorker.register("/push-sw.js");
+      // Register the generated Firebase messaging service worker instead of
+      // the standalone push-sw so a single SW handles all notifications.
+      const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
       return reg;
     } catch (err) {
       console.error("Service worker registration failed", err);

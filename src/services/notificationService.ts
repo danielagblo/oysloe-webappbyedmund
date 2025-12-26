@@ -65,7 +65,9 @@ export const notificationService = {
   registerLocalSubscription: async () => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) return null;
     try {
-      const reg = await navigator.serviceWorker.register("/push-sw.js");
+      // Use the generated firebase messaging service worker so push and FCM
+      // notifications are handled by the same SW registration.
+      const reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
       const existing = await reg.pushManager.getSubscription();
       if (existing) {
         // send existing subscription to backend

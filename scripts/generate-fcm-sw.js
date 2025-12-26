@@ -138,8 +138,13 @@ messaging.onBackgroundMessage(function(payload) {
     body: body,
     icon: icon,
     badge: '/favicon.png',
-    data: payload.data || {},
-    tag: payload.data?.alert_id || payload.messageId || 'default',
+    // Ensure the notification data contains a normalized url field so
+    // we can group/close notifications by the destination URL.
+    data: Object.assign({}, payload.data || {}, {
+      url: payload.data?.url || payload.notification?.click_action || undefined,
+    }),
+    // Keep a tag for compatibility, but grouping will be done by URL below.
+    tag: payload.data?.group || payload.data?.alert_id || payload.messageId || 'oysloe_group',
     requireInteraction: false,
   };
   
@@ -150,20 +155,49 @@ messaging.onBackgroundMessage(function(payload) {
   return self.registration.showNotification(title, notificationOptions);
 });
 
-// Handle notification clicks - close all notifications when one is clicked
+// Also handle generic Push API messages (so the same service worker can be
+// used for PushManager subscriptions created by the page). This allows a
+// single SW to show and close notifications regardless of whether they
+// originate from FCM or a direct Push API payload.
+self.addEventListener('push', function (event) {
+  let data = {};
+  try {
+    if (event.data) data = event.data.json();
+  } catch (e) {
+    data = { text: event.data ? event.data.text() : 'You have a notification' };
+  }
+  const title = data.title || 'Notification';
+  const body = data.body || data.text || '';
+  const options = {
+    body,
+    data: Object.assign({}, data.data || {}, {
+      url: data.data?.url || data.url || data.click_action || undefined,
+    }),
+    icon: data.icon || '/favicon.png',
+    badge: data.badge || '/favicon.png',
+    tag: data.group || data.alert_id || data.tag || 'oysloe_group',
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Handle notification clicks - close related notifications when one is clicked
 self.addEventListener('notificationclick', function(event) {
   console.log('[firebase-messaging-sw.js] Notification clicked:', event.notification);
 
-  // Close all visible notifications when any one is clicked.
-  // This helps ensure the notification tray is cleared for related alerts.
+  // Close notifications that share the same destination URL as the clicked
+  // notification. If no URL is available, fall back to closing all.
   event.waitUntil((async () => {
     try {
-      const notifications = await self.registration.getNotifications();
+      const urlToClose = event.notification?.data?.url;
+      let notifications = await self.registration.getNotifications();
+      if (urlToClose) {
+        notifications = notifications.filter(n => n?.data && n.data.url === urlToClose);
+      }
       notifications.forEach(n => {
         try { n.close(); } catch (e) { /* ignore */ }
       });
     } catch (e) {
-      console.warn('Failed to get notifications, falling back to closing the clicked one', e);
+      console.warn('Failed to get/close notifications, falling back to closing the clicked one', e);
       try { event.notification.close(); } catch (err) { void err; }
     }
 
