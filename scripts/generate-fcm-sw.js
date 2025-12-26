@@ -150,28 +150,34 @@ messaging.onBackgroundMessage(function(payload) {
   return self.registration.showNotification(title, notificationOptions);
 });
 
-// Handle notification clicks
+// Handle notification clicks - close all notifications when one is clicked
 self.addEventListener('notificationclick', function(event) {
   console.log('[firebase-messaging-sw.js] Notification clicked:', event.notification);
-  event.notification.close();
-  
-  const urlToOpen = event.notification.data?.url || '/';
-  
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      // Check if there's already a window open with the target URL
-      for (let i = 0; i < clientList.length; i++) {
-        const client = clientList[i];
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
-        }
+
+  // Close all visible notifications when any one is clicked.
+  // This helps ensure the notification tray is cleared for related alerts.
+  event.waitUntil((async () => {
+    try {
+      const notifications = await self.registration.getNotifications();
+      notifications.forEach(n => {
+        try { n.close(); } catch (e) { /* ignore */ }
+      });
+    } catch (e) {
+      console.warn('Failed to get notifications, falling back to closing the clicked one', e);
+      try { event.notification.close(); } catch (err) { void err; }
+    }
+
+    const urlToOpen = event.notification?.data?.url || '/';
+    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of clientList) {
+      if (client.url === urlToOpen && 'focus' in client) {
+        return client.focus();
       }
-      // If no window is open, open a new one
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    })
-  );
+    }
+    if (clients.openWindow) {
+      return clients.openWindow(urlToOpen);
+    }
+  })());
 });
 `;
 
