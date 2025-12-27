@@ -189,7 +189,7 @@ export function useChatRooms(): UseChatRoomsResult {
                     name: String(msg.room_id ?? msg.roomId ?? msg.id ?? payloadRoomId),
                     is_group: false,
                     total_unread: 0,
-                    created_at: null,
+                    created_at: new Date().toISOString(),
                     messages: [msg],
                     members: [],
                     last_message: msg,
