@@ -58,6 +58,11 @@ const PaystackCallback = () => {
               localStorage.removeItem("pending_subscription");
               localStorage.removeItem(attemptedKey);
               qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+              try {
+                localStorage.setItem("profile_active_tab", "subscription");
+              } catch (e) {
+                // ignore storage errors
+              }
               navigate("/profile");
             },
             onError: () => {
@@ -65,6 +70,11 @@ const PaystackCallback = () => {
               qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
               localStorage.removeItem("pending_subscription");
               localStorage.removeItem(attemptedKey);
+              try {
+                localStorage.setItem("profile_active_tab", "subscription");
+              } catch (e) {
+                // ignore storage errors
+              }
               navigate("/profile");
             },
           },
@@ -111,6 +121,11 @@ const PaystackCallback = () => {
           if (localStorage.getItem(attemptedKey)) {
             qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
             localStorage.removeItem("pending_subscription");
+            try {
+              localStorage.setItem("profile_active_tab", "subscription");
+            } catch (e) {
+              // ignore storage errors
+            }
             navigate("/profile");
             return;
           }
@@ -127,12 +142,22 @@ const PaystackCallback = () => {
                 localStorage.removeItem("pending_subscription");
                 localStorage.removeItem(attemptedKey);
                 qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+                try {
+                  localStorage.setItem("profile_active_tab", "subscription");
+                } catch (e) {
+                  // ignore storage errors
+                }
                 navigate("/profile");
               },
               onError: () => {
                 qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
                 localStorage.removeItem("pending_subscription");
                 localStorage.removeItem(attemptedKey);
+                try {
+                  localStorage.setItem("profile_active_tab", "subscription");
+                } catch (e) {
+                  // ignore storage errors
+                }
                 navigate("/profile");
               },
             },

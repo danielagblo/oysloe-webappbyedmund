@@ -1129,6 +1129,28 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
 
   // Note: we initiate websocket connection eagerly when `caseId` changes.
 
+  // When the user clicks/selects a chat (caseId or validatedRoomId changes),
+  // ensure the message container scrolls to the last message so the user
+  // immediately sees the latest conversation.
+  useEffect(() => {
+    try {
+      const el = containerRef.current;
+      if (!el) return;
+      // allow the UI to render the new room/messages first
+      const t = window.setTimeout(() => {
+        try {
+          el.scrollTop = el.scrollHeight;
+        } catch {
+          // ignore scroll errors
+        }
+      }, 50);
+      return () => window.clearTimeout(t);
+    } catch {
+      // ignore
+    }
+    // we want to run this whenever the selected room id changes
+  }, [caseId, validatedRoomId]);
+
   // When the room's websocket becomes connected, ensure we mark messages read once.
   useEffect(() => {
     const idKey = String(validatedRoomId ?? caseId ?? "");

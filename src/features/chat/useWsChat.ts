@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import chatService, {
-  type ChatRoom,
-  type Message,
+    type ChatRoom,
+    type Message,
 } from "../../services/chatService";
 import WebSocketClient from "../../services/wsClient";
 

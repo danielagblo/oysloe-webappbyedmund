@@ -170,6 +170,53 @@ export function useChatRooms(): UseChatRoomsResult {
                 return copy;
               });
             }
+
+            // Handle single incoming chat message payloads (from live websocket chat)
+            // Some websockets send a payload with `message` or `room_id` rather than a full room object.
+            // Update the matching room's `last_message` and append to its `messages` array.
+            const maybeMessage = payload && (payload.message || payload);
+            const msg = maybeMessage && typeof maybeMessage === 'object' ? (maybeMessage.message ?? maybeMessage) : null;
+            const payloadRoomId = payload && (payload.room_id ?? payload.roomId ?? (msg && (msg.room_id ?? msg.roomId)) ?? null);
+            if (msg && payloadRoomId) {
+              setCanonicalRooms((prev) => {
+                const copy = [...prev];
+                const idx = copy.findIndex((r) => String(r.room_id ?? r.id) === String(payloadRoomId) || String(r.id) === String(payloadRoomId));
+                if (idx === -1) {
+                  // create a lightweight room for this message so UI can show it immediately
+                  const newRoom: ChatRoom = {
+                    id: msg.room_id ?? msg.roomId ?? msg.id ?? payloadRoomId,
+                    room_id: String(msg.room_id ?? msg.roomId ?? msg.id ?? payloadRoomId),
+                    name: String(msg.room_id ?? msg.roomId ?? msg.id ?? payloadRoomId),
+                    is_group: false,
+                    total_unread: 0,
+                    created_at: null,
+                    messages: [msg],
+                    members: [],
+                    last_message: msg,
+                    ad_name: null,
+                    ad_image: null,
+                  };
+                  return [newRoom, ...copy];
+                }
+
+                // Append message if it's not already present at the end (dedupe by id/timestamp)
+                const room = { ...copy[idx] } as ChatRoom;
+                const existingMsgs = Array.isArray(room.messages) ? [...room.messages] : [];
+                const lastExisting = existingMsgs.length ? existingMsgs[existingMsgs.length - 1] : null;
+                const sameAsLast = lastExisting && (String((lastExisting as any).id ?? (lastExisting as any).created_at) === String((msg as any).id ?? (msg as any).created_at));
+                if (!sameAsLast) {
+                  existingMsgs.push(msg);
+                }
+                room.messages = existingMsgs;
+                room.last_message = msg;
+                // if ws provides an unread count, use it; otherwise preserve existing
+                if (typeof payload.total_unread === 'number') {
+                  room.total_unread = payload.total_unread;
+                }
+                copy[idx] = room;
+                return copy;
+              });
+            }
           } catch (e) {
             console.warn("[useChatRooms] Failed to handle ws message", e);
           }
