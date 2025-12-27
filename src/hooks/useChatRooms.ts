@@ -139,7 +139,7 @@ export function useChatRooms(): UseChatRoomsResult {
               // Merge members from existing canonicalRooms when WS payload doesn't include them
               setCanonicalRooms((prev) => {
                 const map = new Map(prev.map((r) => [String(r.id), r]));
-                return normalized.map((nr) => {
+                return normalized.map((nr: any) => {
                   const existing = map.get(String(nr.id));
                   if (existing && (!nr.members || nr.members.length === 0) && existing.members && existing.members.length > 0) {
                     nr.members = existing.members;

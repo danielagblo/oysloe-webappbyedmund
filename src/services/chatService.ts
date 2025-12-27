@@ -19,6 +19,10 @@ export type ChatRoom = {
   messages?: Message[];
   created_at: string;
   total_unread?: number;
+  // Optional fields sometimes provided by websocket payloads
+  last_message?: any;
+  ad_image?: string | null;
+  ad_name?: string | null;
   // TODO: Backend will add these fields; for now use fallbacks below
   // case_id?: string;
   // status?: string;
