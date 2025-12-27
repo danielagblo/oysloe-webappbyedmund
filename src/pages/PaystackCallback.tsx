@@ -33,6 +33,15 @@ const PaystackCallback = () => {
         pendingObj = null;
       }
 
+      // Fallback: if localStorage missing (different domain), try to read subscription_id from query
+      const subscriptionIdFromQuery = searchParams.get("subscription_id");
+      if (!pendingObj && subscriptionIdFromQuery) {
+        const parsed = Number(subscriptionIdFromQuery);
+        if (!Number.isNaN(parsed)) {
+          pendingObj = { subscription_id: parsed };
+        }
+      }
+
       if (userSubId && pendingObj?.subscription_id) {
         // Prevent repeated attempts for the same user subscription id
         const attemptedKey = `pending_subscription_attempted_user_${userSubId}`;
