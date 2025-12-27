@@ -311,7 +311,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
     connectToUnreadCount,
     typing,
     sendTyping,
-   } = ws;;
+  } = ws;;
 
   const queryClient = useQueryClient();
 
@@ -1252,11 +1252,9 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
     // @ts-expect-error - adding temp keys for reconciliation
     optimistic.temp_id = tempId;
 
-    // 2. Clear input and render the message IMMEDIATELY in the UI on both possible keys
+    // 2. Clear input. The hook will create the optimistic placeholder when
+    // `sendMessage` is invoked with `tempId` so avoid writing it locally here.
     setInput("");
-    // write to numeric key first (DB id) then to string key (private_xxx) to ensure UI stays sticky
-    if (numericKey) addLocalMessage(numericKey, optimistic as ChatMessage);
-    if (stringKey && stringKey !== numericKey) addLocalMessage(stringKey, optimistic as ChatMessage);
 
     // Scroll to bottom immediately
     const el = containerRef.current;
@@ -1314,8 +1312,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
     recentlySentRef.current.add(tempId);
     setTimeout(() => recentlySentRef.current.delete(tempId), 10000);
 
-    // Add to UI immediately
-    addLocalMessage(uiRoomKey, optimistic as ChatMessage);
+    // UI optimistic placeholder will be created by the hook's `sendMessage`.
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
 
@@ -1359,7 +1356,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
     recentlySentRef.current.add(tempId);
     setTimeout(() => recentlySentRef.current.delete(tempId), 10000);
 
-    addLocalMessage(String(roomToSend), optimistic as ChatMessage);
+    // UI optimistic placeholder will be created by the hook's `sendMessage`.
     const el = containerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
 

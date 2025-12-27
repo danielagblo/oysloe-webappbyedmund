@@ -5,7 +5,10 @@ import type { ChatMember, ChatRoom } from "../services/chatService";
  */
 export const isSupportMember = (member: ChatMember | undefined): boolean => {
   if (!member) return false;
-  return member.is_staff === true || member.is_superuser === true;
+  // Backends may use different casing. Check common variants.
+  const staff = (member as any).is_staff === true || (member as any).isStaff === true || (member as any).is_staff === true;
+  const superuser = (member as any).is_superuser === true || (member as any).isSuperUser === true || (member as any).isSuperuser === true || (member as any).is_superuser === true;
+  return Boolean(staff || superuser);
 };
 
 /**

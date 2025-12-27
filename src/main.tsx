@@ -4,11 +4,11 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
+import OfflineModal from "./components/OfflineModal.tsx";
 import Toaster from "./components/Toaster";
+import { OnlineStatusProvider } from "./context/ConnectivityStatusContext.tsx";
 import "./index.css";
 import { queryClient } from "./queryClient";
-import { OnlineStatusProvider } from "./context/ConnectivityStatusContext.tsx";
-import OfflineModal from "./components/OfflineModal.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -24,3 +24,32 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+// Listen for messages from the service worker instructing the page to
+// schedule auto-closing notifications (used when the page is open).
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (evt: MessageEvent) => {
+    try {
+      const data = evt.data;
+      if (!data || data.type !== 'NOTIFICATION_DISPLAYED') return;
+      const url = data.url;
+      // Close matching notifications immediately (page is open and active)
+      (async () => {
+        try {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (!reg) return;
+          const notifs = await reg.getNotifications();
+          for (const n of notifs) {
+            if (!url || (n.data && n.data.url === url)) {
+              try { n.close(); } catch (e) { /* ignore */ }
+            }
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    } catch (e) {
+      /* ignore */
+    }
+  });
+}

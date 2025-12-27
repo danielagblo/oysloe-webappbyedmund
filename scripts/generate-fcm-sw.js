@@ -152,7 +152,22 @@ messaging.onBackgroundMessage(function(payload) {
     notificationOptions.image = image;
   }
   
-  return self.registration.showNotification(title, notificationOptions);
+  (async () => {
+    try {
+      await self.registration.showNotification(title, notificationOptions);
+      try {
+        const clientsList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+        const payload = { type: 'NOTIFICATION_DISPLAYED', url: notificationOptions.data?.url, delay: 0 };
+        for (const c of clientsList) {
+          try { c.postMessage(payload); } catch (e) { /* ignore */ }
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    } catch (e) {
+      console.error('Failed to show notification', e);
+    }
+  })();
 });
 
 // Also handle generic Push API messages (so the same service worker can be
@@ -177,7 +192,49 @@ self.addEventListener('push', function (event) {
     badge: data.badge || '/favicon.png',
     tag: data.group || data.alert_id || data.tag || 'oysloe_group',
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil((async () => {
+    try {
+      await self.registration.showNotification(title, options);
+      try {
+        const clientsList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+        const payload = { type: 'NOTIFICATION_DISPLAYED', url: options.data?.url, delay: 0 };
+        for (const c of clientsList) {
+          try { c.postMessage(payload); } catch (e) { /* ignore */ }
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    } catch (e) {
+      console.error('Failed to show push notification', e);
+    }
+  })());
+});
+
+// When a notification is shown and a client (webapp window) is open, post a
+// message to that client so it can schedule auto-closing the notification
+// after a short delay (15s). We do this because service worker timers may
+// be unreliable if the worker is terminated; delegating the timer to the
+// page ensures the auto-close happens while the app is active.
+self.addEventListener('notificationdisplayed', function (event) {
+  // Note: 'notificationdisplayed' isn't a widely supported event; as a
+  // fallback we also postMessage immediately when pushing; this handler is
+  // a best-effort hook if the browser supports it.
+  (async () => {
+    try {
+      const clientsList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+      if (!clientsList || clientsList.length === 0) return;
+      const payload = {
+        type: 'NOTIFICATION_DISPLAYED',
+        url: event.notification?.data?.url,
+        delay: 15000,
+      };
+      for (const c of clientsList) {
+        try { c.postMessage(payload); } catch (e) { /* ignore */ }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+  })();
 });
 
 // Handle notification clicks - close related notifications when one is clicked

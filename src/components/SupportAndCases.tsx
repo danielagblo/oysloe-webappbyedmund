@@ -1,5 +1,4 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import useFeedbacks, {
@@ -7,8 +6,7 @@ import useFeedbacks, {
 } from "../features/feedback/useFeedback";
 import { useChatRooms } from "../hooks/useChatRooms";
 import type { ChatRoom } from "../services/chatService";
-import WebSocketClient from "../services/wsClient";
-import { getCaseId, getCaseStatus, splitRooms } from "../utils/chatFilters";
+import { getCaseId, getCaseStatus } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
 import MobileBanner from "./MobileBanner";
 type SupportAndCasesProps = {
@@ -74,13 +72,10 @@ export default function SupportAndCases({
   // Touch the optional prop so TS doesn't treat it as unused; actual usage via optional chaining below
   void onSelectChat;
   const [activeTab, setActiveTab] = useState<"chat" | "support">("chat");
-  const [chatUnread, setChatUnread] = useState<number>(0);
-  const [supportActive, setSupportActive] = useState<number>(0);
   const [newCaseOpen, setNewCaseOpen] = useState<boolean>(false);
   const [text, setText] = useState("");
   const [isSendable, setIsSendable] = useState<boolean>(false);
-  const wsRef = useRef<WebSocketClient | null>(null);
-  const queryClient = useQueryClient();
+
 
   // --- Mobile bottom sheet drag state ---
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -139,170 +134,18 @@ export default function SupportAndCases({
 
 
 
-  // Use React Query to fetch and cache chat rooms
-  // Keep raw `data` so we can detect when the initial fetch completes
-  const { data } = useChatRooms();
-  const allRooms: ChatRoom[] = data ?? [];
-
-  // Persist a snapshot of fetched rooms (split into user/support) so
-  // the UI renders from the saved lists instead of directly from
-  // websocket-updated feed.
-  const [savedUserRooms, setSavedUserRooms] = useState<ChatRoom[] | null>(null);
-  const [savedSupportRooms, setSavedSupportRooms] = useState<ChatRoom[] | null>(null);
-  const initialSavedRef = useRef(false);
-
-  // Save the first fetched snapshot (runs once after fetch finishes)
-  useEffect(() => {
-    if (initialSavedRef.current) return;
-    // wait until `data` is defined (query finished at least once)
-    if (typeof data === "undefined") return;
-    const { supportRooms, userRooms } = splitRooms(allRooms);
-    setSavedUserRooms(userRooms);
-    setSavedSupportRooms(supportRooms);
-    initialSavedRef.current = true;
-  }, [data, allRooms]);
+  // Use hook which provides canonical-derived lists and manages websocket internally
+  const { userRooms, supportRooms, unreadCount, supportActive } = useChatRooms();
 
   useEffect(() => {
-
-    let mounted = true;
-
-    // Connect WebSocket to listen for room updates
-
     try {
-      const apiBase =
-        (import.meta.env.VITE_API_URL as string) ||
-        "https://api.oysloe.com/api-v1";
-      const wsBaseRaw = (import.meta.env.VITE_WS_URL as string) || apiBase;
-      const wsBase = wsBaseRaw.replace(/^http/, "ws").replace(/\/$/, "");
-      const token =
-        typeof window !== "undefined"
-          ? localStorage.getItem("oysloe_token")
-          : null;
-      const wsUrl = `${wsBase}/chatrooms/`;
-
-      const client = new WebSocketClient(wsUrl, token, {
-        onOpen: () => { },
-        onClose: () => { },
-        onError: (ev) => console.warn("❌ [INBOX PAGE] WebSocket error", ev),
-        onMessage: (payload: any) => {
-          if (!mounted) return;
-
-          try {
-            // Normalize rooms received from websocket to expected ChatRoom shape
-            const normalizeRoom = (raw: any): ChatRoom => {
-              return {
-                id: raw.id,
-                room_id: raw.room_id ?? String(raw.id ?? ""), // Added room_id
-                name: raw.name ?? String(raw.id ?? ""),
-                is_group: raw.is_group ?? false,
-                // some payloads use `unread` rather than `total_unread`
-                total_unread:
-                  raw.total_unread ?? raw.unread ?? raw.unread_count ?? 0,
-                created_at: raw.created_at ?? raw.createdAt ?? null,
-                messages: Array.isArray(raw.messages) ? raw.messages : [],
-                members: Array.isArray(raw.members) ? raw.members : [],
-                // preserve any last message fields from websocket payloads
-                // so UI can show previews (some payloads include `last_message`)
-                // keep the raw field names to remain compatible with usage
-                last_message: raw.last_message ?? raw.lastMessage ?? raw.last ?? null,
-                // preserve ad metadata when present on chatrooms_list payloads
-                ad_name: raw.ad_name ?? raw.adName ?? null,
-                ad_image: raw.ad_image ?? raw.adImage ?? null,
-              } as ChatRoom;
-            };
-
-            // Handle initial chatrooms list
-            if (
-              payload &&
-              typeof payload === "object" &&
-              payload.type === "chatrooms_list" &&
-              Array.isArray(payload.chatrooms)
-            ) {
-              const normalized = payload.chatrooms.map((r: any) => normalizeRoom(r));
-
-
-              // Merge with existing cache to preserve member data
-              queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
-                return normalized.map((wsRoom: ChatRoom) => {
-                  const existingRoom = prev.find(r => r.id === wsRoom.id);
-
-                  // If WS payload has no members but cache has members, preserve cached members
-                  if (wsRoom.members.length === 0 && existingRoom && existingRoom.members.length > 0) {
-                    wsRoom.members = existingRoom.members;
-                  }
-
-                  return wsRoom;
-                });
-              });
-              return;
-            }
-
-            // Handle individual room updates
-            if (payload && typeof payload === "object" && payload.id) {
-              const normalized = normalizeRoom(payload);
-
-              // Update React Query cache instead of local state
-              queryClient.setQueryData(["chatRooms"], (prev: ChatRoom[] = []) => {
-                const idx = prev.findIndex(
-                  (r) => String(r.id) === String(normalized.id),
-                );
-                if (idx === -1) {
-                  return [normalized, ...prev];
-                }
-                const copy = [...prev];
-                // Merge with old room, but PRESERVE members if new payload doesn't have them
-                // (WebSocket updates don't always include the full members array)
-                const merged = { ...copy[idx], ...normalized };
-                if (normalized.members.length === 0 && copy[idx].members.length > 0) {
-                  merged.members = copy[idx].members;
-                }
-                copy[idx] = merged;
-                return copy;
-              });
-            }
-          } catch (e) {
-            console.warn("❌ [INBOX PAGE] Failed to handle room ws message", e);
-          }
-        },
-      });
-
-      wsRef.current = client;
-      try {
-        client.connect();
-      } catch (e) {
-        console.warn("❌ [INBOX PAGE] WebSocket connect failed", e);
-      }
-    } catch (err) {
-      console.warn("❌ [INBOX PAGE] Failed to create ws client", err);
-    }
-
-    return () => {
-
-      mounted = false;
-      wsRef.current?.close();
-      wsRef.current = null;
-    };
-  }, [queryClient]);
-
-  useEffect(() => {
-    // Use the saved lists for counts if available, otherwise fall back
-    // to the live rooms until the first snapshot is taken.
-    const userRoomsForCounts = savedUserRooms ?? splitRooms(allRooms).userRooms;
-    const supportRoomsForCounts = savedSupportRooms ?? splitRooms(allRooms).supportRooms;
-
-    const unread = userRoomsForCounts.reduce((acc, r) => acc + (r.total_unread ?? 0), 0);
-    setChatUnread(unread);
-
-    setSupportActive(supportRoomsForCounts.length);
-    try {
-      console.debug("SupportAndCases: userRooms count", { count: userRoomsForCounts.length, sample: userRoomsForCounts.slice(0, 3) });
+      console.debug("SupportAndCases: userRooms count", { count: userRooms.length, sample: userRooms.slice(0, 3) });
     } catch { }
-  }, [allRooms, savedUserRooms, savedSupportRooms]);
+  }, [userRooms]);
 
-  // Display lists: prefer saved snapshot (taken after initial fetch),
-  // otherwise use live rooms until snapshot exists.
-  const displayUserRooms = savedUserRooms ?? splitRooms(allRooms).userRooms;
-  const displaySupportRooms = savedSupportRooms ?? splitRooms(allRooms).supportRooms;
+  // Rendering reads from saved lists provided by the hook
+  const staffRoomsMemo = supportRooms;
+  const userRoomsMemo = userRooms;
 
   const HeaderTabs = () => (
     <div className="flex items-center justify-center lg:mt-4 max-lg:mb-3 max-sm:px-5 w-full md:gap-10 gap-7.5">
@@ -316,7 +159,7 @@ export default function SupportAndCases({
         <div className="flex flex-col items-start justify-center">
           <p className="inline m-0 lg:text-[1.2vw]">Chat</p>
           <span className=" text-gray-500 text-xs md:text-sm lg:text-[0.9vw]">
-            {chatUnread === null ? "…" : `${chatUnread} unread`}
+            {`${unreadCount} unread`}
           </span>
         </div>
       </button>
@@ -341,7 +184,7 @@ export default function SupportAndCases({
         <div className="flex flex-col items-start justify-center">
           <p className="m-0 inline lg:text-[1.2vw]">Support</p>
           <span className="text-gray-500 text-xs md:text-sm lg:text-[0.9vw]">
-            {supportActive === null ? "…" : `${supportActive} active`}
+            {`${supportActive} active`}
           </span>
         </div>
       </button>
@@ -352,7 +195,7 @@ export default function SupportAndCases({
   const GetChats = () => (
     <div className="mb-6">
       <h2 className="text-xl md:text-2xl lg:text-[1.5vw] font-medium mt-3 mb-1 text-(--dark-def)">Recent Chats</h2>
-      <ChatsList rooms={displayUserRooms} />
+      <ChatsList rooms={userRoomsMemo} />
     </div>
   );
 
@@ -368,12 +211,25 @@ export default function SupportAndCases({
       );
     }
 
-    // Sort rooms by created_at descending (latest first)
-    const sortedRooms = [...rooms].sort((a, b) => {
-      const dateA = new Date(a.created_at || 0).getTime();
-      const dateB = new Date(b.created_at || 0).getTime();
-      return dateB - dateA;
-    });
+    // Sort rooms by last-message timestamp (prefer payload.last_message then messages array)
+    const getLastMsgTime = (room: ChatRoom) => {
+      try {
+        const payloadLast = (room as any).last_message ?? (room as any).lastMessage ?? (room as any).last;
+        if (payloadLast && typeof payloadLast === "object") {
+          const t = payloadLast.created_at ?? payloadLast.createdAt ?? payloadLast.timestamp ?? null;
+          if (t) return new Date(String(t)).getTime();
+        }
+        if (Array.isArray(room.messages) && room.messages.length > 0) {
+          const lm = room.messages[room.messages.length - 1];
+          if (lm && lm.created_at) return new Date(String(lm.created_at)).getTime();
+        }
+      } catch {
+        /* ignore */
+      }
+      return 0;
+    };
+
+    const sortedRooms = [...rooms].sort((a, b) => getLastMsgTime(b) - getLastMsgTime(a));
 
     return (
       <div className="flex flex-col gap-2 my-3 lg:gap-3">
@@ -512,13 +368,13 @@ export default function SupportAndCases({
               className={`relative text-left p-3 cursor-pointer rounded-xl ${(r.total_unread && r.total_unread > 0) ? "max-lg:bg-white hover:bg-gray-50" : "max-lg:hover:bg-gray-100"}  focus:outline-none flex items-start gap-3`}
             >
               {thumbSrc ? (
-                <img src={thumbSrc} alt={String(r.name || "chat")} className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover" />
+                <img src={thumbSrc} alt={String(r.name || "chat")} className="flex-shrink-0 w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl object-cover" />
               ) : (
-                <div className="w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
+                <div className="flex-shrink-0 w-11 h-11 md:h-13 md:w-13 lg:h-[3.25vw] lg:w-[3.25vw] rounded-xl bg-gray-200 flex items-center justify-center text-sm md:text-base lg:text-[1.2vw] text-(--dark-def) font-semibold">
                   {initials}
                 </div>
               )}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <p className="text-base md:text-[18px] text-(--dark-def) lg:text-[1.2vw] font-medium">{(r as any).ad_name ? (r as any).ad_name : r.name}</p>
                   {
@@ -529,9 +385,21 @@ export default function SupportAndCases({
                     ) : null
                   }
                   <span className="text-xs italic md:text-sm lg:text-[0.9vw] text-gray-400 flex items-center gap-2">
-                    {r.created_at
-                      ? r.messages && formatReviewDate(r.messages[r.messages.length - 1]?.created_at || r.created_at)
-                      : ""}
+                    {(() => {
+                      try {
+                        const payloadLast = (r as any).last_message ?? (r as any).lastMessage ?? (r as any).last;
+                        if (payloadLast && typeof payloadLast === "object") {
+                          const t = payloadLast.created_at ?? payloadLast.createdAt ?? payloadLast.timestamp ?? null;
+                          if (t) return formatReviewDate(String(t));
+                        }
+                        if (r.messages && r.messages.length > 0 && r.messages[r.messages.length - 1]?.created_at) {
+                          return formatReviewDate(String(r.messages[r.messages.length - 1].created_at));
+                        }
+                      } catch {
+                        /* ignore */
+                      }
+                      return "";
+                    })()}
                   </span>
                 </div>
                 <p className={`text-xs md:text-sm lg:text-[0.9vw] ${r.total_unread && "font-semibold"} text-gray-500 truncate`}>
@@ -669,7 +537,7 @@ export default function SupportAndCases({
           ) : (
             <div className="max-lg:bg-(--div-active) max-lg:pt-1 max-lg:min-h-[83vh] max-lg:w-screen max-lg:px-5">
               <GetHelp />
-              <OpenCases supportRooms={displaySupportRooms} />
+              <OpenCases supportRooms={staffRoomsMemo} />
             </div>
           )}
           <div className="w-1 h-13" />
