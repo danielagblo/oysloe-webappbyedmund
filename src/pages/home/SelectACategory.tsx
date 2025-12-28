@@ -144,6 +144,7 @@ const SelectACategory = ({
                 navigate("/apply");
                 return;
               }
+              // On mobile, filter in-place; on PC, route as before (handled in HomePage)
               onCategoryClick(category.name);
             }}
             className="

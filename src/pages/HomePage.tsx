@@ -81,7 +81,16 @@ const HomePage = () => {
 
   const handleCategoryClick = (name: string) => {
     const category = categories.find((c) => c.name === name) || null;
-    setSelectedCategory(category);
+    if (isSmall) {
+      // On mobile: apply category as a filter in-place by setting the ID
+      // and ensure `selectedCategory` remains null so we don't render
+      // the ConditionalAds screen.
+      setSelectedCategory(null);
+      setSelectedCategoryId(category ? category.id : null);
+    } else {
+      // On desktop: preserve existing behavior (open ConditionalAds)
+      setSelectedCategory(category);
+    }
   };
   const handleFilterSettings = () => setShowFilterPopup(true);
   const closeFilterPopup = () => setShowFilterPopup(false);
