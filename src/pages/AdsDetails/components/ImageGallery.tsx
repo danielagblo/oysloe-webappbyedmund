@@ -99,7 +99,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             return (
               <div
                 key={i}
-                className="shrink-0 max-w-[27vw] aspect-square rounded-xl bg-gray-200 overflow-hidden flex items-center justify-center relative cursor-pointer hover:opacity-90 transition-opacity"
+                className="shrink-0 max-w-[27vw] aspect-square bg-gray-200 rounded-xl overflow-hidden flex items-center justify-center relative cursor-pointer hover:opacity-90 transition-opacity"
                 onClick={() => {
                   onSetPictureModalIndex(i);
                   onOpenPictureModal();
@@ -133,7 +133,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
 
       {/* MOBILE: full-width swipeable image */}
       <div
-        className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden rounded-lg sm:hidden"
+        className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden  sm:hidden"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >

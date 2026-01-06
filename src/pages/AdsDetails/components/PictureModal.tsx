@@ -85,7 +85,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
           <img
             src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
             alt={`Modal image ${pictureModalIndex + 1}`}
-            className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full rounded relative z-10"
+            className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
           />
         </div>
 
