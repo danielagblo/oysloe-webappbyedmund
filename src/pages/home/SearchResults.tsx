@@ -28,7 +28,6 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
   return (
     <div className="bg-(--div-active) w-full flex justify-center -mb-4">
       <div
-        style={{ transform: "scale(0.9)" }}
         className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-[95vw] pb-8"
       >
         {filteredResults.map((ad) => (
