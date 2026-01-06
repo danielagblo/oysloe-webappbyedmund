@@ -1,6 +1,6 @@
 import React from "react";
-import type { Product } from "../../types/Product";
 import { Link } from "react-router-dom";
+import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 
 const SkeletonCard = () => (
   <div className="rounded-2xl overflow-hidden w-full animate-pulse">
-    <div className="w-full h-[120px] sm:h-52 bg-gray-200" />
+    <div className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] sm:h-52 bg-gray-200" />
     <div className="flex items-center gap-2 px-2 py-1">
       <div className="w-3 sm:w-5 h-3 sm:h-5 bg-gray-200 rounded" />
       <div className="h-3 sm:h-4 w-24 bg-gray-200 rounded" />
@@ -34,7 +34,7 @@ function LazyAdCard({ ad, handleAdClick }: { ad: Product; handleAdClick: Props["
         src={ad.image || "/no-image.jpeg"}
         alt={ad.name}
         loading="lazy"
-        className="w-full h-[120px] sm:h-52 object-cover rounded-2xl"
+        className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] sm:h-52 object-cover rounded-2xl"
       />
       <div className="flex items-center gap-1 px-2 py-0.5">
         <img
