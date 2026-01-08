@@ -21,7 +21,15 @@ const SelectACategory = ({
     return (
       <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
         <div
-          className="grid grid-cols-5 gap-2 sm:gap-4 place-items-center justify-items-center max-w-full w-full sm:max-w-4/5 max-sm:flex max-sm:flex-wrap max-sm:w-screen max-sm:items-center max-sm:justify-center"
+          className="
+                    grid 
+                    grid-cols-5 gap-2 
+                    sm:gap-4 place-items-center justify-items-center 
+                    max-w-full w-full sm:max-w-4/5
+
+                    max-sm:flex max-sm:flex-wrap max-sm:w-screen 
+                    max-sm:items-center max-sm:justify-center
+                "
           style={{ gridAutoRows: "1fr" }}
         >
           {Array.from({ length: 10 }).map((_, i) => (
@@ -55,7 +63,7 @@ const SelectACategory = ({
     }
 
     return (
-      <div className="w-[94vw] sm:max-w-[80vw] mt-3 mx-auto">
+      <div className="w-[94vw] sm:max-w-[98vw] mt-3 mx-auto sm:flex sm:justify-center">
         <div
           className="
                     grid 

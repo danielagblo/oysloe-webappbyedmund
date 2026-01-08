@@ -131,7 +131,7 @@ body {
   .search-input {
     width: 65vw;
     /* Ensure >=16px to prevent iOS zoom-on-focus */
-    font-size: 16px;
+    font-size: 4dvw;
     /* padding-left: 52px; */
     padding-left: 17%;
     padding-right: 22.5px;
@@ -141,7 +141,7 @@ body {
   .search-input::placeholder {
     text-align: center;
     margin-inline: auto;
-    font-size: 16.8px;
+    font-size: 4dvw;
     padding-right: 5px;
   }
 }
@@ -235,8 +235,6 @@ body {
 
   .search-input {
     width: 82vw;
-    /* Ensure >=16px to prevent iOS zoom-on-focus */
-    font-size: 16px;
   }
 }
 
@@ -273,6 +271,37 @@ body {
   textarea,
   select {
     font-size: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .rotating-bg {
+      width: 75dvw;
+      max-width: 74dvw;
+      min-height: 55px;
+    }
+
+    .rotating-bg-inner {
+      width: 73dvw;
+      max-width: 73dvw;
+      min-height: 52px;
+    }
+
+    .search-input {
+      width: 65dvw;
+      /* Ensure >=16px to prevent iOS zoom-on-focus */
+      font-size: 4dvw;
+      /* padding-left: 52px; */
+      padding-left: 17%;
+      padding-right: 22.5px;
+      text-align: left;
+    }
+
+    .search-input::placeholder {
+      text-align: center;
+      margin-inline: auto;
+      font-size: 4dvw;
+      padding-right: 5px;
+    }
   }
 }
 

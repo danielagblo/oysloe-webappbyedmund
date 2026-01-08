@@ -28,30 +28,32 @@ function LazyAdCard({ ad, handleAdClick }: { ad: Product; handleAdClick: Props["
       to={`/ads/${ad.id}`}
       state={{ adData: ad }}
       onClick={(e) => handleAdClick(ad, e)}
-      className="inline-block rounded-2xl overflow-hidden w-full"
+      className="inline-flex rounded-2xl overflow-hidden w-full flex-col mb-2 items-center justify-center"
     >
       <img
         src={ad.image || "/no-image.jpeg"}
         alt={ad.name}
         loading="lazy"
-        className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] sm:h-52 object-cover rounded-2xl"
+        className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-2xl"
       />
-      <div className="flex items-center gap-1 px-2 py-0.5">
-        <img
-          src="/location.svg"
-          alt=""
-          className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
-        />
-        <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
-          {ad.location?.name ?? ad.location?.region ?? "Unknown"}
+      <div className="w-10/12 mt-1">
+        <div className="flex items-center gap-1 px-2 py-0.5">
+          <img
+            src="/location.svg"
+            alt=""
+            className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
+          />
+          <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
+            {ad.location?.name ?? ad.location?.region ?? "Unknown"}
+          </p>
+        </div>
+        <p className="px-2 text-sm sm:text-xl lg:text-[1.2vw] truncate line-clamp-1 text-gray-600">
+          {ad.name}
+        </p>
+        <p className="px-2 text-xs sm:text-base lg:text-[1vw] font-medium text-gray-800">
+          {formatMoney(ad.price, "GHS")}
         </p>
       </div>
-      <p className="px-2 text-sm sm:text-xl lg:text-[1.2vw] truncate line-clamp-1 text-gray-600">
-        {ad.name}
-      </p>
-      <p className="px-2 text-xs sm:text-base lg:text-[1vw] font-medium text-gray-800">
-        {formatMoney(ad.price, "GHS")}
-      </p>
     </Link>
   );
 }
