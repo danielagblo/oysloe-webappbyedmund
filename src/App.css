@@ -139,7 +139,7 @@ body {
   }
 
   .search-input::placeholder {
-    text-align: center;
+    text-align: left;
     margin-inline: auto;
     font-size: 4dvw;
     padding-right: 5px;
@@ -159,7 +159,7 @@ body {
   }
 
   .search-input::placeholder {
-    text-align: center;
+    text-align: left;
   }
 }
 
@@ -297,7 +297,7 @@ body {
     }
 
     .search-input::placeholder {
-      text-align: center;
+      text-align: left;
       margin-inline: auto;
       font-size: 4dvw;
       padding-right: 5px;
