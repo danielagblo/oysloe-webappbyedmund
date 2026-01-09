@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 type HomePageHeaderProps = {
   searchValue: string;
@@ -19,6 +19,29 @@ const HomePageHeader = ({
   //   window.addEventListener("resize", checkScreen);
   //   return () => window.removeEventListener("resize", checkScreen);
   // }, []);
+
+  // iOS Safari: Force repaint when mounting to prevent layer eviction
+  useEffect(() => {
+    const isIOS = document.documentElement.classList.contains("ios");
+    if (isIOS && headerRef.current) {
+      // Force a repaint by triggering a reflow
+      const header = headerRef.current;
+      const innerLayer = header.querySelector(".rotating-bg-inner") as HTMLElement;
+      const searchInput = header.querySelector(".search-input") as HTMLElement;
+      
+      if (innerLayer && searchInput) {
+        // Force reflow/repaint
+        void innerLayer.offsetHeight;
+        void searchInput.offsetHeight;
+        
+        // Trigger a subtle animation to keep the layer active
+        header.style.opacity = "0.99999";
+        requestAnimationFrame(() => {
+          header.style.opacity = "";
+        });
+      }
+    }
+  }, []);
 
   // removed condensed-on-scroll behavior — header stays static
 
