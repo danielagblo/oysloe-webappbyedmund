@@ -34,8 +34,8 @@ const HomePageHeader = ({
 
         <div className="flex w-full px-200">
           <div className={"relative flex items-center z-0 justify-center w-full max-w-[520px]"}>
-            <div className="rotating-bg z-0" aria-hidden="true" />
-            <div className="rotating-bg-inner" aria-hidden="true" />
+            <div className="rotating-bg z-10" aria-hidden="true" />
+            <div className="rotating-bg-inner z-20" aria-hidden="true" />
 
             <div className="relative flex">
               <input
@@ -43,12 +43,12 @@ const HomePageHeader = ({
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="Search anything up for good"
-                className={"search-input text-2xl sm:text-2xl pl-4 pr-2 py-3 h-12 sm:h-14 sm:max-w-[70vw] max-sm:max-w-full max-sm:mx-auto rounded-full outline-0 bg-white text-center"}
+                className={"search-input text-2xl sm:text-2xl pl-4 pr-2 py-3 h-12 sm:h-14 sm:max-w-[70dvw] max-sm:max-w-full max-sm:mx-auto rounded-full outline-0 z-40 bg-white text-center"}
               />
 
               <img
                 src="/search.svg"
-                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 max-sm:left-[9%] w-5 h-5 z-[1]"
+                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 max-sm:left-[9%] w-5 h-5 z-40"
               />
             </div>
           </div>
