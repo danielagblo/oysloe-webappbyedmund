@@ -280,6 +280,36 @@ body {
     background-color: white;
   }
 
+  /* iOS Safari: stabilize search layers to prevent repaint suppression */
+  .rotating-bg-inner,
+  .input-bkg-mask,
+  .search-icon,
+  .search-wrapper {
+    pointer-events: auto !important;
+  }
+
+  /* Force GPU compositing for critical layers */
+  .rotating-bg-inner,
+  .search-input {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Keep rotating background on its own compositing layer */
+  .rotating-bg {
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
+    transform: translate(-50%, -50%) translateZ(0);
+    will-change: transform;
+  }
+
+  /* Avoid overflow clipping issues on masked parent (iOS only) */
+  .input-bkg-mask {
+    overflow: visible !important;
+  }
+
   @media (max-width: 640px) {
     .rotating-bg {
       width: 75dvw;
