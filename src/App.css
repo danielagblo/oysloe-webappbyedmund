@@ -133,7 +133,7 @@ body {
     /* Ensure >=16px to prevent iOS zoom-on-focus */
     font-size: 4dvw;
     /* padding-left: 52px; */
-    padding-left: 17%;
+    padding-left: 57.5px;
     padding-right: 22.5px;
     text-align: left;
   }
@@ -155,7 +155,7 @@ body {
   }
 
   .search-input {
-    padding-left: 45px;
+    padding-left: 57.5px;
   }
 
   .search-input::placeholder {
@@ -290,8 +290,8 @@ body {
       width: 65dvw;
       /* Ensure >=16px to prevent iOS zoom-on-focus */
       font-size: 4dvw;
-      /* padding-left: 52px; */
-      padding-left: 17%;
+      padding-left: 57.5px;
+      /* padding-left: 20%; */
       padding-right: 22.5px;
       text-align: left;
     }
