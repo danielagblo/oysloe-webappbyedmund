@@ -273,6 +273,13 @@ body {
     font-size: 16px;
   }
 
+  .rotating-bg-inner {
+    background-color: white;
+  }
+  .search-input {
+    background-color: white;
+  }
+
   @media (max-width: 640px) {
     .rotating-bg {
       width: 75dvw;
