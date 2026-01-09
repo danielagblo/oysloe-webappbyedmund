@@ -280,36 +280,6 @@ body {
     background-color: white;
   }
 
-  /* iOS Safari: stabilize search layers to prevent repaint suppression */
-  .rotating-bg-inner,
-  .input-bkg-mask,
-  .search-icon,
-  .search-wrapper {
-    pointer-events: auto !important;
-  }
-
-  /* Force GPU compositing for critical layers */
-  .rotating-bg-inner,
-  .search-input {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    will-change: transform;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  /* Keep rotating background on its own compositing layer */
-  .rotating-bg {
-    -webkit-transform: translate(-50%, -50%) translateZ(0);
-    transform: translate(-50%, -50%) translateZ(0);
-    will-change: transform;
-  }
-
-  /* Avoid overflow clipping issues on masked parent (iOS only) */
-  .input-bkg-mask {
-    overflow: visible !important;
-  }
-
   @media (max-width: 640px) {
     .rotating-bg {
       width: 75dvw;
@@ -340,6 +310,50 @@ body {
       padding-right: 5px;
     }
   }
+}
+
+/* iOS-specific fixes: use html.ios class for more reliable targeting */
+html.ios .search-wrapper {
+  position: relative;
+  isolation: isolate;
+}
+
+html.ios .rotating-bg-inner,
+html.ios .search-input {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+html.ios .rotating-bg {
+  -webkit-transform: translate(-50%, -50%) translateZ(0);
+  transform: translate(-50%, -50%) translateZ(0);
+  will-change: transform;
+}
+
+html.ios .rotating-bg-inner,
+html.ios .input-bkg-mask,
+html.ios .search-icon,
+html.ios .search-wrapper {
+  pointer-events: auto !important;
+}
+
+/* Remove blur on iOS to prevent layer eviction and rendering issues */
+html.ios .rotating-bg::before {
+  filter: none;
+}
+
+/* Avoid overflow clipping issues on animated parent (iOS only) */
+html.ios .input-bkg-mask {
+  overflow: visible !important;
+}
+
+html.ios .search-input {
+  -webkit-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
 }
 
 @keyframes slideInLeft {

@@ -37,7 +37,7 @@ const HomePageHeader = ({
             <div className="rotating-bg z-10" aria-hidden="true" />
             <div className="rotating-bg-inner z-20" aria-hidden="true" />
 
-            <div className="relative flex">
+            <div className="search-wrapper relative flex">
               <input
                 type="search"
                 value={searchValue}
@@ -48,7 +48,7 @@ const HomePageHeader = ({
 
               <img
                 src="/search.svg"
-                className="absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 max-sm:left-[9%] w-5 h-5 z-40"
+                className="search-icon absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 max-sm:left-[9%] w-5 h-5 z-40"
               />
             </div>
           </div>
