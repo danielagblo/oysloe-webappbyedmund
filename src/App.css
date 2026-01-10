@@ -329,6 +329,25 @@ body {
 html.ios .search-wrapper {
   position: relative;
   isolation: isolate;
+  /* iOS fallback: paint the solid inner layer on the same element that
+     contains the input + icon, so it cannot be "dropped" independently. */
+  background: white;
+  border-radius: 9999px;
+  width: 514px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+@media (max-width: 640px) {
+  html.ios .search-wrapper {
+    width: 88vw;
+    height: 46px;
+  }
 }
 
 html.ios .rotating-bg-inner,
@@ -344,6 +363,7 @@ html.ios .rotating-bg {
   -webkit-transform: translate(-50%, -50%) translateZ(0);
   transform: translate(-50%, -50%) translateZ(0);
   will-change: transform;
+  contain: paint;
 }
 
 html.ios .rotating-bg-inner,
@@ -356,6 +376,8 @@ html.ios .search-wrapper {
 /* Remove blur on iOS to prevent layer eviction and rendering issues */
 html.ios .rotating-bg::before {
   filter: none;
+  inset: -140%;
+  will-change: auto;
 }
 
 /* Avoid overflow clipping issues on animated parent (iOS only) */
@@ -367,6 +389,8 @@ html.ios .search-input {
   -webkit-appearance: none;
   appearance: none;
   background-clip: padding-box;
+  /* Let the wrapper provide the white fill on iOS */
+  background-color: transparent !important;
 }
 
 /* Ensure pseudo-element stays visible on iOS */
