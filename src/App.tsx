@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import RequireAuth from "./components/RequireAuth";
@@ -21,6 +22,17 @@ import VerificationPage from "./pages/VerificationPage.tsx";
 import ServiceApplicationPage from "./pages/ServiceApplicationPage.tsx";
 
 function App() {
+  // Detect iOS Safari and add class to root element
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const isiOS =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    if (isiOS) {
+      document.documentElement.classList.add("ios");
+    }
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <ScrollToTop />
