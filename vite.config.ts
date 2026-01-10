@@ -14,5 +14,6 @@ export default defineConfig({
         secure: false,
       },
     },
+    allowedHosts: ["electrophotographic-autumnally-salvatore.ngrok-free.dev"]
   },
 });
