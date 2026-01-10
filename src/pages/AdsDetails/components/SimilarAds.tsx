@@ -22,12 +22,12 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
               key={ad.id}
               to={`/ads/${ad.id}`}
               state={{ adData: ad }}
-              className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52"
+              className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52"
             >
               <img
                 src={ad.image || "/no-image.jpeg"}
                 alt={ad.name.slice(0, 10)}
-                className="w-full h-[120px] sm:h-48 object-cover rounded-2xl"
+                className="w-full h-[120px] sm:h-48 object-cover rounded-md"
               />
               <div className="flex items-center gap-1 px-2 py-1">
                 <img
