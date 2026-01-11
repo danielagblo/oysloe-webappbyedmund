@@ -52,16 +52,16 @@ export const getCaseId = (room: ChatRoom): string => {
  */
 export const getCaseStatus = (room: ChatRoom): 'active' | 'closed' => {
   // Check if room has is_closed property
-  console.log('getCaseStatus check:', { 
-    room_id: room.room_id, 
+  console.log('getCaseStatus check:', {
+    room_id: room.room_id,
     is_closed: (room as any).is_closed,
-    full_room: room 
+    full_room: room
   });
-  
+
   if ((room as any).is_closed === true) {
     return 'closed';
   }
-  
+
   // Default to active
   return 'active';
 };

@@ -128,8 +128,8 @@ export function useChatRooms(): UseChatRoomsResult {
       const wsUrl = `${wsBase}/chatrooms/`;
 
       const client = new WebSocketClient(wsUrl, token, {
-        onOpen: () => {},
-        onClose: () => {},
+        onOpen: () => { },
+        onClose: () => { },
         onError: (ev) => console.warn("[useChatRooms] WebSocket error", ev),
         onMessage: (payload: any) => {
           if (!mounted) return;

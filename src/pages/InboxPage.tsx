@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import LiveChat from "../components/LiveChat";
 import MenuButton from "../components/MenuButton";
 import ProfileStats from "../components/ProfileStats";
 import SupportAndCases from "../components/SupportAndCases";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import useWsChat from "../features/chat/useWsChat";
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 
 export default function InboxPage() {
   const isSmallScreen = useIsSmallScreen(1024);
@@ -63,24 +63,24 @@ export default function InboxPage() {
         </div>
 
         {(selectedCase && isSmallScreen) ? ( //dev note to whoever changed this logic: the logic has to be like this bc PC's initial render doesnt have selectedCase but mobile does
-            <div className="lg:hidden fixed inset-0 z-40 bg-white overflow-hidden">
-              <div className="h-full w-full">
-                <LiveChat
-                  caseId={selectedCase}
-                  onClose={() => setSelectedCase(null)}
-                  ws={ws}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+          <div className="lg:hidden fixed inset-0 z-40 bg-white overflow-hidden">
+            <div className="h-full w-full">
               <LiveChat
                 caseId={selectedCase}
                 onClose={() => setSelectedCase(null)}
                 ws={ws}
               />
             </div>
-          )
+          </div>
+        ) : (
+          <div className="hidden lg:flex lg:w-[50%] lg:grow lg:justify-center lg:items-center w-full h-screen overflow-y-auto lg:py-5 lg:px-1.5 lg:mr-1">
+            <LiveChat
+              caseId={selectedCase}
+              onClose={() => setSelectedCase(null)}
+              ws={ws}
+            />
+          </div>
+        )
         }
 
 
