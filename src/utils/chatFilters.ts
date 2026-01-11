@@ -51,14 +51,17 @@ export const getCaseId = (room: ChatRoom): string => {
  * Returns: 'active' | 'closed'
  */
 export const getCaseStatus = (room: ChatRoom): 'active' | 'closed' => {
-  // TODO: When backend adds status field:
-  // if (room.status === 'closed' || room.is_closed === true) return 'closed';
-  // return room.status === 'active' ? 'active' : 'active';
+  // Check if room has is_closed property
+  console.log('getCaseStatus check:', { 
+    room_id: room.room_id, 
+    is_closed: (room as any).is_closed,
+    full_room: room 
+  });
   
-  // For now: treat as 'closed' if there are no unread messages and room is old
-  // Otherwise treat as 'active'
-  // A simple heuristic: if total_unread is 0 and there's an older message, might be closed
-  // But for MVP, we'll keep it simple: always 'active' unless we have a closed indicator
-  console.log('getCaseStatus: defaulting to active for room', room);
+  if ((room as any).is_closed === true) {
+    return 'closed';
+  }
+  
+  // Default to active
   return 'active';
 };

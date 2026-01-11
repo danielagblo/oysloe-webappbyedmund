@@ -135,7 +135,13 @@ export default function SupportAndCases({
 
 
   // Use hook which provides canonical-derived lists and manages websocket internally
-  const { userRooms, supportRooms, unreadCount, supportActive } = useChatRooms();
+  const { userRooms, supportRooms, unreadCount } = useChatRooms();
+
+  // Calculate active support cases (exclude closed ones)
+  const supportActive = supportRooms.filter(room => {
+    const status = getCaseStatus(room);
+    return status === 'active';
+  }).length;
 
   useEffect(() => {
     try {
@@ -503,7 +509,7 @@ export default function SupportAndCases({
                         : "bg-green-200 text-green-700"
                         }`}
                     >
-                      {status.toUpperCase() !== "ACTIVE" ? "Closed" : "Active"}
+                      {status === "closed" ? "Closed" : "Active"}
                     </span>
                   </div>
                 </div>

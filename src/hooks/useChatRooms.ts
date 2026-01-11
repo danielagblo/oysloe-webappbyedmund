@@ -48,6 +48,7 @@ export function useChatRooms(): UseChatRoomsResult {
       room_id: raw.room_id ?? String(raw.id ?? ""),
       name: raw.name ?? String(raw.id ?? ""),
       is_group: raw.is_group ?? false,
+      is_closed: raw.is_closed ?? false,
       total_unread: raw.total_unread ?? raw.unread ?? raw.unread_count ?? 0,
       created_at: raw.created_at ?? raw.createdAt ?? null,
       messages: Array.isArray(raw.messages) ? raw.messages : [],

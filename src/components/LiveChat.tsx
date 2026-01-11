@@ -23,6 +23,7 @@ type ChatInputProps = {
   onRecord?: (recordingOrFile: boolean | File) => void;
   onTyping?: (isTyping: boolean) => void;
   onRecorded?: (file: File) => void;
+  isCaseClosed?: boolean;
 };
 
 function ChatInput({
@@ -35,7 +36,19 @@ function ChatInput({
   onRecord,
   onTyping,
   onRecorded,
+  isCaseClosed,
 }: ChatInputProps) {
+  // If case is closed, show the closed message instead of input
+  if (isCaseClosed) {
+    return (
+      <div className="w-full flex items-center justify-center p-4">
+        <div className="w-11/12 max-sm:w-full rounded-2xl border-2 border-gray-300 bg-gray-100 p-4 flex items-center justify-center text-center">
+          <p className="text-gray-500 font-medium">This case is closed</p>
+        </div>
+      </div>
+    );
+  }
+
   const [recording, setRecording] = useState(false);
   const typingTimeoutRef = useRef<number | null>(null);
   const isTypingRef = useRef(false);
@@ -1921,6 +1934,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
             }}
             onSend={() => void handleSend()}
             disabled={sending}
+            isCaseClosed={roomInfo?.is_closed ?? false}
             onAttach={() => fileInputRef.current?.click()}
             onRecord={(f) => {
               if (f instanceof File) {
