@@ -286,6 +286,10 @@ body {
     font-size: 16px;
   }
 
+  .only-for-iphone {
+    height: 384px !important;
+  }
+
   .rotating-bg-inner {
     background-color: white;
   }
@@ -398,6 +402,10 @@ html.ios .rotating-bg-inner::after {
   will-change: contents;
   -webkit-backface-visibility: visible;
   backface-visibility: visible;
+}
+
+html.ios .only-for-iphone {
+  height: 384px !important;
 }
 
 @keyframes slideInLeft {

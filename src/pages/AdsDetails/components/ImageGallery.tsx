@@ -133,7 +133,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
 
       {/* MOBILE: full-width swipeable image */}
       <div
-        className="relative w-full max-w-3xl h-64 sm:h-96 overflow-hidden  sm:hidden"
+        className="relative w-full max-w-3xl only-for-iphone h-64 sm:h-96 overflow-hidden  sm:hidden"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
