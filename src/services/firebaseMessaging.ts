@@ -15,8 +15,27 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+// commented out to prevent firebase errors on localhost.
+// const app = initializeApp(firebaseConfig);
+// const messaging = getMessaging(app);
+
+const isLocalhost =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+   window.location.hostname === "127.0.0.1");
+
+let app: ReturnType<typeof initializeApp> | null = null;
+let messaging: ReturnType<typeof getMessaging> | null = null;
+
+if (isLocalhost) {
+  try {
+    app = initializeApp(firebaseConfig);
+    messaging = getMessaging(app);
+  } catch (e) {
+    console.warn("Firebase messaging disabled locally:", e);
+  }
+}
+
 
 // Cache the service worker registration to avoid re-registering
 let swRegistration: ServiceWorkerRegistration | null = null;
@@ -69,6 +88,12 @@ async function ensureFirebaseSwRegistered(): Promise<ServiceWorkerRegistration |
 }
 
 export async function getFcmToken(): Promise<string | null> {
+
+  if (!messaging) {
+    console.debug("FCM disabled in this environment");
+    return null;
+  }
+
   try {
     // Ensure browser permission is granted first (will prompt the user if needed)
     if (typeof Notification !== "undefined" && Notification.permission !== "granted") {
@@ -136,6 +161,11 @@ export async function getFcmToken(): Promise<string | null> {
 }
 
 export async function removeFcmToken(): Promise<boolean> {
+
+  if (!messaging) {
+    return false;
+  }
+
   try {
     // Ensure service worker is registered before deleting token
     await ensureFirebaseSwRegistered();
@@ -149,6 +179,11 @@ export async function removeFcmToken(): Promise<boolean> {
 }
 
 export function onFcmMessage(cb: (payload: any) => void): () => void {
+
+  if (!messaging) {
+    return () => {};
+  }
+
   return onMessage(messaging, (payload) => {
     // Store last payload globally for quick inspection in DevTools
     try {
