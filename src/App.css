@@ -376,7 +376,7 @@ html.ios .search-wrapper {
 /* Remove blur on iOS to prevent layer eviction and rendering issues */
 html.ios .rotating-bg::before {
   filter: none;
-  inset: -140%;
+  inset: -400%;
   will-change: auto;
 }
 
