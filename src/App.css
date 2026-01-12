@@ -304,17 +304,30 @@ body {
       min-height: 55px;
     }
 
+    
     .rotating-bg-inner {
       width: 73dvw;
       max-width: 73dvw;
       min-height: 52px;
+
+
+      /* position: absolute;
+      z-index: 10;
+      height: 58px;
+      width: 514px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 9999px;
+      background: white;
+      pointer-events: none; */
     }
 
     .search-input {
       width: 65dvw;
       /* Ensure >=16px to prevent iOS zoom-on-focus */
       font-size: 4dvw;
-      padding-left: 57.5px;
+      padding-left: 25.5px;
       /* padding-left: 20%; */
       padding-right: 22.5px;
       text-align: left;
@@ -325,6 +338,10 @@ body {
       margin-inline: auto;
       font-size: 4dvw;
       padding-right: 5px;
+    }
+
+    .search-icon {
+      left: 2px;
     }
   }
 }
@@ -354,14 +371,14 @@ html.ios .search-wrapper {
   }
 }
 
-html.ios .rotating-bg-inner,
+/* html.ios .rotating-bg-inner,
 html.ios .search-input {
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: transform;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-}
+} */
 
 html.ios .rotating-bg {
   -webkit-transform: translate(-50%, -50%) translateZ(0);
@@ -405,7 +422,7 @@ html.ios .rotating-bg-inner::after {
 }
 
 html.ios .only-for-iphone {
-  height: 384px !important;
+  height: 350px !important;
 }
 
 @keyframes slideInLeft {
