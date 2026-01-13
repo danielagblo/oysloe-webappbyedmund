@@ -247,7 +247,7 @@ const ReferPage = () => {
                 value={profile?.referral_code ?? ""}
                 readOnly
                 placeholder="No referral code"
-                className="focus:outline-none rounded text-md ml-3 sm:py-2 lg:py-0 sm:text-lg lg:text-[1vw]"
+                className="focus:outline-none rounded text-md ml-3 sm:py-2 lg:py-0 sm:text-lg lg:text-[1.2vw]"
               />
               <CopyButton
                 value={profile?.referral_code ?? ""}

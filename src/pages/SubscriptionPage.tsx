@@ -12,7 +12,7 @@ import { formatMoney } from "../utils/formatMoney";
 import { toast } from "sonner";
 
 const SubscriptionPage = () => {
-  const isSmall = useIsSmallScreen(1024);
+  const isSmall = useIsSmallScreen(1023);
   const subsQuery = useSubscriptions();
   const userSubsQuery = useUserSubscriptions();
 

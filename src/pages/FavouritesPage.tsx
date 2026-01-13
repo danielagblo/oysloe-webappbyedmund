@@ -7,7 +7,7 @@ import { formatMoney } from "../utils/formatMoney";
 import { useNavigate } from "react-router-dom";
 
 const FavouritesPage = () => {
-  const isSmall = useIsSmallScreen(1024);
+  const isSmall = useIsSmallScreen(1023);
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
   const {
