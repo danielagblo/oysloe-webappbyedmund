@@ -106,7 +106,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
   return (
     <>
       {/* ---------- DESKTOP SIDEBAR ---------- */}
-      <div className="hidden sm:flex flex-col h-full w-[18vw] sm:w-[14vw] justify-between items-center bg-white pt-[7vh]">
+      <div className="hidden lg:flex flex-col h-full w-[18vw] sm:w-[14vw] justify-between items-center bg-white pt-[7vh]">
         <div className="flex flex-col h-full max-h-[65vh] justify-around w-full">
           {items.map((item) => {
             const isActive = item.key === active;
@@ -159,7 +159,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
       </div>
 
       {/* ---------- MOBILE MENU BUTTON ---------- */}
-      <div className="sm:hidden fixed top-2 right-3 z-[100]">
+      <div className="lg:hidden fixed top-2 right-3 z-[100]">
         <button
           onClick={() => {
             if (accountDeletionRequested || Logout) {
@@ -179,7 +179,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
 
       {/* ---------- MOBILE SIDEBAR DRAWER ---------- */}
       {isOpen && (
-        <div className="sm:hidden fixed inset-0 z-[200] flex justify-end">
+        <div className="lg:hidden fixed inset-0 z-[200] flex justify-end">
           <div
             className="absolute inset-0 bg-black/30 backdrop-blur-md"
             onClick={() => setIsOpen(false)}

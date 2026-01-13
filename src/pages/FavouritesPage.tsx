@@ -7,7 +7,7 @@ import { formatMoney } from "../utils/formatMoney";
 import { useNavigate } from "react-router-dom";
 
 const FavouritesPage = () => {
-  const isSmall = useIsSmallScreen();
+  const isSmall = useIsSmallScreen(1024);
   const [selectedAd, setSelectedAd] = useState<null | Product>(null);
 
   const {
@@ -20,9 +20,9 @@ const FavouritesPage = () => {
 
   return (
     <>
-      {/* Mobile Layout */}
+      {/* Mobile, ipad Layout */}
       {isSmall && (
-        <div className="flex flex-col w-screen h-screen bg-gray-50 max-sm:pt-17.5">
+        <div className="flex flex-col w-screen h-screen bg-gray-50 max-lg:pt-17.5">
           {/* Header */}
           {/* <div className="px-4 py-4">
             <div className="flex items-center gap-3">
@@ -65,18 +65,19 @@ const FavouritesPage = () => {
                   <div
                     key={ad.id ?? index}
                     className="bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm relative"
+                    onClick={() => navigate(`/ads/${ad.id}`) }
                   >
                     {/* Image on left */}
                     <img
-                      className="h-20 w-24 rounded-lg object-cover flex-shrink-0"
+                      className="h-20 w-24 sm:h-24 sm:w-32 rounded-lg object-cover flex-shrink-0"
                       src={ad.image ?? "/no-image.jpeg"}
                       alt={ad.name ?? "Favourite"}
                     />
 
                     {/* Name and Price */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{ad.name}</p>
-                      <p className="text-xs text-gray-600">
+                      <p className="font-medium text-sm sm:text-base truncate">{ad.name}</p>
+                      <p className="text-xs sm:text-lg text-gray-600">
                         {formatMoney(ad.price)}
                       </p>
                     </div>
@@ -120,12 +121,12 @@ const FavouritesPage = () => {
             <img
               src="/favorited.svg"
               alt="Favourites"
-              className="w-10 h-auto bg-[#f3f4f6] rounded-full p-2.5"
+              className="w-10 max-lg:w-20 h-auto bg-[#f3f4f6] rounded-full p-2.5"
             />
 
             <div className="ml-8">
               <h2>
-                <span className="font-bold text-xl">{favourites.length}</span> Ads
+                <span className="font-bold text-xl">{favourites.length}</span> Ad{favourites.length !== 1 ? "s" : ""}
                 Favourited
               </h2>
             </div>

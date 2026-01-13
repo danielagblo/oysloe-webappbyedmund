@@ -15,7 +15,7 @@ const FeedbackPage = () => {
   const [modalStartY, setModalStartY] = useState(0);
   const [modalTranslateY, setModalTranslateY] = useState(0);
   const modalRef = useRef<HTMLDivElement>(null);
-  const isSmall = useIsSmallScreen();
+  const isSmall = useIsSmallScreen(1024);
 
   useFeedbacks();
   const create = useCreateFeedback();
@@ -109,7 +109,7 @@ const FeedbackPage = () => {
 
           <button
             onClick={() => setShowModal(true)}
-            className="bg-white text-gray-700 py-4 rounded-2xl font-medium text-base cursor-pointer hover:bg-gray-100 transition fixed bottom-20 left-4 right-4"
+            className="bg-white text-gray-700 py-4 sm:py-6 lg:py-4 rounded-2xl font-medium text-base cursor-pointer hover:bg-gray-100 transition fixed bottom-20 sm:bottom-25 lg:bottom-20 left-4 right-4"
           >
             Send Feedback
           </button>

@@ -9,9 +9,10 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { initiatePaystackPayment } from "../services/paymentService";
 import { formatMoney } from "../utils/formatMoney";
+import { toast } from "sonner";
 
 const SubscriptionPage = () => {
-  const isSmall = useIsSmallScreen();
+  const isSmall = useIsSmallScreen(1024);
   const subsQuery = useSubscriptions();
   const userSubsQuery = useUserSubscriptions();
 
@@ -77,6 +78,7 @@ const SubscriptionPage = () => {
   };
 
   const handlePayNow = () => {
+    
     if (selectedSubId !== null) {
       handleSubscribe(selectedSubId);
     }
@@ -138,9 +140,9 @@ const SubscriptionPage = () => {
   if (isSmall) {
     return (
       <>
-        <div className="flex flex-col w-full h-screen w-screen bg-gray-50 px-4 py-8 max-sm:py-20 overflow-y-auto">
+        <div className="flex flex-col w-full h-screen w-screen bg-gray-50 px-4 py-8 sm:pb-0 max-lg:py-20 overflow-y-auto">
           {activeUserSub && (
-            <div className="bg-(--div-active) max-sm:bg-white flex p-4 rounded-2xl justify-between items-center gap-2 w-full mb-6">
+            <div className="bg-(--div-active) max-lg:bg-white flex p-4 rounded-2xl justify-between items-center gap-2 w-full mb-6">
               <div className="w-full flex flex-col justify-start items-start gap-4">
                 <p className="text-sm font-light text-nowrap">
                   You're currently subscribed
@@ -168,7 +170,7 @@ const SubscriptionPage = () => {
             <p className="text-center text-red-500">Failed to load plans</p>
           )}
 
-          <div className="flex flex-col gap-6 flex-1">
+          <div className="flex flex-col gap-6 max-sm:flex-1">
             {subscriptions.map((s) => (
               <div
                 key={s.id}
@@ -220,9 +222,11 @@ const SubscriptionPage = () => {
           </div>
 
           <button
-            onClick={handlePayNow}
-            disabled={selectedSubId === null || subscribingId !== null}
-            className="w-full bg-gray-200  font-medium py-3 rounded-xl mt-8 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition"
+            onClick={() => {
+              if (!selectedSubId || subscribingId) toast.error("Please select a plan to proceed.");
+              else handlePayNow();
+            }}
+            className={`w-full bg-gray-200  font-medium py-3 sm:py-5 rounded-xl max-lg:mt-8 hover:bg-gray-300 ${selectedSubId === null || subscribingId !== null ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} transition`}
           >
             {subscribingId !== null ? "Processing..." : "Pay Now"}
           </button>

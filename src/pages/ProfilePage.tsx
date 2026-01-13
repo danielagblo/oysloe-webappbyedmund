@@ -102,9 +102,9 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed]">
+    <div className="overflow-y-hidden no-scrollbar flex sm:justify-between h-[100vh] w-[100vw] items-center bg-[#ededed] lg:bg-[#ededed] sm:bg-white">
 
-        <div className=" sm:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-4 flex items-center justify-between">
+        <div className=" lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50 px-4 py-4 flex items-center justify-between">
           <button
             onClick={handleBackClick}
             className="text-sm whitespace-nowrap font-medium text-gray-700 hover:text-gray-900"
@@ -122,13 +122,13 @@ const ProfilePage = () => {
         <ProfileSidebar active={activeTab} onSelect={setActiveTab} />
       </div>
 
-      <div className="flex no-scrollbar h-full items-start sm:items-center justify-center sm:w-[63vw] sm:mr-6 sm:ml-2 overflow-y-hidden no-scrollbar">
-        <div className="flex gap-2 sm:h-full sm:w-[60vw]">
+      <div className="flex no-scrollbar h-full items-start sm:items-center justify-center lg:w-[63vw] lg:mr-6 lg:ml-2 overflow-y-hidden no-scrollbar">
+        <div className="flex gap-2 lg:h-full lg:w-[60vw]">
           {renderContent()}
         </div>
       </div>
 
-      <div className="hidden sm:flex w-[20vw] h-[100vh] items-center justify-center mr-[2.125vw]">
+      <div className="hidden lg:flex w-[20vw] h-[100vh] items-center justify-center mr-[2.125vw]">
         <ProfileStats />
       </div>
       <MenuButton />

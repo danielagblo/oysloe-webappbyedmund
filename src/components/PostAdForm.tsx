@@ -1634,7 +1634,7 @@ export default function PostAdForm({
                         {...provided.droppableProps}
                         className="
                           grid gap-3 sm:gap-4 relative mt-3 overflow-y-auto no-scrollbar
-                          grid-cols-2 sm:grid-cols-3
+                          grid-cols-3
                         "
                       >
                         {uploadedImages.map((img, index) => (
@@ -1653,7 +1653,7 @@ export default function PostAdForm({
                                 <img
                                   src={img.url}
                                   alt={`Uploaded ${img.id}`}
-                                  className="w-full h-full rounded-lg object-cover cursor-pointer"
+                                  className="w-full h-full rounded-lg object-cover aspect-square cursor-pointer"
                                   onClick={() => setSelectedImage(img.id)}
                                 />
                                 {selectedImage === img.id && (

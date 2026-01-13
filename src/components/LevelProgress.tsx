@@ -95,7 +95,7 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
     >
       <div className={listClass}>
         <div className="px-2">
-          <h2 className={`text-[1.25vw] font-semibold max-sm:text-lg`}>
+          <h2 className={`text-[1.25vw] font-semibold max-lg:text-lg`}>
             Earning track
           </h2>
         </div>
@@ -103,8 +103,8 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
           <div
             className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between shadow-xs ${cardHeightClass}`}
           >
-            <h2 className="text-[1vw] max-sm:text-base">Silver</h2>
-            <h3 className="text-[0.9vw] text-gray-500 max-sm:text-sm">
+            <h2 className="text-[1vw] max-lg:text-base">Silver</h2>
+            <h3 className="text-[0.9vw] text-gray-500 max-lg:text-sm">
               {computedRemainingToGold.toLocaleString()} points to gold
             </h3>
             <div className="my-2 w-full">
@@ -114,8 +114,8 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
           <div
             className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between ${cardHeightClass}`}
           >
-            <h2 className="text-[1vw] max-sm:text-base">Gold</h2>
-            <h3 className="text-[0.9vw] text-gray-500 max-sm:text-sm">
+            <h2 className="text-[1vw] max-lg:text-base">Gold</h2>
+            <h3 className="text-[0.9vw] text-gray-500 max-lg:text-sm">
               {computedRemainingToDiamond.toLocaleString()} points to diamond
             </h3>
             <div className="my-2 w-full">
@@ -125,8 +125,8 @@ const LevelProgress: React.FC<LevelProgressProps> = ({
           <div
             className={`bg-[#F9F9F9] ${cardPadding} flex flex-col justify-between shadow-xs ${cardHeightClass}`}
           >
-            <h2 className="text-[1vw] max-sm:text-base">Diamond</h2>
-            <h3 className="text-[0.9vw] text-gray-500 max-sm:text-sm">
+            <h2 className="text-[1vw] max-lg:text-base">Diamond</h2>
+            <h3 className="text-[0.9vw] text-gray-500 max-lg:text-sm">
               {computedDiamondPointsText}
             </h3>
             <div className="my-1 w-full">

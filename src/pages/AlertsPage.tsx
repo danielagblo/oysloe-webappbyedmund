@@ -264,7 +264,7 @@ const AlertsPanel = ({
       {/* Fixed-height container only for desktop */}
       <div className="bg-white w-full mr-2 lg:w-[75vw] lg:h-[93vh] lg:rounded-2xl shadow-sm flex flex-col">
         {/* Header (desktop only) */}
-        <div className="p-4 sm:p-6 border-b hidden sm:block border-gray-100 shrink-0 relative">
+        <div className="p-4 sm:p-6 border-b hidden lg:block border-gray-100 shrink-0 relative">
           <h2 className="sm:text-center sm:text-3xl sm:font-semibold">
             Alerts
           </h2>
@@ -661,7 +661,7 @@ const AlertsPage = () => {
 
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-[#ededed]">
-      <div className="sm:hidden w-full">
+      <div className="lg:hidden w-full">
         <MobileBanner
           page="Alerts"
           showMenuButton={alerts.length > 0}

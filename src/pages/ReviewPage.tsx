@@ -167,7 +167,7 @@ const ReviewPage = () => {
       </div>
 
       {/* Main Review Area (desktop) */}
-      <div className="hidden sm:flex w-[75vw] h-[93vh] pr-2 gap-4 mt-0">
+      <div className="hidden lg:flex w-[75vw] h-[93vh] pr-2 gap-4 mt-0">
         {/* Comments Panel */}
         <div className="relative bg-white w-[55%] rounded-2xl shadow-lg flex flex-col p-4 overflow-y-auto no-scrollbar">
           <div className="sticky -mt-4 -top-4 left-0 pt-2 bg-white">
@@ -403,10 +403,10 @@ const ReviewPage = () => {
       </div>
 
       {/* Mobile Layout */}
-      <div className="flex flex-col sm:hidden w-full mt-16 relative">
+      <div className="flex flex-col lg:hidden w-full mt-16 sm:mt-0 relative">
         {/* Reviews Section */}
         <div className="p-4 bg-white h-[90vh] -mt-12">
-          <h2 className="text-xl font-semibold mb-3">User Reviews</h2>
+          <h2 className="text-xl font-semibold mb-3 sm:mt-5">User Reviews</h2>
           <div className="flex gap-2 w-full items-center justify-center flex-wrap mb-4">
             <button
               onClick={() => setRatingFilter(null)}

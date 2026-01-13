@@ -115,16 +115,16 @@ const ReferPage = () => {
   // paymentData removed (no transactions endpoint available)
 
   const Refer = () => (
-    <div className="h-full md:h-[93vh] min-h-0 md:overflow-auto no-scrollbar w-full flex flex-col gap-2 rounded-2xl">
-      <div className="max-md:px-2 max-md:mt-3 max-sm:mt-11">
+    <div className="h-full lg:h-[93vh] min-h-0 md:overflow-auto no-scrollbar w-full flex flex-col gap-2 rounded-2xl">
+      <div className="max-md:px-2 max-sm:mt-11">
         <div className="bg-white w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
-          <div className="flex gap-2 my-2 ">
+          <div className="flex gap-2 my-2 sm:items-center ">
             <img
               src="/star green.svg"
               alt=""
-              className="w-4 h-4 md:w-[1.2vw] md:h-[1.2vw] my-auto"
+              className="w-4 h-4 sm:w-7 sm:h-7 lg:w-[1.2vw] lg:h-[1.2vw] my-auto"
             />
-            <h2 className="text-sm md:text-[1.2vw]">Points</h2>
+            <h2 className="text-sm sm:text-6 lg:text-[1.2vw]">Points</h2>
           </div>
           <div className="flex flex-col gap-1">
             <div
@@ -159,10 +159,10 @@ const ReferPage = () => {
           <div className="flex flex-col items-center justify-between gap-2">
             <img
               src="/earn.svg"
-              className="w-5 h-5 md:w-[2vw] md:h-[2vw] md:mx-2"
+              className="w-5 h-5 sm:h-7 sm:w-7 lg:w-[2vw] lg:h-[2vw] md:mx-2"
               alt="earn"
             />
-            <span className="text-sm md:text-[1vw]">Earn</span>
+            <span className="text-sm sm:text-base lg:text-[1vw]">Earn</span>
           </div>
           <img src="/arrowright.svg" alt="" />
         </div>
@@ -178,10 +178,10 @@ const ReferPage = () => {
           <div className="flex flex-col items-center justify-between gap-2">
             <img
               src="/Redeem.svg"
-              className="w-5 h-5 md:w-[2vw] md:h-[2vw] md:mx-1"
+              className="w-5 h-5 sm:w-7 sm:h-7 lg:w-[2vw] lg:h-[2vw] md:mx-1"
               alt="redeem"
             />
-            <span className="text-sm md:text-[1vw]">Redeem</span>
+            <span className="text-sm sm:text-base lg:text-[1vw]">Redeem</span>
           </div>
           <img src="/arrowright.svg" alt="" />
         </div>
@@ -196,48 +196,48 @@ const ReferPage = () => {
         }}
       >
         <div className="flex flex-col justify-between w-full">
-          <h2 className="text-sm md:text-[1.2vw]">
+          <h2 className="text-sm sm:text-7 lg:text-[1.2vw]">
             {(profile ? profile.level : "Gold") + " (Level)"}
           </h2>
-          <h3 className="text-xs text-gray-400 md:text-[1vw]">{nextText}</h3>
+          <h3 className="text-xs text-gray-400 sm:text-base lg:text-[1vw]">{nextText}</h3>
           <div className="my-2 w-full">
             <ProgressBar percent={displayPercent} />
           </div>
         </div>
         <img className="mb-9" src="/arrowright.svg" alt="" />
       </div>
-      <div className="bg-white w-full max-sm:w-[96%] max-sm:mx-auto max-sm:h-fit h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 max-sm:pb-0 pb-18">
+      <div className="bg-white w-full max-sm:w-[96%] max-sm:mx-auto max-lg:h-fit h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 max-sm:pb-0 pb-18">
         <div className="w-full flex flex-col justify-center gap-2">
-          <h2 className="text-sm 2xl:text-xl md:text-[1.5vw]">
+          <h2 className="text-sm lg:text-xl sm:text-lg">
             Refer Your friends and Earn
           </h2>
           <span>
             <p className="inline">&#10004;</p>
-            <h2 className="text-xs md:text-[1vw] inline pl-3 text-gray-400">
+            <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Pro Partnership status
             </h2>
           </span>
           <span>
             <p className="inline">&#10004;</p>
-            <h2 className="text-xs md:text-[1vw] inline pl-3 text-gray-400">
+            <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               All Ads stays promoted for a month
             </h2>
           </span>
           <span>
             <p className="inline">&#10004;</p>
-            <h2 className="text-xs md:text-[1vw] inline pl-3 text-gray-400">
+            <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Share unlimited number of Ads
             </h2>
           </span>
           <span>
             <p className="inline">&#10004;</p>
-            <h2 className="text-xs md:text-[1vw] inline pl-3 text-gray-400">
+            <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Boost your business
             </h2>
           </span>
         </div>
-        <div className=" mt-10 md:mt-5 w-full">
-          <h2 className="text-xs md:text-[1vw] text-gray-400">
+        <div className=" mt-10 lg:mt-5 w-full">
+          <h2 className="text-xs sm:text-base lg:text-[1vw] text-gray-400">
             You've referred 0 friends
           </h2>
           <div className="flex gap-2 items-center justify-between w-full">
@@ -247,7 +247,7 @@ const ReferPage = () => {
                 value={profile?.referral_code ?? ""}
                 readOnly
                 placeholder="No referral code"
-                className="focus:outline-none rounded text-md ml-3 md:text-[2vw]"
+                className="focus:outline-none rounded text-md ml-3 sm:py-2 lg:py-0 sm:text-lg lg:text-[1vw]"
               />
               <CopyButton
                 value={profile?.referral_code ?? ""}
@@ -309,7 +309,7 @@ const ReferPage = () => {
           />
           <div>
             <h2 className="text-sm text-gray-400 md:text-[1.2vw]">You get</h2>
-            <h2 className="text-xs md:text-[1vw]">50 Points</h2>
+            <h2 className="text-xs sm:text-base lg:text-[1vw]">50 Points</h2>
           </div>
         </div>
         <div className="flex gap-8 justify-start items-center">
@@ -327,16 +327,16 @@ const ReferPage = () => {
     </div>
   );
   const Redraw = () => (
-    <div className="h-full md:h-[93vh] lg:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
+    <div className="h-full sm:h-fit lg:h-[93vh] lg:overflow-auto no-scrollbar w-full px-8 bg-white rounded-2xl flex flex-col gap-6">
       <RedrawInner />
       <div>
         <div className="pb-3 text-center">
-          <p className="text-xs ">Payment</p>
-          <p className="text-xs text-gray-400">Recent transactions</p>
+          <p className="text-xs sm:text-sm lg:text-xs">Payment</p>
+          <p className="text-xs text-gray-400 sm:text-sm lg:text-xs">Recent transactions</p>
         </div>
 
         <div className="w-full overflow-hidden py-6 flex items-center justify-center">
-          <p className="text-sm text-gray-500">No redrawal made</p>
+          <p className="text-sm sm:text-base lg:text-sm text-gray-500">No redrawal made</p>
         </div>
       </div>
     </div>
@@ -408,7 +408,7 @@ const ReferPage = () => {
             <img src="/Redeem.svg" alt="" className="w-5 h-5" />
             <h2 className="inline">Apply Coupon</h2>
           </div>
-          <div className="flex justify-between w-full text-xs text-gray-600">
+          <div className="flex justify-between w-full text-xs sm:text-sm lg:text-xs text-gray-600">
             <h2>Get Cash equivalent</h2>
             <h2>
               {data && typeof data.discount_value !== "undefined"
@@ -466,8 +466,8 @@ const ReferPage = () => {
   );
 
   return (
-    <div className="h-screen max-sm:w-screen lg:w-full max-lg:w-full bg-[var(--background)] mb-5 relative">
-      <div className="w-full md:grid md:grid-cols-2 py-5 md:py-[3.5vh] h-full overflow-hidden gap-4">
+    <div className="h-screen max-lg:w-screen lg:w-full bg-[#ededed] mb-5 relative">
+      <div className="w-full md:grid md:grid-cols-2 py-5 lg:py-[3.5vh] h-full overflow-hidden gap-4 sm:mt-15 lg:mt-0 sm:px-4 lg:px-0">
         <Refer />
         <div className="md:w-full no-scrollbar">
           <div className="hidden md:h-full md:block md:min-h-[94vh]">
