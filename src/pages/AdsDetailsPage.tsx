@@ -716,7 +716,7 @@ const AdsDetailsPage = () => {
       <div
         id="main-scroll"
         style={{ color: "var(--dark-def)" }}
-        className="flex flex-col items-center w-full sm:w-full min-h-screen px-0 max-sm:pt-10 sm:px-12 gap-6 sm:gap-2 bg-(--div-active) sm:bg-white"
+        className="flex flex-col items-center w-full sm:w-full min-h-screen px-0 max-sm:pt-10 sm:px-3 lg:px-12 gap-6 sm:gap-2 bg-(--div-active) sm:bg-white"
       >
         <MobileHeader
           imageCount={imageCount}
@@ -775,13 +775,13 @@ const AdsDetailsPage = () => {
             id={id}
           />
 
-          <div className="sm:pr-6">
+          <div className="lg:pr-6 sm:pr-4">
             {currentAdData?.description && (
               <div className="bg-white sm:bg-(--div-active) my-4 sm:p-6 rounded-2xl py-3 px-4 w-full">
-                <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">
+                <h2 className="text-xl sm:text-5 lg:text-[1.75vw] font-bold mb-2">
                   Description
                 </h2>
-                <p className="text-sm md:text-[1.125vw] text-gray-700 whitespace-pre-line">
+                <p className="text-sm sm:text-5 lg:text-[1.125vw] text-gray-700 whitespace-pre-line">
                   {String(currentAdData.description)}
                 </p>
               </div>
@@ -887,7 +887,7 @@ const AdsDetailsPage = () => {
                 </div>
                 <div className="flex flex-col space-y-6 w-full md:w-1/2">
                   <SafetyTips />
-                  <div className="p-6 rounded-lg w-full">
+                  <div className="p-6 max-lg:p-0 rounded-lg w-full">
                     <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
                       <ActionButtons
                         currentAdData={currentAdData}

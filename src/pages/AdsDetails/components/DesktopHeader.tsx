@@ -20,9 +20,9 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/location.svg"
           alt=""
-          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+          className="w-3 h-3 sm:w-5 sm:h-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">
+        <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
           {currentAdData?.location?.name || "Unknown"}
         </h2>
       </div>
@@ -31,9 +31,9 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/star.svg"
           alt=""
-          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+          className="w-3 h-3 sm:h-5 sm:w-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
-        <h2 className="text-base  md:text-[1.125vw]">
+        <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
           {currentAdData?.average_rating ? currentAdData.average_rating : "0.0"}{" "}
           &nbsp;&nbsp;&nbsp;{currentAdData?.total_reviews || "No"} Review
           {(currentAdData?.total_reviews > 1 ||
@@ -45,9 +45,9 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/flag.svg"
           alt=""
-          className="w-3 h-3 md:w-[1.2vw] md:h-[1.2vw]"
+          className="w-3 h-3 sm:h-5 sm:w-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">
+        <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
           {String(currentAdData?.total_reports)}
         </h2>
       </div>
@@ -55,15 +55,15 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/favorited.svg"
           alt=""
-          className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
+          className="w-5 h-5 sm:w-5 sm:h-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
-        <h2 className="text-base md:text-[1.125vw]">
+        <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
           {currentAdData?.total_favourites}
         </h2>
       </div>
       {/* Image count (desktop) - mirrors mobile header */}
       <div className="flex items-center gap-2">
-        <h2 className="text-sm font-medium">
+        <h2 className="text-sm sm:text-5 lg:text-[1.125vw] font-medium">
           {imageCount > 0
             ? `${Math.min(galleryIndex + 1, imageCount)}/${imageCount}`
             : `0/0`}
@@ -71,7 +71,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
       </div>
       <div className="flex gap-2 ml-auto items-center">
         {multiplierLabel && (
-          <div className="text-black font-bold rounded-lg px-2 py-0.5 text-xs bg-green-300">
+          <div className="text-black font-bold rounded-lg px-2 py-0.5 text-xs sm:text-5 lg:text-[1.125vw] bg-green-300">
             {multiplierLabel}
           </div>
         )}

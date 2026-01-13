@@ -12,38 +12,38 @@ const QuickChat: React.FC<QuickChatProps> = ({
   openChatWithOwnerAndSend,
 }) => (
   <div className="w-full">
-    <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:p-4 lg:p-6 sm:shadow-none">
+    <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:py-4 sm:px-1 lg:p-6 sm:shadow-none">
       <div className="flex items-center gap-2 mb-3">
         <img src="/quick chat.svg" alt="" className="w-5 h-5" />
-        <h6 className="font-semibold text-xs md:text-[1vw]">Quick Chat</h6>
+        <h6 className="font-semibold text-xs sm:text-6 lg:text-[1vw]">Quick Chat</h6>
       </div>
       <div
         className="flex flex-wrap
        flex-row gap-2 mb-4 w-full text-(--dark-def) font-medium justify-start"
       >
         <button
-          className="py-1 px-4  bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[22px] md:text-[1.8vw]  max-sm:py-1 hover:bg-gray-100 whitespace-nowrap w-fit"
+          className="py-1 px-4  bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[22px] sm:text-5 lg:text-[1.8vw]  max-sm:py-1 hover:bg-gray-100 whitespace-nowrap w-fit"
           onClick={() => setQuickChatInput("👋")}
         >
           👋
         </button>
 
         <button
-          className="px-4 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+          className="px-4 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] sm:text-5 lg:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
           onClick={() => setQuickChatInput("Delivery possible?")}
         >
           Delivery possible?
         </button>
         <div className="flex flex-row flex-wrap gap-1">
           <button
-            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] sm:text-5 lg:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
             onClick={() => setQuickChatInput("Lower the price please?")}
           >
             Lower the price please?
           </button>
 
           <button
-            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] md:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
+            className="px-2.5 py-2 bg-(--div-active) sm:bg-white rounded-t-2xl rounded-bl-2xl rounded-br-0 text-[12px] sm:text-6 lg:text-[1vw]  max-sm:py-3 hover:bg-gray-100 whitespace-nowrap w-fit"
             onClick={() => setQuickChatInput("Confirm the condition?")}
           >
             Confirm the condition?
@@ -59,7 +59,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
             value={quickChatInput}
             onChange={(e) => setQuickChatInput(e.target.value)}
             style={{ border: "1px solid var(--div-border)" }}
-            className="rounded-2xl px-3 pr-12 py-3 bg-no-repeat sm:bg-white text-sm lg:text-base md:text-[1.125vw] w-full sm:border-(--dark-def)"
+            className="rounded-2xl px-3 pr-12 py-3 bg-no-repeat sm:bg-white text-sm lg:text-base sm:text-5 lg:text-[1.125vw] w-full sm:border-(--dark-def)"
           />
           <button
             type="button"
@@ -112,7 +112,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
       </div>
       <div className="mt-4 whitespace-nowrap text-[10px] flex flex-nowrap gap-2 text-gray-600 justify-start items-center">
         <div className="flex items-center justify-end relative">
-          <h4 className="bg-(--green) h-fit p-0 pl-1 pr-8 rounded-2xl md:text-[0.8vw]">
+          <h4 className="bg-(--green) h-fit p-0 pl-1 pr-8 rounded-2xl sm:text-4 lg:text-[0.8vw]">
             Chat is secured
           </h4>
           <img
@@ -121,7 +121,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
             className="bg-(--green) z-10 rounded-full w-6 h-6 p-1 absolute"
           />
         </div>
-        <div className="flex items-center gap-1 md:text-[0.8vw]">
+        <div className="flex items-center gap-1 sm:text-4 lg:text-[0.8vw]">
           <img
             src="/shield.svg"
             alt=""

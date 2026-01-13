@@ -134,14 +134,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             ...(caller2
               ? ([["outgoing call.svg", "Caller 2"]] as [string, string][])
               : []),
-            ["Make an offer.svg", "Make Offer"],
+            // ["Make an offer.svg", "Make Offer"],
             ["favorited.svg", "Favorites"],
           ];
           return items.map(([icon, label]) => (
             <div key={label} className="relative inline-block sm:w-full">
               <button
                 key={label}
-                className={`flex items-center w-full gap-2 p-4 h-5 rounded-lg text-sm md:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
+                className={`flex items-center w-full gap-2 p-4 sm:py-6 lg:py-4 h-5 rounded-lg text-sm sm:text-5 lg:text-[1.125vw] bg-(--div-active) transition sm:bg-white hover:bg-gray-50
                   ${
                     actions[label]
                       ? "cursor-pointer hover:bg-gray-200 lg:hover:scale-95 active:scale-105"
@@ -196,7 +196,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <img
                           src={`/${icon}`}
                           alt=""
-                          className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
+                          className="w-4 h-4 sm:h-5 sm:w-5 lg:h-[1.125vw] lg:w-[1.125vw]"
                         />
                         <p className="whitespace-nowrap">{label}</p>
                       </>

@@ -48,13 +48,13 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
                 setIsSellerModalOpen(true);
               }
             }}
-            className="w-15 h-15 md:w-[5vw] md:h-[5vw] rounded-full cursor-pointer"
+            className="w-15 h-15 lg:w-[5vw] lg:h-[5vw] rounded-full cursor-pointer"
           />
           {owner?.business_logo && (
             <img
               src={owner?.business_logo}
               alt={`${owner?.name || "Seller"} business logo`}
-              className="absolute -bottom-1 -right-2 w-8 h-8 md:w-[3vw] md:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
+              className="absolute -right-1 -bottom-1 border-3 border-white lg:border-0 lg:-bottom-1 lg:-right-2 w-8 h-8 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
               onClick={() => {
                 setSellerModalImage(
                   owner?.business_logo || owner?.avatar || "/userPfp2.jpg",
@@ -73,7 +73,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
           )}
         </div>
         <div>
-          <h2 className="text-sm text-gray-500 md:text-[1vw]">
+          <h2 className="text-sm text-gray-500 sm:text-3 lg:text-[1vw]">
             {currentAdData?.created_at
               ? new Date(currentAdData.created_at).toLocaleString(undefined, {
                 month: "short",
@@ -81,10 +81,10 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
               })
               : ""}
           </h2>
-          <h3 className="font-semibold md:text-[1.2vw]">
+          <h3 className="font-semibold sm:text-5 lg:text-[1.2vw]">
             {owner?.name ?? "Seller"}
           </h3>
-          <h3 className="text-sm text-gray-600 md:text-[1vw]">
+          <h3 className="text-sm text-gray-600 sm:text-4 lg:text-[1vw]">
             Total Ads: {sellerProducts.length}
           </h3>
         </div>
@@ -92,10 +92,10 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
 
       <div className="flex items-center justify-between px-2 mb md:mb-6">
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
-          <h4 className="text-xl md:text-[1.5vw]">{displayBusinessName}</h4>
+          <h4 className="text-xl sm:text-6 lg:text-[1.5vw]">{displayBusinessName}</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
             <img src="/tick.svg" alt="" className="w-3 h-3" />
-            <span className="text-[10px] md:text-[0.9vw] text-green-800">
+            <span className="text-[10px] sm:text-5 lg:text-[0.9vw] text-green-800">
               {(() => {
                 const ownerLevel = (owner as unknown as { level?: string })
                   ?.level as string | undefined;
@@ -107,7 +107,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
         </div>
         <button
           onClick={() => setIsSellerAdsModalOpen(true)}
-          className="px-2 py-1 h-full rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
+          className="px-2 py-1 h-full rounded text-sm sm:text-5 lg:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
         >
           Seller Ads
         </button>

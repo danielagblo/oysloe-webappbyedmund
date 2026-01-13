@@ -15,15 +15,15 @@ const TitleAndPrice: React.FC<TitleAndPriceProps> = ({
   return (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
-        <img src="/location.svg" alt="" className="w-3 h-3" />
-        <h2 className="text-sm md:text-[1.1vw]">
+        <img src="/location.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 lg:w-[1.2vw] lg:h-[1.2vw]" />
+        <h2 className="text-sm sm:text-5 lg:text-[1.1vw]">
           {currentAdData?.location?.name && currentAdData?.location?.region
             ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region`
             : "Unknown"}
         </h2>
       </div>
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl md:text-[2vw] font-medium">
+        <h2 className="text-2xl sm:text-5 lg:text-[2vw] font-medium">
           {currentAdData?.name || "Untitled Product"}
         </h2>
         {((currentAdData as any)?.is_taken ||
@@ -33,7 +33,7 @@ const TitleAndPrice: React.FC<TitleAndPriceProps> = ({
           </span>
         )}
       </div>
-      <h2 className="text-xl font-medium md:text-[1.5vw]">
+      <h2 className="text-xl font-medium sm:text-5 lg:text-[1.5vw]">
         {currentAdData?.price
           ? `${formatMoney(currentAdData?.price)}${currentAdData?.type?.toLowerCase() === "rent" ? " per month" : ""}`
           : "Please Contact the Seller for the Price of this Product"}

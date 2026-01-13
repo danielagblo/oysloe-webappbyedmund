@@ -15,8 +15,8 @@ const AdDetails: React.FC<AdDetailsProps> = ({
 }) => {
   return (
     <div className=" sm:p-6 md:pl-0">
-      <h2 className="text-xl md:text-[1.75vw] font-bold mb-2">Ad Details</h2>
-      <ul className="list-disc ml-5 md:ml-10 marker:text-black marker:font-extrabold space-y-2 text-sm md:text-[1.125vw]">
+      <h2 className="text-xl sm:text-5 lg:text-[1.75vw] font-bold mb-2">Ad Details</h2>
+      <ul className="list-disc ml-5 md:ml-10 marker:text-black marker:font-extrabold space-y-2 text-sm sm:text-5 lg:text-[1.125vw]">
         <li>
           <span className="font-bold">Ad ID&nbsp;</span> {id}
         </li>

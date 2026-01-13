@@ -103,14 +103,14 @@ const FilterButton = ({
         className={`${className} hidden sm:block`}
       >
         <div
-          className={`bg-white w-[10vw] h-[3.5vw] rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}
+          className={`bg-white w-[10vw] h-[3.5vw] max-lg:h-[3.5vh] max-lg:w-[10vh] max-lg:mb-2 rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}
         >
           {activeFiltersCount > 0 && (
             <div className="absolute -top-1 right-0 bg-(--dark-def) text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {activeFiltersCount}
             </div>
           )}
-          <p className="text-[1.25vw]">Filter</p>
+          <p className="text-[1.25vw] max-lg:text-2xl">Filter</p>
           <img
             src="/filter-svgrepo.svg"
             alt="Filter"

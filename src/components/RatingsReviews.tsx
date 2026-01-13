@@ -45,11 +45,11 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
 
   const ratingSection = (
     <div className={`flex flex-col items-center justify-center`}>
-      <h3 className={"font-medium text-5xl mt-3 md:text-[5vw]"}>
+      <h3 className={"font-medium text-5xl mt-3 sm:text-10 lg:text-[5vw]"}>
         {rd ? rd.avg.toFixed(1) : avgDisplay}
       </h3>
       <p
-        className={` md:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}
+        className={`sm:text-5 lg:text-[1.5vw] whitespace-nowrap ${layout === "row" ? "text-base" : "text-lg"}`}
       >
         {Array.from({ length: 5 }).map((_, i) => (
           <span
@@ -65,7 +65,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
         ))}
       </p>
       <p
-        className={`text-gray-600 md:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}
+        className={`text-gray-600 sm:text-5 lg:text-[1.2vw] mb-3 ${layout === "row" ? "text-sm" : "text-lg"}`}
       >
         {isLoading
           ? "..."
@@ -94,13 +94,13 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
                   style={{ gap: "clamp(0.5rem, 1.5vw, 1.5rem)" }}
                 >
                   <span
-                    className="text-(--dark-def) flex-shrink-0 text-xs md:text-[1.25vw] text-right"
+                    className="text-(--dark-def) flex-shrink-0 text-xs sm:text-5 lg:text-[1.25vw] text-right"
                     style={{ width: "clamp(2rem, 3vw, 4rem)" }}
                   >
                     ★ {star}
                   </span>
                   <div
-                    className="flex-1 h-1.25 md:h-[0.55vw] bg-gray-200 rounded"
+                    className="flex-1 h-1.25 sm:h-1.5 lg:h-[0.55vw] bg-gray-200 rounded"
                     style={{ minWidth: "100px", maxWidth: "600px" }}
                   >
                     <div
@@ -109,7 +109,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
                     />
                   </div>
                   <span
-                    className="text-sm md:text-[1vw] text-gray-500 flex-shrink-0 text-left"
+                    className="text-sm sm:text-5 lg:text-[1vw] text-gray-500 flex-shrink-0 text-left"
                     style={{ width: "clamp(2.5rem, 3.5vw, 5rem)" }}
                   >
                     {Math.round(pct)}%
@@ -159,7 +159,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
               {barsSection}
             </div>
           </div>
-          <div className="flex flex-row my-2 max-w-[90vw] mx-auto gap-4 max-md:gap-2 items-center justify-center md:justify-around md:px-[10%] md:text-[1.25vw]">
+          <div className="flex flex-row my-2 max-w-[90vw] -ml-4 max-sm:ml-0 lg:ml-0 mx-auto gap-4 max-lg:gap-2 items-center justify-center md:justify-around lg:px-[10%] sm:text-2 lg:text-[1.25vw]">
             <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ All
             </p>

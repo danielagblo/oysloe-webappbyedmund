@@ -157,12 +157,12 @@ const ReviewPage = () => {
   return (
     <div className="flex flex-col lg:flex-row items-center justify-center w-[100vw] min-h-screen bg-(--div-active) text-(--dark-def) relative overflow-hidden">
       {/* Mobile header */}
-      <div className="sm:hidden w-full fixed top-0 z-30">
+      <div className="lg:hidden w-full fixed top-0 z-30">
         <MobileBanner page="Reviews" />
       </div>
 
       {/* Profile sidebar (desktop only) */}
-      <div className="hidden sm:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
+      <div className="hidden lg:flex w-[25vw] h-[100vh] items-center justify-center pl-2">
         <ProfileStats />
       </div>
 

@@ -173,7 +173,7 @@ const SelectACategory = ({
                 className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] max-sm:w-[8vw] max-sm:h-[8vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
               />
             </div>
-            <h3 className="text-center flex items-center justify-center text-xs sm:text-[1.25vw] mt-1 truncate">
+            <h3 className="text-center flex items-center justify-center text-xs sm:text-[13px] lg:text-[1.25vw] mt-1 truncate">
               {category.name}
             </h3>
           </div>

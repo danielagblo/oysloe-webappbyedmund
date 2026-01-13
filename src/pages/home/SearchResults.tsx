@@ -28,10 +28,10 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
   return (
     <div className="bg-(--div-active) w-full flex justify-center -mb-4">
       <div
-        className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-[95vw] pb-8"
+        className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 w-[95vw] pb-8 sm:pb-25 lg:pb-8"
       >
         {filteredResults.map((ad) => (
-          <div key={ad.id} className="flex flex-col w-full sm:max-w-[18vw] overflow-hidden">
+          <div key={ad.id} className="flex flex-col w-full lg:max-w-[18vw] sm:max-w-[30vw] overflow-hidden">
             <Link
               to={`/ads/${ad.id}`}
               state={{ adData: ad }}

@@ -21,12 +21,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   return (
     <div className="lg:p-2 w-full rounded-lg lg:p-0">
       <h2 className="text-2xl font-medium sm:hidden inline">Seller Reviews</h2>
-      <h2 className="text-2xl font-medium hidden sm:inline md:text-[1.7vw]">
+      <h2 className="text-2xl font-medium hidden sm:inline sm:text-5 lg:text-[1.7vw]">
         Comments
       </h2>
       <div className="mt-5 lg:-ml-4 w-full flex-col gap-3">
         {thisProductsReviews.length === 0 && (
-          <p className="md:text-[1.2vw]">
+          <p className="sm:text-5 lg:text-[1.2vw]">
             No <span className="max-sm:hidden">comments</span>
             <span className="sm:hidden">reviews</span> to show. Leave one?
           </p>
@@ -97,7 +97,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
           </div>
         ))}
       </div>
-      <div className="flex gap-3 mt-6 items-center justify-center md:text-[1.2vw]">
+      <div className="flex gap-3 mt-6 items-center justify-center sm:text-5 lg:text-[1.2vw]">
         <button
           onClick={() => {
             const id = currentAdData?.id ?? numericId;

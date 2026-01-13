@@ -54,7 +54,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
               className="w-25 h-25"
               alt="nothing to show"
             />
-            <p className="text-gray-500 text-sm md:text-[1.2vw] w-full text-center">
+            <p className="text-gray-500 text-sm sm:text-xl lg:text-[1.2vw] w-full text-center">
               No similar ads to show.
             </p>
           </div>
