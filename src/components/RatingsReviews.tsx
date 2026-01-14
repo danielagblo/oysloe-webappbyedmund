@@ -159,7 +159,7 @@ export const RatingReviews: React.FC<RatingReviewsProps> = ({
               {barsSection}
             </div>
           </div>
-          <div className="flex flex-row my-2 max-w-[90vw] -ml-4 max-sm:ml-0 lg:ml-0 mx-auto gap-4 max-lg:gap-2 items-center justify-center md:justify-around lg:px-[10%] sm:text-2 lg:text-[1.25vw]">
+          <div className="flex flex-row my-2 max-w-[90vw] sm:-ml-4 lg:ml-0 mx-auto gap-4 max-lg:gap-2 items-center justify-center md:justify-around lg:px-[10%] sm:text-2 lg:text-[1.25vw]">
             <p className="bg-(--div-active) py-1.5 px-2.5 rounded-full whitespace-nowrap">
               ★ All
             </p>
