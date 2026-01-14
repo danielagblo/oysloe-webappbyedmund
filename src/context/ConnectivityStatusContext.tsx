@@ -57,7 +57,7 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       if (!isVisible) return;
       
       // Grace period after returning to foreground (avoid false offline on mobile)
-      const GRACE_MS = 1500;
+      const GRACE_MS = 2000;
       if (Date.now() - lastVisibleAt < GRACE_MS) return;
 
       const controller = new AbortController();
@@ -83,8 +83,8 @@ export const OnlineStatusProvider = ({ children }: { children: ReactNode }) => {
       } catch {
         if (isMounted) {
           failures++;
-          // Require 2 consecutive failures before declaring offline
-          if (failures >= 2) {
+          // Require 5 consecutive failures before declaring offline
+          if (failures >= 5) {
             setIsOnline(false);
           }
         }
