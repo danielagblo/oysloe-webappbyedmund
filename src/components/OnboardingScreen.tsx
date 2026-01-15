@@ -118,8 +118,8 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Scale To Success
             </h2>
             <p className="text-center text-sm w-7/10 max-md:w-9/10 px-8 max-sm:p-0">
-              Buyers and sellers undergo strict checks and verification to
-              ensure authenticity and reliability
+              Watch your business grow with our designed marketing tools,
+              and automated processes
             </p>
             <div className="flex gap-2 my-3 max-md:mt-8 max-md:mb-40 max-sm:gap-1">
               <span className="h-5 w-5 max-sm:h-3 max-sm:w-3 bg-gray-300 rounded-full inline-block mx-1"></span>
@@ -149,8 +149,8 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
               Journey Begins Now
             </h2>
             <p className="text-center text-sm w-7/10 max-md:w-9/10 px-8 max-sm:p-0">
-              Buyers and sellers undergo strict checks and verification to
-              ensure authenticity and reliability
+              Optimised for all business owners with 
+              seamless experience for everyone
             </p>
             <div className="flex gap-2 my-3 max-md:mt-8 max-md:mb-40 max-sm:gap-1">
               <span className="h-5 w-5 max-sm:h-3 max-sm:w-3 bg-gray-300 rounded-full inline-block mx-1"></span>
