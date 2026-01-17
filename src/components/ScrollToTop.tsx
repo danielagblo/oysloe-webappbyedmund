@@ -170,8 +170,8 @@ const ScrollToTop = () => {
       });
     }
 
-    // Retry a few times to let layout settle.
-    const delays = [0, 60, 180, 420];
+    // Retry a few times to let layout settle. Increased delays to handle slow layouts.
+    const delays = [0, 50, 100, 200, 400, 800];
     let attempt = 0;
 
     const tryRestore = () => {
@@ -198,7 +198,7 @@ const ScrollToTop = () => {
       if (attempt < delays.length) {
         setTimeout(tryRestore, delays[attempt]);
       } else {
-        // consume one-shot keys
+        // consume one-shot keys after all retries exhausted
         if (popTarget) sessionStorage.removeItem(popTargetKey);
         if (anchorHref) sessionStorage.removeItem(anchorKey);
       }

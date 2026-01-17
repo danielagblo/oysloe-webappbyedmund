@@ -89,7 +89,7 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
         </button>
 
         <h2 className="text-xl md:text-2xl font-bold w-full whitespace-nowrap mb-4 pr-8 sticky top-0 bg-white max-sm:pt-0">
-          <span className="truncate whitespace-nowrap w-[85%]">{currentAdData?.owner?.business_name || owner?.name || "Seller"}</span>
+          <span className="truncate whitespace-nowrap w-[85%] max-sm:w-[85vw]">{currentAdData?.owner?.business_name || owner?.name || "Seller"}</span>
           's Ads
         </h2>
 
