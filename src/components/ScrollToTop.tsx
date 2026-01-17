@@ -52,7 +52,9 @@ function scrollToDataTarget(target: string) {
   );
   const visible = nodes.find(isElementVisible) as HTMLElement | undefined;
   if (!visible) return false;
-  visible.scrollIntoView({ block: "start", behavior: "auto" });
+  // Seller Ads button can sit under a sticky mobile header; center it to avoid overshooting.
+  const block = target === "seller-ads-button" ? "center" : "start";
+  visible.scrollIntoView({ block, behavior: "auto" });
   return true;
 }
 
