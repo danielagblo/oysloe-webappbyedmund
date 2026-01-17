@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { formatMoney } from "../../../utils/formatMoney";
 import type { Product } from "../../../types/Product";
 
@@ -18,8 +18,16 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
   currentAdData,
   owner,
 }) => {
+  const location = useLocation();
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
+
+  const markReturnTarget = () => {
+    sessionStorage.setItem(
+      `scroll:popTarget:path:${location.pathname}`,
+      "seller-ads-button",
+    );
+  };
 
   if (!isSellerAdsModalOpen) return null;
   const sellerAdsToShow =
@@ -92,7 +100,10 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                 key={ad.id}
                 to={`/ads/${ad.id}`}
                 state={{ adData: ad }}
-                onClick={() => setIsSellerAdsModalOpen(false)}
+                onClick={() => {
+                  markReturnTarget();
+                  setIsSellerAdsModalOpen(false);
+                }}
                 className="flex gap-3 p-3 rounded-lg hover:bg-gray-100 transition cursor-pointer border border-gray-200"
               >
                 <img

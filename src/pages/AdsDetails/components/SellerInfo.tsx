@@ -106,6 +106,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
           </div>
         </div>
         <button
+          data-scroll-target="seller-ads-button"
           onClick={() => setIsSellerAdsModalOpen(true)}
           className="px-2 py-1 h-full rounded text-sm sm:text-5 lg:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
         >

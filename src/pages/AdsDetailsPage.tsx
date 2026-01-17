@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useNavigationType, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
@@ -48,6 +48,8 @@ const AdsDetailsPage = () => {
   const numericId = id ? +id : null;
   const navigate = useNavigate();
   const location = useLocation();
+  const navigationType = useNavigationType();
+  const isMobileRef = useRef(window.innerWidth < 640);
   const adDataFromState = location.state?.adData;
 
   const {
@@ -70,7 +72,7 @@ const AdsDetailsPage = () => {
   const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(
     null,
   );
-  console.log("AdsDetailsPage: openLiveChatRoomId", openLiveChatRoomId);
+  if (openLiveChatRoomId) console.debug("AdsDetailsPage: opening LiveChat for room", openLiveChatRoomId);
   //only logged it to remove a build error about unused vars
 
   const { data: favourites = [], toggleFavourite } = useFavourites();
@@ -80,6 +82,9 @@ const AdsDetailsPage = () => {
 
   // Scroll to top when ad details page loads or ad ID changes
   useEffect(() => {
+    // On mobile, when navigating back (POP), allow the global scroll-restorer to handle it.
+    if (isMobileRef.current && navigationType === "POP") return;
+
     // Immediate scroll
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
@@ -93,7 +98,15 @@ const AdsDetailsPage = () => {
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [numericId]);
+  }, [numericId, navigationType]);
+
+  useEffect(() => {
+    const onResize = () => {
+      isMobileRef.current = window.innerWidth < 640;
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   useEffect(() => {
     const favFromProduct = Boolean(

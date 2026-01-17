@@ -1,14 +1,27 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { formatMoney } from "../../../utils/formatMoney";
 
 interface SimilarAdsProps {
   relatedProducts: any[];
 }
 
-const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
+const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => {
+  const location = useLocation();
+  const markReturnTarget = () => {
+    // When the user goes back to this ad, scroll to the Similar Ads section.
+    sessionStorage.setItem(
+      `scroll:popTarget:path:${location.pathname}`,
+      "similar-ads",
+    );
+  };
+
+  return (
   <div className="bg-white sm:bg-(--div-active) max-sm:p-4 sm:py-6 w-screen md:px-12">
-    <h2 className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl">
+    <h2
+      className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl"
+      data-scroll-target="similar-ads"
+    >
       Similar Ads
     </h2>
 
@@ -22,6 +35,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
               key={ad.id}
               to={`/ads/${ad.id}`}
               state={{ adData: ad }}
+              onClick={markReturnTarget}
               className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52"
             >
               <img
@@ -62,6 +76,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({ relatedProducts }) => (
       })()}
     </div>
   </div>
-);
+  );
+};
 
 export default React.memo(SimilarAds);
