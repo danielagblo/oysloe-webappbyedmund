@@ -36,7 +36,7 @@ function LazyAdCard({ ad, handleAdClick }: { ad: Product; handleAdClick: Props["
         loading="lazy"
         className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-md"
       />
-      <div className="w-10/12 mt-1">
+      <div className="w-full mt-1">
         <div className="flex items-center gap-1 px-2 py-0.5">
           <img
             src="/location.svg"
