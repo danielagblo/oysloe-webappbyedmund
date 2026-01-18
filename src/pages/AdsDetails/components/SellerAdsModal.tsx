@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { formatMoney } from "../../../utils/formatMoney";
+import Watermark from "../../../components/ImageWithWatermark";
 import type { Product } from "../../../types/Product";
+import { formatMoney } from "../../../utils/formatMoney";
 
 interface SellerAdsModalProps {
   isSellerAdsModalOpen: boolean;
@@ -65,8 +66,8 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
         style={
           dragOffset > 0
             ? {
-                transform: `translateY(${dragOffset}px)`,
-              }
+              transform: `translateY(${dragOffset}px)`,
+            }
             : undefined
         }
       >
@@ -106,11 +107,15 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                 }}
                 className="flex gap-3 p-3 rounded-lg hover:bg-gray-100 transition cursor-pointer border border-gray-200"
               >
-                <img
-                  src={ad.image || "/no-image.jpeg"}
-                  alt={ad.name}
-                  className="w-20 h-20 object-cover rounded-lg shrink-0"
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={ad.image || "/no-image.jpeg"}
+                    alt={ad.name}
+                    className="w-20 h-20 object-cover rounded-lg"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <Watermark ownerLogo={ad.owner?.business_logo} watermarkSize="xs" />
+                </div>
                 <div className="flex flex-col justify-center flex-1 min-w-0">
                   <h3 className="font-bold text-gray-400 text-sm md:text-base line-clamp-1">
                     {ad.name}

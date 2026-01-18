@@ -1,4 +1,5 @@
 import React from "react";
+import Watermark from "../../../components/ImageWithWatermark";
 
 interface PictureModalProps {
   pageImages: string[];
@@ -7,6 +8,7 @@ interface PictureModalProps {
   setPictureModalIndex: (updater: (index: number) => number) => void;
   setIsPictureModalOpen: (open: boolean) => void;
   setGalleryIndex: (updater: (idx: number) => number) => void;
+  ownerLogo?: string | null;
 }
 
 const PictureModal: React.FC<PictureModalProps> = ({
@@ -16,6 +18,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
   setPictureModalIndex,
   setIsPictureModalOpen,
   setGalleryIndex,
+  ownerLogo,
 }) => {
   if (!isPictureModalOpen) return null;
   const imgs = pageImages.length > 0 ? pageImages : ["/no-image.jpeg"];
@@ -82,11 +85,15 @@ const PictureModal: React.FC<PictureModalProps> = ({
               backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})`,
             }}
           />
-          <img
-            src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
-            alt={`Modal image ${pictureModalIndex + 1}`}
-            className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
-          />
+          <div className="relative">
+            <img
+              src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
+              alt={`Modal image ${pictureModalIndex + 1}`}
+              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
+              onContextMenu={(e) => e.preventDefault()}
+            />
+            <Watermark ownerLogo={ownerLogo} watermarkSize="md" />
+          </div>
         </div>
 
         {max > 1 && (

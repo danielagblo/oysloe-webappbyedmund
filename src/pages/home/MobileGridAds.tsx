@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Watermark from "../../components/ImageWithWatermark";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
 
@@ -30,12 +31,16 @@ function LazyAdCard({ ad, handleAdClick }: { ad: Product; handleAdClick: Props["
       onClick={(e) => handleAdClick(ad, e)}
       className="inline-flex rounded-md overflow-hidden w-full flex-col mb-2 items-center justify-center"
     >
-      <img
-        src={ad.image || "/no-image.jpeg"}
-        alt={ad.name}
-        loading="lazy"
-        className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-md"
-      />
+      <div className="relative w-full">
+        <img
+          src={ad.image || "/no-image.jpeg"}
+          alt={ad.name}
+          loading="lazy"
+          className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-md"
+          onContextMenu={(e) => e.preventDefault()}
+        />
+        <Watermark ownerLogo={ad.owner?.business_logo} watermarkSize="sm" />
+      </div>
       <div className="w-full mt-1">
         <div className="flex items-center gap-1 px-2 py-0.5">
           <img

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Watermark from "../../components/ImageWithWatermark";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
@@ -35,19 +36,23 @@ const ConditionalAds = ({
                 onClick={(e) => handleAdClick(ad, e)}
                 className="max-sm:flex max-sm:flex-col max-sm:justify-center max-sm:items-center"
               >
-                <img
-                  src={ad.image || "/no-image.jpeg"}
-                  alt={ad.name}
-                  className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] max-sm:max-w-52 object-cover rounded-2xl lg:rounded-[1vw]"
-                />
+                <div className="relative inline-block w-full max-sm:max-w-52">
+                  <img
+                    src={ad.image || "/no-image.jpeg"}
+                    alt={ad.name}
+                    className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] max-sm:max-w-52 object-cover rounded-2xl lg:rounded-[1vw]"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <Watermark ownerLogo={ad.owner?.business_logo} watermarkSize="sm" />
+                </div>
                 <div className="max-sm:flex max-sm:flex-col max-sm:w-10/12">
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
                     <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-600 truncate">
                       {
                         ad.location?.name ??
-                          ad.location?.region ??
-                            "Unknown"
+                        ad.location?.region ??
+                        "Unknown"
                       }
                     </p>
                   </div>

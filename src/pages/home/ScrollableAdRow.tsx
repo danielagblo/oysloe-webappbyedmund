@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Watermark from "../../components/ImageWithWatermark";
 import Loader from "../../components/LoadingDots";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
@@ -81,11 +82,15 @@ const ScrollableAdRow = ({
                       onClick={(e) => handleAdClick(ad, e)}
                       className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52 lg:w-[17.5vw]"
                     >
-                      <img
-                        src={ad.image || "/no-image.jpeg"}
-                        alt={ad.name}
-                        className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
-                      />
+                      <div className="relative inline-block w-full">
+                        <img
+                          src={ad.image || "/no-image.jpeg"}
+                          alt={ad.name}
+                          className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
+                          onContextMenu={(e) => e.preventDefault()}
+                        />
+                        <Watermark ownerLogo={ad.owner?.business_logo} watermarkSize="sm" />
+                      </div>
                       <div className="flex items-center gap-1 px-2 py-0.5">
                         <img
                           src="/location.svg"

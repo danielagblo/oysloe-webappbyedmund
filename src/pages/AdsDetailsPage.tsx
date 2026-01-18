@@ -757,6 +757,7 @@ const AdsDetailsPage = () => {
             onOpenPictureModal={() => setIsPictureModalOpen(true)}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
+            ownerLogo={owner?.business_logo || null}
           />
           <PictureModal
             pageImages={pageImages}
@@ -765,6 +766,7 @@ const AdsDetailsPage = () => {
             setPictureModalIndex={setPictureModalIndex}
             setIsPictureModalOpen={setIsPictureModalOpen}
             setGalleryIndex={setGalleryIndex}
+            ownerLogo={owner?.business_logo || null}
           />
           <SellerImageModal
             isSellerModalOpen={isSellerModalOpen}

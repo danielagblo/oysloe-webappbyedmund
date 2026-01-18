@@ -10,6 +10,7 @@ export interface ProductOwner {
   email: string;
   phone?: string;
   name?: string;
+  business_logo?: string;
 }
 
 export interface Product {

@@ -11,14 +11,14 @@ import { useProducts } from "../features/products/useProducts";
 import type { Category } from "../types/Category";
 import type { Product } from "../types/Product";
 
+import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import CategoryFilters from "./home/CategoryFilters";
 import CircularSummaries from "./home/CircularSummaries";
 import ConditionalAds from "./home/ConditionalAds";
 import FilterButton from "./home/FilterButton";
 import HomePageHeader from "./home/HomePageHeader";
-import ScrollableAds from "./home/ScrollableAds";
 import MobileGridAds from "./home/MobileGridAds";
-import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import ScrollableAds from "./home/ScrollableAds";
 import SearchResults from "./home/SearchResults";
 import SelectACategory from "./home/SelectACategory";
 import ShowFilter from "./home/ShowFilter";
@@ -298,16 +298,16 @@ const HomePage = () => {
         const ta = Date.parse(
           (a as unknown as { created_at?: string; createdAt?: string })
             .created_at ||
-            (a as unknown as { created_at?: string; createdAt?: string })
-              .createdAt ||
-            "",
+          (a as unknown as { created_at?: string; createdAt?: string })
+            .createdAt ||
+          "",
         );
         const tb = Date.parse(
           (b as unknown as { created_at?: string; createdAt?: string })
             .created_at ||
-            (b as unknown as { created_at?: string; createdAt?: string })
-              .createdAt ||
-            "",
+          (b as unknown as { created_at?: string; createdAt?: string })
+            .createdAt ||
+          "",
         );
         if (!ta || !tb) return 0;
         return timeframeSort === "newest" ? tb - ta : ta - tb;

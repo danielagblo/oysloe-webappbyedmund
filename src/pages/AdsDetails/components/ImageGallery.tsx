@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Watermark from "../../../components/ImageWithWatermark";
 
 interface ImageGalleryProps {
   images: string[];
@@ -10,6 +11,7 @@ interface ImageGalleryProps {
   onOpenPictureModal: () => void;
   onTouchStart: (e: React.TouchEvent) => void;
   onTouchEnd: (e: React.TouchEvent) => void;
+  ownerLogo?: string | null;
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({
@@ -22,6 +24,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   onOpenPictureModal,
   onTouchStart,
   onTouchEnd,
+  ownerLogo,
 }) => {
   const galleryImages = useMemo(
     () => (images.length > 0 ? images : ["/no-image.jpeg"]),
@@ -31,18 +34,18 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(max > 3);
 
-  const checkScroll = () => {
+  const checkScroll = useCallback(() => {
     if (galleryScrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = galleryScrollRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
     }
-  };
+  }, [galleryScrollRef]);
 
   useEffect(() => {
     const timer = setTimeout(checkScroll, 100);
     return () => clearTimeout(timer);
-  }, [galleryImages]);
+  }, [galleryImages, checkScroll]);
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -110,11 +113,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
                   className="absolute inset-0 bg-cover bg-center blur-sm opacity-50"
                   style={{ backgroundImage: `url(${src})` }}
                 />
-                <img
-                  src={src}
-                  alt={`Image ${i + 1}`}
-                  className="object-cover w-full h-full relative z-10"
-                />
+                <div className="relative w-full h-full">
+                  <img
+                    src={src}
+                    alt={`Image ${i + 1}`}
+                    className="object-cover w-full h-full relative z-10"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <Watermark ownerLogo={ownerLogo} watermarkSize="sm" />
+                </div>
               </div>
             );
           })}
@@ -152,7 +159,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
           src={getMainImage()}
           alt="Ad main"
           className="object-cover w-full h-full relative z-10"
+          onContextMenu={(e) => e.preventDefault()}
         />
+        <Watermark ownerLogo={ownerLogo} watermarkSize="sm" />
         <div
           onClick={() => {
             onSetCurrentIndex((idx) => (idx - 1 + imageCount) % imageCount);
