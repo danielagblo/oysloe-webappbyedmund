@@ -6,6 +6,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import MenuButton from "../components/MenuButton";
 import PostAdForm from "../components/PostAdForm";
 import SkeletonLoader from "../components/SkeletonLoader";
+import Watermark from "../components/ImageWithWatermark";
 import {
   useConfirmMarkAsTaken,
   useDeleteProduct,
@@ -212,16 +213,20 @@ const AdsPage = () => {
                   className="lg:w-[32%] lg:max-w-[325px] lg:min-w-[185px] bg-white rounded-xl px-2 py-2 shadow-sm flex flex-col relative"
                 >
                   <div className="flex flex-row justify-between items-center mb-2">
-                    <img
-                      className="bg-gray-300 h-20 w-auto rounded-lg object-cover min-w-20 max-w-30"
-                      src={
-                        ad.image ||
-                        (ad.images?.[0] as any)?.url ||
-                        (ad.images?.[0] as any)?.src ||
-                        "/no-image.jpeg"
-                      }
-                      alt={ad.name}
-                    />
+                    <div className="relative bg-gray-300 h-20 w-auto rounded-lg min-w-20 max-w-30 overflow-hidden">
+                      <img
+                        className="h-20 w-full object-cover"
+                        src={
+                          ad.image ||
+                          (ad.images?.[0] as any)?.url ||
+                          (ad.images?.[0] as any)?.src ||
+                          "/no-image.jpeg"
+                        }
+                        alt={ad.name}
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
+                      <Watermark businessName={ad.owner?.business_name} size="sm" />
+                    </div>
                     <button
                       className="inline text-lg font-bold rotate-90 select-none cursor-pointer bg-(--div-active) px-4 rounded-full pb-2 "
                       onClick={() => setSelectedAd(ad)}
