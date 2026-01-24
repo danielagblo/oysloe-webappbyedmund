@@ -279,7 +279,7 @@ const AdsDetailsPage = () => {
   const sellerProducts = (ownerProductsQuery.data)?.filter(ad =>
     !ad.is_taken && ad.status === "ACTIVE") ?? [];
 
-  const { data: relatedProducts = [] } = useRelatedProducts(
+  const { data: relatedProducts = [], isLoading: relatedProductsLoading } = useRelatedProducts(
     numericId ?? undefined,
   );
 
@@ -1101,7 +1101,8 @@ const AdsDetailsPage = () => {
       <div className="w-screen p-0 lg:mt-15">
         <SimilarAds 
           relatedProducts={mergedSimilarAds.merged} 
-          fallbackStartIndex={mergedSimilarAds.fallbackStartIndex} 
+          fallbackStartIndex={mergedSimilarAds.fallbackStartIndex}
+          isLoading={relatedProductsLoading}
         />
         <div className=" max-sm:hidden p-8 sm:p-10 bg-(--div-active)" />
       </div>

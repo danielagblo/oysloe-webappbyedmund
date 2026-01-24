@@ -6,11 +6,25 @@ import ProgressiveImage from "../../../components/ProgressiveImage";
 interface SimilarAdsProps {
   relatedProducts: any[];
   fallbackStartIndex?: number;
+  isLoading?: boolean;
 }
+
+const SkeletonCard = () => (
+  <div className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52 animate-pulse">
+    <div className="w-full h-[120px] sm:h-48 bg-gray-200 rounded-md" />
+    <div className="flex items-center gap-1 px-2 py-1">
+      <div className="w-3 sm:w-4 h-3 sm:h-4 bg-gray-200 rounded" />
+      <div className="h-3 sm:h-3.5 w-20 bg-gray-200 rounded" />
+    </div>
+    <div className="px-2 h-4 sm:h-5 w-4/5 bg-gray-200 rounded mt-1" />
+    <div className="px-2 h-4 sm:h-5 w-2/5 bg-gray-200 rounded mt-1 mb-2" />
+  </div>
+);
 
 const SimilarAds: React.FC<SimilarAdsProps> = ({ 
   relatedProducts, 
-  fallbackStartIndex = -1 
+  fallbackStartIndex = -1,
+  isLoading = false
 }) => {
   const location = useLocation();
   const [displayCount, setDisplayCount] = useState(12); // Show 12 ads initially
@@ -58,7 +72,13 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
       Similar Ads
     </h2>
 
-    {availableAds.length === 0 ? (
+    {isLoading ? (
+      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
+      </div>
+    ) : availableAds.length === 0 ? (
       <div className="flex items-center flex-col justify-center w-full gap-2">
         <img
           src="/nothing-to-show.png"
