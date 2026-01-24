@@ -893,7 +893,13 @@ const AdsDetailsPage = () => {
             onOpenPictureModal={() => setIsPictureModalOpen(true)}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            businessName={owner?.business_name || null}
+            businessName={
+              owner?.business_name ??
+              owner?.name ??
+              currentAdData?.owner?.business_name ??
+              currentAdData?.owner?.name ??
+              null
+            }
           />
           <PictureModal
             pageImages={pageImages}
@@ -902,7 +908,13 @@ const AdsDetailsPage = () => {
             setPictureModalIndex={setPictureModalIndex}
             setIsPictureModalOpen={setIsPictureModalOpen}
             setGalleryIndex={setGalleryIndex}
-            businessName={owner?.business_name || null}
+            businessName={
+              owner?.business_name ??
+              owner?.name ??
+              currentAdData?.owner?.business_name ??
+              currentAdData?.owner?.name ??
+              null
+            }
           />
           <SellerImageModal
             isSellerModalOpen={isSellerModalOpen}
