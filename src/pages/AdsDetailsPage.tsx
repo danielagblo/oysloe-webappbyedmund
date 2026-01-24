@@ -286,7 +286,7 @@ const AdsDetailsPage = () => {
   // Fetch all products to enable category-based fallback
   // OPTIMIZATION: Only fetch if we have subcategory info and no enough related products
   // Note: This was fetching ALL products every time. Now we fetch smartly.
-  const { data: allProducts = [] } = useProducts();
+  const { data: allProducts = [], isLoading: allProductsLoading } = useProducts();
 
   // Helper function to calculate string similarity (simple token-based approach)
   const getStringSimilarity = (str1: string, str2: string): number => {
@@ -1102,7 +1102,7 @@ const AdsDetailsPage = () => {
         <SimilarAds 
           relatedProducts={mergedSimilarAds.merged} 
           fallbackStartIndex={mergedSimilarAds.fallbackStartIndex}
-          isLoading={relatedProductsLoading}
+          isLoading={relatedProductsLoading || allProductsLoading}
         />
         <div className=" max-sm:hidden p-8 sm:p-10 bg-(--div-active)" />
       </div>
