@@ -83,8 +83,8 @@ const AdsDetailsPage = () => {
 
   // Scroll to top when ad details page loads or ad ID changes
   useEffect(() => {
-    // On mobile, when navigating back (POP), allow the global scroll-restorer to handle it.
-    if (isMobileRef.current && navigationType === "POP") return;
+    // When navigating back (POP), allow the global scroll-restorer to handle it.
+    if (navigationType === "POP") return;
 
     // Immediate scroll
     window.scrollTo(0, 0);
