@@ -1,0 +1,1083 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useNavigationType, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import "../App.css";
+import AdLoadingOverlay from "../components/AdLoadingOverlay";
+// LiveChat intentionally not rendered on AdsDetailsPage
+import MenuButton from "../components/MenuButton";
+import RatingReviews from "../components/RatingsReviews";
+import ReportModal from "../components/ReportModal";
+import useWsChat from "../features/chat/useWsChat";
+import useFavourites from "../features/products/useFavourites";
+import {
+  productKeys,
+  useMarkProductAsTaken,
+  useOwnerProducts,
+  useProduct,
+  useProducts,
+  useRelatedProducts,
+  useReportProduct,
+} from "../features/products/useProducts";
+import useReviews from "../features/reviews/useReviews";
+import { useUserSubscriptions } from "../features/subscriptions/useSubscriptions";
+import useUserProfile from "../features/userProfile/useUserProfile";
+import type { Message as ChatMessage } from "../services/chatService";
+import { createChatRoom, resolveChatroomId } from "../services/chatService";
+import { likeReview } from "../services/reviewService";
+import type { Product } from "../types/Product";
+import type { Review } from "../types/Review";
+import {
+  ActionButtons,
+  AdDetails,
+  CommentsSection,
+  DesktopHeader,
+  ImageGallery,
+  MobileHeader,
+  PictureModal,
+  QuickChat,
+  SafetyTips,
+  SellerAdsModal,
+  SellerImageModal,
+  SellerInfo,
+  SimilarAds,
+  TitleAndPrice,
+} from "./AdsDetails/components";
+
+const AdsDetailsPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const numericId = id ? +id : null;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const navigationType = useNavigationType();
+  const isMobileRef = useRef(window.innerWidth < 640);
+  const adDataFromState = location.state?.adData;
+
+  const {
+    data: currentAdDataFromQuery,
+    isLoading: adLoading,
+    error: adError,
+  } = useProduct(numericId!);
+  const { profile: currentUserProfile } = useUserProfile();
+  const { reviews: reviews = [] } = useReviews({
+    product: numericId ?? undefined,
+  });
+  const { data: userSubscriptions = [] } = useUserSubscriptions();
+
+  const queryClient = useQueryClient();
+
+  const activeUserSubscription =
+    (userSubscriptions as any[]).find((us) => us?.is_active) || null;
+
+  const { sendMessage, addLocalMessage, connectToRoom, isRoomConnected } = useWsChat();
+  const [openLiveChatRoomId, setOpenLiveChatRoomId] = useState<string | null>(
+    null,
+  );
+  if (openLiveChatRoomId) console.debug("AdsDetailsPage: opening LiveChat for room", openLiveChatRoomId);
+  //only logged it to remove a build error about unused vars
+
+  const { data: favourites = [], toggleFavourite } = useFavourites();
+  const [isFavourited, setIsFavourited] = useState<boolean>(false);
+
+  const markTaken = useMarkProductAsTaken();
+
+  // Scroll to top when ad details page loads or ad ID changes
+  useEffect(() => {
+    // On mobile, when navigating back (POP), allow the global scroll-restorer to handle it.
+    if (isMobileRef.current && navigationType === "POP") return;
+
+    // Immediate scroll
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Delayed scroll to ensure it happens after any router transitions
+    const timeoutId = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
+  }, [numericId, navigationType]);
+
+  useEffect(() => {
+    const onResize = () => {
+      isMobileRef.current = window.innerWidth < 640;
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const favFromProduct = Boolean(
+      (currentAdDataFromQuery as Product)?.favourited_by_user,
+    );
+    const favFromList = favourites.some(
+      (p) => p.id === currentAdDataFromQuery?.id,
+    );
+    setIsFavourited(Boolean(favFromProduct || favFromList));
+  }, [currentAdDataFromQuery, favourites]);
+
+  const handleToggleFavourite = async () => {
+    const pidRaw = currentAdDataFromQuery?.id || adDataFromState?.id || null;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+
+    if (toggleFavourite.status === "pending") {
+      console.debug("handleToggleFavourite: mutation already in-flight", {
+        pid,
+      });
+      return;
+    }
+
+    console.debug("handleToggleFavourite: toggling", { pid, at: Date.now() });
+    setIsFavourited((s) => !s);
+
+    try {
+      if ((toggleFavourite as any).mutateAsync) {
+        await (toggleFavourite as any).mutateAsync(pid);
+      } else {
+        await new Promise((resolve, reject) =>
+          toggleFavourite.mutate(pid, { onSuccess: resolve, onError: reject }),
+        );
+      }
+    } catch (err) {
+      setIsFavourited((s) => !s);
+      console.warn("handleToggleFavourite failed", err);
+      toast.error("Failed to toggle favourite");
+    } finally {
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
+    }
+  };
+
+  const handleMarkAsTaken = async () => {
+    const pidRaw =
+      currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+    setOpenPanel(null);
+    toast.promise(
+      Promise.resolve().then(async () => {
+        const src =
+          currentAdDataFromQuery || adDataFromState || currentAdData || {};
+        const payload = {
+          pid: src?.pid ?? `pid_${pid}`,
+          name: src?.name ?? "",
+          image: src?.image ?? src?.images?.[0]?.image ?? "",
+          type: src?.type ?? ("SALE" as const),
+          status: src?.status ?? ("ACTIVE" as const),
+          is_taken: true,
+          description: src?.description ?? "",
+          price: src?.price ?? 0,
+          duration: src?.duration ?? "",
+          category: src?.category ?? src?.category_id ?? 0,
+        } as Record<string, unknown>;
+
+        if ((markTaken as any).mutateAsync) {
+          await (markTaken as any).mutateAsync({ id: pid, body: payload });
+        } else {
+          await new Promise((resolve, reject) =>
+            markTaken.mutate(
+              { id: pid, body: payload },
+              { onSuccess: resolve, onError: reject },
+            ),
+          );
+        }
+        try {
+          queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+        } catch (e) {
+          queryClient.invalidateQueries({ queryKey: ["products"] });
+        }
+      }),
+      {
+        loading: "Sending alert to owner to mark ad as taken...",
+        success: "Alert sent to owner to mark ad as taken!",
+        error: "Failed to send alert to owner to mark ad as taken",
+      },
+    );
+  };
+
+  const handleReportAd = () => {
+    const pid = currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pid) return;
+    setOpenPanel(null);
+    setIsReportModalOpen(true);
+    setOpenPanel("report");
+  };
+
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
+
+  const submitReport = async () => {
+    const pidRaw =
+      currentAdDataFromQuery?.id || adDataFromState?.id || numericId;
+    if (!pidRaw) return;
+    const pid = Number(pidRaw);
+    if (Number.isNaN(pid)) return;
+
+    const src =
+      currentAdDataFromQuery || adDataFromState || currentAdData || {};
+    const payload = {
+      pid: src?.pid ?? `pid_${pid}`,
+      name: src?.name ?? "",
+      image: src?.image ?? src?.images?.[0]?.image ?? "",
+      type: src?.type ?? ("SALE" as const),
+      status: src?.status ?? ("ACTIVE" as const),
+      is_taken: Boolean(src?.is_taken),
+      description: src?.description ?? "",
+      price: src?.price ?? 0,
+      duration: src?.duration ?? "",
+      category: src?.category ?? src?.category_id ?? 0,
+      message: reportMessage,
+    } as Record<string, unknown>;
+
+    try {
+      const mutatePromise = (reportProduct as any).mutateAsync
+        ? (reportProduct as any).mutateAsync({ id: pid, body: payload })
+        : new Promise((resolve, reject) => {
+          reportProduct.mutate(
+            { id: pid, body: payload },
+            { onSuccess: resolve, onError: reject },
+          );
+        });
+
+      await toast.promise(mutatePromise, {
+        loading: "Reporting ad...",
+        success: "Ad reported successfully!",
+        error: "Failed to report ad",
+      });
+
+      setIsReportModalOpen(false);
+      setReportMessage("");
+      try {
+        queryClient.invalidateQueries({ queryKey: productKeys.detail(pid) });
+      } catch (e) {
+        queryClient.invalidateQueries({ queryKey: ["products"] });
+      }
+      setOpenPanel(null);
+    } catch (err) {
+      console.warn("submitReport failed", err);
+    }
+  };
+
+  const ownerIdCandidate =
+    adDataFromState?.owner?.id ??
+    currentAdDataFromQuery?.owner?.id ??
+    undefined;
+
+  const ownerProductsQuery = useOwnerProducts(
+    ownerIdCandidate as number | undefined,
+  );
+
+  const sellerProducts = (ownerProductsQuery.data)?.filter(ad =>
+    !ad.is_taken && ad.status === "ACTIVE") ?? [];
+
+  const { data: relatedProducts = [] } = useRelatedProducts(
+    numericId ?? undefined,
+  );
+
+  // Fetch all products to enable category-based fallback
+  // OPTIMIZATION: Only fetch if we have subcategory info and no enough related products
+  // Note: This was fetching ALL products every time. Now we fetch smartly.
+  const { data: allProducts = [] } = useProducts();
+
+  // Helper function to calculate string similarity (simple token-based approach)
+  const getStringSimilarity = (str1: string, str2: string): number => {
+    const normalize = (s: string) => s.toLowerCase().trim().split(/\s+/);
+    const tokens1 = normalize(str1);
+    const tokens2 = normalize(str2);
+    
+    const matches = tokens1.filter(t1 => 
+      tokens2.some(t2 => t1 === t2 || t1.includes(t2) || t2.includes(t1))
+    ).length;
+    
+    const totalTokens = Math.max(tokens1.length, tokens2.length);
+    return totalTokens > 0 ? matches / totalTokens : 0;
+  };
+
+  // Create merged similar ads: backend similar ads + same-category similar names + subcategory fallback
+  const mergedSimilarAds = useMemo(() => {
+    const currentAdData = currentAdDataFromQuery ?? adDataFromState;
+    const currentAdId = numericId ?? currentAdDataFromQuery?.id ?? adDataFromState?.id;
+    const currentAdName = currentAdData?.name || "";
+    const currentCategory = currentAdData?.category;
+    
+    // Extract subcategory from product_features if available
+    const currentSubcategory = currentAdData?.product_features?.[0]?.feature?.subcategory;
+    
+    console.debug("[SimilarAds] mergedSimilarAds computation:", {
+      currentAdName,
+      currentCategory,
+      currentSubcategory,
+      currentAdId,
+      relatedProductsCount: relatedProducts.length,
+      allProductsCount: allProducts.length,
+    });
+    
+    // If no subcategory or no all products loaded, return only related products
+    if (!currentSubcategory || !allProducts.length) {
+      console.debug("[SimilarAds] Returning only related products (no subcategory or no all products)");
+      return relatedProducts;
+    }
+
+    // Get IDs of related products and current ad to avoid duplicates
+    const relatedIds = new Set(relatedProducts.map(p => p.id));
+    
+    // TIER 2: Find ads with similar titles in the same category
+    const similarNameProducts = allProducts.filter(p => {
+      if (relatedIds.has(p.id) || p.id === currentAdId || p.is_taken || p.status !== "ACTIVE") {
+        return false;
+      }
+      // Check if same category and similar name
+      return (
+        p.category === currentCategory && 
+        getStringSimilarity(currentAdName, p.name) >= 0.3
+      );
+    });
+
+    console.debug("[SimilarAds] Similar name products in category:", similarNameProducts.length);
+
+    // Add these to relatedIds to avoid duplicates in subcategory tier
+    similarNameProducts.forEach(p => relatedIds.add(p.id));
+
+    // TIER 3: Filter remaining products by subcategory (fallback)
+    const subcategoryProducts = allProducts.filter(p => {
+      if (relatedIds.has(p.id) || p.id === currentAdId || p.is_taken || p.status !== "ACTIVE") {
+        return false;
+      }
+      // Extract subcategory from this product's features
+      const productSubcategory = p.product_features?.[0]?.feature?.subcategory;
+      return productSubcategory === currentSubcategory;
+    });
+
+    console.debug("[SimilarAds] Subcategory fallback products:", subcategoryProducts.length);
+
+    // Sort similar names by multiplier and date
+    const sortedSimilarNames = [...similarNameProducts].sort((a, b) => {
+      const ma = Number((a as any).multiplier ?? 0) || 0;
+      const mb = Number((b as any).multiplier ?? 0) || 0;
+      if (mb !== ma) return mb - ma;
+      const ta = Date.parse(a.created_at || "");
+      const tb = Date.parse(b.created_at || "");
+      if (isFinite(tb) && isFinite(ta)) return tb - ta;
+      return 0;
+    });
+
+    // Sort subcategory products by multiplier and date
+    const sortedSubcategory = [...subcategoryProducts].sort((a, b) => {
+      const ma = Number((a as any).multiplier ?? 0) || 0;
+      const mb = Number((b as any).multiplier ?? 0) || 0;
+      if (mb !== ma) return mb - ma;
+      const ta = Date.parse(a.created_at || "");
+      const tb = Date.parse(b.created_at || "");
+      if (isFinite(tb) && isFinite(ta)) return tb - ta;
+      return 0;
+    });
+
+    // Merge in priority order: backend similar ads → similar names in category → subcategory fallback
+    const result = [...relatedProducts, ...sortedSimilarNames, ...sortedSubcategory];
+    console.debug("[SimilarAds] Final merged ads count:", result.length, {
+      backend: relatedProducts.length,
+      similarNames: sortedSimilarNames.length,
+      subcategory: sortedSubcategory.length,
+    });
+    return result;
+  }, [relatedProducts, allProducts, currentAdDataFromQuery, adDataFromState, numericId]);
+
+  const reportProduct = useReportProduct();
+  const likeMutation = useMutation({
+    mutationFn: async ({ id, body }: { id: number; body?: any }) =>
+      likeReview(id, body),
+    onMutate: async ({ id }) => {
+      const queryKey = ["reviews", { product: numericId }];
+      const previousReviews = queryClient.getQueryData(queryKey) as
+        | Review[]
+        | undefined;
+
+      if (previousReviews) {
+        const updated = previousReviews.map((review: Review) => {
+          if (review.id !== id) return review;
+          const wasLiked = Boolean(review.liked);
+          const likes =
+            typeof review.likes_count === "number" ? review.likes_count : 0;
+          return {
+            ...review,
+            liked: !wasLiked,
+            likes_count: wasLiked ? Math.max(0, likes - 1) : likes + 1,
+          } as Review;
+        });
+        queryClient.setQueryData(queryKey, updated);
+      }
+
+      return { previousReviews };
+    },
+    onSuccess: async (data: any, variables: any) => {
+      const revId = data?.id ?? variables?.id;
+      const prodId = data?.product?.id ?? numericId;
+      const reviewsKey = ["reviews", { product: prodId }];
+
+      if (revId != null) {
+        queryClient.setQueryData(["review", revId], {
+          ...(data || {}),
+          id: revId,
+        });
+      }
+
+      const allReviews = queryClient.getQueryData(reviewsKey) as
+        | Review[]
+        | undefined;
+      if (allReviews) {
+        const updated = allReviews.map((review: Review) =>
+          review.id === revId
+            ? { ...review, ...(data || {}), id: revId }
+            : review,
+        );
+        queryClient.setQueryData(reviewsKey, updated);
+      }
+
+      toast.success(data && data.liked ? "Review liked!" : "Review unliked!");
+    },
+    onError: (err: unknown, context: any) => {
+      const queryKey = ["reviews", { product: numericId }];
+      if (context?.previousReviews) {
+        queryClient.setQueryData(queryKey, context.previousReviews);
+      } else {
+        queryClient.invalidateQueries({ queryKey });
+      }
+
+      const message =
+        err instanceof Error ? err.message : "Failed to like review";
+      toast.error(message);
+    },
+  });
+
+  const [openPanel, setOpenPanel] = useState<string | null>(null);
+  const [quickChatInput, setQuickChatInput] = useState("");
+  const [isSellerAdsModalOpen, setIsSellerAdsModalOpen] = useState(false);
+
+  const thisProductsReviews = useMemo(() => {
+    if (!reviews || reviews.length === 0) return [];
+    return reviews.filter((review) => review?.product?.id === numericId);
+  }, [reviews, numericId]);
+
+  const reviewDeconstruction = useMemo(() => {
+    return thisProductsReviews.reduce(
+      (acc, p) => {
+        const star = Math.round(p.rating) as 5 | 4 | 3 | 2 | 1;
+        return {
+          sum: acc.sum + p.rating,
+          count: acc.count + 1,
+          avg: (acc.sum + p.rating) / (acc.count + 1),
+          stars: {
+            ...acc.stars,
+            [star]: (acc.stars[star] || 0) + 1,
+          },
+        };
+      },
+      {
+        sum: 0,
+        count: 0,
+        avg: 0,
+        stars: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+      },
+    );
+  }, [thisProductsReviews]);
+
+  const touchStartX = useRef<number | null>(null);
+  const galleryScrollRef = useRef<HTMLDivElement | null>(null);
+  const sellerCarouselRef = useRef<HTMLDivElement | null>(null);
+
+  const [galleryIndex, setGalleryIndex] = useState<number>(0);
+  useEffect(() => {
+    setGalleryIndex(0);
+  }, [id]);
+
+  const [isPictureModalOpen, setIsPictureModalOpen] = useState<boolean>(false);
+  const [pictureModalIndex, setPictureModalIndex] = useState<number>(0);
+  const [isSellerModalOpen, setIsSellerModalOpen] = useState<boolean>(false);
+  const [sellerModalImage, setSellerModalImage] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isPictureModalOpen) {
+      setGalleryIndex(pictureModalIndex);
+    }
+  }, [isPictureModalOpen, pictureModalIndex]);
+
+  useEffect(() => {
+    if (!isPictureModalOpen) return;
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key === "Escape") setIsPictureModalOpen(false);
+      if (ev.key === "ArrowLeft")
+        setPictureModalIndex((i) => Math.max(0, i - 1));
+      if (ev.key === "ArrowRight") setPictureModalIndex((i) => i + 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isPictureModalOpen]);
+
+  if (!id || numericId === null)
+    return (
+      <p className="h-screen w-screen m-0 flex items-center justify-center">
+        Invalid ad ID
+      </p>
+    );
+  if (adError)
+    return (
+      <p className="h-screen w-screen m-0 flex flex-col items-center justify-center">
+        <span className="text-8xl font-bold text-gray-400 animate-pulse">
+          404
+        </span>
+        <span>There was an error loading this ad</span>
+        <span className="text-3xl">
+          {
+            [
+              "(ಥ‿ಥ)",
+              "(ᗒᗣᗕ)՞",
+              "(╯▔皿▔)╯",
+              "(╯‵□′)╯︵┻━┻",
+              "(︶︹︺)",
+              "(╯︵╰,)",
+              "(；一_一)",
+              "(´･_･`)",
+              "(´-﹏-`；)",
+              "┗( T﹏T )┛",
+              "(┬┬﹏┬┬)"
+            ][
+            Math.floor(Math.random() * 11)
+            ]
+          }
+        </span>
+      </p>
+    );
+
+  const currentAdData =
+    currentAdDataFromQuery != null ? currentAdDataFromQuery : adDataFromState;
+  const subscriptionMultiplierRaw =
+    (currentAdData as any)?.multiplier ??
+    activeUserSubscription?.subscription?.multiplier ??
+    null;
+  const multiplierLabel = (() => {
+    if (subscriptionMultiplierRaw == null) return null;
+    const n = Number(subscriptionMultiplierRaw);
+    if (!Number.isNaN(n)) return `${n}x`;
+    return String(subscriptionMultiplierRaw);
+  })();
+  const pageImages: string[] = (() => {
+    const mainImage = (currentAdData as any)?.image;
+    const imgsRaw = (currentAdData as any)?.images;
+
+    const isValidImageUrl = (url: any): url is string => {
+      if (typeof url !== "string") return false;
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    const addFromArray = (arr: any[]) =>
+      arr
+        .map((it: any) =>
+          typeof it === "string" ? it : (it?.image ?? it?.url ?? null),
+        )
+        .filter(isValidImageUrl) as string[];
+
+    let list: string[] = [];
+    if (isValidImageUrl(mainImage)) list.push(mainImage);
+
+    if (Array.isArray(imgsRaw) && imgsRaw.length > 0) {
+      list = list.concat(addFromArray(imgsRaw));
+    } else if (imgsRaw && typeof imgsRaw === "object") {
+      const maybeArr = imgsRaw.results ?? imgsRaw.data ?? null;
+      if (Array.isArray(maybeArr)) {
+        list = list.concat(addFromArray(maybeArr));
+      } else {
+        const vals =
+          (Object.values(imgsRaw) as any).flat?.() ?? Object.values(imgsRaw);
+        if (Array.isArray(vals) && vals.length > 0) {
+          list = list.concat(addFromArray(vals as any[]));
+        }
+      }
+    }
+
+    if (list.length === 0 && mainImage) return [mainImage];
+
+    const deduped = Array.from(new Set(list.filter(Boolean)));
+
+    const resolveAssetUrl = (img: string) => {
+      try {
+        if (!img) return img;
+        if (img.startsWith("data:")) return img;
+        if (img.startsWith("/")) {
+          if (/^\/assets\//i.test(img) || /^\/media\//i.test(img) || /^\/uploads\//i.test(img)) {
+            const apiRaw = import.meta.env.VITE_API_URL ?? "";
+            try {
+              const origin = new URL(String(apiRaw)).origin;
+              return origin + img;
+            } catch {
+              const fallback = String(apiRaw).replace(/\/+$/, "") || (typeof window !== "undefined" ? window.location.origin : "");
+              return fallback + img;
+            }
+          }
+          return (typeof window !== "undefined" ? window.location.origin : "") + img;
+        }
+        return img;
+      } catch {
+        return img;
+      }
+    };
+
+    const resolved = deduped.map(resolveAssetUrl);
+    return resolved.length > 0 ? resolved : [];
+  })();
+
+  const imageCount = pageImages.length;
+
+  const owner =
+    currentAdData?.owner ||
+    currentAdDataFromQuery?.owner ||
+    adDataFromState?.owner;
+  const callerNumber1: string | null =
+    owner?.phone || owner?.phone_number || owner?.primary_phone || null;
+  const callerNumber2: string | null =
+    owner?.second_number ||
+    owner?.phone2 ||
+    owner?.secondary_phone ||
+    owner?.alt_phone ||
+    null;
+  const toggleCaller1 = () =>
+    setOpenPanel((p) => (p === "caller1" ? null : "caller1"));
+  const toggleCaller2 = () =>
+    setOpenPanel((p) => (p === "caller2" ? null : "caller2"));
+
+  const openChatWithOwnerAndSend = async (text: string) => {
+    if (!owner?.id) {
+      toast.error("Unable to start chat: seller information not available");
+      return;
+    }
+
+    try {
+      // Ask the API for the chatroom id by email (GET /chatroomid/?email=...), which returns existing room or creates one
+      let roomKey: string | null = null;
+      const pid = numericId ?? currentAdData?.id ?? (currentAdData as any)?.pid ?? undefined;
+      let chatroomMeta: Record<string, unknown> = {};
+      try {
+        const params: Record<string, unknown> = { email: owner.email };
+        if (pid != null) params.product_id = String(pid);
+        const res = await resolveChatroomId(params as any);
+        const roomKeyRaw =
+          (res as any)?.chatroom_id ??
+          (res as any)?.room_id ??
+          (res as any)?.room ??
+          (res as any)?.id ??
+          null;
+        roomKey = roomKeyRaw != null ? String(roomKeyRaw) : null;
+        // capture ad meta if provided by API
+        try {
+          chatroomMeta = {
+            ad_name: (res as any)?.ad_name ?? (res as any)?.product_name ?? undefined,
+            ad_image: (res as any)?.ad_image ?? (res as any)?.product_image ?? undefined,
+          };
+        } catch {
+          chatroomMeta = {};
+        }
+      } catch (resolveErr) {
+        console.debug("resolveChatroomId by email failed; will try creating room via REST", resolveErr);
+        // Attempt to create a chatroom via POST /chatrooms/ with email and product_id
+        try {
+          const body: Record<string, unknown> = { email: owner.email };
+          if (pid != null) body.product_id = String(pid);
+          const created = await createChatRoom(body as any);
+          const createdId =
+            (created as any)?.chatroom_id ??
+            (created as any)?.id ??
+            (created as any)?.room_id ??
+            (created as any)?.room ??
+            null;
+          roomKey = createdId != null ? String(createdId) : null;
+          // capture ad meta from creation response
+          try {
+            chatroomMeta = {
+              ad_name: (created as any)?.ad_name ?? (created as any)?.product_name ?? undefined,
+              ad_image: (created as any)?.ad_image ?? (created as any)?.product_image ?? undefined,
+            };
+          } catch {
+            /* ignore */
+          }
+        } catch (createErr) {
+          console.debug("createChatRoom failed", createErr);
+          roomKey = null;
+        }
+      }
+
+      // Require a persistent REST-created room id. Do not continue with a temp_ websocket room.
+      if (!roomKey) {
+        console.warn("AdsDetailsPage: unable to resolve or create chatroom via REST for", owner?.email);
+        toast.error("Unable to start chat. Could not create chatroom.");
+        return;
+      }
+
+      // persist chatroom metadata (ad_name/ad_image) for LiveChat header to consume
+      try {
+        const key = String(roomKey);
+        const raw = localStorage.getItem("oysloe_chatroom_meta") || "{}";
+        const map = JSON.parse(raw || "{}") as Record<string, any>;
+        map[key] = { ...(map[key] || {}), ...(chatroomMeta || {}) };
+        localStorage.setItem("oysloe_chatroom_meta", JSON.stringify(map));
+      } catch {
+        // ignore storage errors
+      }
+
+      const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const tempMsg: Partial<ChatMessage> = {
+        room: roomKey as any,
+        sender: {
+          id: currentUserProfile?.id ?? 0,
+          name: currentUserProfile?.name ?? "You",
+          avatar: (currentUserProfile as any)?.avatar ?? null,
+        } as any,
+        content: text,
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+      (tempMsg as unknown as Record<string, unknown>).__temp_id = tempId;
+      (tempMsg as unknown as Record<string, unknown>).__optimistic = true;
+
+      try {
+        // Ensure websocket room client is connected where possible so sendMessage uses WS (wss/chat/<room>)
+        const targetRoom = String(roomKey);
+
+        // Open the in-page LiveChat immediately so it can validate/connect
+        if (roomKey) setOpenLiveChatRoomId(String(roomKey));
+
+        addLocalMessage(String(targetRoom), tempMsg as ChatMessage);
+
+        // Always prefer websocket for sending messages (persistent rooms use wss/chat/<id>/)
+        if (roomKey) {
+          // Open the in-page LiveChat so it can validate/connect
+          setOpenLiveChatRoomId(String(roomKey));
+
+          // Ensure the websocket client attempts to connect to the room
+          try {
+            await connectToRoom(roomKey);
+          } catch (e) {
+            console.debug("connectToRoom attempt failed (will poll):", e);
+          }
+
+          // Wait for the WS client to become connected (polling with timeout)
+          const waitForConnected = async (timeoutMs = 10000, intervalMs = 200) => {
+            const start = Date.now();
+            while (Date.now() - start < timeoutMs) {
+              try {
+                if (isRoomConnected(String(roomKey))) return true;
+              } catch {
+                // ignore
+              }
+              // small delay
+              // eslint-disable-next-line no-await-in-loop
+              await new Promise((r) => setTimeout(r, intervalMs));
+            }
+            return false;
+          };
+
+          const connected = await waitForConnected(10000, 200);
+          if (!connected) {
+            console.warn("AdsDetailsPage: websocket did not connect within timeout for room", roomKey);
+            toast.error("Unable to connect to chat. Message will be delivered when connection is available.");
+          } else {
+            try {
+              await sendMessage(String(roomKey), text, tempId);
+              // Inform the user the message was sent successfully
+              toast.success("Message sent");
+            } catch (err) {
+              console.warn("AdsDetailsPage: sendMessage failed after websocket connected", err);
+              toast.error("Failed to send message via websocket");
+            }
+          }
+        } else {
+          // No persistent room id returned. We'll open a temporary chat view and show the optimistic message.
+          // When the backend creates a room and the websocket list updates, LiveChat will resolve it.
+          setOpenLiveChatRoomId(String(targetRoom));
+          // Do not attempt REST fallback; wait for websocket resolution as requested.
+        }
+      } catch (err) {
+        console.warn("AdsDetailsPage: addLocalMessage/send flow failed", err);
+      }
+
+      // Do not redirect to inbox — stay on the ad details page after sending
+      // navigate("/inbox", { state: { openRoom: String(roomKey) } });
+    } catch (err) {
+      console.warn("AdsDetailsPage: createChatRoom/send failed", err);
+      toast.error("Failed to start chat. Please try again.");
+    }
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        setGalleryIndex((idx) => (idx + 1) % imageCount);
+      } else {
+        setGalleryIndex((idx) => (idx - 1 + imageCount) % imageCount);
+      }
+      touchStartX.current = null;
+    }
+  };
+
+  return (
+    <div className="lg:pt-5">
+      <AdLoadingOverlay isVisible={adLoading} />
+      <SellerAdsModal
+        isSellerAdsModalOpen={isSellerAdsModalOpen}
+        sellerProducts={sellerProducts}
+        setIsSellerAdsModalOpen={setIsSellerAdsModalOpen}
+        currentAdData={currentAdData}
+        owner={owner}
+      />
+      <div
+        id="main-scroll"
+        style={{ color: "var(--dark-def)" }}
+        className="flex flex-col items-center w-full sm:w-full min-h-screen px-0 max-sm:pt-10 sm:px-3 lg:px-12 gap-6 sm:gap-2 bg-(--div-active) sm:bg-white"
+      >
+        <MobileHeader
+          imageCount={imageCount}
+          galleryIndex={galleryIndex}
+          multiplierLabel={multiplierLabel}
+          totalReports={currentAdData?.total_reports ?? null}
+          totalFavourites={currentAdData?.total_favourites ?? null}
+          onBack={() => navigate(-1)}
+        />
+        <DesktopHeader
+          currentAdData={currentAdData}
+          multiplierLabel={multiplierLabel}
+          imageCount={imageCount}
+          galleryIndex={galleryIndex}
+        />
+
+        <div className="w-full">
+          <ImageGallery
+            images={pageImages}
+            currentIndex={galleryIndex}
+            imageCount={imageCount}
+            galleryScrollRef={galleryScrollRef}
+            onSetCurrentIndex={setGalleryIndex}
+            onSetPictureModalIndex={setPictureModalIndex}
+            onOpenPictureModal={() => setIsPictureModalOpen(true)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            businessName={owner?.business_name || null}
+          />
+          <PictureModal
+            pageImages={pageImages}
+            isPictureModalOpen={isPictureModalOpen}
+            pictureModalIndex={pictureModalIndex}
+            setPictureModalIndex={setPictureModalIndex}
+            setIsPictureModalOpen={setIsPictureModalOpen}
+            setGalleryIndex={setGalleryIndex}
+            businessName={owner?.business_name || null}
+          />
+          <SellerImageModal
+            isSellerModalOpen={isSellerModalOpen}
+            sellerModalImage={sellerModalImage}
+            setIsSellerModalOpen={setIsSellerModalOpen}
+          />
+          <ReportModal
+            isOpen={isReportModalOpen}
+            message={reportMessage}
+            setMessage={setReportMessage}
+            onClose={() => {
+              setIsReportModalOpen(false);
+              setReportMessage("");
+              setOpenPanel(null);
+            }}
+            onSubmit={submitReport}
+          />
+          <TitleAndPrice
+            currentAdData={currentAdData}
+            currentAdDataFromQuery={currentAdDataFromQuery}
+            id={id}
+          />
+
+          <div className="lg:pr-6 sm:pr-4">
+            {currentAdData?.description && (
+              <div className="bg-white sm:bg-(--div-active) my-4 sm:p-6 rounded-2xl py-3 px-4 w-full">
+                <h2 className="text-xl sm:text-5 lg:text-[1.75vw] font-bold mb-2">
+                  Description
+                </h2>
+                <p className="text-sm sm:text-5 lg:text-[1.125vw] text-gray-700 whitespace-pre-line">
+                  {String(currentAdData.description)}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-4 w-full">
+            <div className="flex justify-evenly gap-4 flex-col md:px-4 lg:px-0 ad-details-page">
+              <div className="sm:hidden flex w-full justify-between ad-details-page">
+                <div className="flex flex-col space-y-6 w-fit px-4 md:w-1/2 mb-6 md:min-h-[250px] pt-7">
+                  <AdDetails
+                    id={id}
+                    currentAdDataFromQuery={currentAdDataFromQuery}
+                    currentAdData={currentAdData}
+                  />
+                </div>
+                <div className="flex flex-col space-y-6 w-full md:w-1/2 pt-10">
+                  <SafetyTips />
+                </div>
+              </div>
+              <div className="sm:hidden flex w-full ad-details-page">
+                <div className="flex flex-col w-fit space-y-6 md:w-1/2  bg-white p-6 rounded-lg mb-5">
+                  <ActionButtons
+                    currentAdData={currentAdData}
+                    currentAdDataFromQuery={currentAdDataFromQuery}
+                    onMarkTaken={handleMarkAsTaken}
+                    onFavorite={handleToggleFavourite}
+                    onReportAd={handleReportAd}
+                    isFavourited={isFavourited}
+                    favouritePending={toggleFavourite.status === "pending"}
+                    caller1={callerNumber1}
+                    caller2={callerNumber2}
+                    showCaller1={openPanel === "caller1"}
+                    showCaller2={openPanel === "caller2"}
+                    toggleCaller1={toggleCaller1}
+                    toggleCaller2={toggleCaller2}
+                    showOffer={openPanel === "makeOffer"}
+                    toggleOffer={() =>
+                      setOpenPanel((p) =>
+                        p === "makeOffer" ? null : "makeOffer",
+                      )
+                    }
+                    openChatWithOwnerAndSend={openChatWithOwnerAndSend}
+                    setOpenPanel={setOpenPanel}
+                  />
+                  <QuickChat
+                    quickChatInput={quickChatInput}
+                    setQuickChatInput={setQuickChatInput}
+                    openChatWithOwnerAndSend={openChatWithOwnerAndSend}
+                  />
+                </div>
+                <div className="bg-white rounded-lg w-full">
+                  <SellerInfo
+                    owner={owner}
+                    currentAdData={currentAdData}
+                    sellerProducts={sellerProducts}
+                    setSellerModalImage={setSellerModalImage}
+                    setIsSellerModalOpen={setIsSellerModalOpen}
+                    sellerCarouselRef={sellerCarouselRef}
+                    navigate={navigate}
+                    setIsSellerAdsModalOpen={setIsSellerAdsModalOpen}
+                  />
+                  <div className="hidden md:block">
+                    <RatingReviews layout="row" />
+                  </div>
+                  <div className="md:hidden">
+                    <RatingReviews
+                      layout="row"
+                      fullWidth
+                      rd={reviewDeconstruction}
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-white mt-6 p-6 rounded-lg w-full">
+                  <CommentsSection
+                    thisProductsReviews={thisProductsReviews}
+                    navigate={navigate}
+                    currentAdData={currentAdData}
+                    numericId={numericId}
+                    likeMutation={likeMutation}
+                  />
+                </div>
+              </div>
+
+              <div className="hidden sm:flex w-full justify-between ad-details-page">
+                <div className="flex flex-col space-y-6 w-fit md:w-1/2 mb-6 md:min-h-[250px]">
+                  <AdDetails
+                    id={id}
+                    currentAdDataFromQuery={currentAdDataFromQuery}
+                    currentAdData={currentAdData}
+                  />
+                  <div className="flex flex-col w-full space-y-6 p-6 lg:p-0 mb-5">
+                    <RatingReviews layout="row" rd={reviewDeconstruction} />
+                    <CommentsSection
+                      thisProductsReviews={thisProductsReviews}
+                      navigate={navigate}
+                      currentAdData={currentAdData}
+                      numericId={numericId}
+                      likeMutation={likeMutation}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col space-y-6 w-full md:w-1/2">
+                  <SafetyTips />
+                  <div className="p-6 max-lg:p-0 rounded-lg w-full">
+                    <div className="sm:bg-(--div-active) w-full p-3 rounded-2xl">
+                      <ActionButtons
+                        currentAdData={currentAdData}
+                        currentAdDataFromQuery={currentAdDataFromQuery}
+                        onMarkTaken={handleMarkAsTaken}
+                        onFavorite={handleToggleFavourite}
+                        onReportAd={handleReportAd}
+                        isFavourited={isFavourited}
+                        favouritePending={toggleFavourite.status === "pending"}
+                        caller1={callerNumber1}
+                        caller2={callerNumber2}
+                        showCaller1={openPanel === "caller1"}
+                        showCaller2={openPanel === "caller2"}
+                        toggleCaller1={toggleCaller1}
+                        toggleCaller2={toggleCaller2}
+                        showOffer={openPanel === "makeOffer"}
+                        toggleOffer={() =>
+                          setOpenPanel((p) =>
+                            p === "makeOffer" ? null : "makeOffer",
+                          )
+                        }
+                        openChatWithOwnerAndSend={openChatWithOwnerAndSend}
+                        setOpenPanel={setOpenPanel}
+                      />
+                      <QuickChat
+                        quickChatInput={quickChatInput}
+                        setQuickChatInput={setQuickChatInput}
+                        openChatWithOwnerAndSend={openChatWithOwnerAndSend}
+                      />
+                    </div>
+                    <SellerInfo
+                      owner={owner}
+                      currentAdData={currentAdData}
+                      sellerProducts={sellerProducts}
+                      setSellerModalImage={setSellerModalImage}
+                      setIsSellerModalOpen={setIsSellerModalOpen}
+                      sellerCarouselRef={sellerCarouselRef}
+                      navigate={navigate}
+                      setIsSellerAdsModalOpen={setIsSellerAdsModalOpen}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="w-screen p-0 lg:mt-15">
+        <SimilarAds relatedProducts={mergedSimilarAds} />
+        <div className=" max-sm:hidden p-8 sm:p-10 bg-(--div-active)" />
+      </div>
+      {/* LiveChat removed from AdsDetailsPage */}
+      <MenuButton />
+    </div>
+  );
+};
+
+export default AdsDetailsPage;

@@ -1,0 +1,57 @@
+name: Deploy to Droplet
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        environment: prod
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v0.1.9
+              with:
+                  host: ${{ secrets.DROPLET_HOST1 }}
+                  username: ${{ secrets.DROPLET_USER }}
+                  key: ${{ secrets.DROPLET_PEKEY1 }}
+                  port: 22
+                  script: |
+                      cd oysloe-webappbyedmund
+                      sudo rm -rf dist/* 
+                      git pull origin main
+                      # Ensure .env file exists with required environment variables (create if missing)
+                      if [ ! -f .env ]; then
+                        echo "Creating .env file with required configuration..."
+                        cat > .env << 'EOF'
+                      VITE_API_URL=https://api.oysloe.com/api-v1
+                      VITE_WS_URL=wss://api.oysloe.com/ws
+                      VITE_API_CREDENTIALS=omit
+                      VITE_API_AUTH_SCHEME=Token
+                      VITE_USE_MOCKS=false
+                      VITE_MEDIA_URL=https://api.oysloe.com
+                      VITE_FIREBASE_API_KEY=AIzaSyBxeua-AU_WOpNS2ECM4owYxbOTFoKDFOA
+                      VITE_FIREBASE_AUTH_DOMAIN=oysloe-45292.firebaseapp.com
+                      VITE_FIREBASE_PROJECT_ID=oysloe-45292
+                      VITE_FIREBASE_STORAGE_BUCKET=oysloe-45292.firebasestorage.app
+                      VITE_FIREBASE_MESSAGING_SENDER_ID=473482750146
+                      VITE_FIREBASE_APP_ID=1:473482750146:web:070c9347e8964a7003f35b
+                      VITE_FIREBASE_MEASUREMENT_ID=G-MVPHXFTGWD
+                      VITE_FIREBASE_VAPID_KEY=BLVZZeWKBodftfYErb5CLwYddVGcTT8u7tQ9ot38UIZg-OXtED1B1s2l5HoF9cb8r1vHW7ybox7mDb6vXXdIrtk
+                      EOF
+                      fi
+                      npm install                   
+                      npm run build                 
+
+                      sudo rm -rf /var/www/oysloe/dist/*
+
+                      sudo cp -r dist/* /var/www/oysloe/dist
+
+                      sudo chown -R www-data:www-data /var/www/oysloe
+                      sudo chmod -R 755 /var/www/oysloe
+
+                      sudo systemctl restart nginx
