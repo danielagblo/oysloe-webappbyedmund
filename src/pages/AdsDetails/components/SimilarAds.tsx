@@ -10,14 +10,14 @@ interface SimilarAdsProps {
 }
 
 const SkeletonCard = () => (
-  <div className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52 animate-pulse">
-    <div className="w-full h-[120px] sm:h-48 bg-gray-200 rounded-md" />
+  <div className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52">
+    <div className="w-full h-[120px] sm:h-48 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-md" />
     <div className="flex items-center gap-1 px-2 py-1">
-      <div className="w-3 sm:w-4 h-3 sm:h-4 bg-gray-200 rounded" />
-      <div className="h-3 sm:h-3.5 w-20 bg-gray-200 rounded" />
+      <div className="w-3 sm:w-4 h-3 sm:h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded" />
+      <div className="h-3 sm:h-3.5 w-20 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded" />
     </div>
-    <div className="px-2 h-4 sm:h-5 w-4/5 bg-gray-200 rounded mt-1" />
-    <div className="px-2 h-4 sm:h-5 w-2/5 bg-gray-200 rounded mt-1 mb-2" />
+    <div className="px-2 h-4 sm:h-5 w-4/5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded mt-1" />
+    <div className="px-2 h-4 sm:h-5 w-2/5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded mt-1 mb-2" />
   </div>
 );
 

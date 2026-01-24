@@ -11,14 +11,14 @@ type Props = {
 };
 
 const SkeletonCard = () => (
-  <div className="rounded-2xl overflow-hidden w-full animate-pulse">
-    <div className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] sm:h-52 bg-gray-200" />
+  <div className="rounded-2xl overflow-hidden w-full">
+    <div className="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] sm:h-52 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
     <div className="flex items-center gap-2 px-2 py-1">
-      <div className="w-3 sm:w-5 h-3 sm:h-5 bg-gray-200 rounded" />
-      <div className="h-3 sm:h-4 w-24 bg-gray-200 rounded" />
+      <div className="w-3 sm:w-5 h-3 sm:h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded" />
+      <div className="h-3 sm:h-4 w-24 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded" />
     </div>
-    <div className="h-4 sm:h-5 w-5/6 bg-gray-200 rounded mx-2 mt-1" />
-    <div className="h-4 sm:h-5 w-2/5 bg-gray-200 rounded mx-2 mt-1 mb-2" />
+    <div className="h-4 sm:h-5 w-5/6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded mx-2 mt-1" />
+    <div className="h-4 sm:h-5 w-2/5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded mx-2 mt-1 mb-2" />
   </div>
 );
 
