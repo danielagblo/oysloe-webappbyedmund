@@ -94,8 +94,6 @@ const ScrollToTop = () => {
   // Capture where the user clicked BEFORE navigation (works even if scrollY is unreliable).
   useEffect(() => {
     const onClickCapture = (e: MouseEvent) => {
-      if (!isMobileRef.current) return;
-
       const target = e.target as HTMLElement | null;
       const link = target?.closest?.("a") as HTMLAnchorElement | null;
       if (!link) return;
@@ -112,7 +110,7 @@ const ScrollToTop = () => {
 
       if (debugRef.current) {
         // eslint-disable-next-line no-console
-        console.log("[scroll-debug] saved", { from: pathname, href: hrefAttr, y });
+        console.log("[scroll-debug] saved", { from: pathname, href: hrefAttr, y, isMobile: isMobileRef.current });
       }
     };
 
@@ -127,12 +125,6 @@ const ScrollToTop = () => {
       document.body.scrollTop = 0;
     };
 
-    // Desktop behavior stays as-is: always top.
-    if (!isMobileRef.current) {
-      applyScrollTop();
-      return;
-    }
-
     // Refresh/first load should go to top.
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
@@ -144,12 +136,13 @@ const ScrollToTop = () => {
       return;
     }
 
-    // Only restore on back.
+    // Only restore on back (POP navigation).
     if (navigationType !== "POP") {
       applyScrollTop();
       return;
     }
 
+    // *** SCROLL RESTORATION FOR BACK NAVIGATION ***
     const popTargetKey = `scroll:popTarget:path:${pathname}`;
     const anchorKey = `scroll:anchorHref:path:${pathname}`;
     const yKey = `scroll:savedY:path:${pathname}`;
@@ -167,6 +160,7 @@ const ScrollToTop = () => {
         popTarget,
         anchorHref,
         savedY,
+        isMobile: isMobileRef.current,
       });
     }
 
