@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Watermark from "../../../components/ImageWithWatermark";
+import ProgressiveImage from "../../../components/ProgressiveImage";
 
 interface ImageGalleryProps {
   images: string[];
@@ -118,13 +118,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
                   style={{ backgroundImage: `url(${src})` }}
                 />
                 <div className="relative w-full h-full">
-                  <img
+                  <ProgressiveImage
                     src={src}
                     alt={`Image ${i + 1}`}
-                    className="object-cover w-full h-full relative z-10"
+                    containerClassName="relative w-full h-full"
+                    imgClassName="object-cover w-full h-full relative z-10"
+                    watermarkBusinessName={businessName}
+                    watermarkSize={watermarkSize}
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  <Watermark businessName={businessName} size={watermarkSize} />
                 </div>
               </div>
             );
@@ -159,13 +161,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             onOpenPictureModal();
           }}
         />
-        <img
+        <ProgressiveImage
           src={getMainImage()}
           alt="Ad main"
-          className="object-cover w-full h-full relative z-10"
+          containerClassName="relative w-full h-full"
+          imgClassName="object-cover w-full h-full relative z-10"
+          watermarkBusinessName={businessName}
+          watermarkSize={watermarkSize}
           onContextMenu={(e) => e.preventDefault()}
         />
-        <Watermark businessName={businessName} size={watermarkSize} />
         <div
           onClick={() => {
             onSetCurrentIndex((idx) => (idx - 1 + imageCount) % imageCount);

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Watermark from "../../components/ImageWithWatermark";
+import ProgressiveImage from "../../components/ProgressiveImage";
 import Loader from "../../components/LoadingDots";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
@@ -64,22 +64,22 @@ const ScrollableAdRow = ({
       // style={{
       //   WebkitMaskImage: maskGradient,
       //   maskImage: maskGradient,
-      // }}
-      >
-        {filteredProducts.length > 0 ? (
-          <div className="flex gap-2 sm:gap-3 lg:gap-[1vw] w-max">
-            {productsLoading ? (
-              <Loader className={"h-40 my-0"} />
-            ) : (
-              filteredProducts.map(
-                (ad) =>
-                  ad.status === "ACTIVE" &&
-                  !ad.is_taken && (
-                    <Link
+                    <div
                       key={ad.id}
                       to={`/ads/${ad.id}`}
                       state={{ adData: ad }}
                       onClick={(e) => handleAdClick(ad, e)}
+                      className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52 lg:w-[17.5vw]"
+                    >
+                      <ProgressiveImage
+                        src={ad.image || "/no-image.jpeg"}
+                        alt={ad.name}
+                        containerClassName="relative inline-block w-full"
+                        imgClassName="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
+                        watermarkBusinessName={ad.owner?.business_name}
+                        watermarkSize="md"
+                        onContextMenu={(e) => e.preventDefault()}
+                      />
                       className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52 lg:w-[17.5vw]"
                     >
                       <div className="relative inline-block w-full">

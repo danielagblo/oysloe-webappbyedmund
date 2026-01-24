@@ -1,5 +1,5 @@
 import React from "react";
-import Watermark from "../../../components/ImageWithWatermark";
+import ProgressiveImage from "../../../components/ProgressiveImage";
 
 interface PictureModalProps {
   pageImages: string[];
@@ -86,14 +86,15 @@ const PictureModal: React.FC<PictureModalProps> = ({
             }}
           />
           <div className="relative">
-            <img
+            <ProgressiveImage
               src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
               alt={`Modal image ${pictureModalIndex + 1}`}
-              className="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
+              containerClassName="relative"
+              imgClassName="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
+              watermarkBusinessName={businessName}
+              watermarkSize="lg"
               onContextMenu={(e) => e.preventDefault()}
             />
-            {/* choose larger watermark on small screens for readability */}
-            <Watermark businessName={businessName} size="lg" />
           </div>
         </div>
 

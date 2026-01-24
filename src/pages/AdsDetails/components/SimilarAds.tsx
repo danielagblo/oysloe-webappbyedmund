@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { formatMoney } from "../../../utils/formatMoney";
-import Watermark from "../../../components/ImageWithWatermark";
+import ProgressiveImage from "../../../components/ProgressiveImage";
 
 interface SimilarAdsProps {
   relatedProducts: any[];
@@ -91,16 +91,15 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   onClick={markReturnTarget}
                   className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52"
                 >
-                  <div className="relative w-full h-[120px] sm:h-48">
-                    <img
-                      src={ad.image || "/no-image.jpeg"}
-                      alt={ad.name.slice(0, 10)}
-                      loading="lazy"
-                      className="w-full h-full object-cover rounded-md"
-                      onContextMenu={(e) => e.preventDefault()}
-                    />
-                    <Watermark businessName={ad.owner?.business_name} size="sm" />
-                  </div>
+                  <ProgressiveImage
+                    src={ad.image || "/no-image.jpeg"}
+                    alt={ad.name.slice(0, 10)}
+                    containerClassName="relative w-full h-[120px] sm:h-48"
+                    imgClassName="w-full h-full object-cover rounded-md"
+                    watermarkBusinessName={ad.owner?.business_name}
+                    watermarkSize="sm"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img
                       src="/location.svg"
