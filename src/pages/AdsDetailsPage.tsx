@@ -325,7 +325,11 @@ const AdsDetailsPage = () => {
     // If no subcategory or no all products loaded, return only related products
     if (!currentSubcategory || !allProducts.length) {
       console.debug("[SimilarAds] Returning only related products (no subcategory or no all products)");
-      return relatedProducts;
+      const backendAvailable = relatedProducts.filter(p => !p.is_taken);
+      return {
+        merged: backendAvailable,
+        fallbackStartIndex: -1,
+      };
     }
 
     // Get IDs of related products and current ad to avoid duplicates
