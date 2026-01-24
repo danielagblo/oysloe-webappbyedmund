@@ -303,6 +303,7 @@ const AdsDetailsPage = () => {
   };
 
   // Create merged similar ads: backend similar ads + same-category similar names + subcategory fallback
+  // Also compute a fallback start index to label "Other ads" in the UI.
   const mergedSimilarAds = useMemo(() => {
     const currentAdData = currentAdDataFromQuery ?? adDataFromState;
     const currentAdId = numericId ?? currentAdDataFromQuery?.id ?? adDataFromState?.id;
@@ -381,14 +382,25 @@ const AdsDetailsPage = () => {
       return 0;
     });
 
+    // Compute available (not taken) counts aligned with UI filtering
+    const backendAvailable = relatedProducts.filter(p => !p.is_taken);
+    const similarAvailable = sortedSimilarNames; // already excludes taken
+    const subcategoryAvailable = sortedSubcategory; // already excludes taken
+
     // Merge in priority order: backend similar ads → similar names in category → subcategory fallback
-    const result = [...relatedProducts, ...sortedSimilarNames, ...sortedSubcategory];
-    console.debug("[SimilarAds] Final merged ads count:", result.length, {
-      backend: relatedProducts.length,
-      similarNames: sortedSimilarNames.length,
-      subcategory: sortedSubcategory.length,
+    const merged = [...backendAvailable, ...similarAvailable, ...subcategoryAvailable];
+    const fallbackStartIndex = backendAvailable.length + similarAvailable.length;
+
+    console.debug("[SimilarAds] Final merged ads count:", merged.length, {
+      backend: backendAvailable.length,
+      similarNames: similarAvailable.length,
+      subcategory: subcategoryAvailable.length,
+      fallbackStartIndex,
     });
-    return result;
+    return {
+      merged,
+      fallbackStartIndex,
+    };
   }, [relatedProducts, allProducts, currentAdDataFromQuery, adDataFromState, numericId]);
 
   const reportProduct = useReportProduct();
@@ -1071,7 +1083,10 @@ const AdsDetailsPage = () => {
         </div>
       </div>
       <div className="w-screen p-0 lg:mt-15">
-        <SimilarAds relatedProducts={mergedSimilarAds} />
+        <SimilarAds 
+          relatedProducts={mergedSimilarAds.merged} 
+          fallbackStartIndex={mergedSimilarAds.fallbackStartIndex} 
+        />
         <div className=" max-sm:hidden p-8 sm:p-10 bg-(--div-active)" />
       </div>
       {/* LiveChat removed from AdsDetailsPage */}
