@@ -155,60 +155,54 @@ const ScrollToTop = () => {
 
     if (debugRef.current) {
       // eslint-disable-next-line no-console
-      console.log("[scroll-debug] restore", {
+      console.log("[scroll-debug] BACK navigation detected", {
         path: pathname,
-        nav: navigationType,
         popTarget,
         anchorHref,
         savedY,
-        isMobile: isMobileRef.current,
       });
     }
 
-    // Retry a few times to let layout settle. Increased delays to handle slow layouts.
-    const delays = [0, 100, 200, 400, 600, 1000, 1500];
-    let attempt = 0;
-
-    const tryRestore = () => {
+    // Use requestAnimationFrame for smoother, frame-based restoration
+    let frameCount = 0;
+    const maxFrames = 60; // Up to 1 second at 60fps
+    
+    const restoreFrame = () => {
+      frameCount++;
+      
       const didTarget = popTarget ? scrollToDataTarget(popTarget) : false;
       const didAnchor = !didTarget && anchorHref ? scrollToAnchorHref(anchorHref) : false;
-
-      if (debugRef.current) {
+      
+      if (debugRef.current && frameCount % 10 === 0) {
         // eslint-disable-next-line no-console
-        console.log("[scroll-debug] attempt", {
-          attempt,
+        console.log("[scroll-debug] frame", frameCount, {
           didTarget,
           didAnchor,
-          currentY: window.scrollY || document.documentElement.scrollTop || 0,
+          currentY: window.scrollY,
           targetY: savedY,
         });
       }
-
+      
       if (!didTarget && !didAnchor && savedY > 0) {
-        if (debugRef.current) {
-          // eslint-disable-next-line no-console
-          console.log("[scroll-debug] restoring to Y:", savedY);
-        }
-        window.scrollTo({ top: savedY, behavior: 'auto' });
+        window.scrollTo(0, savedY);
       }
-
-      attempt += 1;
-      if (attempt < delays.length) {
-        setTimeout(tryRestore, delays[attempt]);
+      
+      if (frameCount < maxFrames && !didTarget && !didAnchor) {
+        requestAnimationFrame(restoreFrame);
       } else {
-        // consume one-shot keys after all retries exhausted
+        // Cleanup
         if (popTarget) sessionStorage.removeItem(popTargetKey);
         if (anchorHref) sessionStorage.removeItem(anchorKey);
         if (savedYRaw) sessionStorage.removeItem(yKey);
         
         if (debugRef.current) {
           // eslint-disable-next-line no-console
-          console.log("[scroll-debug] cleanup complete, final Y:", window.scrollY || document.documentElement.scrollTop || 0);
+          console.log("[scroll-debug] restoration complete at frame", frameCount, "final Y:", window.scrollY);
         }
       }
     };
-
-    setTimeout(tryRestore, delays[0]);
+    
+    requestAnimationFrame(restoreFrame);
   }, [pathname, navigationType]);
 
   return null;
