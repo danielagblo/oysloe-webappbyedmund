@@ -7,7 +7,8 @@ function isDebugScroll() {
   try {
     return (
       (typeof window !== "undefined" && window.location.search.includes("debugScroll=1")) ||
-      (typeof import.meta !== "undefined" && Boolean((import.meta as any).env?.DEV))
+      (typeof import.meta !== "undefined" && Boolean((import.meta as any).env?.DEV)) ||
+      true // Always enable debug for now to troubleshoot
     );
   } catch {
     return false;
@@ -165,7 +166,7 @@ const ScrollToTop = () => {
     }
 
     // Retry a few times to let layout settle. Increased delays to handle slow layouts.
-    const delays = [0, 50, 100, 200, 400, 800];
+    const delays = [0, 100, 200, 400, 600, 1000, 1500];
     let attempt = 0;
 
     const tryRestore = () => {
@@ -178,14 +179,17 @@ const ScrollToTop = () => {
           attempt,
           didTarget,
           didAnchor,
-          y: window.scrollY || document.documentElement.scrollTop || 0,
+          currentY: window.scrollY || document.documentElement.scrollTop || 0,
+          targetY: savedY,
         });
       }
 
       if (!didTarget && !didAnchor && savedY > 0) {
-        window.scrollTo(0, savedY);
-        document.documentElement.scrollTop = savedY;
-        document.body.scrollTop = savedY;
+        if (debugRef.current) {
+          // eslint-disable-next-line no-console
+          console.log("[scroll-debug] restoring to Y:", savedY);
+        }
+        window.scrollTo({ top: savedY, behavior: 'auto' });
       }
 
       attempt += 1;
@@ -195,6 +199,12 @@ const ScrollToTop = () => {
         // consume one-shot keys after all retries exhausted
         if (popTarget) sessionStorage.removeItem(popTargetKey);
         if (anchorHref) sessionStorage.removeItem(anchorKey);
+        if (savedYRaw) sessionStorage.removeItem(yKey);
+        
+        if (debugRef.current) {
+          // eslint-disable-next-line no-console
+          console.log("[scroll-debug] cleanup complete, final Y:", window.scrollY || document.documentElement.scrollTop || 0);
+        }
       }
     };
 
