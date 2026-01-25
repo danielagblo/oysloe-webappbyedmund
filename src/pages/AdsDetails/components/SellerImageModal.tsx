@@ -1,15 +1,18 @@
 import React from "react";
+import ProgressiveImage from "../../../components/ProgressiveImage";
 
 interface SellerImageModalProps {
   isSellerModalOpen: boolean;
   sellerModalImage: string | null;
   setIsSellerModalOpen: (open: boolean) => void;
+  businessName?: string | null;
 }
 
 const SellerImageModal: React.FC<SellerImageModalProps> = ({
   isSellerModalOpen,
   sellerModalImage,
   setIsSellerModalOpen,
+  businessName,
 }) => {
   if (!isSellerModalOpen || !sellerModalImage) return null;
   return (
@@ -29,10 +32,14 @@ const SellerImageModal: React.FC<SellerImageModalProps> = ({
           ✕
         </button>
 
-        <img
+        <ProgressiveImage
           src={sellerModalImage}
           alt="Seller"
-          className="max-h-[80vh] object-contain w-full rounded"
+          containerClassName="w-full"
+          imgClassName="max-h-[80vh] object-contain w-full rounded"
+          watermarkBusinessName={businessName}
+          watermarkSize="md"
+          onContextMenu={(e) => e.preventDefault()}
         />
       </div>
     </div>

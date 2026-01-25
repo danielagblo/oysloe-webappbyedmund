@@ -293,11 +293,11 @@ const AdsDetailsPage = () => {
     const normalize = (s: string) => s.toLowerCase().trim().split(/\s+/);
     const tokens1 = normalize(str1);
     const tokens2 = normalize(str2);
-    
-    const matches = tokens1.filter(t1 => 
+
+    const matches = tokens1.filter(t1 =>
       tokens2.some(t2 => t1 === t2 || t1.includes(t2) || t2.includes(t1))
     ).length;
-    
+
     const totalTokens = Math.max(tokens1.length, tokens2.length);
     return totalTokens > 0 ? matches / totalTokens : 0;
   };
@@ -309,10 +309,10 @@ const AdsDetailsPage = () => {
     const currentAdId = numericId ?? currentAdDataFromQuery?.id ?? adDataFromState?.id;
     const currentAdName = currentAdData?.name || "";
     const currentCategory = currentAdData?.category;
-    
+
     // Extract subcategory from product_features if available
     const currentSubcategory = currentAdData?.product_features?.[0]?.feature?.subcategory;
-    
+
     console.debug("[SimilarAds] mergedSimilarAds computation:", {
       currentAdName,
       currentCategory,
@@ -321,7 +321,7 @@ const AdsDetailsPage = () => {
       relatedProductsCount: relatedProducts.length,
       allProductsCount: allProducts.length,
     });
-    
+
     // If no subcategory or no all products loaded, return only related products
     if (!currentSubcategory || !allProducts.length) {
       console.debug("[SimilarAds] Returning only related products (no subcategory or no all products)");
@@ -334,7 +334,7 @@ const AdsDetailsPage = () => {
 
     // Get IDs of related products and current ad to avoid duplicates
     const relatedIds = new Set(relatedProducts.map(p => p.id));
-    
+
     // TIER 2: Find ads with similar titles in the same category
     const similarNameProducts = allProducts.filter(p => {
       if (relatedIds.has(p.id) || p.id === currentAdId || p.is_taken || p.status !== "ACTIVE") {
@@ -342,7 +342,7 @@ const AdsDetailsPage = () => {
       }
       // Check if same category and similar name
       return (
-        p.category === currentCategory && 
+        p.category === currentCategory &&
         getStringSimilarity(currentAdName, p.name) >= 0.3
       );
     });
@@ -920,6 +920,13 @@ const AdsDetailsPage = () => {
             isSellerModalOpen={isSellerModalOpen}
             sellerModalImage={sellerModalImage}
             setIsSellerModalOpen={setIsSellerModalOpen}
+            businessName={
+              owner?.business_name ??
+              owner?.name ??
+              currentAdData?.owner?.business_name ??
+              currentAdData?.owner?.name ??
+              null
+            }
           />
           <ReportModal
             isOpen={isReportModalOpen}
@@ -1099,8 +1106,8 @@ const AdsDetailsPage = () => {
         </div>
       </div>
       <div className="w-screen p-0 lg:mt-15">
-        <SimilarAds 
-          relatedProducts={mergedSimilarAds.merged} 
+        <SimilarAds
+          relatedProducts={mergedSimilarAds.merged}
           fallbackStartIndex={mergedSimilarAds.fallbackStartIndex}
           isLoading={relatedProductsLoading || allProductsLoading}
         />

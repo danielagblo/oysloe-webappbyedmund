@@ -119,10 +119,14 @@ const PictureModal: React.FC<PictureModalProps> = ({
               onClick={() => setPictureModalIndex(() => i)}
               className={`shrink-0 w-20 h-20 overflow-hidden rounded ${i === pictureModalIndex ? "ring-2 ring-white" : ""}`}
             >
-              <img
+              <ProgressiveImage
                 src={s}
                 alt={`thumb ${i + 1}`}
-                className="object-cover w-full h-full"
+                containerClassName="w-full h-full"
+                imgClassName="object-cover w-full h-full"
+                watermarkBusinessName={businessName}
+                watermarkSize="xxs"
+                onContextMenu={(e) => e.preventDefault()}
               />
             </button>
           ))}
