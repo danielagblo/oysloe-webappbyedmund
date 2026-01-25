@@ -631,6 +631,8 @@ const EditProfilePage = () => {
                             try {
                               let avatarUrl: string | undefined;
                               let logoUrl: string | undefined;
+                              let idFrontUrl: string | undefined;
+                              let idBackUrl: string | undefined;
                               // upload avatar/logo to Cloudinary when available
                               if (avatarFile) {
                                 const r = await uploadToCloudinary(avatarFile);
@@ -642,12 +644,23 @@ const EditProfilePage = () => {
                                 if (r && (r.secure_url || r.url))
                                   logoUrl = r.secure_url || r.url;
                               }
+                              // upload ID front/back to Cloudinary when available
+                              if (idFrontFile) {
+                                const r = await uploadToCloudinary(idFrontFile);
+                                if (r && (r.secure_url || r.url))
+                                  idFrontUrl = r.secure_url || r.url;
+                              }
+                              if (idBackFile) {
+                                const r = await uploadToCloudinary(idBackFile);
+                                if (r && (r.secure_url || r.url))
+                                  idBackUrl = r.secure_url || r.url;
+                              }
 
                               // If we uploaded at least one file to Cloudinary,
                               // send a JSON PATCH with the URLs instead of the
                               // binary files. If Cloudinary isn't configured or
                               // uploads failed, fall back to multipart FormData below.
-                              if (avatarUrl || logoUrl) {
+                              if (avatarUrl || logoUrl || idFrontUrl || idBackUrl) {
                                 const payloadForServer: any = {
                                   name: selectedUser?.name,
                                   email: selectedUser?.email,
@@ -666,6 +679,8 @@ const EditProfilePage = () => {
                                 };
                                 if (avatarUrl) payloadForServer.avatar = avatarUrl;
                                 if (logoUrl) payloadForServer.business_logo = logoUrl;
+                                if (idFrontUrl) payloadForServer.id_front_page = idFrontUrl;
+                                if (idBackUrl) payloadForServer.id_back_page = idBackUrl;
 
                                 await apiClient.patch(
                                   endpoints.userProfile.userProfile,
