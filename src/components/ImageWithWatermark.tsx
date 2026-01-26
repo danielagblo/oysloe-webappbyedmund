@@ -56,5 +56,5 @@ const Watermark: React.FC<WatermarkProps> = ({ businessName, size = "md" }) => {
         </div>
     );
 };
- 
+
 export default Watermark;
