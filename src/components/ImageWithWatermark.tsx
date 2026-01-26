@@ -44,7 +44,7 @@ const Watermark: React.FC<WatermarkProps> = ({ businessName, size = "md" }) => {
         size === "xxs" ? "opacity-30" : size === "xs" ? "opacity-30" : size === "sm" ? "opacity-30" : size === "md" ? "opacity-30" : "opacity-30";
 
     return (
-        <div className={`absolute inset-0 flex items-end justify-center pointer-events-none ${containerPbClass}`}>
+        <div className={`absolute inset-0 flex items-end justify-center pointer-events-none ${containerPbClass} z-30`}>
             <div className={`text-center ${containerOpacityClass} w-full px-1`}>
                 <p className={`${firstLineClass} text-gray-500 tracking-wider leading-tight mb-1 text-shadow-md text-shadow-white `}>
                     POSTED ON OYSLOE
