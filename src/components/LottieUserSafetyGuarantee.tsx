@@ -1,11 +1,11 @@
 import Lottie from "lottie-react";
-import BoardingScreen from "../assets/User safety guarantee.json";
+import BoardingScreen from "../assets/SAFETY ASSURANCE.json";
 
 const LottieUserSafetyGuarantee = () => {
   return (
     <Lottie
       animationData={BoardingScreen}
-      loop={false}
+      loop={true}
       autoplay={true}
       className="max-sm:hidden h-1/2"
     />
