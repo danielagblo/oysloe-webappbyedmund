@@ -390,14 +390,14 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/40 z-998 sm:hidden"
+        className="fixed inset-0 bg-black/40 z-[998] sm:hidden"
         onClick={onClose}
       />
 
       {/* Bottom Sheet Modal */}
       <div
         ref={modalRef}
-        className={`fixed bottom-15 left-0 right-0 bg-(--div-active) rounded-t-3xl z-999 sm:hidden max-h-[77.5vh] overflow-hidden flex flex-col transition-transform duration-400 ease-out ${
+        className={`fixed bottom-15 z-50 left-0 right-0 bg-(--div-active) rounded-t-3xl z-[999] sm:hidden max-h-[77.5vh] overflow-hidden flex flex-col transition-transform duration-400 ease-out ${
           isOpen
             ? "translate-y-0"
             : "translate-y-full"

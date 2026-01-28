@@ -82,7 +82,7 @@ const FilterButton = ({
       {/* Mobile Filter Button */}
       <button
         onClick={handleMobileFilterClick}
-        className={`${className} sm:hidden`}
+        className={`${className} z-40 sm:hidden`}
       >
         <div
           className={`bg-gray-100 w-25 h-12 rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}
@@ -100,7 +100,7 @@ const FilterButton = ({
       {/* Desktop Filter Button */}
       <button
         onClick={handleDesktopFilterClick}
-        className={`${className} hidden sm:block`}
+        className={`${className} hidden z-40 sm:block`}
       >
         <div
           className={`bg-white w-[10vw] h-[3.5vw] max-lg:h-[3.5vh] max-lg:w-[10vh] max-lg:mb-2 rounded-full flex items-center justify-center gap-2 shadow-lg cursor-pointer relative`}

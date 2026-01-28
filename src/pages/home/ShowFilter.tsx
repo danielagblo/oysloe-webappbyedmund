@@ -317,7 +317,7 @@ const ShowFilter = ({
 
   return (
     <div className="fixed inset-0 bg-[#4c4a4ab8] flex items-center justify-center z-50 px-3 sm:px-0">
-      <div className="relative pt-15 bg-white rounded-[30px] sm:rounded-[60px] w-[95vw] sm:w-[70vw] lg:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
+      <div className="relative pt-15 bg-white rounded-[30px] z-50 sm:rounded-[60px] w-[95vw] sm:w-[70vw] lg:w-[50vw] max-h-[90vh] overflow-y-auto no-scrollbar shadow-lg">
         <div className="absolute top-0 right-0 p-4 sm:p-6">
           <button onClick={closeFilterPopup} className="block mb-3">
             <svg

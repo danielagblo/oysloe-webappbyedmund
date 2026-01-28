@@ -1,7 +1,9 @@
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import Lottie from "lottie-react";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import subscriptionOffer from "../assets/50Off.json";
 import submittedGif from "../assets/Submitted.gif";
 import uploadImg from "../assets/upload.png";
 import usePostAd from "../features/ad/usePostAd";
@@ -469,7 +471,9 @@ export default function PostAdForm({
   } = useLocationSelection(groupedLocations);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const gridRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   // Mutation hook for posting ads
   const postAdMutation = usePostAd();
@@ -1224,7 +1228,7 @@ export default function PostAdForm({
         : {}),
     } as any;
 
-    console.log("Ad metadata (JSON):", metadata);
+    // console.log("Ad metadata (JSON):", metadata);
 
     // Debug: log uploadedImages details to help diagnose missing files
     if (import.meta.env.DEV) {
@@ -1244,8 +1248,8 @@ export default function PostAdForm({
       }
     }
 
-    console.log("Location Details:", locationDetails);
-    console.log("Ad Metadata to submit:", metadata);
+    // console.log("Location Details:", locationDetails);
+    // console.log("Ad Metadata to submit:", metadata);
 
     try {
       if (effectiveEditId) {
@@ -1366,9 +1370,15 @@ export default function PostAdForm({
 
       // Try to extract a helpful server-side error message (e.g. { detail: '...' })
       let friendly = "An error occurred while saving.";
+      let isSubscriptionError = false;
 
       try {
         const raw = err instanceof Error ? err.message : String(err);
+
+        // Check if this is a subscription-related error
+        if (raw.toLowerCase().includes("subscription") || raw.toLowerCase().includes("acquire")) {
+          isSubscriptionError = true;
+        }
 
         // Look for a JSON object in the error text and parse it
         const jsonMatch = raw.match(/(\{[\s\S]*\})$/);
@@ -1376,9 +1386,17 @@ export default function PostAdForm({
           try {
             const parsed = JSON.parse(jsonMatch[1]);
             if (parsed && typeof parsed === "object") {
-              if (typeof parsed.detail === "string") friendly = parsed.detail;
-              else if (typeof parsed.message === "string")
+              if (typeof parsed.detail === "string") {
+                friendly = parsed.detail;
+                if (friendly.toLowerCase().includes("subscription") || friendly.toLowerCase().includes("acquire")) {
+                  isSubscriptionError = true;
+                }
+              } else if (typeof parsed.message === "string") {
                 friendly = parsed.message;
+                if (friendly.toLowerCase().includes("subscription") || friendly.toLowerCase().includes("acquire")) {
+                  isSubscriptionError = true;
+                }
+              }
             }
           } catch (e) {
             // not JSON — ignore
@@ -1391,9 +1409,17 @@ export default function PostAdForm({
             try {
               const parsed = JSON.parse(curly[1]);
               if (parsed && typeof parsed === "object") {
-                if (typeof parsed.detail === "string") friendly = parsed.detail;
-                else if (typeof parsed.message === "string")
+                if (typeof parsed.detail === "string") {
+                  friendly = parsed.detail;
+                  if (friendly.toLowerCase().includes("subscription") || friendly.toLowerCase().includes("acquire")) {
+                    isSubscriptionError = true;
+                  }
+                } else if (typeof parsed.message === "string") {
                   friendly = parsed.message;
+                  if (friendly.toLowerCase().includes("subscription") || friendly.toLowerCase().includes("acquire")) {
+                    isSubscriptionError = true;
+                  }
+                }
               }
             } catch (e) {
               void e;
@@ -1410,7 +1436,12 @@ export default function PostAdForm({
         void e;
       }
 
-      toast.error(friendly);
+      // Show subscription modal instead of toast if this is a subscription error
+      if (isSubscriptionError) {
+        setShowSubscriptionModal(true);
+      } else {
+        toast.error(friendly);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -1814,6 +1845,53 @@ export default function PostAdForm({
                 <SaveBtn />
               </div>
             )}
+          </div>
+        )}
+
+        {showSubscriptionModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
+              <div className="mb-6">
+                <div className="w-40 h-40 flex items-center justify-center">
+                  <Lottie
+                    animationData={subscriptionOffer}
+                    loop={true}
+                    autoplay={true}
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-2xl font-semibold text-[var(--dark-def)] mb-2">
+                Subscriptions
+              </h2>
+              <p className="text-sm text-gray-600 mb-2">
+                Need to Sell fast?
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                We're offering you up to <span className="font-semibold text-[var(--dark-def)]">50% off</span> on all our subscription offers
+              </p>
+
+              <div className="flex gap-3 w-full">
+                <button
+                  onClick={() => {
+                    setShowSubscriptionModal(false);
+                  }}
+                  className="w-full py-3 rounded-xl border-gray-300 hover:bg-gray-100 hover:text-[var(--dark-def)] border cursor-pointer active:scale-98 transition"
+                >
+                  Maybe Later
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSubscriptionModal(false);
+                    navigate("/profile?tab=subscription");
+                  }}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-[var(--dark-def)] py-3 cursor-pointer rounded-xl font-medium transition"
+                >
+                  Get Subscription
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
