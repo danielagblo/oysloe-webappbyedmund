@@ -262,114 +262,127 @@ const EditProfilePage = () => {
                 </div>
               )}
 
+              <div className="flex items-center justify-end w-9/10">
+                <button
+                  className="bg-gray-100 py-3 w-full rounded-xl text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
+                  onClick={() => {
+                    setIsReadonly(!isReadonly);
+                    setIsReadonlyRight(!isReadonlyRight);
+                  }}
+                >
+                  {isReadonly ? "Edit Details" : "Preview Details"}
+                </button>
+              </div>
+
               {/* profile images area */}
-              <div className="flex justify-around items-center w-full p-4 rounded-md">
-                <div className="flex flex-col items-center gap-2 relative">
-                  <img
-                    src={
-                      buildMediaUrl(selectedUser?.profileImage) ||
-                      avatarPlaceholder
-                    }
-                    alt="Profile"
-                    className="w-20 max-w-full h-20 rounded-full object-cover bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      setImageModalSrc(
+              <div className="flex justify-center flex-col items-center w-full p-2 rounded-md gap-3">
+                <div className="flex flex-row items-center justify-around w-full relative">
+                  <div className="bg-green-300 relative rounded-full p-1">
+                    <img
+                      src={
                         buildMediaUrl(selectedUser?.profileImage) ||
-                        avatarPlaceholder,
-                      );
-                      setImageModalAlt("Profile Image");
-                      setImageModalOpen(true);
-                    }}
-                    onError={(e) => onImgError(e, avatarPlaceholder)}
-                  />
-                  <p className="text-xs ">Profile Image</p>
-                  {!isReadonly && (
-                    <label
-                      htmlFor="avatar-file-input"
-                      className="absolute right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
-                    >
-                      <input
-                        id="avatar-file-input"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0] ?? null;
-                          if (f) {
-                            setAvatarFile(f);
-                            setSelectedUser((p) => ({
-                              ...p,
-                              profileImage: URL.createObjectURL(f),
-                            }));
-                          }
-                        }}
-                      />
-                      <Camera size={16} />
-                    </label>
-                  )}
+                        avatarPlaceholder
+                      }
+                      alt="Profile"
+                      className="w-17 max-w-full h-17 lg:w-[5vw] lg:h-[5vw] rounded-full border-5 border-white object-cover bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setImageModalSrc(
+                          buildMediaUrl(selectedUser?.profileImage) ||
+                          avatarPlaceholder,
+                        );
+                        setImageModalAlt("Profile Image");
+                        setImageModalOpen(true);
+                      }}
+                      onError={(e) => onImgError(e, avatarPlaceholder)}
+                    />
+                    {!isReadonly && (
+                      <label
+                        htmlFor="avatar-file-input"
+                        className="absolute right-0 bottom-0 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                      >
+                        <input
+                          id="avatar-file-input"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0] ?? null;
+                            if (f) {
+                              setAvatarFile(f);
+                              setSelectedUser((p) => ({
+                                ...p,
+                                profileImage: URL.createObjectURL(f),
+                              }));
+                            }
+                          }}
+                        />
+                        <Camera size={16} />
+                      </label>
+                    )}
+                  </div>
+                  
+                  <div className="max-w-7/10 lg:max-w-3/5">
+                    <p className="text-sm lg:text-[1.1vw] font-semibold">Profile Image</p>
+                    <p className="text-[11px] lg:text-[0.9vw]">To verify your identity and keep the platform safe. A clear Picture of your face is required.</p>
+                  
+                  </div>
                 </div>
-                <div className="flex flex-col items-center gap-2 relative">
-                  <img
-                    src={
-                      buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder
-                    }
-                    alt="Business Logo"
-                    className="w-20 max-w-full h-20 rounded-md object-cover bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      setImageModalSrc(
-                        buildMediaUrl(selectedUser?.businessLogo) ||
-                        logoPlaceholder,
-                      );
-                      setImageModalAlt("Business Logo");
-                      setImageModalOpen(true);
-                    }}
-                    onError={(e) => onImgError(e, logoPlaceholder)}
-                  />
-                  <p className="text-xs">Business Logo</p>
-                  {!isReadonly && (
-                    <label
-                      htmlFor="logo-file-input"
-                      className="absolute -right-1 bottom-5 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
-                    >
-                      <input
-                        id="logo-file-input"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0] ?? null;
-                          if (f) {
-                            setLogoFile(f);
-                            setSelectedUser((p) => ({
-                              ...p,
-                              businessLogo: URL.createObjectURL(f),
-                            }));
-                          }
-                        }}
-                      />
-                      <Camera size={16} />
-                    </label>
-                  )}
+                <div className="flex flex-row items-center justify-around w-full relative">
+                  <div className="bg-green-300 p-1 rounded-full relative">
+                    <img
+                      src={
+                        buildMediaUrl(selectedUser?.businessLogo) || logoPlaceholder
+                      }
+                      alt="Business Logo"
+                      className="w-17 max-w-full h-17 lg:w-[5vw] lg:h-[5vw] border-5 border-white rounded-full object-cover bg-gray-100 cursor-pointer"
+                      onClick={() => {
+                        setImageModalSrc(
+                          buildMediaUrl(selectedUser?.businessLogo) ||
+                          logoPlaceholder,
+                        );
+                        setImageModalAlt("Business Logo");
+                        setImageModalOpen(true);
+                      }}
+                      onError={(e) => onImgError(e, logoPlaceholder)}
+                    />
+                    {!isReadonly && (
+                      <label
+                        htmlFor="logo-file-input"
+                        className="absolute right-0 bottom-0 bg-white rounded-full p-1 shadow z-10 cursor-pointer"
+                      >
+                        <input
+                          id="logo-file-input"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0] ?? null;
+                            if (f) {
+                              setLogoFile(f);
+                              setSelectedUser((p) => ({
+                                ...p,
+                                businessLogo: URL.createObjectURL(f),
+                              }));
+                            }
+                          }}
+                        />
+                        <Camera size={16} />
+                      </label>
+                    )}
+                  </div>
+                <div className="max-w-7/10 lg:max-w-3/5">
+                  <p className="text-sm lg:text-[1.1vw] font-semibold">Business Logo</p>
+                  <p className="text-[11px] lg:text-[0.9vw]">Upload any image that represents what you do.</p>
+                </div>                  
                 </div>
               </div>
 
               {/* general details */}
               <div className="w-[95%] bg-white p-4 rounded-md">
-                <div className="grid grid-cols-3 justify-between items-center mb-2 max-w-[650px]">
+                <div className="grid grid-cols-2 justify-between items-center mb-2 max-w-[650px]">
                   <p className="text-sm font-medium whitespace-nowrap">
                     General Details
                   </p>
-                  <div className="flex items-center justify-end">
-                    <button
-                      className="bg-gray-100 py-1 px-3 w-fit rounded-full text-xs cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
-                      onClick={() => {
-                        setIsReadonly(!isReadonly);
-                        setIsReadonlyRight(!isReadonlyRight);
-                      }}
-                    >
-                      {isReadonly ? "Edit" : "Preview"}
-                    </button>
-                  </div>
                   <button
                     onClick={() => setAccountDeletionRequested(true)}
                     className="text-xs cursor-pointer hover:text-red-700 underline text-red-500 transition text-right"

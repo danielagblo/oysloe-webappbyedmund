@@ -1857,7 +1857,12 @@ export default function PostAdForm({
                 onClick={(e) => {
                   e.preventDefault();
                   setShowSubscriptionModal(false);
-                  navigate("/profile?tab=subscription");
+                  try {
+                      localStorage.setItem("profile_active_tab", "subscription");
+                    } catch {
+                      // ignore storage errors
+                    }
+                    navigate("/profile");
                 }}
               >
                 Subscriptions

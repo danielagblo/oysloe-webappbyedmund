@@ -1,5 +1,5 @@
 import Lottie from "lottie-react";
-import SecurityStatusSafe from "../assets/Security status Safe.json";
+import SecurityStatusSafe from "../assets/SAFETY ASSURANCE.json";
 
 const LottieSecurityStatusSafe = () => {
   return (
