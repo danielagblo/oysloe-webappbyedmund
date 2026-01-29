@@ -363,7 +363,7 @@ export default function PostAdForm({
   useEffect(() => {
     if (import.meta.env.DEV) {
       try {
-        console.debug("possibleFeatureValues updated:", possibleFeatureValues);
+        // console.debug("possibleFeatureValues updated:", possibleFeatureValues);
       } catch (e) {
         void e;
       }
@@ -489,13 +489,13 @@ export default function PostAdForm({
 
     if (import.meta.env.DEV) {
       try {
-        console.debug("[Edit Prefill] existingProduct:", existingProduct);
-        console.debug("[Edit Prefill] fetchedCategories:", fetchedCategories);
-        console.debug("[Edit Prefill] current subcategories:", subcategories);
-        console.debug(
-          "[Edit Prefill] groupedLocations keys:",
-          Object.keys(groupedLocations || {}),
-        );
+        // console.debug("[Edit Prefill] existingProduct:", existingProduct);
+        // console.debug("[Edit Prefill] fetchedCategories:", fetchedCategories);
+        // console.debug("[Edit Prefill] current subcategories:", subcategories);
+        // console.debug(
+        //   "[Edit Prefill] groupedLocations keys:",
+        //   Object.keys(groupedLocations || {}),
+        // );
       } catch (e) {
         void e;
       }
@@ -1851,8 +1851,26 @@ export default function PostAdForm({
         {showSubscriptionModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
-              <div className="mb-6">
-                <div className="w-40 h-40 flex items-center justify-center">
+              
+              <button 
+                className="text-xl max-sm:text-base w-full py-5 rounded-3xl text-[var(--dark-def)] bg-[var(--green)] mb-2 hover:bg-green-500"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowSubscriptionModal(false);
+                  navigate("/profile?tab=subscription");
+                }}
+              >
+                Subscriptions
+              </button>
+              <p className="text-base sm:text-lg font-semibold text-gray-600 mb-2">
+                Need to Sell fast?
+              </p>
+              <p className="text-base text-gray-500 mb-6">
+                We're offering <span className="font-bold">you</span> up to <span className="font-semibold text-[var(--dark-def)]">50% off</span> on all our subscription offers
+              </p>
+
+              <div>
+                <div className="w-45 h-45 flex items-center justify-center">
                   <Lottie
                     animationData={subscriptionOffer}
                     loop={true}
@@ -1860,36 +1878,6 @@ export default function PostAdForm({
                     className="w-full h-full"
                   />
                 </div>
-              </div>
-
-              <h2 className="text-2xl font-semibold text-[var(--dark-def)] mb-2">
-                Subscriptions
-              </h2>
-              <p className="text-sm text-gray-600 mb-2">
-                Need to Sell fast?
-              </p>
-              <p className="text-sm text-gray-500 mb-6">
-                We're offering you up to <span className="font-semibold text-[var(--dark-def)]">50% off</span> on all our subscription offers
-              </p>
-
-              <div className="flex gap-3 w-full">
-                <button
-                  onClick={() => {
-                    setShowSubscriptionModal(false);
-                  }}
-                  className="w-full py-3 rounded-xl border-gray-300 hover:bg-gray-100 hover:text-[var(--dark-def)] border cursor-pointer active:scale-98 transition"
-                >
-                  Maybe Later
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSubscriptionModal(false);
-                    navigate("/profile?tab=subscription");
-                  }}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-[var(--dark-def)] py-3 cursor-pointer rounded-xl font-medium transition"
-                >
-                  Get Subscription
-                </button>
               </div>
             </div>
           </div>
