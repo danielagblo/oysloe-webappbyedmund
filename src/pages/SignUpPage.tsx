@@ -68,6 +68,8 @@ const SignInPage = () => {
   });
 
   const registerMutation = useRegister();
+  const [showCompleteSteps, setShowCompleteSteps] = useState(false);
+  const [pendingRegisterData, setPendingRegisterData] = useState<RegisterRequest | null>(null);
 
   const handleInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const { name, value, type, checked } = e.target;
@@ -181,10 +183,9 @@ const SignInPage = () => {
         referral_code: data.referral_code || "",
       };
 
-      // Navigate to the referral verification page first and pass the
-      // registration payload in location state so the verification page
-      // can handle verification and then submit the registration.
-      navigate("/referal-verification", { state: { registerData } });
+      // Show the complete steps prompt; referral verification continues on Skip.
+      setPendingRegisterData(registerData);
+      setShowCompleteSteps(true);
       return;
     } catch (err) {
       console.log("could not navigate to referral verification");
@@ -205,6 +206,15 @@ const SignInPage = () => {
       if (contentRef.current) contentRef.current.scrollTop = 0;
     }
   }, [policyModalOpen, policyModalType]);
+
+  const continueSignupFlow = () => {
+    setShowCompleteSteps(false);
+    if (pendingRegisterData) {
+      navigate("/referal-verification", { state: { registerData: pendingRegisterData } });
+      return;
+    }
+    navigate("/homepage");
+  };
 
   return (
     <div className="lg:max-h-screen max-sm:text-(--dark-def) max-sm:bg-(--bg) no-scrollbar lg:overflow-hidden h-screen w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center relative">
@@ -483,6 +493,151 @@ const SignInPage = () => {
       ) : (
         <div className="lg:w-full lg:h-[90vh] lg:pr-5">
           <OnboardingScreen />
+        </div>
+      )}
+
+      {showCompleteSteps && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div
+            className={`bg-white w-full sm:max-w-md max-sm:rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 sm:p-7 ${
+              isSmall ? "max-sm:pb-8" : ""
+            }`}
+          >
+            <div className="flex items-start justify-between">
+              <p className="text-[15px] sm:text-base text-gray-700 font-medium leading-snug pr-6">
+                Showcase your brand to credible buyers across the internet
+                (Tiktok,Google,Facebook) on oysloe.
+              </p>
+              <button
+                type="button"
+                onClick={continueSignupFlow}
+                className="text-gray-500 hover:text-gray-700"
+                aria-label="Close"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.36a1 1 0 111.414 1.414L13.414 10.586l4.36 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.36-4.361-4.36-4.36a1 1 0 010-1.415z" />
+                </svg>
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-500 mt-2">
+              Complete this 3 simple steps to start earning-10x
+            </p>
+
+            <div className="mt-5 rounded-3xl bg-gray-50 p-4">
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center">
+                  <div className="h-12 w-12 rounded-full bg-[#A6F4B8] flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#0F5132"
+                      strokeWidth="1.5"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="w-px flex-1 bg-gray-300 my-2" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-800">Finalize Account Setup</p>
+                  <p className="text-sm text-gray-500">
+                    Upload the required remaining details, of the business at{" "}
+                    <span className="bg-yellow-300 px-1 rounded-sm font-semibold text-gray-900">
+                      Edit Profile
+                    </span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 mt-4">
+                <div className="flex flex-col items-center">
+                  <div className="h-12 w-12 rounded-full bg-[#DDF59B] flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#4A5D23"
+                      strokeWidth="1.5"
+                      className="w-6 h-6"
+                    >
+                      <rect x="3" y="6" width="18" height="12" rx="2" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 12h10" />
+                    </svg>
+                  </div>
+                  <div className="w-px flex-1 bg-gray-300 my-2" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-800">Subscribe To Boost 10x</p>
+                  <p className="text-sm text-gray-500">
+                    Activate a subscription to unlock full access, promote your
+                    listings
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 mt-4">
+                <div className="flex flex-col items-center">
+                  <div className="h-12 w-12 rounded-full bg-[#F2D19B] flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#7A4A10"
+                      strokeWidth="1.5"
+                      className="w-6 h-6"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m-7-7h14" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-800">Post Ads Now</p>
+                  <div className="mt-1 rounded-xl border border-dashed border-blue-400/70 px-3 py-2 text-sm text-gray-500">
+                    You're set 100% to upload unlimited ads to real buyers
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowCompleteSteps(false);
+                try {
+                  localStorage.setItem("profile_active_tab", "profile");
+                } catch {
+                  // ignore storage errors
+                }
+                navigate("/profile");
+              }}
+              className="mt-5 w-full rounded-2xl bg-[#9AF4A5] py-4 text-lg font-semibold text-gray-800 hover:bg-[#86ee95] transition"
+            >
+              Complete steps
+            </button>
+
+            <p className="text-xs text-gray-400 text-center mt-3">
+              Skip if you’re not a business owner
+            </p>
+            <button
+              type="button"
+              onClick={continueSignupFlow}
+              className="mt-2 w-full rounded-2xl border border-gray-200 py-3 text-sm text-gray-600 hover:bg-gray-50 transition"
+            >
+              Skip
+            </button>
+          </div>
         </div>
       )}
 
