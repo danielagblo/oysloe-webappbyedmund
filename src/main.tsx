@@ -2,7 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { HelmetProvider } from "react-helmet-async";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import OfflineModal from "./components/OfflineModal.tsx";
@@ -14,6 +14,9 @@ import { queryClient } from "./queryClient";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <HelmetProvider>
+      <Helmet>
+        <meta name="robots" content="index, follow" />
+      </Helmet>
       <QueryClientProvider client={queryClient}>
         <OnlineStatusProvider>
           <BrowserRouter>

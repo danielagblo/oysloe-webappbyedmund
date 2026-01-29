@@ -133,7 +133,7 @@ const LogInPage = () => {
     <div className="max-sm:bg-(--bg) h-screen w-screen flex items-center max-sm:items-start justify-center max-sm:justify-center">
       <Helmet>
         <title>Login | OYSLOE</title>
-        <meta name="robots" content="noindex, nofollow" />
+        <meta name="robots" content="index, follow" />
       </Helmet>
       
       <div className="flex flex-col items-center justify-center w-11/12 sm:w-full m-8 max-sm:pb-20">
