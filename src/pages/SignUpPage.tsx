@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+﻿import { useQuery } from "@tanstack/react-query";
 import type { FormEvent, FormEventHandler } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -180,6 +180,13 @@ const SignInPage = () => {
         address: data.address || "",
         referral_code: data.referral_code || "",
       };
+
+      // Set flag for showing complete steps modal after 2 minutes
+      try {
+        localStorage.setItem("oysloe_just_logged_in", Date.now().toString());
+      } catch {
+        // ignore storage errors
+      }
 
       // Navigate to the referral verification page first and pass the
       // registration payload in location state so the verification page
@@ -523,7 +530,7 @@ const SignInPage = () => {
                     onClick={() => setPolicyModalOpen(false)}
                     className="text-2xl leading-none px-2"
                   >
-                    ×
+                    ├ù
                   </button>
                 </div>
 

@@ -78,11 +78,18 @@ const LogInPage = () => {
     } catch (permErr) {
       void permErr;
     }
+
     try {
       await loginMutation.mutateAsync({
         email: formData.email,
         password: formData.password,
       });
+      // Set flag for showing complete steps modal after 2 minutes
+      try {
+        localStorage.setItem("oysloe_just_logged_in", Date.now().toString());
+      } catch {
+        // ignore storage errors
+      }
       navigate("/");
     } catch (err) {
       // Parse backend error payload when apiClient throws an Error containing
