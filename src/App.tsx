@@ -1,9 +1,10 @@
-import { useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import RequireAuth from "./components/RequireAuth";
 import ScrollToTop from "./components/ScrollToTop";
 import FcmNotificationHandler from "./components/FcmNotificationHandler";
+import CompleteStepsModal from "./components/CompleteStepsModal";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
 import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
@@ -22,6 +23,9 @@ import VerificationPage from "./pages/VerificationPage.tsx";
 import ServiceApplicationPage from "./pages/ServiceApplicationPage.tsx";
 
 function App() {
+  const [showCompleteSteps, setShowCompleteSteps] = useState(false);
+  const location = useLocation();
+
   // Detect iOS Safari and add class to root element
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -33,10 +37,74 @@ function App() {
     }
   }, []);
 
+  // Check if user just logged in and set up timer to show Complete Steps modal after 2 minutes
+  useEffect(() => {
+    const checkLoginTimestamp = () => {
+      try {
+        const loginTimestamp = localStorage.getItem("oysloe_just_logged_in");
+        if (!loginTimestamp) {
+          console.log("No login timestamp found");
+          return;
+        }
+
+        const loginTime = parseInt(loginTimestamp, 10);
+        const currentTime = Date.now();
+        const twoMinutesInMs = 2 * 60 * 1000; // 2 minutes in milliseconds
+        const timeElapsed = currentTime - loginTime;
+        const remainingSeconds = Math.ceil((twoMinutesInMs - timeElapsed) / 1000);
+
+        console.log(`Login detected! Time elapsed: ${Math.floor(timeElapsed / 1000)}s`);
+        console.log(`Complete Steps modal will show in ${remainingSeconds}s (${Math.floor(remainingSeconds / 60)}m ${remainingSeconds % 60}s)`);
+
+        if (timeElapsed >= twoMinutesInMs) {
+          // Show the modal
+          console.log("2 minutes elapsed! Showing Complete Steps modal now");
+          setShowCompleteSteps(true);
+          // Remove the timestamp so we don't show it again
+          localStorage.removeItem("oysloe_just_logged_in");
+        } else {
+          // Set timeout for remaining time
+          const remainingTime = twoMinutesInMs - timeElapsed;
+          
+          // Log countdown every 10 seconds
+          const countdownInterval = setInterval(() => {
+            const currentTimeNow = Date.now();
+            const timeElapsedNow = currentTimeNow - loginTime;
+            const remainingSecondsNow = Math.ceil((twoMinutesInMs - timeElapsedNow) / 1000);
+            
+            if (remainingSecondsNow > 0) {
+              console.log(`⏱️ Complete Steps modal countdown: ${remainingSecondsNow}s remaining (${Math.floor(remainingSecondsNow / 60)}m ${remainingSecondsNow % 60}s)`);
+            }
+          }, 10000); // Log every 10 seconds
+
+          const timer = setTimeout(() => {
+            console.log("✅ 2 minutes complete! Showing Complete Steps modal");
+            setShowCompleteSteps(true);
+            localStorage.removeItem("oysloe_just_logged_in");
+            clearInterval(countdownInterval);
+          }, remainingTime);
+
+          return () => {
+            clearTimeout(timer);
+            clearInterval(countdownInterval);
+          };
+        }
+      } catch {
+        // ignore storage errors
+      }
+    };
+
+    checkLoginTimestamp();
+  }, [location]); // Check whenever route changes
+
   return (
     <div className="flex flex-col min-h-screen w-full">
       <ScrollToTop />
       <FcmNotificationHandler />
+      <CompleteStepsModal 
+        isOpen={showCompleteSteps} 
+        onClose={() => setShowCompleteSteps(false)} 
+      />
       <Routes>
         <Route path="/login" element={<LogInPage />} />
         <Route path="/signUp" element={<SignUpPage />} />
