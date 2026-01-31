@@ -138,12 +138,17 @@ const HiringPage: React.FC = () => {
                 <p className="text-gray-600 mb-4">
                   Interested in joining our team? Send your resume and a cover letter to:
                 </p>
-                <a
-                  href="mailto:careers@oysloe.com"
-                  className="inline-block bg-(--green) text-(--dark-def) px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition"
-                >
-                  Apply Now - careers@oysloe.com
-                </a>
+                <div className="space-y-2">
+                  <a
+                    href="mailto:agblod27@gmail.com"
+                    className="inline-block bg-(--green) text-(--dark-def) px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition"
+                  >
+                    Apply Now - agblod27@gmail.com
+                  </a>
+                  <p className="text-gray-500 text-sm">
+                    Or email us at: <a href="mailto:careers@oysloe.com" className="text-green-600 hover:underline">careers@oysloe.com</a>
+                  </p>
+                </div>
               </section>
 
               {/* Our Culture */}
