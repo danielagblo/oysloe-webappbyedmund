@@ -1,5 +1,4 @@
 import { CircularProgressbar } from "react-circular-progressbar";
-import Loader from "../../components/LoadingDots";
 import type { Category } from "../../types/Category";
 import { formatCount } from "../../utils/formatCount";
 
@@ -18,9 +17,17 @@ const CircularSummaries = ({
 }: Props) => {
   if (categoriesLoading) {
     return (
-      <div className="flex flex-col items-center mt-12">
-        <p className="loading-dots">Loading ad counts</p>
-        <Loader className={"h-40 -mt-12"} />
+      <div className="w-full overflow-x-auto only-on-ios-container overflow-y-hidden my-12">
+        <div className="flex justify-center items-center gap-1 sm:gap-2 w-full min-h-fit py-4 px-2 sm:px-0">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className="only-on-ios-svg relative shrink-0 w-16 h-16 max-sm:min-h-16 max-sm:min-w-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 flex items-center justify-center"
+            >
+              <div className="absolute w-full h-full rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

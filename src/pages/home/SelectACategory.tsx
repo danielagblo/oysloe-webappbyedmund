@@ -38,14 +38,14 @@ const SelectACategory = ({
               className="
                                 flex flex-col items-center justify-center
                                 w-[12vw] h-[12vw] min-h-[75px] min-w-[75px]
-                                bg-(--div-active) rounded-lg 
-                                p-0 sm:p-3 cursor-progress animate-pulse
+                                bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]
+                                rounded-lg p-0 sm:p-3
                                 max-sm:w-[20vw] max-sm:h-[20vw]
                                 max-sm:min-w-[75px] max-sm:min-h-[75px]
                                 "
             >
-              <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-gray-200" />
-              <div className="mt-2 h-3 w-3/5 bg-gray-300 rounded-full" />
+              <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite]" />
+              <div className="mt-2 h-3 w-3/5 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 bg-[length:200%_100%] animate-[shimmer_1.5s_ease-in-out_infinite] rounded-full" />
             </div>
           ))}
         </div>
