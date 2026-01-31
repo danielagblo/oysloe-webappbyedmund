@@ -119,7 +119,7 @@ const FAQPage: React.FC = () => {
                 Our support team is here to help. Send us a message and we'll get back to you as soon as possible.
               </p>
               <a
-                href="mailto:support@oysloe.com"
+                href="mailto:agblod27@gmail.com"
                 className="inline-block bg-(--green) text-(--dark-def) px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition"
               >
                 Contact Support

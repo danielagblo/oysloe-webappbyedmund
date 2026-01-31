@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="mailto:support@oysloe.com"
+                  href="mailto:agblod27@gmail.com"
                   className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
                 >
                   Email Support
@@ -121,20 +121,12 @@ const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/about"
                   className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
                 >
                   About Oysloe
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
-                >
-                  Blog
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
