@@ -33,6 +33,14 @@ import SellAppliancePage from "./pages/SellAppliancePage.tsx";
 import InvestPage from "./pages/InvestPage.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
+import SellElectronicsPage from "./pages/SellElectronicsPage.tsx";
+import SellFashionPage from "./pages/SellFashionPage.tsx";
+import SellFurniturePage from "./pages/SellFurniturePage.tsx";
+import SellMotorcyclePage from "./pages/SellMotorcyclePage.tsx";
+import SellBooksPage from "./pages/SellBooksPage.tsx";
+import SellSportsPage from "./pages/SellSportsPage.tsx";
+import SellBeautyPage from "./pages/SellBeautyPage.tsx";
+import SellJewelryPage from "./pages/SellJewelryPage.tsx";
 
 function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
@@ -219,6 +227,14 @@ function App() {
           <Route path="/sell/property" element={<SellPropertyPage />} />
           <Route path="/sell/phone" element={<SellPhonePage />} />
           <Route path="/sell/appliance" element={<SellAppliancePage />} />
+          <Route path="/sell/electronics" element={<SellElectronicsPage />} />
+          <Route path="/sell/fashion" element={<SellFashionPage />} />
+          <Route path="/sell/furniture" element={<SellFurniturePage />} />
+          <Route path="/sell/motorcycle" element={<SellMotorcyclePage />} />
+          <Route path="/sell/books" element={<SellBooksPage />} />
+          <Route path="/sell/sports" element={<SellSportsPage />} />
+          <Route path="/sell/beauty" element={<SellBeautyPage />} />
+          <Route path="/sell/jewelry" element={<SellJewelryPage />} />
         </Routes>
       </main>
       <Footer />
