@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import type { Product } from "../../types/Product";
@@ -69,7 +69,9 @@ const LazyAdCard = React.memo(function LazyAdCard({
 });
 
 const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
-  const [displayCount, setDisplayCount] = useState(12); // Show 12 cards initially (2 columns × 6 rows)
+  // Use ref to preserve displayCount across component remounts
+  const displayCountRef = useRef(12);
+  const [displayCount, setDisplayCount] = useState(12);
   const [hasHydratedFromAnchor, setHasHydratedFromAnchor] = useState(false);
 
   const parseAdIdFromHref = (href: string) => {
@@ -144,6 +146,12 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
 
   const hasMore = displayCount < active.length;
 
+  const handleLoadMore = () => {
+    const newCount = displayCount + 12;
+    displayCountRef.current = newCount;
+    setDisplayCount(newCount);
+  };
+
   return (
     <div className="px-2 py-3">
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -153,7 +161,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
       </div>
       {hasMore && (
         <button
-          onClick={() => setDisplayCount((prev) => prev + 12)}
+          onClick={handleLoadMore}
           className="w-full mt-4 py-3 bg-white hover:bg-gray-50 rounded-lg font-medium transition border border-gray-200"
           style={{ color: '#646161' }}
         >
