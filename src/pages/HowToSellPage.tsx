@@ -1,7 +1,10 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { useNavigate } from "react-router-dom";
 
 const HowToSellPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <>
       <Helmet>
@@ -19,6 +22,19 @@ const HowToSellPage: React.FC = () => {
             h-screen sm:h-auto overflow-auto no-scrollbar
           `}
         >
+          {/* Back Button */}
+          <div className="w-full flex items-start mb-4">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-(--dark-def) hover:opacity-70 transition font-medium text-sm sm:text-base"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+          </div>
+
           <div className="flex lg:pt-15 px-5 flex-col justify-start gap-4 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
             <h1 className="text-3xl sm:text-4xl font-bold text-(--dark-def) max-lg:pt-15 mb-4">
               How to Sell on Oysloe
