@@ -91,7 +91,7 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
               <p className="text-sm lg:text-[1.1vw] text-gray-500">
                 Upload the required remaining details, of the business at{" "}
                 <span 
-                  className="bg-yellow-300 px-1 cursor-pointer rounded-sm font-semibold text-gray-900"
+                  className="bg-transparent px-1 cursor-pointer rounded-sm font-semibold text-gray-900"
                   onClick={(e) => {
                     e.preventDefault();
                     handleCompleteSteps();
