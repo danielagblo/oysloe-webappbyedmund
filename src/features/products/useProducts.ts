@@ -65,23 +65,15 @@ export const useProducts = (params?: { search?: string; ordering?: string }) =>
 
 // useProduct
 export const useProduct = (id: number | string) =>
-  useQuery(
-    queryOptions({
-      queryKey: productKeys.detail(id),
-      queryFn: () => getProduct(id),
-      enabled: !!id,
-    }),
-  );
+  useQuery<Product, Error>(productKeys.detail(id), () => getProduct(id), {
+    enabled: !!id,
+  });
 
 // useRelatedProduct
 export const useRelatedProducts = (productId?: number) =>
-  useQuery(
-    queryOptions({
-      queryKey: productKeys.related(productId),
-      queryFn: () => getRelatedProducts(productId),
-      enabled: productId != null,
-    }),
-  );
+  useQuery<Product[], Error>(productKeys.related(productId), () => getRelatedProducts(productId), {
+    enabled: productId != null,
+  });
 
 // useProductReportCount
 export const useProductReportCount = (productId?: number) =>
