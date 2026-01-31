@@ -407,6 +407,8 @@ const HomePage = () => {
               <SelectACategory
                 categories={categories}
                 onCategoryClick={handleCategoryClick}
+                categoriesLoading={categoriesLoading}
+                categoriesError={categoriesError}
               />
               <CircularSummaries
                 categories={categoriesWithCounts}
