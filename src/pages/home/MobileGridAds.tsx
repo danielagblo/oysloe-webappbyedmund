@@ -117,26 +117,29 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
   // Paginate displayed products
   const displayedProducts = useMemo(() => active.slice(0, displayCount), [active, displayCount]);
 
-  if (productsLoading) {
-    // Show a grid of skeletons while loading
-    return (
-      <div className="px-2 py-3">
-        <div className="grid grid-cols-2 gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
+  // If no ads are loaded yet, show skeletons. Otherwise, show ads even while refetching
+  if (!displayedProducts || displayedProducts.length === 0) {
+    if (productsLoading) {
+      // Show a grid of skeletons only when there's truly no data
+      return (
+        <div className="px-2 py-3">
+          <div className="grid grid-cols-2 gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (!active || active.length === 0) {
-    return (
-      <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-        <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
-        <p>No ads to show right now.</p>
-      </div>
-    );
+    if (!active || active.length === 0) {
+      return (
+        <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
+          <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
+          <p>No ads to show right now.</p>
+        </div>
+      );
+    }
   }
 
   const hasMore = displayCount < active.length;
