@@ -58,7 +58,7 @@ const ScrollableAdRow = ({
       </div>
 
       <div id={containerId} className="overflow-x-auto no-scrollbar px-1 py-3 sm:px-2">
-        {productsLoading && filteredProducts.length === 0 ? (
+        {productsLoading ? (
           <div className="w-full flex items-center justify-center py-6">
             <Loader />
           </div>

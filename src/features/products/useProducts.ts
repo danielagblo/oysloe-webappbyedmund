@@ -38,10 +38,8 @@ export const productKeys = {
 };
 
 // useProducts
-export const useProducts = (params?: { search?: string; ordering?: string }) => {
-  const qc = useQueryClient();
-  
-  return useQuery<Product[], Error>({
+export const useProducts = (params?: { search?: string; ordering?: string }) =>
+  useQuery<Product[], Error>({
     queryKey: productKeys.list(params),
     queryFn: async () => {
       const items = await getProducts(params);
@@ -59,22 +57,22 @@ export const useProducts = (params?: { search?: string; ordering?: string }) => 
         return items;
       }
     },
-    placeholderData: () => {
-      // When user searches, show all products from base query as placeholder
-      // This prevents blank screens when switching between search/no-search
-      if (params?.search) {
-        const baseData = qc.getQueryData<Product[]>(productKeys.list());
-        if (baseData) return baseData;
+    placeholderData: (previousData, previousQuery) => {
+      // Keep previous data visible during refetch or when switching between queries
+      if (previousData) return previousData;
+      
+      // When search changes, try to show cached data from base query (no search)
+      if (params?.search && previousQuery) {
+        const baseQuery = previousQuery.state.data;
+        return baseQuery as Product[] | undefined;
       }
+      
       return undefined;
     },
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    gcTime: 1000 * 60 * 10, // Keep data for 10 minutes after last use
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false, // Don't refetch on reconnect if data is still fresh
   });
-};
 
 // useProduct
 export const useProduct = (id: number | string) =>
