@@ -16,8 +16,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/sell"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -27,8 +27,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/how-to-sell"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -38,8 +38,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/hiring"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -49,8 +49,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/invest"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -60,8 +60,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/faq"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -80,8 +80,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/faq"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -91,8 +91,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/billing"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -102,8 +102,8 @@ const Footer: React.FC = () => {
               <li>
                 <a
                   href="mailto:agblod27@gmail.com"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -122,8 +122,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/privacy"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -133,8 +133,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/terms"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
@@ -153,8 +153,8 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   to="/about"
-                  className="text-gray-600 transition text-xs sm:text-sm"
-                  style={{transition: 'all 0.3s ease', cursor: 'pointer'}}
+                  className="transition text-xs sm:text-sm"
+                  style={{color: '#4B5563', transition: 'all 0.3s ease', cursor: 'pointer', textDecoration: 'none'}}
                   onMouseEnter={(e) => {e.currentTarget.style.color = '#74ffa7'; e.currentTarget.style.fontWeight = '500'}}
                   onMouseLeave={(e) => {e.currentTarget.style.color = '#4B5563'; e.currentTarget.style.fontWeight = 'normal'}}
                 >
