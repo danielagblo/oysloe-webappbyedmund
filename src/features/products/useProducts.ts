@@ -77,6 +77,12 @@ export const useProducts = (params?: { search?: string; ordering?: string }) =>
           return items;
         }
       },
+      // Keep previous data while a new query is fetching so the UI
+      // doesn't blank out when params (e.g., search) change.
+      keepPreviousData: true,
+      // Avoid treating component remounts as fresh loads if we already
+      // have data persisted in the cache.
+      refetchOnMount: false,
     }),
   );
 
