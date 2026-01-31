@@ -327,7 +327,7 @@ const HomePage = () => {
           content="OYSLOE is Ghana's leading online marketplace connecting verified buyers and sellers for safe, secure, and reliable buying and selling."
         />
         <link rel="canonical" href="https://oysloe.com/" />
-        
+
         {/* Open Graph */}
         <meta property="og:title" content="OYSLOE | Ghana's Safest Online Marketplace" />
         <meta
@@ -336,7 +336,7 @@ const HomePage = () => {
         />
         <meta property="og:url" content="https://oysloe.com/" />
       </Helmet>
-      
+
       <AdLoadingOverlay isVisible={isAdLoading} />
       <HomePageHeader searchValue={searchTerm} setSearchValue={setSearchTerm} />
       <div className="flex flex-col items-center justify-center">
@@ -434,7 +434,7 @@ const HomePage = () => {
             </div>
           </>
         )}
-        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center">
+        <div className="fixed w-full bottom-20 lg:bottom-21 left-0 flex items-center justify-center z-50">
           <FilterButton
             handleFilterSettings={handleFilterSettings}
             selectedCategoryId={selectedCategoryId}
