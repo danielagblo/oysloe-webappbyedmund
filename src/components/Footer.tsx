@@ -71,6 +71,14 @@ const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link
+                  to="/billing"
+                  className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
+                >
+                  Billing
+                </Link>
+              </li>
+              <li>
                 <a
                   href="mailto:support@oysloe.com"
                   className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"

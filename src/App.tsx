@@ -41,6 +41,7 @@ import SellBooksPage from "./pages/SellBooksPage.tsx";
 import SellSportsPage from "./pages/SellSportsPage.tsx";
 import SellBeautyPage from "./pages/SellBeautyPage.tsx";
 import SellJewelryPage from "./pages/SellJewelryPage.tsx";
+import BillingPage from "./pages/BillingPage.tsx";
 
 function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
@@ -222,6 +223,7 @@ function App() {
           <Route path="/invest" element={<InvestPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/billing" element={<BillingPage />} />
           <Route path="/sell" element={<SellAnythingPage />} />
           <Route path="/sell/car" element={<SellCarPage />} />
           <Route path="/sell/property" element={<SellPropertyPage />} />
