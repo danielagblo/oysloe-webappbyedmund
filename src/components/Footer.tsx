@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-white border-t-2 mt-8" style={{borderColor: '#74ffa7'}}>
+    <footer className="w-full bg-white border-t border-gray-200 mt-8">
       <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
         {/* Footer Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mb-8">
