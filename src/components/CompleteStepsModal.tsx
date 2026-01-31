@@ -10,7 +10,7 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
 
-  if (!isOpen) return null;
+  if (isOpen) return null;
 
   const handleCompleteSteps = () => {
     onClose();
@@ -33,13 +33,14 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[99999] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
-        className={`bg-white w-full max-sm:h-full max-sm:py-20 overflow-y-auto no-scrollbar sm:max-w-md sm:max-h-[85vh] sm:rounded-3xl shadow-2xl p-6 sm:p-7 ${
+        className={`bg-white w-full max-sm:h-full min-h-screen flex flex-col max-sm:py-20 overflow-y-auto no-scrollbar sm:max-w-md sm:max-h-[85vh] sm:rounded-3xl shadow-2xl p-6 sm:p-7 ${
           isSmall ? "max-sm:pb-8" : ""
         }`}
       >
-        <div className="flex items-start justify-between">
+        <div className="flex-1">
+                    <div className="flex items-start justify-between">
           <p className="text-lg sm:text-[2vw] text-gray-700 font-medium leading-snug pr-6">
             Showcase your brand to credible buyers across the internet
             (Tiktok, Google, Facebook) on Oysloe.
@@ -47,14 +48,14 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
           <button
             type="button"
             onClick={handleSkip}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 max-sm:fixed max-sm:top-7.5 max-sm:right-7.5 hover:text-gray-700"
             aria-label="Close"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="w-6 h-6"
+              className="w-10 h-10 sm:w-6 sm:h-6"
             >
               <path d="M6.225 4.811a1 1 0 011.414 0L12 9.172l4.361-4.36a1 1 0 111.414 1.414L13.414 10.586l4.36 4.361a1 1 0 01-1.414 1.414L12 12l-4.361 4.361a1 1 0 01-1.414-1.414l4.36-4.361-4.36-4.36a1 1 0 010-1.415z" />
             </svg>
@@ -62,10 +63,10 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
         </div>
 
         <p className="text-sm sm:text-[1.1vw] text-gray-500 mt-2">
-          Complete this 3 simple steps to start earning-10x
+          Complete these 3 simple steps to start earning-10x
         </p>
 
-        <div className="mt-5 rounded-3xl bg-gray-50 p-4">
+        <div className="mt-5 rounded-3xl bg-gray-50 flex flex-col gap-5 p-4">
           <div className="flex items-start gap-4">
             <div className="flex flex-col items-center">
               <div className="h-12 w-12 rounded-full bg-[#A6F4B8] flex items-center justify-center">
@@ -133,8 +134,10 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
             </div>
           </div>
         </div>
+        </div>
 
-        <button
+        <div>
+            <button
           type="button"
           onClick={handleCompleteSteps}
           className="mt-5 w-full rounded-2xl bg-[#9AF4A5] py-4 text-base lg:text-[1.25vw] font-semibold text-gray-800 hover:bg-[#86ee95] transition"
@@ -152,6 +155,7 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
         >
           Skip
         </button>
+        </div>
       </div>
     </div>
   );
