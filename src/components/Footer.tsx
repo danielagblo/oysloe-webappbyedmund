@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mb-8">
           {/* Company */}
           <div>
-            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base pb-2 border-b-2" style={{borderColor: '#74ffa7'}}>
+            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base">
               Company
             </h3>
             <ul className="space-y-2">
@@ -73,7 +73,7 @@ const Footer: React.FC = () => {
 
           {/* Help & Support */}
           <div>
-            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base pb-2 border-b-2" style={{borderColor: '#74ffa7'}}>
+            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base">
               Help & Support
             </h3>
             <ul className="space-y-2">
@@ -115,7 +115,7 @@ const Footer: React.FC = () => {
 
           {/* Policies */}
           <div>
-            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base pb-2 border-b-2" style={{borderColor: '#74ffa7'}}>
+            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base">
               Policies
             </h3>
             <ul className="space-y-2">
@@ -146,7 +146,7 @@ const Footer: React.FC = () => {
 
           {/* About */}
           <div>
-            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base pb-2 border-b-2" style={{borderColor: '#74ffa7'}}>
+            <h3 className="font-semibold text-(--dark-def) mb-4 text-sm sm:text-base">
               About
             </h3>
             <ul className="space-y-2">
