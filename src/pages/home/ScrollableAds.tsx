@@ -41,8 +41,8 @@ const ScrollableAds = ({
     return filteredProducts.length > 0;
   });
 
-  // Show loading state while products are being fetched
-  if (productsLoading) {
+  // Only show loading state if we have no data at all (not when refetching with cached data)
+  if (productsLoading && Object.keys(productsByCategory).length === 0) {
     return (
       <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
         <LoadingDots />
