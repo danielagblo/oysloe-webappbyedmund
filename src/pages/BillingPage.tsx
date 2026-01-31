@@ -74,10 +74,10 @@ const BillingPage: React.FC = () => {
                   </div>
 
                   {/* Business Plan */}
-                  <div className="border-2 border-blue-500 rounded-lg p-4 shadow-md bg-blue-50 relative">
-                    <div className="absolute -top-3 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>
+                  <div className="border-2 border-(--green) rounded-lg p-4 shadow-md relative" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)'}}>
+                    <div className="absolute -top-3 right-4 text-white px-3 py-1 rounded-full text-xs font-semibold" style={{backgroundColor: '#74ffa7'}}>Popular</div>
                     <div className="mb-3">
-                      <h3 className="text-xl font-bold text-(--dark-def)">Business <span className="text-lg font-semibold text-blue-600">4.00x</span></h3>
+                      <h3 className="text-xl font-bold text-(--dark-def)">Business <span className="text-lg font-semibold" style={{color: '#74ffa7'}}>4.00x</span></h3>
                       <p className="text-sm text-gray-600 mt-1">Best for SMEs</p>
                     </div>
                     <ul className="text-sm text-gray-600 space-y-1 mb-4 border-b pb-4">
@@ -95,7 +95,7 @@ const BillingPage: React.FC = () => {
                       </li>
                     </ul>
                     <div className="mb-3">
-                      <p className="text-2xl font-bold text-blue-600">₵200.00</p>
+                      <p className="text-2xl font-bold" style={{color: '#74ffa7'}}>₵200.00</p>
                       <p className="text-sm text-gray-500 line-through">₵750.00</p>
                     </div>
                   </div>
@@ -125,7 +125,7 @@ const BillingPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="border rounded-lg p-4" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                     <p className="font-semibold text-gray-800 mb-2">📍 Plan Features Include:</p>
                     <ul className="list-disc list-inside text-gray-600 space-y-1">
                       <li>Increased visibility multiplier for your listings (1x to 3x+)</li>

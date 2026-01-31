@@ -225,7 +225,7 @@ const PrivacyPage: React.FC = () => {
                 <p className="text-gray-600">
                   If you have any questions or concerns about this Privacy Policy or how your data is handled, please contact us:
                 </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3 space-y-2">
+                <div className="border rounded-lg p-4 mt-3 space-y-2" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                   <p className="text-gray-700">
                     <strong>OYSLOE</strong>
                   </p>

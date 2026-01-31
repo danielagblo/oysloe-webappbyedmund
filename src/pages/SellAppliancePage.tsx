@@ -50,19 +50,19 @@ const SellAppliancePage: React.FC = () => {
                   Popular Appliances to Sell
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                  <div className="p-3 rounded border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                     <p className="font-semibold text-gray-800">Kitchen</p>
                     <p className="text-sm text-gray-600">Refrigerators, Ovens, Microwaves</p>
                   </div>
-                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                  <div className="p-3 rounded border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                     <p className="font-semibold text-gray-800">Laundry</p>
                     <p className="text-sm text-gray-600">Washing Machines, Dryers</p>
                   </div>
-                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                  <div className="p-3 rounded border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                     <p className="font-semibold text-gray-800">Cooling</p>
                     <p className="text-sm text-gray-600">Air Conditioners, Fans</p>
                   </div>
-                  <div className="p-3 bg-blue-50 rounded border border-blue-200">
+                  <div className="p-3 rounded border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                     <p className="font-semibold text-gray-800">Heating</p>
                     <p className="text-sm text-gray-600">Water Heaters, Boilers</p>
                   </div>

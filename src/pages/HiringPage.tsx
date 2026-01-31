@@ -152,7 +152,7 @@ const HiringPage: React.FC = () => {
               </section>
 
               {/* Our Culture */}
-              <section className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <section className="p-4 rounded-lg border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                 <h2 className="text-xl font-semibold text-(--dark-def) mb-3">
                   Our Culture
                 </h2>

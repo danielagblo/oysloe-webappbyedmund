@@ -136,7 +136,7 @@ const SellAnythingPage: React.FC = () => {
               ))}
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+            <div className="border rounded-lg p-6 mt-6" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
               <h2 className="text-xl font-semibold text-(--dark-def) mb-2">
                 💡 Getting Started
               </h2>

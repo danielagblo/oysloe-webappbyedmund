@@ -67,7 +67,7 @@ const AboutPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-(--dark-def) mb-3">
                   Our Mission
                 </h2>
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                <div className="border-l-4 p-4 rounded" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: '#74ffa7'}}>
                   <p className="text-gray-700 font-medium">
                     To empower African entrepreneurs and consumers by providing a secure, accessible, and innovative online 
                     marketplace that enables seamless buying and selling of goods and services across the continent.

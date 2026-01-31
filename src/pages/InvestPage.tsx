@@ -72,7 +72,7 @@ const InvestPage: React.FC = () => {
                 <h2 className="text-2xl font-semibold text-(--dark-def) mb-3">
                   Market Opportunity
                 </h2>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                <div className="border rounded-lg p-4 space-y-3" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                   <p className="text-gray-600">
                     <strong>Ghana's E-commerce Market:</strong> Growing at 25% annually, with increasing smartphone penetration and digital payment adoption.
                   </p>
