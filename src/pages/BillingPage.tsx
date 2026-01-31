@@ -48,6 +48,82 @@ const BillingPage: React.FC = () => {
                 <p className="text-gray-600 mb-4">
                   OYSLOE offers flexible subscription plans to help you sell more effectively. Choose the plan that best fits your needs.
                 </p>
+
+                {/* Pricing Plans Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  {/* Basic Plan */}
+                  <div className="border border-gray-300 rounded-lg p-4 hover:shadow-md transition">
+                    <div className="mb-3">
+                      <h3 className="text-xl font-bold text-(--dark-def)">Basic <span className="text-lg font-semibold text-gray-600">1.50x</span></h3>
+                      <p className="text-sm text-gray-600 mt-1">Best for small businesses</p>
+                    </div>
+                    <ul className="text-sm text-gray-600 space-y-1 mb-4 border-b pb-4">
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Share limited number of ads</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Stays active for 7 days</span>
+                      </li>
+                    </ul>
+                    <div className="mb-3">
+                      <p className="text-2xl font-bold text-(--dark-def)">₵25.00</p>
+                      <p className="text-sm text-gray-500 line-through">₵120.00</p>
+                    </div>
+                  </div>
+
+                  {/* Business Plan */}
+                  <div className="border-2 border-blue-500 rounded-lg p-4 shadow-md bg-blue-50 relative">
+                    <div className="absolute -top-3 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>
+                    <div className="mb-3">
+                      <h3 className="text-xl font-bold text-(--dark-def)">Business <span className="text-lg font-semibold text-blue-600">4.00x</span></h3>
+                      <p className="text-sm text-gray-600 mt-1">Best for SMEs</p>
+                    </div>
+                    <ul className="text-sm text-gray-600 space-y-1 mb-4 border-b pb-4">
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Pro partnership status</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Earn more with best for SMEs</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Active for 4 weeks</span>
+                      </li>
+                    </ul>
+                    <div className="mb-3">
+                      <p className="text-2xl font-bold text-blue-600">₵200.00</p>
+                      <p className="text-sm text-gray-500 line-through">₵750.00</p>
+                    </div>
+                  </div>
+
+                  {/* Platinum Plan */}
+                  <div className="border border-purple-300 rounded-lg p-4 hover:shadow-md transition bg-gradient-to-br from-purple-50 to-blue-50 relative">
+                    <div className="absolute -top-3 right-4 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">50% OFF</div>
+                    <div className="mb-3">
+                      <h3 className="text-xl font-bold text-(--dark-def)">Platinum <span className="text-lg font-semibold text-purple-600">10.00x</span></h3>
+                      <p className="text-sm text-gray-600 mt-1">Best for large scale businesses</p>
+                    </div>
+                    <ul className="text-sm text-gray-600 space-y-1 mb-4 border-b pb-4">
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Submit unlimited ads and earn more</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-600 mr-2">✓</span>
+                        <span>Stays active for 3 months</span>
+                      </li>
+                    </ul>
+                    <div className="mb-3">
+                      <p className="text-2xl font-bold text-purple-600">₵1,500.00</p>
+                      <p className="text-sm text-gray-500 line-through">₵3,000.00</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-3">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="font-semibold text-gray-800 mb-2">📍 Plan Features Include:</p>
@@ -57,8 +133,16 @@ const BillingPage: React.FC = () => {
                       <li>Enhanced ad exposure to buyers</li>
                       <li>Priority support</li>
                       <li>Monthly renewal options</li>
+                      <li>Access to analytics and performance insights</li>
                     </ul>
                   </div>
+                </div>
+
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                  <p className="font-semibold text-gray-800 mb-2">✨ What the Multiplier Means:</p>
+                  <p className="text-gray-600 text-sm">
+                    A listing multiplier increases the visibility of your products in search results. For example, a 2x multiplier shows your listings twice as often as basic listings, significantly increasing buyer engagement and sales potential.
+                  </p>
                 </div>
               </section>
 
