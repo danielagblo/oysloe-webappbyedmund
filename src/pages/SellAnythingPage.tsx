@@ -30,6 +30,54 @@ const SellAnythingPage: React.FC = () => {
       path: "/sell/appliance",
       icon: "🔧",
     },
+    {
+      title: "Sell Electronics & Gadgets",
+      description: "Laptops, tablets, headphones, cameras, and more",
+      path: "/sell/electronics",
+      icon: "💻",
+    },
+    {
+      title: "Sell Fashion & Clothing",
+      description: "Designer clothes, shoes, bags, and accessories",
+      path: "/sell/fashion",
+      icon: "👗",
+    },
+    {
+      title: "Sell Furniture",
+      description: "Sofas, tables, beds, chairs, and home decor",
+      path: "/sell/furniture",
+      icon: "🪑",
+    },
+    {
+      title: "Sell Motorcycles & Bikes",
+      description: "Sell your bike or motorcycle to interested buyers",
+      path: "/sell/motorcycle",
+      icon: "🏍️",
+    },
+    {
+      title: "Sell Books & Media",
+      description: "Textbooks, novels, magazines, and educational materials",
+      path: "/sell/books",
+      icon: "📚",
+    },
+    {
+      title: "Sell Sports & Fitness",
+      description: "Equipment, gym gear, sports accessories, and apparel",
+      path: "/sell/sports",
+      icon: "⚽",
+    },
+    {
+      title: "Sell Beauty & Personal Care",
+      description: "Cosmetics, skincare, wellness products, and more",
+      path: "/sell/beauty",
+      icon: "💄",
+    },
+    {
+      title: "Sell Jewelry & Watches",
+      description: "Rings, necklaces, bracelets, watches, and accessories",
+      path: "/sell/jewelry",
+      icon: "💍",
+    },
   ];
 
   return (
@@ -38,7 +86,7 @@ const SellAnythingPage: React.FC = () => {
         <title>Sell Anything on Oysloe | Ghana's #1 Online Marketplace</title>
         <meta
           name="description"
-          content="Sell cars, property, phones, appliances and more on Oysloe. Ghana's safest online marketplace for buyers and sellers. Fast listings, verified buyers, secure payments."
+          content="Sell cars, property, phones, appliances, electronics, fashion, furniture, bikes, books, sports, beauty products and jewelry on Oysloe. Ghana's safest online marketplace."
         />
       </Helmet>
       <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center max-sm:pt-10">

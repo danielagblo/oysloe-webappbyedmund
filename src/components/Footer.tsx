@@ -39,6 +39,14 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
+                  to="/invest"
+                  className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
+                >
+                  Invest in Oysloe
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/faq"
                   className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
                 >
