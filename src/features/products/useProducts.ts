@@ -57,8 +57,21 @@ export const useProducts = (params?: { search?: string; ordering?: string }) =>
         return items;
       }
     },
-    placeholderData: (previousData) => previousData,
+    placeholderData: (previousData, previousQuery) => {
+      // Keep previous data visible during refetch or when switching between queries
+      if (previousData) return previousData;
+      
+      // When search changes, try to show cached data from base query (no search)
+      if (params?.search && previousQuery) {
+        const baseQuery = previousQuery.state.data;
+        return baseQuery as Product[] | undefined;
+      }
+      
+      return undefined;
+    },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 
 // useProduct
