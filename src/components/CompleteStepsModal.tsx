@@ -35,12 +35,12 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
-        className={`bg-white w-full overflow-y-auto no-scrollbar sm:max-w-md sm:max-h-[85vh] max-sm:rounded-t-3xl sm:rounded-3xl shadow-2xl p-6 sm:p-7 ${
+        className={`bg-white w-full max-sm:h-full max-sm:py-20 overflow-y-auto no-scrollbar sm:max-w-md sm:max-h-[85vh] sm:rounded-3xl shadow-2xl p-6 sm:p-7 ${
           isSmall ? "max-sm:pb-8" : ""
         }`}
       >
         <div className="flex items-start justify-between">
-          <p className="text-[15px] sm:text-[1.2vw] text-gray-700 font-medium leading-snug pr-6">
+          <p className="text-lg sm:text-[2vw] text-gray-700 font-medium leading-snug pr-6">
             Showcase your brand to credible buyers across the internet
             (Tiktok, Google, Facebook) on Oysloe.
           </p>
