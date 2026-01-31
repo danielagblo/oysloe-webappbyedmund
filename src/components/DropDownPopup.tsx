@@ -567,7 +567,7 @@ const DropdownPopup = forwardRef<DropdownPopupHandle, DropdownPopupProps>(
                   </div>
                 </div>
 
-                <div className="max-h-[70vh] overflow-y-auto overscroll-contain px-4 pb-5 pt-1">
+                <div className="max-h-[70vh] overflow-y-auto overscroll-contain px-4 pb-17 pt-1">
                   {renderOptions(viewSub)}
                 </div>
               </div>
