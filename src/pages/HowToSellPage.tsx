@@ -8,10 +8,10 @@ const HowToSellPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>How to Sell - Oysloe</title>
+        <title>How to Sell on Oysloe | Step-by-Step Guide for Online Sellers</title>
         <meta
           name="description"
-          content="Learn how to sell on Oysloe - create listings, manage orders, and grow your business."
+          content="Complete guide to selling on Oysloe marketplace in Ghana. Learn how to create listings, attract buyers, manage sales, and grow your business online."
         />
       </Helmet>
       <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center max-sm:pt-10">
@@ -37,8 +37,11 @@ const HowToSellPage: React.FC = () => {
 
           <div className="flex lg:pt-15 px-5 flex-col justify-start gap-4 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
             <h1 className="text-3xl sm:text-4xl font-bold text-(--dark-def) max-lg:pt-15 mb-4">
-              How to Sell on Oysloe
+              How to Sell on Oysloe - Complete Selling Guide
             </h1>
+            <p className="text-gray-600 mb-4">
+              Start selling on Oysloe, Ghana's trusted online marketplace. Follow our proven 6-step guide to create successful listings and reach thousands of buyers.
+            </p>
 
             <div className="text-left space-y-6">
               {/* Step 1 */}

@@ -25,6 +25,11 @@ import ServiceApplicationPage from "./pages/ServiceApplicationPage.tsx";
 import HowToSellPage from "./pages/HowToSellPage.tsx";
 import FAQPage from "./pages/FAQPage.tsx";
 import HiringPage from "./pages/HiringPage.tsx";
+import SellAnythingPage from "./pages/SellAnythingPage.tsx";
+import SellCarPage from "./pages/SellCarPage.tsx";
+import SellPropertyPage from "./pages/SellPropertyPage.tsx";
+import SellPhonePage from "./pages/SellPhonePage.tsx";
+import SellAppliancePage from "./pages/SellAppliancePage.tsx";
 
 function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
@@ -203,6 +208,11 @@ function App() {
           <Route path="/how-to-sell" element={<HowToSellPage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/hiring" element={<HiringPage />} />
+          <Route path="/sell" element={<SellAnythingPage />} />
+          <Route path="/sell/car" element={<SellCarPage />} />
+          <Route path="/sell/property" element={<SellPropertyPage />} />
+          <Route path="/sell/phone" element={<SellPhonePage />} />
+          <Route path="/sell/appliance" element={<SellAppliancePage />} />
         </Routes>
       </main>
       <Footer />

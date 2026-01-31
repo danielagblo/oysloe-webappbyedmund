@@ -15,6 +15,14 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li>
                 <Link
+                  to="/sell"
+                  className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
+                >
+                  Sell Anything
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/how-to-sell"
                   className="text-gray-600 hover:text-(--dark-def) transition text-xs sm:text-sm"
                 >

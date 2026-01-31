@@ -8,10 +8,10 @@ const HiringPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>Hiring - Join Oysloe</title>
+        <title>Oysloe Careers | Join Our Ghana-Based E-commerce Team</title>
         <meta
           name="description"
-          content="Join the Oysloe team! We're hiring talented individuals passionate about e-commerce and technology."
+          content="Careers at Oysloe Ghana - join our team of innovators building Africa's leading online marketplace. Open positions in engineering, design, and support."
         />
       </Helmet>
       <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center max-sm:pt-10">
@@ -37,8 +37,11 @@ const HiringPage: React.FC = () => {
 
           <div className="flex lg:pt-15 px-5 flex-col justify-start gap-4 mb-2 w-full sm:h-[85vh] overflow-auto no-scrollbar">
             <h1 className="text-3xl sm:text-4xl font-bold text-(--dark-def) max-lg:pt-15 mb-4">
-              Join Our Team
+              Join Oysloe - Careers in E-commerce
             </h1>
+            <p className="text-gray-600 mb-4">
+              Be part of Ghana's fastest-growing online marketplace. We're hiring talented engineers, designers, and support specialists to revolutionize e-commerce in Africa.
+            </p>
 
             <div className="text-left space-y-6">
               {/* About Oysloe */}

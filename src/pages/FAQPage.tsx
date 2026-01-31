@@ -60,10 +60,10 @@ const FAQPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>FAQ - Oysloe</title>
+        <title>FAQ - Oysloe Online Marketplace Ghana | Buy & Sell Safely</title>
         <meta
           name="description"
-          content="Frequently asked questions about Oysloe - learn how to buy, sell, and use our platform."
+          content="Oysloe marketplace FAQ - answers to buying and selling questions in Ghana. Learn about safe transactions, payments, listings, and trusted online selling."
         />
       </Helmet>
       <div className="relative flex items-center justify-center w-screen sm:w-full h-full text-center max-sm:pt-10">
@@ -91,6 +91,9 @@ const FAQPage: React.FC = () => {
             <h1 className="text-3xl sm:text-4xl font-bold text-(--dark-def) max-lg:pt-15 mb-4">
               Frequently Asked Questions
             </h1>
+            <p className="text-gray-600 mb-4">
+              Find answers to common questions about buying and selling on Oysloe, Ghana's leading online marketplace platform.
+            </p>
 
             <div className="space-y-4">
               {faqs.map((faq, index) => (
