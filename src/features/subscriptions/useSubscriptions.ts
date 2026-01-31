@@ -20,11 +20,11 @@ export const subscriptionKeys = {
 
 // useSubscriptions (public packages)
 export const useSubscriptions = () =>
-  useQuery(subscriptionKeys.list(), () => getSubscriptions());
+  useQuery({ queryKey: subscriptionKeys.list(), queryFn: () => getSubscriptions() });
 
 // useUserSubscriptions (what the current user has)
 export const useUserSubscriptions = () =>
-  useQuery(subscriptionKeys.userList(), () => getUserSubscriptions());
+  useQuery({ queryKey: subscriptionKeys.userList(), queryFn: () => getUserSubscriptions() });
 
 // create a user subscription
 export const useCreateUserSubscription = () => {

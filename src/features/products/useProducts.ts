@@ -39,9 +39,9 @@ export const productKeys = {
 
 // useProducts
 export const useProducts = (params?: { search?: string; ordering?: string }) =>
-  useQuery<Product[], Error>(
-    productKeys.list(params),
-    async () => {
+  useQuery<Product[], Error>({
+    queryKey: productKeys.list(params),
+    queryFn: async () => {
       const items = await getProducts(params);
       try {
         return [...items].sort((a, b) => {
@@ -57,21 +57,23 @@ export const useProducts = (params?: { search?: string; ordering?: string }) =>
         return items;
       }
     },
-    {
-      keepPreviousData: true,
-      refetchOnMount: false,
-    },
-  );
+    placeholderData: (previousData) => previousData,
+    refetchOnMount: false,
+  });
 
 // useProduct
 export const useProduct = (id: number | string) =>
-  useQuery<Product, Error>(productKeys.detail(id), () => getProduct(id), {
+  useQuery<Product, Error>({
+    queryKey: productKeys.detail(id),
+    queryFn: () => getProduct(id),
     enabled: !!id,
   });
 
 // useRelatedProduct
 export const useRelatedProducts = (productId?: number) =>
-  useQuery<Product[], Error>(productKeys.related(productId), () => getRelatedProducts(productId), {
+  useQuery<Product[], Error>({
+    queryKey: productKeys.related(productId),
+    queryFn: () => getRelatedProducts(productId),
     enabled: productId != null,
   });
 
