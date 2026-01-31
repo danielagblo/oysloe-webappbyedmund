@@ -7,6 +7,7 @@ import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
+import { svg } from "leaflet";
 
 // Local Cloudinary upload helper (unsigned preset). Returns upload response or null.
 const uploadToCloudinary = async (file: File) => {
@@ -262,7 +263,7 @@ const EditProfilePage = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-end w-9/10">
+              <div className="flex items-center justify-end w-2/5">
                 <button
                   className="bg-gray-100 py-3 w-full rounded-xl text-sm cursor-pointer hover:scale-95 active:scale-105 hover:bg-gray-200  transition"
                   onClick={() => {
@@ -276,25 +277,40 @@ const EditProfilePage = () => {
 
               {/* profile images area */}
               <div className="flex justify-center flex-col items-center w-full p-2 rounded-md gap-3">
-                <div className="flex flex-row items-center justify-around w-full relative">
+                <div className="flex flex-row items-center bg-white p-2 rounded-2xl border border-dashed border-gray-300 justify-around w-full relative">
                   <div className="bg-green-300 relative rounded-full p-1">
-                    <img
-                      src={
-                        buildMediaUrl(selectedUser?.profileImage) ||
-                        avatarPlaceholder
-                      }
-                      alt="Profile"
-                      className="w-17 max-w-full h-17 lg:w-[5vw] lg:h-[5vw] rounded-full border-5 border-white object-cover bg-gray-100 cursor-pointer"
-                      onClick={() => {
-                        setImageModalSrc(
-                          buildMediaUrl(selectedUser?.profileImage) ||
-                          avatarPlaceholder,
-                        );
-                        setImageModalAlt("Profile Image");
-                        setImageModalOpen(true);
-                      }}
-                      onError={(e) => onImgError(e, avatarPlaceholder)}
-                    />
+                    {selectedUser?.profileImage ? (
+                      <img
+                        src={
+                          buildMediaUrl(selectedUser?.profileImage)
+                        }
+                        alt="Profile"
+                        className="w-17 max-w-full h-17 lg:w-[5vw] lg:h-[5vw] rounded-full border-5 border-white object-cover bg-gray-100 cursor-pointer"
+                        onClick={() => {
+                          setImageModalSrc(
+                            buildMediaUrl(selectedUser?.profileImage) ||
+                            avatarPlaceholder,
+                          );
+                          setImageModalAlt("Profile Image");
+                          setImageModalOpen(true);
+                        }}
+                        onError={(e) => onImgError(e, avatarPlaceholder)}
+                      />
+                    ):(
+                      <svg 
+                        className="w-17 max-w-full h-17 lg:w-[5vw] lg:h-[5vw] rounded-full border-5 border-white object-cover bg-gray-100 cursor-pointer"
+                        viewBox="0 0 60 61" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path d="M30 61C46.5685 61 60 47.3447 60 30.5C60 13.6553 46.5685 0 30 0C13.4315 0 0 13.6553 0 30.5C0 47.3447 13.4315 61 30 61Z" fill="#B8BAC0"/>
+                        <path d="M29.9999 45.0094C26.5069 45.0094 23.3378 43.5105 20.9996 41.0879C20.9978 42.5398 20.9451 44.6353 20.5601 46.1643C20.8126 46.3186 21.0086 46.572 21.0468 46.8873C21.5458 50.9478 25.3944 54.0094 29.9999 54.0094C34.6044 54.0094 38.4531 50.9474 38.9531 46.8873C38.9918 46.5716 39.1836 46.3186 39.4399 46.1648C39.0549 44.6356 39.0021 42.5399 39.0003 41.0879C36.6621 43.5105 33.4929 45.0094 29.9999 45.0094Z" fill="white"/>
+                        <path d="M38.8049 41.2724C36.4863 43.582 33.3997 45.0094 29.9999 45.0094C26.5069 45.0094 23.3378 43.5105 20.9996 41.0879C20.9978 42.5398 20.9451 44.6353 20.5601 46.1643C20.8126 46.3186 21.0086 46.572 21.0468 46.8873C21.2674 48.6821 22.1441 50.2803 23.4497 51.5065C29.4707 50.6588 36.3046 44.7134 38.8049 41.2724Z" fill="#D7DBE0"/>
+                        <path d="M39 20.0078H22C19.2431 20.0078 17 22.2509 17 25.0078V31.0078C17 38.7276 22.832 45.0078 30 45.0078C37.168 45.0078 43 38.7276 43 31.0078V24.0078C43 21.8023 41.206 20.0078 39 20.0078Z" fill="white"/>
+                        <path d="M8 49.0682C13.4913 55.1651 21.4449 59.0002 30.296 59.0002C39.1471 59.0002 47.1008 55.1651 52.592 49.0682C51.6345 47.7737 50.2843 46.7219 48.548 46.2358C48.508 46.2246 48.4679 46.2158 48.4269 46.2099L40.4445 45.0122C40.3956 45.0048 40.2911 45.0009 40.2414 45.0009C39.7365 45.0009 39.3107 45.3774 39.2491 45.8788C38.7491 49.9388 34.9005 53.0009 30.296 53.0009C25.6905 53.0009 21.8419 49.9394 21.3429 45.8788C21.2804 45.3627 20.8155 44.9746 20.3252 45.0013C20.2666 44.9979 20.209 45.0028 20.1475 45.0121L12.1651 46.2098C12.1241 46.2157 12.0841 46.2244 12.044 46.2357C10.3078 46.7221 8.9575 47.7737 8 49.0682Z" fill="#5C546A"/>
+                      </svg>
+                    )}
+
                     {!isReadonly && (
                       <label
                         htmlFor="avatar-file-input"
@@ -322,12 +338,23 @@ const EditProfilePage = () => {
                   </div>
                   
                   <div className="max-w-7/10 lg:max-w-3/5">
-                    <p className="text-sm lg:text-[1.1vw] font-semibold">Profile Image</p>
+                    <p className="text-sm lg:text-[1.1vw] font-semibold flex gap-1 items-center">
+                      <span>Profile Image</span>
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <mask id="mask0_21369_749" maskUnits="userSpaceOnUse" x="0" y="0" width="11" height="11">
+                        <path d="M11 0H0V11H11V0Z" fill="white"/>
+                        </mask>
+                        <g mask="url(#mask0_21369_749)">
+                        <path d="M5.50008 6.87612C5.37853 6.87612 5.26198 6.82569 5.17599 6.74319C5.09006 6.65611 5.04175 6.54154 5.04175 6.41779V2.75112C5.04175 2.62737 5.09006 2.51281 5.17599 2.42572C5.26198 2.34322 5.37853 2.29279 5.50008 2.29279C5.62163 2.29279 5.73823 2.34322 5.82417 2.42572C5.91015 2.51281 5.95842 2.62737 5.95842 2.75112V6.41779C5.95842 6.54154 5.91015 6.65611 5.82417 6.74319C5.73823 6.82569 5.62163 6.87612 5.50008 6.87612ZM5.86354 10.8911C6.85354 10.4924 10.0834 8.92947 10.0834 5.51947V3.14987C10.0839 2.66862 9.93244 2.2011 9.65047 1.80693C9.36855 1.41735 8.97053 1.12863 8.51316 0.977376L5.64446 0.0240625C5.55082 -0.00802083 5.44939 -0.00802083 5.35571 0.0240625L2.487 0.977376C2.02963 1.12863 1.63166 1.41735 1.34969 1.80693C1.06777 2.2011 0.916245 2.66862 0.916749 3.14987V5.51947C0.916749 8.53072 4.12737 10.3686 5.11187 10.859C5.2364 10.9186 5.36643 10.969 5.50008 11.0011C5.62438 10.9736 5.74602 10.937 5.86354 10.8911ZM8.22441 1.84363C8.49877 1.9353 8.73743 2.10945 8.9066 2.34779C9.07577 2.58154 9.16679 2.86112 9.16675 3.14987V5.51947C9.16675 8.35656 6.37687 9.69488 5.52162 10.0386C4.65629 9.6078 1.83342 8.00364 1.83342 5.51947V3.14987C1.83337 2.86112 1.92439 2.58154 2.09357 2.34779C2.26274 2.10945 2.50144 1.9353 2.77575 1.84363L5.50008 0.940729L8.22441 1.84363ZM5.50008 7.79279C5.40942 7.79279 5.32083 7.82031 5.24548 7.87073C5.17008 7.92114 5.11133 7.98987 5.07663 8.07695C5.04198 8.15945 5.0329 8.2511 5.05055 8.34277C5.06824 8.42985 5.11192 8.51236 5.17599 8.57652C5.24012 8.64069 5.32179 8.68195 5.41066 8.70028C5.49958 8.71861 5.59175 8.70948 5.67549 8.67281C5.75922 8.64073 5.83081 8.58115 5.88118 8.50782C5.93156 8.4299 5.95842 8.34279 5.95842 8.25112C5.95842 8.12737 5.91015 8.01281 5.82417 7.92572C5.73823 7.84322 5.62163 7.79279 5.50008 7.79279Z" fill="#FF6B6B"/>
+                        </g>
+                      </svg>
+
+                    </p>
                     <p className="text-[11px] lg:text-[0.9vw]">To verify your identity and keep the platform safe. A clear Picture of your face is required.</p>
                   
                   </div>
                 </div>
-                <div className="flex flex-row items-center justify-around w-full relative">
+                <div className="flex flex-row items-center justify-around  bg-white p-2 rounded-2xl border border-dashed border-gray-300 w-full relative">
                   <div className="bg-green-300 p-1 rounded-full relative">
                     <img
                       src={
