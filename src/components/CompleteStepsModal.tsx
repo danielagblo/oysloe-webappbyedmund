@@ -10,7 +10,7 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
 
-  if (isOpen) return null;
+  if (!isOpen) return null;
 
   const handleCompleteSteps = () => {
     onClose();
