@@ -84,9 +84,10 @@ export function useCategories(params?: { ordering?: string; search?: string }) {
     // Expose the single-category hook
     useCategory,
 
-    // Status
+    // Status - show loading while fetching OR if using placeholder data (not actual data)
     loading:
       categoriesQuery.isLoading ||
+      categoriesQuery.isFetching ||
       createCategoryMutation.isPending ||
       updateCategoryMutation.isPending ||
       patchCategoryMutation.isPending ||

@@ -108,12 +108,13 @@ const HomePage = () => {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const { data: products = [], isLoading, isPlaceholderData } = useProducts({
+  const { data: products = [], isLoading, isFetching, isPlaceholderData } = useProducts({
     search: debouncedSearch || undefined,
   });
   
-  // Only show loading state when we have no data at all (not when using placeholder data)
-  const productsLoading = isLoading && !isPlaceholderData;
+  // Show loading state while fetching (including when using placeholder data)
+  // Only hide when data is fully loaded
+  const productsLoading = isLoading || (isFetching && isPlaceholderData);
 
   // Mobile-only breakpoint detection (<= 640px)
   const isSmall = useIsSmallScreen(640);
