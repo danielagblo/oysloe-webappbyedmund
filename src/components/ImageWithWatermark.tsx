@@ -27,14 +27,14 @@ const Watermark: React.FC<WatermarkProps> = ({ businessName, size = "md" }) => {
 
     const secondLineClass =
         size === "xxs"
-            ? "text-[8px] sm:text-[10px] font-normal"
+            ? "text-[4px] sm:text-[6px] font-normal"
             : size === "xs"
-                ? "text-[10px] sm:text-[12px] font-normal"
+                ? "text-[6px] sm:text-[8px] font-normal"
                 : size === "sm"
-                    ? "text-[12px] sm:text-[14px] font-normal"
+                    ? "text-[8px] sm:text-[12px] font-normal"
                     : size === "lg"
-                        ? "text-[40px] sm:text-[56px] font-normal"
-                        : "text-[16px] sm:text-[20px] lg:text-[30px] font-normal";
+                        ? "text-[20px] sm:text-[24px] font-normal"
+                        : "text-[8px] sm:text-[12px] lg:text-[20px] font-normal";
 
     // adjust bottom padding for small variants so watermark stays inside small thumbnails
     const containerPbClass = size === "xxs" ? "pb-1" : size === "xs" ? "pb-2" : size === "sm" ? "pb-3" : "pb-6";
