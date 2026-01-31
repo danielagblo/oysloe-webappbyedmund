@@ -5,6 +5,7 @@ import RequireAuth from "./components/RequireAuth";
 import ScrollToTop from "./components/ScrollToTop";
 import FcmNotificationHandler from "./components/FcmNotificationHandler";
 import CompleteStepsModal from "./components/CompleteStepsModal";
+import Footer from "./components/Footer";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
 import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
@@ -21,6 +22,27 @@ import ReviewPage from "./pages/ReviewPage.tsx";
 import SignUpPage from "./pages/SignUpPage.tsx";
 import VerificationPage from "./pages/VerificationPage.tsx";
 import ServiceApplicationPage from "./pages/ServiceApplicationPage.tsx";
+import HowToSellPage from "./pages/HowToSellPage.tsx";
+import FAQPage from "./pages/FAQPage.tsx";
+import HiringPage from "./pages/HiringPage.tsx";
+import SellAnythingPage from "./pages/SellAnythingPage.tsx";
+import SellCarPage from "./pages/SellCarPage.tsx";
+import SellPropertyPage from "./pages/SellPropertyPage.tsx";
+import SellPhonePage from "./pages/SellPhonePage.tsx";
+import SellAppliancePage from "./pages/SellAppliancePage.tsx";
+import InvestPage from "./pages/InvestPage.tsx";
+import PrivacyPage from "./pages/PrivacyPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
+import SellElectronicsPage from "./pages/SellElectronicsPage.tsx";
+import SellFashionPage from "./pages/SellFashionPage.tsx";
+import SellFurniturePage from "./pages/SellFurniturePage.tsx";
+import SellMotorcyclePage from "./pages/SellMotorcyclePage.tsx";
+import SellBooksPage from "./pages/SellBooksPage.tsx";
+import SellSportsPage from "./pages/SellSportsPage.tsx";
+import SellBeautyPage from "./pages/SellBeautyPage.tsx";
+import SellJewelryPage from "./pages/SellJewelryPage.tsx";
+import BillingPage from "./pages/BillingPage.tsx";
+import AboutPage from "./pages/AboutPage.tsx";
 
 function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
@@ -105,97 +127,121 @@ function App() {
         isOpen={showCompleteSteps} 
         onClose={() => setShowCompleteSteps(false)} 
       />
-      <Routes>
-        <Route path="/login" element={<LogInPage />} />
-        <Route path="/signUp" element={<SignUpPage />} />
-        <Route
-          path="/reset-password/phone"
-          element={<ResetPasswordWithPhonePage />}
-        />
-        <Route
-          path="/enterphone"
-          element={
-            <ResetPasswordWithPhonePage page="OTP Login" />
-          }
-        />
-        <Route
-          path="/reset-password/email"
-          element={<ResetPasswordWithEmailPage />}
-        />
-        <Route path="/verification" element={<VerificationPage />} />
-        <Route
-          path="/referal-verification"
-          element={<ReferalVerificationPage />}
-        />
-        <Route path="/resetpassword" element={<ResetPasswordPage />} />
-        <Route path="/resetpassword/new" element={<ResetPasswordPage />} />
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <HomePage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/homepage"
-          element={
-            <RequireAuth>
-              <HomePage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/ads/:id"
-          element={
-            <RequireAuth>
-              <AdsDetailsPage />
-            </RequireAuth>
-          }
-        />
-        <Route path="/reviews" element={<ReviewPage />} />
-        <Route
-          path="/postad"
-          element={
-            <RequireAuth>
-              <PostAdPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/inbox"
-          element={
-            <RequireAuth>
-              <InboxPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <RequireAuth>
-              <ProfilePage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/alerts"
-          element={
-            <RequireAuth>
-              <AlertsPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/apply"
-          element={
-            <RequireAuth>
-              <ServiceApplicationPage />
-            </RequireAuth>
-          }
-        />
-        <Route path="/paystack/callback" element={<PaystackCallback />} />
-      </Routes>
+      <main className="flex-1">
+        <Routes>
+          <Route path="/login" element={<LogInPage />} />
+          <Route path="/signUp" element={<SignUpPage />} />
+          <Route
+            path="/reset-password/phone"
+            element={<ResetPasswordWithPhonePage />}
+          />
+          <Route
+            path="/enterphone"
+            element={
+              <ResetPasswordWithPhonePage page="OTP Login" />
+            }
+          />
+          <Route
+            path="/reset-password/email"
+            element={<ResetPasswordWithEmailPage />}
+          />
+          <Route path="/verification" element={<VerificationPage />} />
+          <Route
+            path="/referal-verification"
+            element={<ReferalVerificationPage />}
+          />
+          <Route path="/resetpassword" element={<ResetPasswordPage />} />
+          <Route path="/resetpassword/new" element={<ResetPasswordPage />} />
+          <Route
+            path="/"
+            element={
+              <RequireAuth>
+                <HomePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/homepage"
+            element={
+              <RequireAuth>
+                <HomePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/ads/:id"
+            element={
+              <RequireAuth>
+                <AdsDetailsPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/reviews" element={<ReviewPage />} />
+          <Route
+            path="/postad"
+            element={
+              <RequireAuth>
+                <PostAdPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/inbox"
+            element={
+              <RequireAuth>
+                <InboxPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/alerts"
+            element={
+              <RequireAuth>
+                <AlertsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/apply"
+            element={
+              <RequireAuth>
+                <ServiceApplicationPage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/paystack/callback" element={<PaystackCallback />} />
+          <Route path="/how-to-sell" element={<HowToSellPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/hiring" element={<HiringPage />} />
+          <Route path="/invest" element={<InvestPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/billing" element={<BillingPage />} />
+          <Route path="/sell" element={<SellAnythingPage />} />
+          <Route path="/sell/car" element={<SellCarPage />} />
+          <Route path="/sell/property" element={<SellPropertyPage />} />
+          <Route path="/sell/phone" element={<SellPhonePage />} />
+          <Route path="/sell/appliance" element={<SellAppliancePage />} />
+          <Route path="/sell/electronics" element={<SellElectronicsPage />} />
+          <Route path="/sell/fashion" element={<SellFashionPage />} />
+          <Route path="/sell/furniture" element={<SellFurniturePage />} />
+          <Route path="/sell/motorcycle" element={<SellMotorcyclePage />} />
+          <Route path="/sell/books" element={<SellBooksPage />} />
+          <Route path="/sell/sports" element={<SellSportsPage />} />
+          <Route path="/sell/beauty" element={<SellBeautyPage />} />
+          <Route path="/sell/jewelry" element={<SellJewelryPage />} />
+        </Routes>
+      </main>
+      <Footer />
     </div>
   );
 }

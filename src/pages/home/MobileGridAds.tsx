@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import type { Product } from "../../types/Product";
@@ -69,7 +69,9 @@ const LazyAdCard = React.memo(function LazyAdCard({
 });
 
 const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
-  const [displayCount, setDisplayCount] = useState(12); // Show 12 cards initially (2 columns × 6 rows)
+  // Use ref to preserve displayCount across component remounts
+  const displayCountRef = useRef(12);
+  const [displayCount, setDisplayCount] = useState(12);
   const [hasHydratedFromAnchor, setHasHydratedFromAnchor] = useState(false);
 
   const parseAdIdFromHref = (href: string) => {
@@ -117,29 +119,38 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
   // Paginate displayed products
   const displayedProducts = useMemo(() => active.slice(0, displayCount), [active, displayCount]);
 
-  if (productsLoading) {
-    // Show a grid of skeletons while loading
-    return (
-      <div className="px-2 py-3">
-        <div className="grid grid-cols-2 gap-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
+  // If no ads are loaded yet, show skeletons. Otherwise, show ads even while refetching
+  if (!displayedProducts || displayedProducts.length === 0) {
+    if (productsLoading) {
+      // Show a grid of skeletons only when there's truly no data
+      return (
+        <div className="px-2 py-3">
+          <div className="grid grid-cols-2 gap-2">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (!active || active.length === 0) {
-    return (
-      <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-        <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
-        <p>No ads to show right now.</p>
-      </div>
-    );
+    if (!active || active.length === 0) {
+      return (
+        <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
+          <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
+          <p>No ads to show right now.</p>
+        </div>
+      );
+    }
   }
 
   const hasMore = displayCount < active.length;
+
+  const handleLoadMore = () => {
+    const newCount = displayCount + 12;
+    displayCountRef.current = newCount;
+    setDisplayCount(newCount);
+  };
 
   return (
     <div className="px-2 py-3">
@@ -150,7 +161,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
       </div>
       {hasMore && (
         <button
-          onClick={() => setDisplayCount((prev) => prev + 12)}
+          onClick={handleLoadMore}
           className="w-full mt-4 py-3 bg-white hover:bg-gray-50 rounded-lg font-medium transition border border-gray-200"
           style={{ color: '#646161' }}
         >

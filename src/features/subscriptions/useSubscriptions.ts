@@ -1,9 +1,4 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getSubscriptions } from "../../services/subscriptionService";
 import {
@@ -25,21 +20,11 @@ export const subscriptionKeys = {
 
 // useSubscriptions (public packages)
 export const useSubscriptions = () =>
-  useQuery(
-    queryOptions({
-      queryKey: subscriptionKeys.list(),
-      queryFn: () => getSubscriptions(),
-    }),
-  );
+  useQuery({ queryKey: subscriptionKeys.list(), queryFn: () => getSubscriptions() });
 
 // useUserSubscriptions (what the current user has)
 export const useUserSubscriptions = () =>
-  useQuery(
-    queryOptions({
-      queryKey: subscriptionKeys.userList(),
-      queryFn: () => getUserSubscriptions(),
-    }),
-  );
+  useQuery({ queryKey: subscriptionKeys.userList(), queryFn: () => getUserSubscriptions() });
 
 // create a user subscription
 export const useCreateUserSubscription = () => {

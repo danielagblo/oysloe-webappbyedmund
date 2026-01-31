@@ -1,9 +1,4 @@
-import {
-  queryOptions,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   confirmMarkProductAsTaken,
@@ -44,61 +39,56 @@ export const productKeys = {
 
 // useProducts
 export const useProducts = (params?: { search?: string; ordering?: string }) =>
-  useQuery(
-    queryOptions({
-      queryKey: productKeys.list(params),
-      // Wrap the service call so we can enforce client-side ordering by
-      // `multiplier` (highest first) when the backend does not provide
-      // that ordering. This keeps existing `getProducts` behavior while
-      // ensuring premium/boosted owners appear before others.
-      queryFn: async () => {
-        const items = await getProducts(params);
-        try {
-          // Sort by numeric multiplier (desc). Treat missing/non-numeric as 0.
-          return [...items].sort((a, b) => {
-            const ma = Number((a as any).multiplier ?? 0) || 0;
-            const mb = Number((b as any).multiplier ?? 0) || 0;
-            // Higher multiplier first
-            if (mb !== ma) return mb - ma;
-            // Preserve original relative order for equal multipliers by
-            // falling back to created_at (newest first) if available.
-            const ta = Date.parse(
-              (a as any).created_at || (a as any).createdAt || "",
-            );
-            const tb = Date.parse(
-              (b as any).created_at || (b as any).createdAt || "",
-            );
-            if (isFinite(tb) && isFinite(ta)) return tb - ta;
-            return 0;
-          });
-        } catch (e) {
-          // If sorting fails for any reason, return unsorted list to avoid
-          // breaking the UI.
-          return items;
-        }
-      },
-    }),
-  );
+  useQuery<Product[], Error>({
+    queryKey: productKeys.list(params),
+    queryFn: async () => {
+      const items = await getProducts(params);
+      try {
+        return [...items].sort((a, b) => {
+          const ma = Number((a as any).multiplier ?? 0) || 0;
+          const mb = Number((b as any).multiplier ?? 0) || 0;
+          if (mb !== ma) return mb - ma;
+          const ta = Date.parse((a as any).created_at || (a as any).createdAt || "");
+          const tb = Date.parse((b as any).created_at || (b as any).createdAt || "");
+          if (isFinite(tb) && isFinite(ta)) return tb - ta;
+          return 0;
+        });
+      } catch (e) {
+        return items;
+      }
+    },
+    placeholderData: (previousData, previousQuery) => {
+      // Keep previous data visible during refetch or when switching between queries
+      if (previousData) return previousData;
+      
+      // When search changes, try to show cached data from base query (no search)
+      if (params?.search && previousQuery) {
+        const baseQuery = previousQuery.state.data;
+        return baseQuery as Product[] | undefined;
+      }
+      
+      return undefined;
+    },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
 // useProduct
 export const useProduct = (id: number | string) =>
-  useQuery(
-    queryOptions({
-      queryKey: productKeys.detail(id),
-      queryFn: () => getProduct(id),
-      enabled: !!id,
-    }),
-  );
+  useQuery<Product, Error>({
+    queryKey: productKeys.detail(id),
+    queryFn: () => getProduct(id),
+    enabled: !!id,
+  });
 
 // useRelatedProduct
 export const useRelatedProducts = (productId?: number) =>
-  useQuery(
-    queryOptions({
-      queryKey: productKeys.related(productId),
-      queryFn: () => getRelatedProducts(productId),
-      enabled: productId != null,
-    }),
-  );
+  useQuery<Product[], Error>({
+    queryKey: productKeys.related(productId),
+    queryFn: () => getRelatedProducts(productId),
+    enabled: productId != null,
+  });
 
 // useProductReportCount
 export const useProductReportCount = (productId?: number) =>

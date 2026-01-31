@@ -59,3 +59,14 @@ if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
     }
   });
 }
+
+// Register the service worker (ensures our runtime image caching is active).
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+  (async () => {
+    try {
+      await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    } catch (e) {
+      // ignore registration errors (e.g., dev server or differing scope)
+    }
+  })();
+}
