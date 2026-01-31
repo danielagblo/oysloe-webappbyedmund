@@ -101,10 +101,10 @@ const BillingPage: React.FC = () => {
                   </div>
 
                   {/* Platinum Plan */}
-                  <div className="border border-purple-300 rounded-lg p-4 hover:shadow-md transition bg-gradient-to-br from-purple-50 to-blue-50 relative">
-                    <div className="absolute -top-3 right-4 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">50% OFF</div>
+                  <div className="border rounded-lg p-4 hover:shadow-md transition relative" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
+                    <div className="absolute -top-3 right-4 text-white px-2 py-1 rounded-full text-xs font-semibold" style={{backgroundColor: '#74ffa7'}}>50% OFF</div>
                     <div className="mb-3">
-                      <h3 className="text-xl font-bold text-(--dark-def)">Platinum <span className="text-lg font-semibold text-purple-600">10.00x</span></h3>
+                      <h3 className="text-xl font-bold text-(--dark-def)">Platinum <span className="text-lg font-semibold" style={{color: '#74ffa7'}}>10.00x</span></h3>
                       <p className="text-sm text-gray-600 mt-1">Best for large scale businesses</p>
                     </div>
                     <ul className="text-sm text-gray-600 space-y-1 mb-4 border-b pb-4">
@@ -118,7 +118,7 @@ const BillingPage: React.FC = () => {
                       </li>
                     </ul>
                     <div className="mb-3">
-                      <p className="text-2xl font-bold text-purple-600">₵1,500.00</p>
+                      <p className="text-2xl font-bold" style={{color: '#74ffa7'}}>₵1,500.00</p>
                       <p className="text-sm text-gray-500 line-through">₵3,000.00</p>
                     </div>
                   </div>

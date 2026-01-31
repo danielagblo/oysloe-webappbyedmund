@@ -195,21 +195,21 @@ const AboutPage: React.FC = () => {
               </section>
 
               {/* Our Impact */}
-              <section className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+              <section className="p-4 rounded-lg border" style={{backgroundColor: 'rgba(116, 255, 167, 0.1)', borderColor: 'rgba(116, 255, 167, 0.3)'}}>
                 <h2 className="text-2xl font-semibold text-(--dark-def) mb-3">
                   Our Impact
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-purple-600">10,000+</p>
+                    <p className="text-3xl font-bold" style={{color: '#74ffa7'}}>10,000+</p>
                     <p className="text-gray-600 text-sm">Active Sellers</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-purple-600">50,000+</p>
+                    <p className="text-3xl font-bold" style={{color: '#74ffa7'}}>50,000+</p>
                     <p className="text-gray-600 text-sm">Monthly Users</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-purple-600">100,000+</p>
+                    <p className="text-3xl font-bold" style={{color: '#74ffa7'}}>100,000+</p>
                     <p className="text-gray-600 text-sm">Products Listed</p>
                   </div>
                 </div>
