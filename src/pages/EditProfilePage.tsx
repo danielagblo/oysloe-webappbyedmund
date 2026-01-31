@@ -7,7 +7,6 @@ import useUserProfile from "../features/userProfile/useUserProfile";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import { buildMediaUrl } from "../services/media";
-import { svg } from "leaflet";
 
 // Local Cloudinary upload helper (unsigned preset). Returns upload response or null.
 const uploadToCloudinary = async (file: File) => {
