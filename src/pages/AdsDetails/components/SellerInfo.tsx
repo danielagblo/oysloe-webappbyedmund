@@ -15,7 +15,6 @@ interface SellerInfoProps {
 const SellerInfo: React.FC<SellerInfoProps> = ({
   owner,
   currentAdData,
-  sellerProducts,
   setSellerModalImage,
   setIsSellerModalOpen,
   setIsSellerAdsModalOpen,
