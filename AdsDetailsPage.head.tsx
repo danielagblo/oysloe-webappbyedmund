@@ -1487,10 +1487,10 @@ const AdsDetailsPage = () => {
               style={{ border: "1px solid var(--div-border)" }}
               className="rounded-2xl px-3 py-3 bg-no-repeat sm:bg-white text-sm md:text-[1.125vw] w-full sm:border-(--dark-def)"
             />
-            <img 
-              src="/send.svg" 
-              alt="Send" 
-              className="w-6 h-6 absolute top-3 right-2 cursor-pointer" 
+            <img
+              src="/send.svg"
+              alt="Send"
+              className="w-6 h-6 absolute top-3 right-2 cursor-pointer"
               role="button"
               tabIndex={0}
               onClick={async () => {
@@ -1506,9 +1506,9 @@ const AdsDetailsPage = () => {
             className="p-2 rounded-2xl hover:bg-gray-300 sm:bg-white shrink-0"
           >
             <svg className="w-6 h-6" viewBox="0 0 25 39" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0.998535 14.625C1.98883 33.1542 23.9842 30.6966 23.9924 14.6384" stroke="#374957" stroke-width="2"/>
-              <rect x="6.49268" y="0.5" width="11" height="20" rx="5.5" fill="#374957" stroke="#374957"/>
-              <rect x="10.4927" y="31.5" width="4" height="7" fill="#374957" stroke="#374957"/>
+              <path d="M0.998535 14.625C1.98883 33.1542 23.9842 30.6966 23.9924 14.6384" stroke="#374957" stroke-width="2" />
+              <rect x="6.49268" y="0.5" width="11" height="20" rx="5.5" fill="#374957" stroke="#374957" />
+              <rect x="10.4927" y="31.5" width="4" height="7" fill="#374957" stroke="#374957" />
             </svg>
           </button>
         </div>
@@ -1589,7 +1589,7 @@ const AdsDetailsPage = () => {
             {owner?.name ?? "Seller"}
           </h3>
           <h3 className="text-sm text-gray-600 md:text-[1vw]">
-            Total Ads: {sellerProducts.length}
+            Total Ads: {owner?.total_ads || 0}
           </h3>
         </div>
       </div>
@@ -1612,7 +1612,7 @@ const AdsDetailsPage = () => {
             </span>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => setIsSellerAdsModalOpen(true)}
           className="px-2 py-1 whitespace-nowrap rounded text-sm md:text-[1vw] bg-(--div-active) hover:bg-gray-200 cursor-pointer"
         >
@@ -1737,7 +1737,7 @@ const AdsDetailsPage = () => {
             {currentAdData?.owner?.name ?? "Seller"}
           </h3>
           <h3 className="text-sm text-gray-600">
-            Total Ads: {sellerProducts.length || 0}
+            Total Ads: {owner?.total_ads || 0}
           </h3>
         </div>
       </div>
@@ -1806,7 +1806,7 @@ const AdsDetailsPage = () => {
   const SellerAdsModal = () => {
     if (!isSellerAdsModalOpen) return null;
     const sellerAdsToShow = sellerProducts?.filter((p) => !p.is_taken && p.status === "ACTIVE") ?? [];
-    
+
     return (
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
@@ -1848,7 +1848,7 @@ const AdsDetailsPage = () => {
                       {ad.name}
                     </h3>
                     <p className="text-gray-600 text-xs md:text-sm">
-                      {(ad.location?.name || "") +  ((ad.location?.name && ad.location?.region) ? ", " : "") + (ad.location?.region || "") || "Unknown location"}
+                      {(ad.location?.name || "") + ((ad.location?.name && ad.location?.region) ? ", " : "") + (ad.location?.region || "") || "Unknown location"}
                     </p>
                     <p className="text-gray-800 font-semibold text-sm md:text-base mt-1">
                       {ad.price ? `${formatMoney(ad.price)}${ad.type?.toLowerCase() === "rent" ? "/month" : ""}` : "Contact for price"}
