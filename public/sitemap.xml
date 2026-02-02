@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://oysloe.com/</loc></url>
-  <url><loc>https://oysloe.com/ads</loc></url>
-  <url><loc>https://oysloe.com/categories</loc></url>
-  <url><loc>https://oysloe.com/post-ad</loc></url>
+  <url><loc>https://oysloe.com/homepage</loc></url>
+  <url><loc>https://oysloe.com/login</loc></url>
+  <url><loc>https://oysloe.com/signUp</loc></url>
+  <url><loc>https://oysloe.com/reset-password/phone</loc></url>
+  <url><loc>https://oysloe.com/enterphone</loc></url>
+  <url><loc>https://oysloe.com/reset-password/email</loc></url>
+  <url><loc>https://oysloe.com/verification</loc></url>
+  <url><loc>https://oysloe.com/referal-verification</loc></url>
+  <url><loc>https://oysloe.com/resetpassword</loc></url>
+  <url><loc>https://oysloe.com/resetpassword/new</loc></url>
+  <url><loc>https://oysloe.com/reviews</loc></url>
+  <url><loc>https://oysloe.com/postad</loc></url>
+  <url><loc>https://oysloe.com/inbox</loc></url>
+  <url><loc>https://oysloe.com/profile</loc></url>
+  <url><loc>https://oysloe.com/alerts</loc></url>
+  <url><loc>https://oysloe.com/apply</loc></url>
+  <url><loc>https://oysloe.com/paystack/callback</loc></url>
+  <url><loc>https://oysloe.com/how-to-sell</loc></url>
+  <url><loc>https://oysloe.com/faq</loc></url>
+  <url><loc>https://oysloe.com/hiring</loc></url>
+  <url><loc>https://oysloe.com/invest</loc></url>
+  <url><loc>https://oysloe.com/about</loc></url>
   <url><loc>https://oysloe.com/privacy</loc></url>
   <url><loc>https://oysloe.com/terms</loc></url>
-  <url><loc>https://oysloe.com/refer</loc></url>
+  <url><loc>https://oysloe.com/billing</loc></url>
+  <url><loc>https://oysloe.com/sell</loc></url>
+  <url><loc>https://oysloe.com/sell/car</loc></url>
+  <url><loc>https://oysloe.com/sell/property</loc></url>
+  <url><loc>https://oysloe.com/sell/phone</loc></url>
+  <url><loc>https://oysloe.com/sell/appliance</loc></url>
+  <url><loc>https://oysloe.com/sell/electronics</loc></url>
+  <url><loc>https://oysloe.com/sell/fashion</loc></url>
+  <url><loc>https://oysloe.com/sell/furniture</loc></url>
+  <url><loc>https://oysloe.com/sell/motorcycle</loc></url>
+  <url><loc>https://oysloe.com/sell/books</loc></url>
+  <url><loc>https://oysloe.com/sell/sports</loc></url>
+  <url><loc>https://oysloe.com/sell/beauty</loc></url>
+  <url><loc>https://oysloe.com/sell/jewelry</loc></url>
 </urlset>
-<parameter name="filePath">/Users/danielagblo/Downloads/oysloe-webappbyedmund-main 6/public/sitemap.xml
