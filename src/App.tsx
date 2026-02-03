@@ -48,6 +48,23 @@ function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
   const location = useLocation();
 
+  const authPaths = new Set([
+    "/login",
+    "/signUp",
+    "/reset-password/phone",
+    "/enterphone",
+    "/reset-password/email",
+    "/verification",
+    "/referal-verification",
+    "/resetpassword",
+    "/resetpassword/new",
+  ]);
+
+  const isHomepage = location.pathname === "/" || location.pathname === "/homepage";
+  const isAuthScreen = authPaths.has(location.pathname);
+  const isAdsDetails = location.pathname.startsWith("/ads/");
+  const showFooter = isHomepage || isAuthScreen || isAdsDetails;
+
   // Detect iOS Safari and add class to root element
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -241,7 +258,7 @@ function App() {
           <Route path="/sell/jewelry" element={<SellJewelryPage />} />
         </Routes>
       </main>
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   );
 }

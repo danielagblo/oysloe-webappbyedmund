@@ -55,6 +55,9 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
     setDragOffset(0);
   };
 
+  const sellerName =
+    currentAdData?.owner?.business_name || owner?.name || "Seller";
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center max-sm:mb-15 bg-black/40 sm:bg-black/40 max-sm:p-0 p-4 animate-fade-in"
@@ -89,9 +92,11 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
           ✕
         </button>
 
-        <h2 className="text-xl md:text-2xl font-bold w-full whitespace-nowrap mb-4 pr-8 sticky top-0 bg-white max-sm:pt-0">
-          <span className="truncate whitespace-nowrap w-[85%] max-sm:w-[85vw]">{currentAdData?.owner?.business_name || owner?.name || "Seller"}</span>
-          's Ads
+        <h2 className="text-xl md:text-2xl font-bold w-full mb-4 sticky top-0 bg-white max-sm:pt-0">
+          <span className="flex items-center w-full min-w-0">
+            <span className="flex-1 min-w-0 truncate pr-0" title={sellerName}>{sellerName}</span>
+            <span className="flex-shrink-0 ml-1">'s Ads</span>
+          </span>
         </h2>
 
         {sellerAdsToShow.length > 0 ? (

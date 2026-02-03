@@ -15,7 +15,6 @@ interface SellerInfoProps {
 const SellerInfo: React.FC<SellerInfoProps> = ({
   owner,
   currentAdData,
-  sellerProducts,
   setSellerModalImage,
   setIsSellerModalOpen,
   setIsSellerAdsModalOpen,
@@ -85,7 +84,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             {owner?.name ?? "Seller"}
           </h3>
           <h3 className="text-sm text-gray-600 sm:text-4 lg:text-[1vw]">
-            Total Ads: {sellerProducts.length}
+            Total Ads: {owner?.total_ads || 0}
           </h3>
         </div>
       </div>
@@ -246,7 +245,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             {currentAdData?.owner?.name ?? "Seller"}
           </h3>
           <h3 className="text-sm text-gray-600">
-            Total Ads: {sellerProducts.length || 0}
+            Total Ads: {owner?.total_ads || 0}
           </h3>
         </div>
       </div>
