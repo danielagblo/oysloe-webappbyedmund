@@ -1,16 +1,41 @@
 import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import type { UserProfile } from "../types/UserProfile";
 
 interface CompleteStepsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  userProfile?: UserProfile | null;
 }
 
-const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
+const CompleteStepsModal = ({ isOpen, onClose, userProfile }: CompleteStepsModalProps) => {
   const navigate = useNavigate();
   const isSmall = useIsSmallScreen();
 
-  if (!isOpen) return null;
+  // Calculate profile completion percentage
+  const profileCompletion = (() => {
+    if (!userProfile) return 0;
+    const fields = [
+      userProfile.name,
+      userProfile.email,
+      userProfile.phone,
+      userProfile.business_name,
+      userProfile.business_logo,
+      userProfile.avatar,
+      userProfile.id_number,
+      userProfile.id_front_page,
+      userProfile.id_back_page,
+      userProfile.account_name,
+      userProfile.account_number,
+      userProfile.mobile_network,
+    ];
+    const filled = fields.filter((f) => !!f).length;
+    if (fields.length === 0) return 0;
+    return Math.round((filled / fields.length) * 100);
+  })();
+
+  // Don't show modal if profile is 100% complete
+  if (!isOpen || profileCompletion === 100) return null;
 
   const handleCompleteSteps = () => {
     onClose();
@@ -24,8 +49,9 @@ const CompleteStepsModal = ({ isOpen, onClose }: CompleteStepsModalProps) => {
 
   const handleSkip = () => {
     onClose();
-    // Clear the login timestamp so we don't show it again
+    // Mark that user has skipped this modal - don't show again
     try {
+      localStorage.setItem("oysloe_skipped_complete_steps", "true");
       localStorage.removeItem("oysloe_just_logged_in");
     } catch {
       // ignore storage errors

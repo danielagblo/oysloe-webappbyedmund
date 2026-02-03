@@ -1939,7 +1939,7 @@ export default function PostAdForm({
           </div>
         )}
 
-        {!showSubscriptionModal && (
+        {showSubscriptionModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
               

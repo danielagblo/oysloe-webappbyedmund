@@ -6,6 +6,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import FcmNotificationHandler from "./components/FcmNotificationHandler";
 import CompleteStepsModal from "./components/CompleteStepsModal";
 import Footer from "./components/Footer";
+import useUserProfile from "./features/userProfile/useUserProfile";
 import AdsDetailsPage from "./pages/AdsDetailsPage.tsx";
 import AlertsPage from "./pages/AlertsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
@@ -47,6 +48,7 @@ import AboutPage from "./pages/AboutPage.tsx";
 function App() {
   const [showCompleteSteps, setShowCompleteSteps] = useState(false);
   const location = useLocation();
+  const { profile } = useUserProfile();
 
   const authPaths = new Set([
     "/login",
@@ -80,6 +82,13 @@ function App() {
   useEffect(() => {
     const checkLoginTimestamp = () => {
       try {
+        // Check if user already skipped this modal
+        const hasSkipped = localStorage.getItem("oysloe_skipped_complete_steps");
+        if (hasSkipped) {
+          console.log("User previously skipped Complete Steps modal");
+          return;
+        }
+
         const loginTimestamp = localStorage.getItem("oysloe_just_logged_in");
         if (!loginTimestamp) {
           console.log("No login timestamp found");
@@ -142,7 +151,8 @@ function App() {
       <FcmNotificationHandler />
       <CompleteStepsModal 
         isOpen={showCompleteSteps} 
-        onClose={() => setShowCompleteSteps(false)} 
+        onClose={() => setShowCompleteSteps(false)}
+        userProfile={profile}
       />
       <main className="flex-1">
         <Routes>
