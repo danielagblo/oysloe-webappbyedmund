@@ -561,7 +561,10 @@ export default function PostAdForm({
       // Restore location details if available
       if (draft.locationDetails) {
         try {
-          selectPlace(draft.locationDetails.place, draft.locationDetails.region);
+          const locationString = draft.locationDetails.region
+            ? `${draft.locationDetails.place}, ${draft.locationDetails.region}`
+            : draft.locationDetails.place;
+          selectPlace(locationString);
         } catch (e) {
           console.warn("Failed to restore location from draft:", e);
         }
