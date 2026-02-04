@@ -30,7 +30,7 @@ import DropdownPopup, { type DropdownPopupHandle } from "./DropDownPopup";
 const SUBSCRIPTION_DRAFT_KEY = "oysloe_ad_draft_from_subscription";
 
 // Helper to save form state to localStorage when user navigates to subscription
-const saveDraftForSubscriptionFlow = (formData: {
+const saveDraftForSubscriptionFlow = async (formData: {
   title: string;
   description: string;
   category: string;
@@ -44,14 +44,43 @@ const saveDraftForSubscriptionFlow = (formData: {
   uploadedImages: UploadedImage[];
 }) => {
   try {
-    // Only save images as URLs, not File objects (can't serialize File)
+    const toDataUrl = (blob: Blob) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+    const serializeImage = async (img: UploadedImage) => {
+      try {
+        if (img.file instanceof File) {
+          const dataUrl = await toDataUrl(img.file);
+          return { id: img.id, url: dataUrl };
+        }
+        if (typeof img.url === "string" && img.url.startsWith("data:")) {
+          return { id: img.id, url: img.url };
+        }
+        if (typeof img.url === "string" && img.url.startsWith("blob:")) {
+          const res = await fetch(img.url);
+          const blob = await res.blob();
+          const dataUrl = await toDataUrl(blob);
+          return { id: img.id, url: dataUrl };
+        }
+        return { id: img.id, url: img.url };
+      } catch (e) {
+        console.warn("Failed to serialize image for draft:", e);
+        return { id: img.id, url: img.url };
+      }
+    };
+
+    const serializedImages = await Promise.all(
+      (formData.uploadedImages || []).map(serializeImage),
+    );
+
     const dataToSave = {
       ...formData,
-      uploadedImages: formData.uploadedImages.map((img) => ({
-        id: img.id,
-        url: img.url,
-        // Don't save file objects as they can't be serialized
-      })),
+      uploadedImages: serializedImages,
     };
     localStorage.setItem(SUBSCRIPTION_DRAFT_KEY, JSON.stringify(dataToSave));
   } catch (e) {
@@ -558,13 +587,17 @@ export default function PostAdForm({
         setUploadedImages(draft.uploadedImages);
       }
       
-      // Restore location details if available
+      // Restore location details if available (without opening save modal)
       if (draft.locationDetails) {
         try {
-          const locationString = draft.locationDetails.region
-            ? `${draft.locationDetails.place}, ${draft.locationDetails.region}`
-            : draft.locationDetails.place;
-          selectPlace(locationString);
+          applySavedLocation({
+            label: draft.locationDetails.region
+              ? `${draft.locationDetails.place}, ${draft.locationDetails.region}`
+              : draft.locationDetails.place,
+            region: draft.locationDetails.region || "",
+            place: draft.locationDetails.place || "",
+          });
+          setShowSaveLocationModal(false);
         } catch (e) {
           console.warn("Failed to restore location from draft:", e);
         }
@@ -573,7 +606,7 @@ export default function PostAdForm({
       // Clear the draft after restoring so it doesn't persist
       clearDraftFromSubscriptionFlow();
     }
-  }, [effectiveEditId, selectPlace]);
+  }, [effectiveEditId, applySavedLocation, setShowSaveLocationModal]);
 
   // Prefill form when editing an existing product (robust handling)
   useEffect(() => {
@@ -1948,12 +1981,12 @@ export default function PostAdForm({
               
               <button 
                 className="text-xl max-sm:text-base w-full py-5 rounded-3xl text-[var(--dark-def)] bg-[var(--green)] mb-2 hover:bg-green-500"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
                   setShowSubscriptionModal(false);
                   
                   // Save current form state before navigating
-                  saveDraftForSubscriptionFlow({
+                  await saveDraftForSubscriptionFlow({
                     title,
                     description,
                     category,
