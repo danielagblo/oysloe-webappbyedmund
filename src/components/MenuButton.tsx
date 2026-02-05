@@ -122,11 +122,13 @@ const MobileFooter = ({
   onClick,
   alertCount,
   inboxCount,
+  enableHideOnScroll,
 }: {
   active: RouteKey;
   onClick: (id: RouteKey) => void;
   alertCount?: number;
   inboxCount?: number;
+  enableHideOnScroll: boolean;
 }) => {
   // Use auto-detected scroll container inside hook (no ref required)
   const direction = useScrollDirectionOnContainer(null);
@@ -138,14 +140,17 @@ const MobileFooter = ({
   // debug logging when enabled
   useEffect(() => {
     if (typeof window !== 'undefined' && (window as any).__DEBUG_SCROLL_DIRECTION) {
-      console.log(`[scroll-debug] MenuButton MobileFooter direction=${direction} modalOpen=${modalOpen}`);
+      console.log(
+        `[scroll-debug] MenuButton MobileFooter direction=${direction} modalOpen=${modalOpen} enableHideOnScroll=${enableHideOnScroll}`,
+      );
     }
-  }, [direction, modalOpen]);
+  }, [direction, modalOpen, enableHideOnScroll]);
+  const shouldHide = enableHideOnScroll && direction === 'down' && !modalOpen;
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-50 transition-transform duration-300 ease-in-out ${direction === 'down' && !modalOpen ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+      className={`fixed bottom-0 left-0 right-0 sm:hidden bg-white border-t border-gray-300 flex justify-around items-center h-16 shadow-[0_-2px_6px_rgba(0,0,0,0.1)] z-50 transition-transform duration-300 ease-in-out ${shouldHide ? 'translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
         }`}
-      aria-hidden={direction === 'down' && !modalOpen}
+      aria-hidden={shouldHide}
     >
       {Object.entries(icons).map(([id, icon]) => {
         const key = id as RouteKey;
@@ -250,12 +255,18 @@ export default function ResponsiveMenu() {
     setActive(id);
   };
 
+  const enableHideOnScroll =
+    location.pathname === "/" ||
+    location.pathname === "/homepage" ||
+    location.pathname.startsWith("/ads/");
+
   return isMobile ? (
     <MobileFooter
       active={active}
       onClick={handleClick}
       alertCount={unreadAlertCount}
       inboxCount={unreadInboxCount}
+      enableHideOnScroll={enableHideOnScroll}
     />
   ) : (
     <MenuBar

@@ -148,7 +148,7 @@ const FeedbackPage = () => {
                 <button
                   onClick={submit}
                   disabled={create.status === "pending"}
-                  className="w-full text-base cursor-pointer bg-gray-100 py-3 rounded-2xl hover:bg-gray-200 active:scale-95 transition font-medium"
+                  className="w-full text-base cursor-pointer bg-gray-100 py-3 rounded-2xl mb-10 hover:bg-gray-200 active:scale-95 transition font-medium"
                 >
                   {create.status === "pending" ? "Sending..." : "Send Review"}
                 </button>

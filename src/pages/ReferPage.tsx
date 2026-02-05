@@ -212,25 +212,41 @@ const ReferPage = () => {
             Refer Your friends and Earn
           </h2>
           <span>
-            <p className="inline">&#10004;</p>
+            <svg className="inline" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.368441 2.50246C0.761467 2.20986 1.30636 2.29911 1.58549 2.70182L4.36621 6.71359L2.94293 7.77319L0.162215 3.76142C-0.116915 3.35871 -0.024585 2.79506 0.368441 2.50246Z" fill="#374957"/>
+              <rect width="10.5862" height="1.79391" rx="0.896955" transform="matrix(-0.79379 0.608191 -0.580733 -0.814094 11.6562 1.09766)" fill="#374957"/>
+            </svg>
+
             <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Pro Partnership status
             </h2>
           </span>
           <span>
-            <p className="inline">&#10004;</p>
+            <svg className="inline" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.368441 2.50246C0.761467 2.20986 1.30636 2.29911 1.58549 2.70182L4.36621 6.71359L2.94293 7.77319L0.162215 3.76142C-0.116915 3.35871 -0.024585 2.79506 0.368441 2.50246Z" fill="#374957"/>
+              <rect width="10.5862" height="1.79391" rx="0.896955" transform="matrix(-0.79379 0.608191 -0.580733 -0.814094 11.6562 1.09766)" fill="#374957"/>
+            </svg>
+
             <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               All Ads stays promoted for a month
             </h2>
           </span>
           <span>
-            <p className="inline">&#10004;</p>
+            <svg className="inline" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.368441 2.50246C0.761467 2.20986 1.30636 2.29911 1.58549 2.70182L4.36621 6.71359L2.94293 7.77319L0.162215 3.76142C-0.116915 3.35871 -0.024585 2.79506 0.368441 2.50246Z" fill="#374957"/>
+              <rect width="10.5862" height="1.79391" rx="0.896955" transform="matrix(-0.79379 0.608191 -0.580733 -0.814094 11.6562 1.09766)" fill="#374957"/>
+            </svg>
+
             <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Share unlimited number of Ads
             </h2>
           </span>
           <span>
-            <p className="inline">&#10004;</p>
+            <svg className="inline" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0.368441 2.50246C0.761467 2.20986 1.30636 2.29911 1.58549 2.70182L4.36621 6.71359L2.94293 7.77319L0.162215 3.76142C-0.116915 3.35871 -0.024585 2.79506 0.368441 2.50246Z" fill="#374957"/>
+              <rect width="10.5862" height="1.79391" rx="0.896955" transform="matrix(-0.79379 0.608191 -0.580733 -0.814094 11.6562 1.09766)" fill="#374957"/>
+            </svg>
+
             <h2 className="text-xs sm:text-base lg:text-[1vw] inline pl-3 text-gray-400">
               Boost your business
             </h2>
