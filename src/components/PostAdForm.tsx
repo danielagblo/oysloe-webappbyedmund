@@ -1270,37 +1270,32 @@ export default function PostAdForm({
           ...locationResolution,
         };
 
-        // Check if we have actual File objects to upload
-        const newFiles = uploadedImages.filter(
-          (img) => img.file instanceof File,
-        );
-
-        // If we have new images, upload them first to get the URLs before patching
-        let uploadedUrls: string[] = [];
-        if (newFiles.length > 0) {
-          // First upload to Cloudinary to get URLs
-          const cloudinaryUploads = await Promise.all(
-            newFiles.map(async (img) => {
+        // Resolve the final ordered URLs (existing + newly uploaded)
+        const orderedUrls: string[] = [];
+        if (uploadedImages.length > 0) {
+          for (const img of uploadedImages) {
+            if (img.file instanceof File) {
               try {
-                const cloudinaryResult = await uploadImageToCloudinary(img.file as File);
-                if (!cloudinaryResult || !cloudinaryResult.secure_url) {
+                const cloudinaryResult = await uploadImageToCloudinary(
+                  img.file as File,
+                );
+                if (cloudinaryResult?.secure_url) {
+                  orderedUrls.push(cloudinaryResult.secure_url);
+                } else {
                   console.error("Cloudinary upload failed for image:", img.file);
-                  return null;
                 }
-                return cloudinaryResult.secure_url;
               } catch (error) {
                 console.error("Error uploading image:", error);
-                return null;
               }
-            })
-          );
-          
-          uploadedUrls = cloudinaryUploads.filter((url): url is string => url !== null);
+            } else if (img.url) {
+              orderedUrls.push(String(img.url));
+            }
+          }
         }
 
         // Update patchBody with the first image as main image if available
-        if (uploadedUrls.length > 0) {
-          patchBody.image = uploadedUrls[0];
+        if (orderedUrls.length > 0) {
+          patchBody.image = orderedUrls[0];
         }
 
         // Update the product metadata
@@ -1309,42 +1304,62 @@ export default function PostAdForm({
           body: patchBody,
         });
 
-        // Delete all old product images if adding new ones
-        if (uploadedUrls.length > 0) {
+        // Save non-main images to productImages endpoint (no cleanup)
+        if (orderedUrls.length > 1 || orderedUrls.length === 1) {
+          let existingUrlSet = new Set<string>();
+          let existingImages: any[] = [];
           try {
             const oldImages = await getProductImages({
               product: Number(effectiveEditId),
             });
-            
-            // Delete each old image
-            const deletePromises = oldImages.map((img) =>
-              deleteProductImage(img.id).catch((err) => {
-                console.warn("Failed to delete product image:", err);
-              }),
-            );
-            
-            await Promise.all(deletePromises);
+            existingImages = Array.isArray(oldImages) ? oldImages : [];
+            existingImages.forEach((img: any) => {
+              const url = String((img?.image ?? img?.url ?? "") || "").trim();
+              if (url) existingUrlSet.add(url);
+            });
           } catch (err) {
-            console.warn("Failed to fetch or delete old images:", err);
-            // Continue anyway - not critical if old images aren't deleted
+            console.warn("Failed to fetch existing product images:", err);
           }
-        }
 
-        // Save all uploaded images to productImages endpoint
-        if (uploadedUrls.length > 0) {
-          const imageCreationPromises = uploadedUrls.map(async (url) => {
-            try {
-              return createProductImage({
-                product: Number(effectiveEditId),
-                image: url,
-              });
-            } catch (error) {
-              console.error("Error creating product image:", error);
-              return null;
+          // Ensure main image is not stored in product-images
+          if (orderedUrls.length > 0 && existingImages.length > 0) {
+            const mainUrl = String(orderedUrls[0]).trim();
+            const toRemove = existingImages.filter((img: any) => {
+              const url = String((img?.image ?? img?.url ?? "") || "").trim();
+              return url && url === mainUrl;
+            });
+
+            if (toRemove.length > 0) {
+              await Promise.all(
+                toRemove.map((img: any) =>
+                  deleteProductImage(img.id).catch((err) => {
+                    console.warn("Failed to remove main product image:", err);
+                  }),
+                ),
+              );
             }
-          });
+          }
 
-          await Promise.all(imageCreationPromises);
+          const urlsToCreate = orderedUrls
+            .slice(1)
+            .map((u) => String(u).trim())
+            .filter((u) => u && !existingUrlSet.has(u));
+
+          if (urlsToCreate.length > 0) {
+            const imageCreationPromises = urlsToCreate.map(async (url) => {
+              try {
+                return createProductImage({
+                  product: Number(effectiveEditId),
+                  image: url,
+                });
+              } catch (error) {
+                console.error("Error creating product image:", error);
+                return null;
+              }
+            });
+
+            await Promise.all(imageCreationPromises);
+          }
         }
 
         toast.success("Ad updated successfully");
@@ -1497,9 +1512,8 @@ export default function PostAdForm({
     >
       <div className="text-xs flex lg:items-center lg:flex-row flex-1 min-h-0 w-full gap-6 lg:gap-2 py-3 lg:pr-2 lg:overflow-y-hidden">
         {(!isMobile || mobileStep === "form") && (
-          <div className={`flex flex-col w-full lg:h-[93vh] lg:w-3/5 bg-white max-lg:bg-[var(--div)] lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar ${
-            isMobile && !embedded ? "bg-[var(--div-active)]" : ""
-          }`}>
+          <div className={`flex flex-col w-full lg:h-[93vh] lg:w-3/5 bg-white max-lg:bg-[var(--div)] lg:rounded-xl p-4 sm:p-6 space-y-4 flex-1 min-h-0 overflow-y-auto no-scrollbar ${isMobile && !embedded ? "bg-[var(--div-active)]" : ""
+            }`}>
             <div className="grid grid-cols-1 gap-2">
               <div>
                 <label className="block mb-1 max-sm:font-medium text-sm md:text-base lg:text-[1vw]">Product Category</label>
@@ -1624,7 +1638,7 @@ export default function PostAdForm({
                   </button>
                 ))}
               </div>
-             
+
             </div>
 
             <div>
@@ -1637,59 +1651,59 @@ export default function PostAdForm({
                   if (!shouldShowBlock) return null;
 
                   return (
-                  <div className="mt-4">
-                    {hasRenderableFeatures && (
-                      <label className="block mb-1 font-medium max-sm:font-medium text-sm md:text-base lg:text-[0.85vw]">
-                        Features for selected subcategory
-                      </label>
-                    )}
+                    <div className="mt-4">
+                      {hasRenderableFeatures && (
+                        <label className="block mb-1 font-medium max-sm:font-medium text-sm md:text-base lg:text-[0.85vw]">
+                          Features for selected subcategory
+                        </label>
+                      )}
 
-                    {featureDefsLoading ? (
-                      <p className="loading-dots text-sm md:text-base lg:text-[0.85vw]">
-                        Loading this subcategory's features
-                      </p>
-                    ) : (
-                      <div className="flex flex-col gap-2">
-                        {featureDefinitions
-                          .filter((fd) => (possibleFeatureValues[fd.id] ?? []).length > 0)
-                          .map((fd) => {
-                            const values = possibleFeatureValues[fd.id] ?? [];
-                            return (
-                              <div
-                                key={`def-${fd.id}`}
-                                className="grid grid-cols-1 sm:grid-cols-[auto,1fr] items-start gap-2 sm:gap-3 min-w-0"
-                              >
-                                <div className="text-sm md:text-base lg:text-[0.85vw] text-gray-700 break-words sm:pr-2">
-                                  {fd.name}
+                      {featureDefsLoading ? (
+                        <p className="loading-dots text-sm md:text-base lg:text-[0.85vw]">
+                          Loading this subcategory's features
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          {featureDefinitions
+                            .filter((fd) => (possibleFeatureValues[fd.id] ?? []).length > 0)
+                            .map((fd) => {
+                              const values = possibleFeatureValues[fd.id] ?? [];
+                              return (
+                                <div
+                                  key={`def-${fd.id}`}
+                                  className="grid grid-cols-1 sm:grid-cols-[auto,1fr] items-start gap-2 sm:gap-3 min-w-0"
+                                >
+                                  <div className="text-sm md:text-base lg:text-[0.85vw] text-gray-700 break-words sm:pr-2">
+                                    {fd.name}
+                                  </div>
+                                  <div className="w-full min-w-0">
+                                    <DropdownPopup
+                                      triggerLabel={
+                                        featureValues[fd.id]
+                                          ? String(featureValues[fd.id])
+                                          : `Select ${fd.name}`
+                                      }
+                                      options={values}
+                                      onSelect={(opt) => {
+                                        setFeatureValues((prev) => ({
+                                          ...prev,
+                                          [fd.id]: opt,
+                                        }));
+                                      }}
+                                      title={`Select ${fd.name}`}
+                                      truncate
+                                      useBottomSheetOnMobile
+                                      isFeatureDropdown
+                                      subcategoryId={Number(subcategoryId) || 0}
+                                      featureId={Number(fd.id)}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="w-full min-w-0">
-                                  <DropdownPopup
-                                    triggerLabel={
-                                      featureValues[fd.id]
-                                        ? String(featureValues[fd.id])
-                                        : `Select ${fd.name}`
-                                    }
-                                    options={values}
-                                    onSelect={(opt) => {
-                                      setFeatureValues((prev) => ({
-                                        ...prev,
-                                        [fd.id]: opt,
-                                      }));
-                                    }}
-                                    title={`Select ${fd.name}`}
-                                    truncate
-                                    useBottomSheetOnMobile
-                                    isFeatureDropdown
-                                    subcategoryId={Number(subcategoryId) || 0}
-                                    featureId={Number(fd.id)}
-                                  />
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    )}
-                  </div>
+                              );
+                            })}
+                        </div>
+                      )}
+                    </div>
                   );
                 })()}
                 <div className="mt-4">
@@ -1828,11 +1842,10 @@ export default function PostAdForm({
                       setMobileStep("form");
                     }}
                     type="button"
-                    className={`fixed bottom-20 sm:bottom-25 w-9/10 py-3.5 max-lg:bg-gray-200 sm:py-7 text-sm rounded-xl transition z-50 cursor-pointer ${
-                      uploadedImages.length === 0
+                    className={`fixed bottom-20 sm:bottom-25 w-9/10 py-3.5 max-lg:bg-gray-200 sm:py-7 text-sm rounded-xl transition z-50 cursor-pointer ${uploadedImages.length === 0
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-gray-100 text-[var(--dark-def)] hover:bg-gray-200"
-                    }`}
+                      }`}
                   >
                     Next
                   </button>
@@ -1851,18 +1864,18 @@ export default function PostAdForm({
         {showSubscriptionModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
             <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-[90%] max-w-sm flex flex-col items-center text-center mx-3">
-              
-              <button 
+
+              <button
                 className="text-xl max-sm:text-base w-full py-5 rounded-3xl text-[var(--dark-def)] bg-[var(--green)] mb-2 hover:bg-green-500"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowSubscriptionModal(false);
                   try {
-                      localStorage.setItem("profile_active_tab", "subscription");
-                    } catch {
-                      // ignore storage errors
-                    }
-                    navigate("/profile");
+                    localStorage.setItem("profile_active_tab", "subscription");
+                  } catch {
+                    // ignore storage errors
+                  }
+                  navigate("/profile");
                 }}
               >
                 Subscriptions
