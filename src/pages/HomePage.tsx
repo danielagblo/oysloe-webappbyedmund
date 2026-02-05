@@ -318,6 +318,24 @@ const HomePage = () => {
       });
     }
 
+    if (hasActiveFilters) {
+      const filteredAds = out.map((p) => {
+        const subcategories = Array.from(
+          new Set(
+            (p.product_features || [])
+              .map((pf) => pf?.feature?.subcategory)
+              .filter((v): v is number => typeof v === "number"),
+          ),
+        );
+        return {
+          id: p.id,
+          name: p.name,
+          subcategories,
+        };
+      });
+      console.log("[filters] matched ads & subcategories", filteredAds);
+    }
+
     return out;
   };
 
@@ -442,6 +460,8 @@ const HomePage = () => {
             handleFilterSettings={handleFilterSettings}
             selectedCategoryId={selectedCategoryId}
             setSelectedCategoryId={setSelectedCategoryId}
+            selectedSubcategoryId={selectedSubcategoryId}
+            setSelectedSubcategoryId={setSelectedSubcategoryId}
             selectedFeatures={selectedFeatures}
             setSelectedFeatures={setSelectedFeatures}
             selectedLocation={selectedLocation}

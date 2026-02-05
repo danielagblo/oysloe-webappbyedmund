@@ -18,6 +18,8 @@ interface MobileFilterModalProps {
   onClose: () => void;
   selectedCategoryId: number | null;
   setSelectedCategoryId: (id: number | null) => void;
+  selectedSubcategoryId: number | "";
+  setSelectedSubcategoryId: (id: number | "") => void;
   selectedLocation: string | null;
   setSelectedLocation: (location: string | null) => void;
   selectedTimeframe: "newest" | "7days" | "30days" | "anytime";
@@ -52,6 +54,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   onClose,
   selectedCategoryId,
   setSelectedCategoryId,
+  selectedSubcategoryId,
+  setSelectedSubcategoryId,
   setSelectedLocation,
   selectedTimeframe,
   setSelectedTimeframe,
@@ -134,6 +138,14 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   useEffect(() => {
     setSelectedSubcategoryIds([]);
   }, [selectedCategoryId]);
+
+  useEffect(() => {
+    if (selectedSubcategoryId === "" || selectedSubcategoryId === null) {
+      setSelectedSubcategoryIds([]);
+      return;
+    }
+    setSelectedSubcategoryIds([String(selectedSubcategoryId)]);
+  }, [selectedSubcategoryId]);
 
   // Fetch subcategories when category changes
   useEffect(() => {
@@ -334,6 +346,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   const handleClearAll = () => {
     setCurrentPanel("main");
     setSelectedCategoryId(null);
+    setSelectedSubcategoryId("");
     setSelectedLocation(null);
     setSelectedRegion(null);
     setSelectedLocationIds([]);
@@ -348,6 +361,13 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
   };
 
   const handleViewAll = () => {
+    if (selectedSubcategoryIds.length > 0) {
+      const first = Number(selectedSubcategoryIds[0]);
+      setSelectedSubcategoryId(Number.isNaN(first) ? "" : first);
+    } else {
+      setSelectedSubcategoryId("");
+    }
+
     // Apply selected locations to parent state
     if (selectedLocationIds.length > 0) {
       // Store as comma-separated string to maintain single selectedLocation prop
@@ -372,6 +392,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
         min: minVal,
         max: maxVal,
       });
+    } else {
+      setPriceFilter({ mode: "none" });
     }
     onClose();
   };

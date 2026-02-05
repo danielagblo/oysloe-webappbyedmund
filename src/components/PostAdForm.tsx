@@ -26,6 +26,89 @@ import {
 import type { LocationPayload, Region } from "../types/Location";
 import DropdownPopup, { type DropdownPopupHandle } from "./DropDownPopup";
 
+// LocalStorage key for draft ad when subscription modal is used
+const SUBSCRIPTION_DRAFT_KEY = "oysloe_ad_draft_from_subscription";
+
+// Helper to save form state to localStorage when user navigates to subscription
+const saveDraftForSubscriptionFlow = async (formData: {
+  title: string;
+  description: string;
+  category: string;
+  categoryId: number | null;
+  subcategoryId: number | string;
+  purpose: "Sale" | "Pay Later" | "Rent";
+  price: number | string;
+  keyFeatures: string[];
+  featureValues: Record<number, string>;
+  locationDetails: any;
+  uploadedImages: UploadedImage[];
+}) => {
+  try {
+    const toDataUrl = (blob: Blob) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(blob);
+      });
+
+    const serializeImage = async (img: UploadedImage) => {
+      try {
+        if (img.file instanceof File) {
+          const dataUrl = await toDataUrl(img.file);
+          return { id: img.id, url: dataUrl };
+        }
+        if (typeof img.url === "string" && img.url.startsWith("data:")) {
+          return { id: img.id, url: img.url };
+        }
+        if (typeof img.url === "string" && img.url.startsWith("blob:")) {
+          const res = await fetch(img.url);
+          const blob = await res.blob();
+          const dataUrl = await toDataUrl(blob);
+          return { id: img.id, url: dataUrl };
+        }
+        return { id: img.id, url: img.url };
+      } catch (e) {
+        console.warn("Failed to serialize image for draft:", e);
+        return { id: img.id, url: img.url };
+      }
+    };
+
+    const serializedImages = await Promise.all(
+      (formData.uploadedImages || []).map(serializeImage),
+    );
+
+    const dataToSave = {
+      ...formData,
+      uploadedImages: serializedImages,
+    };
+    localStorage.setItem(SUBSCRIPTION_DRAFT_KEY, JSON.stringify(dataToSave));
+  } catch (e) {
+    console.warn("Failed to save draft ad to localStorage:", e);
+  }
+};
+
+// Helper to restore form state from localStorage
+const restoreDraftFromSubscriptionFlow = () => {
+  try {
+    const saved = localStorage.getItem(SUBSCRIPTION_DRAFT_KEY);
+    if (!saved) return null;
+    return JSON.parse(saved);
+  } catch (e) {
+    console.warn("Failed to restore draft ad from localStorage:", e);
+    return null;
+  }
+};
+
+// Helper to clear the saved draft
+const clearDraftFromSubscriptionFlow = () => {
+  try {
+    localStorage.removeItem(SUBSCRIPTION_DRAFT_KEY);
+  } catch (e) {
+    console.warn("Failed to clear draft ad from localStorage:", e);
+  }
+};
+
 // Module-level cache to persist possible-values requests across component
 // mounts. This prevents duplicate network calls when React StrictMode mounts
 // components twice during development or when the component unmounts/remounts.
@@ -482,6 +565,48 @@ export default function PostAdForm({
   const effectiveEditId = propEditId ?? editIdFromUrl;
   const { data: existingProduct } = useProduct(effectiveEditId ?? "");
   const patchMutation = usePatchProduct();
+
+  // Restore draft from subscription flow on mount (only if not editing)
+  useEffect(() => {
+    if (effectiveEditId) return; // Don't restore if editing
+    
+    const draft = restoreDraftFromSubscriptionFlow();
+    if (draft) {
+      setTitle(draft.title || "");
+      setDescription(draft.description || "");
+      setCategory(draft.category || "Select Product Category");
+      setCategoryId(draft.categoryId || null);
+      setSubcategoryId(draft.subcategoryId || "");
+      setPurpose(draft.purpose || "Sale");
+      setPrice(draft.price || "");
+      setKeyFeatures(draft.keyFeatures || ["", ""]);
+      setFeatureValues(draft.featureValues || {});
+      
+      // Restore uploaded images (URLs only, no File objects)
+      if (Array.isArray(draft.uploadedImages) && draft.uploadedImages.length > 0) {
+        setUploadedImages(draft.uploadedImages);
+      }
+      
+      // Restore location details if available (without opening save modal)
+      if (draft.locationDetails) {
+        try {
+          applySavedLocation({
+            label: draft.locationDetails.region
+              ? `${draft.locationDetails.place}, ${draft.locationDetails.region}`
+              : draft.locationDetails.place,
+            region: draft.locationDetails.region || "",
+            place: draft.locationDetails.place || "",
+          });
+          setShowSaveLocationModal(false);
+        } catch (e) {
+          console.warn("Failed to restore location from draft:", e);
+        }
+      }
+      
+      // Clear the draft after restoring so it doesn't persist
+      clearDraftFromSubscriptionFlow();
+    }
+  }, [effectiveEditId, applySavedLocation, setShowSaveLocationModal]);
 
   // Prefill form when editing an existing product (robust handling)
   useEffect(() => {
@@ -1364,6 +1489,7 @@ export default function PostAdForm({
 
         toast.success("Ad updated successfully");
         console.log("Patch response:", result);
+        clearDraftFromSubscriptionFlow();
         setShowSuccess(true);
         if (embedded && typeof onClose === "function") {
           // close after small delay so the success toast is visible
@@ -1375,6 +1501,7 @@ export default function PostAdForm({
         console.log("Server response:", result);
         const serverMessage = (result as { message?: string })?.message;
         toast.success(serverMessage ?? "Ad saved successfully!");
+        clearDraftFromSubscriptionFlow();
         setShowSuccess(true);
         if (embedded && typeof onClose === "function") {
           setTimeout(() => onClose(), 700);
@@ -1867,9 +1994,25 @@ export default function PostAdForm({
 
               <button
                 className="text-xl max-sm:text-base w-full py-5 rounded-3xl text-[var(--dark-def)] bg-[var(--green)] mb-2 hover:bg-green-500"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
                   setShowSubscriptionModal(false);
+                  
+                  // Save current form state before navigating
+                  await saveDraftForSubscriptionFlow({
+                    title,
+                    description,
+                    category,
+                    categoryId,
+                    subcategoryId,
+                    purpose,
+                    price,
+                    keyFeatures,
+                    featureValues,
+                    locationDetails,
+                    uploadedImages,
+                  });
+                  
                   try {
                     localStorage.setItem("profile_active_tab", "subscription");
                   } catch {

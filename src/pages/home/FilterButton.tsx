@@ -11,6 +11,8 @@ type Props = {
   handleFilterSettings: () => void;
   selectedCategoryId: number | null;
   setSelectedCategoryId: (id: number | null) => void;
+  selectedSubcategoryId: number | "";
+  setSelectedSubcategoryId: (id: number | "") => void;
   selectedFeatures: Record<number, string>;
   setSelectedFeatures: (features: Record<number, string>) => void;
   selectedLocation: string | null;
@@ -38,6 +40,8 @@ const FilterButton = ({
   handleFilterSettings,
   selectedCategoryId,
   setSelectedCategoryId,
+  selectedSubcategoryId,
+  setSelectedSubcategoryId,
   selectedLocation,
   setSelectedLocation,
   selectedTimeframe,
@@ -61,6 +65,7 @@ const FilterButton = ({
 
   const activeFiltersCount = [
     selectedCategoryId !== null ? 1 : 0,
+    selectedSubcategoryId !== "" ? 1 : 0,
     selectedLocation ? 1 : 0,
     selectedTimeframe !== "anytime" ? 1 : 0,
     selectedAdType !== "all" ? 1 : 0,
@@ -125,6 +130,8 @@ const FilterButton = ({
         onClose={() => setIsMobileModalOpen(false)}
         selectedCategoryId={selectedCategoryId}
         setSelectedCategoryId={setSelectedCategoryId}
+        selectedSubcategoryId={selectedSubcategoryId}
+        setSelectedSubcategoryId={setSelectedSubcategoryId}
         selectedLocation={selectedLocation}
         setSelectedLocation={setSelectedLocation}
         selectedTimeframe={selectedTimeframe}
