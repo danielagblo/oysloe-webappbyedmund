@@ -1,26 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
-  confirmMarkProductAsTaken,
-  createProduct,
-  deleteProduct,
-  getProduct,
-  getProductReportCount,
-  getProducts,
-  getProductsForOwner,
-  getRelatedProducts,
-  markProductAsTaken,
-  patchProduct,
-  reportProduct,
-  repostProduct,
-  setProductStatus,
-  updateProduct,
+    confirmMarkProductAsTaken,
+    createProduct,
+    deleteProduct,
+    getProduct,
+    getProductReportCount,
+    getProducts,
+    getProductsForOwner,
+    getRelatedProducts,
+    markProductAsTaken,
+    patchProduct,
+    reportProduct,
+    repostProduct,
+    setProductStatus,
+    updateProduct,
 } from "../../services/productService";
 
 import type {
-  Product,
-  ProductPayload,
-  ProductStatus,
+    Product,
+    ProductPayload,
+    ProductStatus,
 } from "../../types/Product";
 
 // query keys
@@ -96,7 +96,7 @@ export const useProductReportCount = (productId?: number) =>
     queryKey: productKeys.reports(productId),
     queryFn: () => getProductReportCount(productId as number),
     enabled: productId != null,
-    staleTime: 1000 * 60 * 10, // 10 minute
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
 // useCreateProduct
@@ -243,7 +243,7 @@ export const useOwnerProducts = (ownerId?: number | null) => {
     // only run when ownerId is not null/undefined (allow 0)
     enabled: ownerId != null,
     queryFn: () => getProductsForOwner(ownerId as number),
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5,
   });
 };
 

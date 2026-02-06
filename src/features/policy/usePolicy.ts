@@ -8,7 +8,7 @@ export function useLatestPrivacyPolicy() {
     queryFn: async () => {
       return policyService.getLatestPrivacyPolicy();
     },
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 30 * 1000, // 30 seconds
   });
 
   return {
@@ -26,7 +26,7 @@ export function useLatestTermsAndConditions() {
     queryFn: async () => {
       return policyService.getLatestTermsAndConditions();
     },
-    staleTime: 1000 * 60 * 60, // 1 hour
+    staleTime: 30 * 1000, // 30 seconds
   });
 
   return {

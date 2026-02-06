@@ -2,9 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { getSubscriptions } from "../../services/subscriptionService";
 import {
-  createUserSubscription,
-  getUserSubscriptions,
-  updateUserSubscription,
+    createUserSubscription,
+    getUserSubscriptions,
+    updateUserSubscription,
 } from "../../services/userSubscriptionService";
 
 // query keys
@@ -20,11 +20,19 @@ export const subscriptionKeys = {
 
 // useSubscriptions (public packages)
 export const useSubscriptions = () =>
-  useQuery({ queryKey: subscriptionKeys.list(), queryFn: () => getSubscriptions() });
+  useQuery({
+    queryKey: subscriptionKeys.list(),
+    queryFn: () => getSubscriptions(),
+    staleTime: 30 * 1000,
+  });
 
 // useUserSubscriptions (what the current user has)
 export const useUserSubscriptions = () =>
-  useQuery({ queryKey: subscriptionKeys.userList(), queryFn: () => getUserSubscriptions() });
+  useQuery({
+    queryKey: subscriptionKeys.userList(),
+    queryFn: () => getUserSubscriptions(),
+    staleTime: 30 * 1000,
+  });
 
 // create a user subscription
 export const useCreateUserSubscription = () => {
@@ -36,6 +44,7 @@ export const useCreateUserSubscription = () => {
 
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: subscriptionKeys.user });
+      qc.invalidateQueries({ queryKey: subscriptionKeys.userList() });
     },
   });
 };
@@ -55,6 +64,7 @@ export const useUpdateUserSubscription = () => {
 
     onSuccess: (_data, variables) => {
       qc.invalidateQueries({ queryKey: subscriptionKeys.user });
+      qc.invalidateQueries({ queryKey: subscriptionKeys.userList() });
       qc.invalidateQueries({
         queryKey: subscriptionKeys.userDetail(variables.id),
       });

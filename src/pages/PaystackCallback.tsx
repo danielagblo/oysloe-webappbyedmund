@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useUpdateUserSubscription } from "../features/subscriptions/useSubscriptions";
+import {
+  subscriptionKeys,
+  useUpdateUserSubscription,
+} from "../features/subscriptions/useSubscriptions";
 import { verifyPaystackTransaction } from "../services/paymentService";
 import { getUserSubscriptions } from "../services/userSubscriptionService";
 
@@ -10,6 +13,12 @@ const PaystackCallback = () => {
   const navigate = useNavigate();
   const updateUserSub = useUpdateUserSubscription();
   const qc = useQueryClient();
+
+  const refreshUserSubscriptions = () => {
+    qc.invalidateQueries({ queryKey: subscriptionKeys.user });
+    qc.invalidateQueries({ queryKey: subscriptionKeys.userList() });
+    qc.refetchQueries({ queryKey: subscriptionKeys.userList(), type: "active" });
+  };
 
   useEffect(() => {
     (async () => {
@@ -47,7 +56,7 @@ const PaystackCallback = () => {
         const attemptedKey = `pending_subscription_attempted_user_${userSubId}`;
         if (localStorage.getItem(attemptedKey)) {
           // Already tried updating this user subscription; just refresh and navigate
-          qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+          refreshUserSubscriptions();
           localStorage.removeItem("pending_subscription");
           navigate("/profile");
           return;
@@ -66,7 +75,7 @@ const PaystackCallback = () => {
             onSuccess: () => {
               localStorage.removeItem("pending_subscription");
               localStorage.removeItem(attemptedKey);
-              qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+              refreshUserSubscriptions();
               try {
                 localStorage.setItem("profile_active_tab", "subscription");
               } catch (e) {
@@ -76,7 +85,7 @@ const PaystackCallback = () => {
             },
             onError: () => {
               // fallback: refresh list and clear pending so polling branch won't re-run
-              qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+              refreshUserSubscriptions();
               localStorage.removeItem("pending_subscription");
               localStorage.removeItem(attemptedKey);
               try {
@@ -128,7 +137,7 @@ const PaystackCallback = () => {
         if (found) {
           const attemptedKey = `pending_subscription_attempted_user_${found.id}`;
           if (localStorage.getItem(attemptedKey)) {
-            qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+            refreshUserSubscriptions();
             localStorage.removeItem("pending_subscription");
             try {
               localStorage.setItem("profile_active_tab", "subscription");
@@ -150,7 +159,7 @@ const PaystackCallback = () => {
               onSuccess: () => {
                 localStorage.removeItem("pending_subscription");
                 localStorage.removeItem(attemptedKey);
-                qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+                refreshUserSubscriptions();
                 try {
                   localStorage.setItem("profile_active_tab", "subscription");
                 } catch (e) {
@@ -159,7 +168,7 @@ const PaystackCallback = () => {
                 navigate("/profile");
               },
               onError: () => {
-                qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+                refreshUserSubscriptions();
                 localStorage.removeItem("pending_subscription");
                 localStorage.removeItem(attemptedKey);
                 try {
@@ -176,7 +185,7 @@ const PaystackCallback = () => {
       }
 
       // fallback: refresh list and navigate back
-      qc.invalidateQueries({ queryKey: ["user-subscriptions"] });
+      refreshUserSubscriptions();
       localStorage.removeItem("pending_subscription");
       navigate("/profile");
     })();
