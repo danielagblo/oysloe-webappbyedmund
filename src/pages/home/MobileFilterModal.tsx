@@ -424,6 +424,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
             ? "translate-y-0"
             : "translate-y-full"
         }`}
+        role="dialog"
+        aria-modal="true"
         style={{
           transform: dragOffset > 0 ? `translateY(${dragOffset}px)` : undefined,
         }}

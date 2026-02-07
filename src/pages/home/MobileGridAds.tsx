@@ -26,22 +26,27 @@ const SkeletonCard = () => (
 const LazyAdCard = React.memo(function LazyAdCard({
   ad,
   handleAdClick,
+  layout,
 }: {
   ad: Product;
   handleAdClick: Props["handleAdClick"];
+  layout: "grid" | "mason";
 }) {
   return (
     <Link
       to={`/ads/${ad.id}`}
       state={{ adData: ad }}
       onClick={(e) => handleAdClick(ad, e)}
-      className="inline-flex rounded-md overflow-hidden w-full flex-col mb-2 items-center justify-center"
+      className={`inline-flex rounded-md overflow-hidden w-full flex-col ${layout === "mason" ? "mb-10" : "mb-2"} items-center justify-center
+      }`}
     >
       <ProgressiveImage
         src={ad.image || "/no-image.jpeg"}
         alt={ad.name}
         containerClassName="relative w-full"
-        imgClassName="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-md"
+        imgClassName={`w-full max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md ${
+          layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-52"
+        }`}
         watermarkBusinessName={ad.owner?.business_name}
         watermarkSize="md"
         onContextMenu={(e) => e.preventDefault()}
@@ -73,6 +78,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
   const displayCountRef = useRef(12);
   const [displayCount, setDisplayCount] = useState(12);
   const [hasHydratedFromAnchor, setHasHydratedFromAnchor] = useState(false);
+  const [layout, setLayout] = useState<"grid" | "mason">("grid");
 
   const parseAdIdFromHref = (href: string) => {
     try {
@@ -154,9 +160,27 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
 
   return (
     <div className="px-2 py-3">
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="flex justify-end items-center p-2">
+        <div className="flex justify-end gap-4 mr-2 items-center">
+          <button
+            onClick={() => setLayout("grid")}
+            className={`py-1 rounded`}
+          >
+            <img className="h-8 w-8" src="/grid-svgrepo-com.svg" alt="grid" />
+
+          </button>
+          <button
+            onClick={() => setLayout("mason")}
+            className={`py-1 rounded`}
+          >
+            <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+
+          </button>
+        </div>
+      </div>
+      <div className={`${layout === "grid" ? "grid grid-cols-2" : "columns-2"} gap-2 sm:gap-3`}>
         {displayedProducts.map((ad) => (
-          <LazyAdCard key={ad.id} ad={ad} handleAdClick={handleAdClick} />
+          <LazyAdCard key={ad.id} ad={ad} handleAdClick={handleAdClick} layout={layout} />
         ))}
       </div>
       {hasMore && (

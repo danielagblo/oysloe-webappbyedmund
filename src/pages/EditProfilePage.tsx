@@ -860,7 +860,7 @@ const EditProfilePage = () => {
                 )}
               </div>
             </div>
-            <div className="md:w-full md:h-20" />
+            <div className="w-full h-20 " />
           </div>
         </div>
 

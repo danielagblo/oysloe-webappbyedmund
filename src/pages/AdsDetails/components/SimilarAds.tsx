@@ -28,6 +28,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
 }) => {
   const location = useLocation();
   const [displayCount, setDisplayCount] = useState(12); // Show 12 ads initially
+  const [layout, setLayout] = useState<"grid" | "mason">("grid");
   
   const markReturnTarget = () => {
     // When the user goes back to this ad, scroll to the Similar Ads section.
@@ -65,15 +66,33 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
 
   return (
   <div className="bg-white sm:bg-(--div-active) max-sm:p-4 sm:py-6 w-screen md:px-12">
-    <h2
-      className="text-xl font-bold mb-6 px-2 md:px-20 lg:text-2xl"
-      data-scroll-target="similar-ads"
-    >
-      Similar Ads
-    </h2>
+    <div className="flex items-center justify-between mb-6 px-2 md:px-20">
+      <h2
+        className="text-xl font-bold lg:text-2xl"
+        data-scroll-target="similar-ads"
+      >
+        Similar Ads
+      </h2>
+      <div className="flex items-center gap-3 sm:gap-4">
+        <button
+          onClick={() => setLayout("grid")}
+          className="py-1 rounded"
+          aria-label="Grid view"
+        >
+          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-svgrepo-com.svg" alt="grid" />
+        </button>
+        <button
+          onClick={() => setLayout("mason")}
+          className="py-1 rounded"
+          aria-label="Masonry view"
+        >
+          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+        </button>
+      </div>
+    </div>
 
     {isLoading ? (
-      <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
+      <div className={`${layout === "grid" ? "grid grid-cols-2" : "columns-2"} sm:flex sm:flex-wrap gap-2 sm:gap-3 w-full justify-start`}>
         {Array.from({ length: 8 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -91,7 +110,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
       </div>
     ) : (
       <>
-        <div className="flex flex-wrap gap-2 sm:gap-3 w-full justify-start">
+        <div className={`${layout === "grid" ? "grid grid-cols-2" : "columns-2"} sm:flex sm:flex-wrap gap-2 sm:gap-3 w-full justify-start`}>
           {displayedAds.map((ad, index) => {
             // Insert "Other ads" label if we've reached the fallback section
             const isFallbackStart = fallbackStartIndex > 0 && index === fallbackStartIndex;
@@ -99,7 +118,10 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
             return (
               <React.Fragment key={ad.id}>
                 {isFallbackStart && (
-                  <div className="w-full px-2 md:px-20 mt-4 mb-2">
+                  <div
+                    className="w-full px-2 md:px-20 mt-4 mb-2"
+                    style={layout === "mason" ? { columnSpan: "all" } : undefined}
+                  >
                     <h3 className="text-lg font-semibold text-gray-700">
                       Other ads
                     </h3>
@@ -109,12 +131,14 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   to={`/ads/${ad.id}`}
                   state={{ adData: ad }}
                   onClick={markReturnTarget}
-                  className="inline-block rounded-md overflow-hidden shrink-0 w-[38vw] max-sm:min-w-[43.5vw] sm:w-48 md:w-52"
+                  className={`inline-block rounded-md overflow-hidden shrink-0 w-full sm:w-48 md:w-52 ${
+                    layout === "mason" ? "mb-8" : "mb-2"
+                  }`}
                 >
                   <ProgressiveImage
                     src={ad.image || "/no-image.jpeg"}
                     alt={ad.name.slice(0, 10)}
-                    containerClassName="relative w-full h-[120px] sm:h-48"
+                    containerClassName={`relative w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85" : "h-[120px] sm:h-48"}`}
                     imgClassName="w-full h-full object-cover rounded-md"
                     watermarkBusinessName={ad.owner?.business_name}
                     watermarkSize="sm"
