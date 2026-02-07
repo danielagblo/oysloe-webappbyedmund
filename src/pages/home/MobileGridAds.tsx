@@ -35,13 +35,13 @@ const LazyAdCard = React.memo(function LazyAdCard({
       to={`/ads/${ad.id}`}
       state={{ adData: ad }}
       onClick={(e) => handleAdClick(ad, e)}
-      className="inline-flex rounded-md overflow-hidden w-full flex-col mb-2 items-center justify-center"
+      className="inline-flex rounded-md overflow-hidden w-full flex-col mb-10 items-center justify-center"
     >
       <ProgressiveImage
         src={ad.image || "/no-image.jpeg"}
         alt={ad.name}
         containerClassName="relative w-full"
-        imgClassName="w-full h-[120px] min-[410px]:h-[150px] min-[490px]:h-40 min-[510px]:h-[180px] max-w-62 sm:h-52 object-cover rounded-md"
+        imgClassName="w-full max-sm:break-inside-avoid max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md"
         watermarkBusinessName={ad.owner?.business_name}
         watermarkSize="md"
         onContextMenu={(e) => e.preventDefault()}
@@ -154,7 +154,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
 
   return (
     <div className="px-2 py-3">
-      <div className="grid grid-cols-2 gap-2 sm:gap-3">
+      <div className="columns-2 gap-2 sm:gap-3">
         {displayedProducts.map((ad) => (
           <LazyAdCard key={ad.id} ad={ad} handleAdClick={handleAdClick} />
         ))}
