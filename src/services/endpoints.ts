@@ -117,6 +117,7 @@ export const endpoints = {
   },
   paystack: {
     initiate: () => "/paystack/initiate/",
+    status: () => "/paystack/status/",
     webhook: () => "/paystack/webhook/",
   },
   productFeatures: {

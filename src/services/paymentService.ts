@@ -1,7 +1,7 @@
 import type {
-  Payment,
-  PaymentStatus,
-  PaystackInitiateRequest,
+    Payment,
+    PaymentStatus,
+    PaystackInitiateRequest,
 } from "../types/Payment";
 import { apiClient } from "./apiClient";
 import { endpoints } from "./endpoints";
@@ -40,6 +40,12 @@ export const paystackWebhook = async (body: unknown): Promise<void> => {
   await apiClient.post<void>(endpoints.paystack.webhook(), body);
 };
 
+export const checkPaystackStatus = async (paymentId: number): Promise<any> => {
+  return apiClient.post<any>(endpoints.paystack.status(), {
+    payment_id: paymentId,
+  });
+};
+
 /**
  * Trigger server-side Paystack verification flow.
  * For debugging you can POST { reference } to the webhook endpoint
@@ -58,6 +64,7 @@ export default {
   getPayments,
   getPayment,
   initiatePaystackPayment,
+  checkPaystackStatus,
   paystackWebhook,
   verifyPaystackTransaction,
 };

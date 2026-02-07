@@ -5,7 +5,10 @@ import {
   subscriptionKeys,
   useUpdateUserSubscription,
 } from "../features/subscriptions/useSubscriptions";
-import { verifyPaystackTransaction } from "../services/paymentService";
+import {
+  checkPaystackStatus,
+  verifyPaystackTransaction,
+} from "../services/paymentService";
 import { getUserSubscriptions } from "../services/userSubscriptionService";
 
 const PaystackCallback = () => {
@@ -35,7 +38,9 @@ const PaystackCallback = () => {
 
       // Read pending subscription stored before redirect
       const pending = localStorage.getItem("pending_subscription");
-      let pendingObj: { subscription_id?: number } | null = null;
+      let pendingObj:
+        | { subscription_id?: number; payment_id?: number }
+        | null = null;
       try {
         pendingObj = pending ? JSON.parse(pending) : null;
       } catch (e) {
@@ -101,7 +106,14 @@ const PaystackCallback = () => {
       }
 
       // If a Paystack reference is present, trigger server-side verification first
-      if (reference) {
+      if (pendingObj?.payment_id) {
+        try {
+          await checkPaystackStatus(Number(pendingObj.payment_id));
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.warn("checkPaystackStatus failed", err);
+        }
+      } else if (reference) {
         try {
           await verifyPaystackTransaction(reference);
         } catch (err) {

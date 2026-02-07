@@ -23,7 +23,8 @@ export const useSubscriptions = () =>
   useQuery({
     queryKey: subscriptionKeys.list(),
     queryFn: () => getSubscriptions(),
-    staleTime: 30 * 1000,
+    staleTime: 0,
+    gcTime: 0,
   });
 
 // useUserSubscriptions (what the current user has)
@@ -31,7 +32,8 @@ export const useUserSubscriptions = () =>
   useQuery({
     queryKey: subscriptionKeys.userList(),
     queryFn: () => getUserSubscriptions(),
-    staleTime: 30 * 1000,
+    staleTime: 0,
+    gcTime: 0,
   });
 
 // create a user subscription
