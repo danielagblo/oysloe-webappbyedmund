@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import Subscription from "../assets/Subscription.png";
 import {
   useCreateUserSubscription,
@@ -9,7 +10,6 @@ import {
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { initiatePaystackPayment } from "../services/paymentService";
 import { formatMoney } from "../utils/formatMoney";
-import { toast } from "sonner";
 
 const SubscriptionPage = () => {
   const isSmall = useIsSmallScreen(1023);
@@ -52,6 +52,15 @@ const SubscriptionPage = () => {
           callback_url: callbackUrl,
         });
 
+        const paymentId =
+          res?.payment_id || res?.data?.payment_id || res?.data?.paymentId;
+        if (paymentId) {
+          localStorage.setItem(
+            "pending_subscription",
+            JSON.stringify({ subscription_id: id, payment_id: paymentId }),
+          );
+        }
+
         // attempt to extract redirect URL from common shapes
         const redirectUrl =
           res?.data?.authorization_url ||
@@ -78,7 +87,7 @@ const SubscriptionPage = () => {
   };
 
   const handlePayNow = () => {
-    
+
     if (selectedSubId !== null) {
       handleSubscribe(selectedSubId);
     }
@@ -105,6 +114,18 @@ const SubscriptionPage = () => {
           subscription_id: subscriptionId,
           callback_url: callbackUrl,
         });
+
+        const paymentId =
+          res?.payment_id || res?.data?.payment_id || res?.data?.paymentId;
+        if (paymentId) {
+          localStorage.setItem(
+            "pending_subscription",
+            JSON.stringify({
+              subscription_id: subscriptionId,
+              payment_id: paymentId,
+            }),
+          );
+        }
 
         // attempt to extract redirect URL from common shapes
         const redirectUrl =
@@ -176,8 +197,8 @@ const SubscriptionPage = () => {
                 key={s.id}
                 onClick={() => setSelectedSubId(s.id)}
                 className={`rounded-2xl relative p-4 border cursor-pointer transition-all ${selectedSubId === s.id
-                    ? "border-4 border-black bg-white"
-                    : "border-4 border-transparent bg-white"
+                  ? "border-4 border-black bg-white"
+                  : "border-4 border-transparent bg-white"
                   }`}
               >
                 <div className="flex justify-between items-start mb-3">

@@ -42,7 +42,7 @@ export function useUserProfile() {
       return getUserProfile();
     },
     retry: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds
   });
 
   /* -------------------------------------------------------
@@ -75,7 +75,7 @@ export function useUserProfile() {
       return getUserPreferences();
     },
     retry: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds
   });
 
   /* -------------------------------------------------------

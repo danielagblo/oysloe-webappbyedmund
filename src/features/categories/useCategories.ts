@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Category, CategoryPayload } from "../../types/Category";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as categoryService from "../../services/categoryService";
+import type { Category, CategoryPayload } from "../../types/Category";
 
 // query keys
 const QUERY_KEYS = {
@@ -15,7 +15,7 @@ export function useCategory(id: number) {
     queryFn: () => categoryService.getCategory(id),
     enabled: !!id,
     retry: 1,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -29,7 +29,7 @@ export function useCategories(params?: { ordering?: string; search?: string }) {
     queryFn: () => categoryService.getCategories(params),
     placeholderData: (prev) => prev,
     retry: 1,
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // create category
