@@ -162,17 +162,17 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
     <div className="px-2 py-3">
       <div className="flex justify-end items-center p-2">
         <div className="flex justify-end gap-4 mr-2 items-center">
-{
-  layout === "mason" && (
+          {
+            layout === "mason" && (
               <button
-            onClick={() => setLayout("mason")}
-            className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
-          >
-            <img className="h-10 w-10" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                onClick={() => setLayout("mason")}
+                className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
+              >
+                <img className="h-10 w-10" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
-          </button>
-  )
-}
+              </button>
+            )
+          }
           <button
             onClick={() => setLayout("grid")}
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
@@ -180,17 +180,17 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
             <img className={`${layout === "grid" ? "h-10 w-10" : "h-8 w-8 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
 
           </button>
-{
-  layout === "grid" && (
+          {
+            layout === "grid" && (
               <button
-            onClick={() => setLayout("mason")}
-            className={`py-1 rounded`}
-          >
-            <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                onClick={() => setLayout("mason")}
+                className={`py-1 rounded`}
+              >
+                <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
-          </button>
-  )
-}
+              </button>
+            )
+          }
         </div>
       </div>
       <div className={`${layout === "grid" ? "grid grid-cols-2" : "columns-2"} gap-2 sm:gap-3`}>

@@ -65,7 +65,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
   const hasMoreFallback = fallbackStartIndex > 0 && displayedFallbackCount < fallbackAds.length;
 
   return (
-  <div className="bg-white sm:bg-(--div-active) max-sm:p-4 sm:py-6 w-screen md:px-12">
+  <div className="bg-(--div-active) max-sm:bg-gray-100 max-sm:p-4 sm:py-6 w-screen md:px-12">
     <div className="flex items-center justify-between mb-6 px-2 md:px-20">
       <h2
         className="text-xl font-bold lg:text-2xl"
@@ -74,20 +74,38 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
         Similar Ads
       </h2>
       <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          onClick={() => setLayout("grid")}
-          className="py-1 rounded"
-          aria-label="Grid view"
-        >
-          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-svgrepo-com.svg" alt="grid" />
-        </button>
-        <button
-          onClick={() => setLayout("mason")}
-          className="py-1 rounded"
-          aria-label="Masonry view"
-        >
-          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
-        </button>
+          {
+            layout === "mason" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
+                aria-label="Mason View"
+              >
+                <img className="h-10 w-10" src="/grid-3-svgrepo-com.svg" alt="mason" />
+
+              </button>
+            )
+          }
+          <button
+            onClick={() => setLayout("grid")}
+            className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
+            aria-label="Grid View"
+          >
+            <img className={`${layout === "grid" ? "h-10 w-10" : "h-8 w-8 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+
+          </button>
+          {
+            layout === "grid" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`py-1 rounded`}
+                aria-label="Mason View"
+              >
+                <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+
+              </button>
+            )
+          }
       </div>
     </div>
 
@@ -131,7 +149,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   to={`/ads/${ad.id}`}
                   state={{ adData: ad }}
                   onClick={markReturnTarget}
-                  className={`inline-block rounded-md overflow-hidden shrink-0 w-full sm:w-48 md:w-52 ${
+                  className={`inline-block rounded-md overflow-hidden max-sm:bg-white max-sm:p-2 shrink-0 w-full sm:w-48 md:w-52 ${
                     layout === "mason" ? "mb-8" : "mb-2"
                   }`}
                 >
