@@ -91,7 +91,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
             aria-label="Grid View"
           >
-            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5 w-5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
 
           </button>
           {
@@ -101,7 +101,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                 className={`py-1 rounded`}
                 aria-label="Mason View"
               >
-                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img className="h-5.5 w-5.5" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
               </button>
             )

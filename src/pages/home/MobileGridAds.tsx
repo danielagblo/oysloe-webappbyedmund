@@ -37,7 +37,7 @@ const LazyAdCard = React.memo(function LazyAdCard({
       to={`/ads/${ad.id}`}
       state={{ adData: ad }}
       onClick={(e) => handleAdClick(ad, e)}
-      className={`inline-flex max-sm:bg-white max-sm:p-2 rounded-md overflow-hidden w-full flex-col ${layout === "mason" ? "mb-10" : "mb-2"} items-center justify-center
+      className={`inline-flex max-sm:bg-white max-sm:p-2 rounded-md overflow-hidden w-full flex-col ${layout === "mason" ? "mb-2" : "mb-2"} items-center justify-center
       }`}
     >
       <ProgressiveImage
@@ -177,7 +177,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
             onClick={() => setLayout("grid")}
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
           >
-            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5 w-5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
 
           </button>
           {
@@ -186,7 +186,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
                 onClick={() => setLayout("mason")}
                 className={`py-1 rounded`}
               >
-                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img className="h-5.5 w-5.5" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
               </button>
             )
