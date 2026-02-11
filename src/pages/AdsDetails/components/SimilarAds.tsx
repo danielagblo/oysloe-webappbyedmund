@@ -81,7 +81,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                 className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
                 aria-label="Mason View"
               >
-                <img className="h-10 w-10" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
               </button>
             )
@@ -91,7 +91,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
             aria-label="Grid View"
           >
-            <img className={`${layout === "grid" ? "h-10 w-10" : "h-8 w-8 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5 w-5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
 
           </button>
           {
@@ -101,7 +101,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                 className={`py-1 rounded`}
                 aria-label="Mason View"
               >
-                <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
 
               </button>
             )
@@ -150,7 +150,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   state={{ adData: ad }}
                   onClick={markReturnTarget}
                   className={`inline-block rounded-md overflow-hidden max-sm:bg-white max-sm:p-2 shrink-0 w-full sm:w-48 md:w-52 ${
-                    layout === "mason" ? "mb-8" : "mb-2"
+                    layout === "mason" ? "mb-2" : "mb-2"
                   }`}
                 >
                   <ProgressiveImage
