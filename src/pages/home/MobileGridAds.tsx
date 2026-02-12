@@ -45,7 +45,7 @@ const LazyAdCard = React.memo(function LazyAdCard({
         alt={ad.name}
         containerClassName="relative w-full"
         imgClassName={`w-full max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md ${
-          layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-52"
+          layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-40"
         }`}
         watermarkBusinessName={ad.owner?.business_name}
         watermarkSize="md"

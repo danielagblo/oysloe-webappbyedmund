@@ -313,18 +313,18 @@ const AdsDetailsPage = () => {
     // Extract subcategory from product_features if available
     const currentSubcategory = currentAdData?.product_features?.[0]?.feature?.subcategory;
 
-    console.debug("[SimilarAds] mergedSimilarAds computation:", {
-      currentAdName,
-      currentCategory,
-      currentSubcategory,
-      currentAdId,
-      relatedProductsCount: relatedProducts.length,
-      allProductsCount: allProducts.length,
-    });
+    // console.debug("[SimilarAds] mergedSimilarAds computation:", {
+    //   currentAdName,
+    //   currentCategory,
+    //   currentSubcategory,
+    //   currentAdId,
+    //   relatedProductsCount: relatedProducts.length,
+    //   allProductsCount: allProducts.length,
+    // });
 
     // If no subcategory or no all products loaded, return only related products
     if (!currentSubcategory || !allProducts.length) {
-      console.debug("[SimilarAds] Returning only related products (no subcategory or no all products)");
+      // console.debug("[SimilarAds] Returning only related products (no subcategory or no all products)");
       const backendAvailable = relatedProducts.filter(p => !p.is_taken);
       return {
         merged: backendAvailable,
@@ -347,7 +347,7 @@ const AdsDetailsPage = () => {
       );
     });
 
-    console.debug("[SimilarAds] Similar name products in category:", similarNameProducts.length);
+    // console.debug("[SimilarAds] Similar name products in category:", similarNameProducts.length);
 
     // Add these to relatedIds to avoid duplicates in subcategory tier
     similarNameProducts.forEach(p => relatedIds.add(p.id));
@@ -362,7 +362,7 @@ const AdsDetailsPage = () => {
       return productSubcategory === currentSubcategory;
     });
 
-    console.debug("[SimilarAds] Subcategory fallback products:", subcategoryProducts.length);
+    // console.debug("[SimilarAds] Subcategory fallback products:", subcategoryProducts.length);
 
     // Sort similar names by multiplier and date
     const sortedSimilarNames = [...similarNameProducts].sort((a, b) => {
@@ -395,12 +395,12 @@ const AdsDetailsPage = () => {
     const merged = [...backendAvailable, ...similarAvailable, ...subcategoryAvailable];
     const fallbackStartIndex = backendAvailable.length + similarAvailable.length;
 
-    console.debug("[SimilarAds] Final merged ads count:", merged.length, {
-      backend: backendAvailable.length,
-      similarNames: similarAvailable.length,
-      subcategory: subcategoryAvailable.length,
-      fallbackStartIndex,
-    });
+    // console.debug("[SimilarAds] Final merged ads count:", merged.length, {
+    //   backend: backendAvailable.length,
+    //   similarNames: similarAvailable.length,
+    //   subcategory: subcategoryAvailable.length,
+    //   fallbackStartIndex,
+    // });
     return {
       merged,
       fallbackStartIndex,

@@ -156,7 +156,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   <ProgressiveImage
                     src={ad.image || "/no-image.jpeg"}
                     alt={ad.name.slice(0, 10)}
-                    containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85" : "h-[120px] sm:h-48"}`}
+                    containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85" : "h-40 sm:h-48"}`}
                     imgClassName="w-full h-full object-cover rounded-md"
                     watermarkBusinessName={ad.owner?.business_name}
                     watermarkSize="sm"
