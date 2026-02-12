@@ -1915,7 +1915,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
             return null;
           })()
         }
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-sm:mb-14">
           <input
             ref={fileInputRef}
             type="file"
