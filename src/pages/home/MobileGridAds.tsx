@@ -43,7 +43,7 @@ const LazyAdCard = React.memo(function LazyAdCard({
       <ProgressiveImage
         src={ad.image || "/no-image.jpeg"}
         alt={ad.name}
-        containerClassName="relative w-full"
+        containerClassName={`relative w-full ${layout === "mason" ? "max-sm:min-h-[140px]" : ""}`}
         imgClassName={`w-full max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md ${
           layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-40"
         }`}
@@ -56,6 +56,8 @@ const LazyAdCard = React.memo(function LazyAdCard({
           <img
             src="/location.svg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
           />
           <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
@@ -143,7 +145,13 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
     if (!active || active.length === 0) {
       return (
         <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-          <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
+          <img
+            src="/nothing-to-show.png"
+            alt="Nothing to show"
+            loading="lazy"
+            decoding="async"
+            className="max-w-[50vw] sm:max-w-50"
+          />
           <p>No ads to show right now.</p>
         </div>
       );
@@ -168,7 +176,13 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
                 onClick={() => setLayout("mason")}
                 className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
               >
-                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img
+                  className="h-7 w-7"
+                  src="/grid-3-svgrepo-com.svg"
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
 
               </button>
             )
@@ -177,7 +191,13 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
             onClick={() => setLayout("grid")}
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
           >
-            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+            <img
+              className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
+              src="/grid-svgrepo-com.svg"
+              alt="grid"
+              loading="lazy"
+              decoding="async"
+            />
 
           </button>
           {
@@ -186,7 +206,13 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
                 onClick={() => setLayout("mason")}
                 className={`py-1 rounded`}
               >
-                <img className="h-5.5 w-5.5" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img
+                  className="h-5.5 w-5.5"
+                  src="/grid-3-svgrepo-com.svg"
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
 
               </button>
             )

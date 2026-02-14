@@ -14,7 +14,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
   <div className="w-full">
     <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:py-4 sm:px-1 lg:p-6 sm:shadow-none">
       <div className="flex items-center gap-2 mb-3">
-        <img src="/quick chat.svg" alt="" className="w-5 h-5" />
+        <img src="/quick chat.svg" alt="" loading="lazy" decoding="async" className="w-5 h-5" />
         <h6 className="font-semibold text-xs sm:text-6 lg:text-[1vw]">Quick Chat</h6>
       </div>
       <div
@@ -71,7 +71,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
               setQuickChatInput("");
             }}
           >
-            <img src="/send.svg" alt="Send" className="w-5 h-5" />
+            <img src="/send.svg" alt="Send" loading="lazy" decoding="async" className="w-5 h-5" />
           </button>
         </div>
 
@@ -118,6 +118,8 @@ const QuickChat: React.FC<QuickChatProps> = ({
           <img
             src="/lock-on-svgrepo-com.svg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="bg-(--green) z-10 rounded-full w-6 h-6 p-1 absolute"
           />
         </div>
@@ -125,6 +127,8 @@ const QuickChat: React.FC<QuickChatProps> = ({
           <img
             src="/shield.svg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-3 h-3 md:w-[0.9vw] md:h-[0.9vw]"
           />
           <h4>Always chat here for Safety reasons!</h4>

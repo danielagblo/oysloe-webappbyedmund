@@ -81,7 +81,13 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                 className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
                 aria-label="Mason View"
               >
-                <img className="h-7 w-7" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img
+                  className="h-7 w-7"
+                  src="/grid-3-svgrepo-com.svg"
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
 
               </button>
             )
@@ -91,7 +97,13 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
             className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
             aria-label="Grid View"
           >
-            <img className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`} src="/grid-svgrepo-com.svg" alt="grid" />
+            <img
+              className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
+              src="/grid-svgrepo-com.svg"
+              alt="grid"
+              loading="lazy"
+              decoding="async"
+            />
 
           </button>
           {
@@ -101,7 +113,13 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                 className={`py-1 rounded`}
                 aria-label="Mason View"
               >
-                <img className="h-5.5 w-5.5" src="/grid-3-svgrepo-com.svg" alt="mason" />
+                <img
+                  className="h-5.5 w-5.5"
+                  src="/grid-3-svgrepo-com.svg"
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
 
               </button>
             )
@@ -121,6 +139,8 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
           src="/nothing-to-show.png"
           className="w-25 h-25"
           alt="nothing to show"
+          loading="lazy"
+          decoding="async"
         />
         <p className="text-gray-500 text-sm sm:text-xl lg:text-[1.2vw] w-full text-center">
           No similar ads to show.
@@ -156,7 +176,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   <ProgressiveImage
                     src={ad.image || "/no-image.jpeg"}
                     alt={ad.name.slice(0, 10)}
-                    containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85" : "h-40 sm:h-48"}`}
+                    containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85 max-sm:min-h-[140px]" : "h-40 sm:h-48"}`}
                     imgClassName="w-full h-full object-cover rounded-md"
                     watermarkBusinessName={ad.owner?.business_name}
                     watermarkSize="sm"
@@ -166,6 +186,8 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                     <img
                       src="/location.svg"
                       alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
                     />
                     <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">

@@ -74,17 +74,11 @@ const PictureModal: React.FC<PictureModalProps> = ({
             }}
             aria-label="Previous"
           >
-            <img src="/arrowleft.svg" alt="Prev" />
+            <img src="/arrowleft.svg" alt="Prev" loading="lazy" decoding="async" />
           </button>
         )}
 
         <div className="relative flex items-center justify-center w-full">
-          <div
-            className="absolute inset-0 bg-cover bg-center blur-md opacity-40 rounded"
-            style={{
-              backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})`,
-            }}
-          />
           <div className="relative">
             <ProgressiveImage
               src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
@@ -94,6 +88,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
               watermarkBusinessName={businessName}
               watermarkSize="lg"
               onContextMenu={(e) => e.preventDefault()}
+              loading="eager"
             />
           </div>
         </div>
@@ -108,7 +103,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
             }}
             aria-label="Next"
           >
-            <img src="/arrowright.svg" alt="Next" />
+            <img src="/arrowright.svg" alt="Next" loading="lazy" decoding="async" />
           </button>
         )}
 
@@ -127,6 +122,8 @@ const PictureModal: React.FC<PictureModalProps> = ({
                 watermarkBusinessName={businessName}
                 watermarkSize="xxs"
                 onContextMenu={(e) => e.preventDefault()}
+                width={80}
+                height={80}
               />
             </button>
           ))}

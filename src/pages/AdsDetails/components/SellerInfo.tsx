@@ -33,6 +33,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             alt={owner?.name || "Seller"}
             role="button"
             tabIndex={0}
+            loading="lazy"
+            decoding="async"
             onClick={() => {
               setSellerModalImage(
                 owner?.avatar || owner?.business_logo || "/userPfp2.jpg",
@@ -53,6 +55,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             <img
               src={owner?.business_logo}
               alt={`${owner?.name || "Seller"} business logo`}
+              loading="lazy"
+              decoding="async"
               className="absolute -right-1 -bottom-1 border-3 border-white lg:border-0 lg:-bottom-1 lg:-right-2 w-8 h-8 lg:w-[3vw] lg:h-[3vw] rounded-full object-cover bg-white cursor-pointer"
               onClick={() => {
                 setSellerModalImage(
@@ -93,7 +97,7 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
         <div className="flex items-start gap-2 flex-col max-sm:p-4">
           <h4 className="text-xl sm:text-6 lg:text-[1.5vw]">{displayBusinessName}</h4>
           <div className="flex bg-green-300 px-1 p-0.5 rounded items-center gap-1">
-            <img src="/tick.svg" alt="" className="w-3 h-3" />
+            <img src="/tick.svg" alt="" loading="lazy" decoding="async" className="w-3 h-3" />
             <span className="text-[10px] sm:text-5 lg:text-[0.9vw] text-green-800">
               {(() => {
                 const ownerLevel = (owner as unknown as { level?: string })
@@ -195,6 +199,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
               alt={currentAdData?.owner?.name || "Seller"}
               role="button"
               tabIndex={0}
+              loading="lazy"
+              decoding="async"
               onClick={() => {
                 setSellerModalImage(
                   currentAdData?.owner?.avatar ||
@@ -220,6 +226,8 @@ const SellerInfo: React.FC<SellerInfoProps> = ({
             <img
               src={currentAdData?.owner?.business_logo}
               alt={`${currentAdData?.owner?.name || "Seller"} business logo`}
+              loading="lazy"
+              decoding="async"
               className="absolute -bottom-1 -right-2 w-8 h-8 rounded-full object-cover bg-white border-3 border-white cursor-pointer"
               onClick={() => {
                 setSellerModalImage(

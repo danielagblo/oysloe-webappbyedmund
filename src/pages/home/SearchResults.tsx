@@ -48,7 +48,13 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
                 onContextMenu={(e) => e.preventDefault()}
               />
               <div className="flex items-center gap-1 px-2 py-1">
-                <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
+                <img
+                  src="/location.svg"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
+                />
                 <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-600 truncate">
                   {
                     ad.location?.name ??

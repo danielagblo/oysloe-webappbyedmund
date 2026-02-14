@@ -1440,6 +1440,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                     <img
                       src={headerProductImage}
                       alt={headerProduct?.name ?? "Product"}
+                      loading="eager"
+                      decoding="async"
+                      width={40}
+                      height={40}
                       onError={(e) => {
                         try {
                           const el = e.target as HTMLImageElement;
@@ -1494,6 +1498,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                 <img
                   src={headerAvatar}
                   alt={(roomInfo as any)?.other_user ?? "User"}
+                  loading="eager"
+                  decoding="async"
+                  width={40}
+                  height={40}
                   onError={(e) => {
                     try {
                       const el = e.target as HTMLImageElement;
@@ -1726,6 +1734,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                               <img
                                 src={String(maybeImageSrc)}
                                 alt="attachment"
+                                loading="lazy"
+                                decoding="async"
                                 className="max-w-full max-h-60 object-contain rounded cursor-pointer"
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
@@ -1741,6 +1751,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                           <img
                             src={normAvatar || DEFAULT_AVATAR}
                             alt={msg.sender?.name ?? "You"}
+                            loading="lazy"
+                            decoding="async"
+                            width={40}
+                            height={40}
                             onError={(e) => {
                               try {
                                 const el = e.target as HTMLImageElement;
@@ -1799,6 +1813,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                               <img
                                 src={String(maybeImageSrc)}
                                 alt="attachment"
+                                loading="lazy"
+                                decoding="async"
                                 className="max-w-full max-h-60 object-contain rounded cursor-pointer"
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
@@ -1814,6 +1830,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                           <img
                             src={normAvatar || DEFAULT_AVATAR}
                             alt={msg.sender?.name ?? "User"}
+                            loading="lazy"
+                            decoding="async"
+                            width={40}
+                            height={40}
                             onError={(e) => {
                               try {
                                 const el = e.target as HTMLImageElement;
@@ -1968,6 +1988,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
               <img
                 src={lightboxSrc}
                 alt="preview"
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-contain rounded"
               />
             </div>

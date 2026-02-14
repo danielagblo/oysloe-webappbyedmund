@@ -20,6 +20,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/location.svg"
           alt=""
+          loading="lazy"
+          decoding="async"
           className="w-3 h-3 sm:w-5 sm:h-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
         <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
@@ -31,6 +33,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/star.svg"
           alt=""
+          loading="lazy"
+          decoding="async"
           className="w-3 h-3 sm:h-5 sm:w-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
         <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
@@ -45,6 +49,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/flag.svg"
           alt=""
+          loading="lazy"
+          decoding="async"
           className="w-3 h-3 sm:h-5 sm:w-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
         <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
@@ -55,6 +61,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
         <img
           src="/favorited.svg"
           alt=""
+          loading="lazy"
+          decoding="async"
           className="w-5 h-5 sm:w-5 sm:h-5 lg:w-[1.2vw] lg:h-[1.2vw]"
         />
         <h2 className="text-base sm:text-5 lg:text-[1.125vw]">
@@ -82,6 +90,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
           <img
             src="/arrowleft.svg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
           />
         </button>
@@ -92,6 +102,8 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
           <img
             src="/arrowright.svg"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw]"
           />
         </button>

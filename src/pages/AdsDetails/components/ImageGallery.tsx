@@ -91,7 +91,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
             aria-label="Previous image"
           >
-            <img src="/arrowleft.svg" alt="Previous" />
+            <img src="/arrowleft.svg" alt="Previous" loading="lazy" decoding="async" />
           </button>
         )}
 
@@ -113,10 +113,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
                 }}
                 aria-label={`Show image ${i + 1}`}
               >
-                <div
-                  className="absolute inset-0 bg-cover bg-center blur-sm opacity-50"
-                  style={{ backgroundImage: `url(${src})` }}
-                />
                 <div className="relative w-full h-full">
                   <ProgressiveImage
                     src={src}
@@ -139,7 +135,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
             aria-label="Next image"
           >
-            <img src="/arrowright.svg" alt="Next" />
+            <img src="/arrowright.svg" alt="Next" loading="lazy" decoding="async" />
           </button>
         )}
       </div>
@@ -150,10 +146,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div
-          className="absolute inset-0 bg-cover bg-center blur-md opacity-40"
-          style={{ backgroundImage: `url(${getMainImage()})` }}
-        />
         <div
           className="absolute inset-0 w-[40%] left-[30%] z-30 cursor-zoom-in"
           onClick={() => {
@@ -169,6 +161,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
           watermarkBusinessName={businessName}
           watermarkSize={watermarkSize}
           onContextMenu={(e) => e.preventDefault()}
+          loading="eager"
+          fetchPriority="high"
         />
         <div
           onClick={() => {

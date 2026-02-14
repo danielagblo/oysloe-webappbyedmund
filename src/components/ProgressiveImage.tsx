@@ -12,6 +12,13 @@ type Props = {
   watermarkBusinessName?: string | null;
   watermarkSize?: WatermarkSize;
   onContextMenu?: (e: React.MouseEvent) => void;
+  loading?: "lazy" | "eager";
+  decoding?: "async" | "sync" | "auto";
+  fetchPriority?: "high" | "low" | "auto";
+  width?: number | string;
+  height?: number | string;
+  srcSet?: string;
+  sizes?: string;
 };
 
 const ProgressiveImage: React.FC<Props> = ({
@@ -22,6 +29,13 @@ const ProgressiveImage: React.FC<Props> = ({
   watermarkBusinessName,
   watermarkSize,
   onContextMenu,
+  loading = "lazy",
+  decoding = "async",
+  fetchPriority,
+  width,
+  height,
+  srcSet,
+  sizes,
 }) => {
   const [loaded, setLoaded] = useState(false);
 
@@ -30,7 +44,13 @@ const ProgressiveImage: React.FC<Props> = ({
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={loading}
+        decoding={decoding}
+        fetchPriority={fetchPriority}
+        width={width}
+        height={height}
+        srcSet={srcSet}
+        sizes={sizes}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
         onContextMenu={onContextMenu}
