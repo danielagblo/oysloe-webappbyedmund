@@ -5,7 +5,7 @@ import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
 import { userPfp2Url } from "../assets/images";
-import { assetUrl } from "../assets/publicAssets";
+import { assetImage, assetUrl } from "../assets/publicAssets";
 import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 import { formatReviewDate } from "../utils/formatReviewDate";
@@ -263,7 +263,13 @@ function ChatInput({
                 className="absolute bottom-3 left-3"
                 type="button"
               >
-                <img src={assetUrl("image.png")} alt="Attach" className="w-5 lg:w-[1.75vw] h-auto" />
+                <img
+                  src={assetImage("image.png").src}
+                  srcSet={assetImage("image.png").srcSet}
+                  sizes="20px"
+                  alt="Attach"
+                  className="w-5 lg:w-[1.75vw] h-auto"
+                />
               </button>
             )}
           </div>

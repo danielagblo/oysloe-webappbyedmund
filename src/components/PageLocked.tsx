@@ -2,8 +2,7 @@ import React from "react";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import MenuButton from "./MenuButton";
 
-import gPng from "../assets/google-play-badge.png";
-import iPng from "../assets/app-store-badge.png";
+import { getOptimizedAsset } from "../assets/optimizedImages";
 
 interface PageLockedProps {
   page: string;
@@ -43,7 +42,9 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 mb-2">
           <a href="#" target="_blank" rel="noopener noreferrer">
             <img
-              src={gPng}
+              src={getOptimizedAsset("google-play-badge.png").src}
+              srcSet={getOptimizedAsset("google-play-badge.png").srcSet}
+              sizes="200px"
               alt="Get it on Google Play"
               className="h-25 w-auto object-contain transition-transform hover:scale-105"
             />
@@ -51,7 +52,9 @@ const PageLocked: React.FC<PageLockedProps> = ({ page = "This" }) => {
 
           <a href="#" target="_blank" rel="noopener noreferrer">
             <img
-              src={iPng}
+              src={getOptimizedAsset("app-store-badge.png").src}
+              srcSet={getOptimizedAsset("app-store-badge.png").srcSet}
+              sizes="160px"
               alt="Download on the App Store"
               className="h-17 w-auto object-contain transition-transform hover:scale-105 translate-y-[2px]"
             />

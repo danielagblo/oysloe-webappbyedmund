@@ -12,6 +12,26 @@ declare module "*?url" {
   export default src;
 }
 
+declare module "*.jpeg?*" {
+  const src: string;
+  export default src;
+}
+
+declare module "*.jpg?*" {
+  const src: string;
+  export default src;
+}
+
+declare module "*.png?*" {
+  const src: string;
+  export default src;
+}
+
+declare module "*?*" {
+  const src: string;
+  export default src;
+}
+
 declare module "*?w=*&format=*&as=srcset" {
   const srcset: string;
   export default srcset;

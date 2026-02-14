@@ -6,7 +6,7 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
 import { timeAgo } from "../utils/timeAgo";
-import { assetUrl } from "../assets/publicAssets";
+import { assetImage, assetUrl } from "../assets/publicAssets";
 
 type Alert = {
   id: number;
@@ -153,7 +153,9 @@ const AlertRow = ({
         }}
       >
         <img
-          src={assetUrl("alien-svgrepo-com.png")}
+          src={assetImage("alien-svgrepo-com.png").src}
+          srcSet={assetImage("alien-svgrepo-com.png").srcSet}
+          sizes="40px"
           alt="alert source"
           className="w-10 h-10 object-contain shrink-0"
         />

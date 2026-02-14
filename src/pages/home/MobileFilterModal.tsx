@@ -9,6 +9,7 @@ import { nothingToShowUrl } from "../../assets/images";
 import normalizePossibleFeatureValues from "../../hooks/normalizearrayfeatures";
 import Loader from "../../components/LoadingDots";
 import { assetUrl } from "../../assets/publicAssets";
+import { getCategoryIcon } from "../../assets/categoryIcons";
 
 interface Category {
   id: number;
@@ -400,13 +401,6 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
     onClose();
   };
 
-  const getCategoryIcon = (categoryName: string) => {
-    const cleanName = categoryName
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    return assetUrl(`${cleanName}.png`);
-  };
 
   if (!isOpen) return null;
 
@@ -809,7 +803,9 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                         className="w-full flex items-center gap-3 p-3 transition hover:bg-gray-50"
                       >
                         <img
-                          src={getCategoryIcon(category.name)}
+                          src={getCategoryIcon(category.name).src}
+                          srcSet={getCategoryIcon(category.name).srcSet}
+                          sizes="96px"
                           alt={category.name}
                           className="w-6 h-6 object-contain"
                           onError={(e) => {

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { Category } from "../../types/Category";
-import { assetUrl } from "../../assets/publicAssets";
+import { getCategoryIcon } from "../../assets/categoryIcons";
 
 type Props = {
   categories: Category[];
@@ -18,13 +18,6 @@ const SelectACategory = ({
 }: Props) => {
   const navigate = useNavigate();
 
-  const getCategoryIcon = (name: string) => {
-    const cleanName = name
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    return assetUrl(`${cleanName}.png`);
-  };
 
   if (categoriesLoading) {
     return (
@@ -121,7 +114,9 @@ const SelectACategory = ({
               >
                 <div className="w-[8vw] h-[8vw] min-h-[45px] min-w-[45px] sm:h-20 sm:w-20 relative rounded-full bg-white">
                   <img
-                    src={getCategoryIcon(category)}
+                    src={getCategoryIcon(category).src}
+                    srcSet={getCategoryIcon(category).srcSet}
+                    sizes="96px"
                     alt={category}
                     className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
                   />
@@ -177,7 +172,9 @@ const SelectACategory = ({
           >
             <div className="w-[8vw] h-[8vw] max-sm:w-[12vw] max-sm:h-[12vw] min-h-[45px] min-w-[45px] relative rounded-full bg-white">
               <img
-                src={getCategoryIcon(category.name)}
+                src={getCategoryIcon(category.name).src}
+                srcSet={getCategoryIcon(category.name).srcSet}
+                sizes="96px"
                 alt={category.name}
                 className="absolute bottom-1 sm:bottom-3 w-[7vw] h-[7vw] max-sm:w-[8vw] max-sm:h-[8vw] min-w-[85%] min-h-[85%] object-contain left-1/2 -translate-x-1/2"
               />
