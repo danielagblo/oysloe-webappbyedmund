@@ -7,8 +7,10 @@ import useAccountDeleteRequest from "../features/accountDelete/useAccountDeleteR
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
+import { userPfp2Url } from "../assets/images";
 import { LEVELS } from "../constants/levels";
 import Tooltip from "./Tooltip";
+import { assetUrl } from "../assets/publicAssets";
 
 export type MenuItem = {
   key: string;
@@ -123,7 +125,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 >
                   {item.icon && (
                     <img
-                      src={item.icon}
+                      src={assetUrl(item.icon.replace(/^\//, ""))}
                       alt={item.label}
                       className="h-auto shrink-0 w-[2vw]"
                     />
@@ -147,7 +149,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
               className="text-left h-[14vh] hover:rounded-2xl hover:bg-gray-100 flex items-center w-9/10 px-4"
               onClick={() => setLogout(true)}
             >
-              <img src="/logout.svg" alt="Logout" className="w-[2vw] h-auto" />
+              <img src={assetUrl("logout.svg")} alt="Logout" className="w-[2vw] h-auto" />
               <span
                 className={`text-left text-[1.25vw] flex items-center justify-center gap-3 w-full cursor-pointer transition            `}
               >
@@ -201,7 +203,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 className="flex items-center bg-(--div-active) justify-center gap-2 w-fit py-2 px-3 rounded-full hover:bg-gray-200 transition text-base"
                 onClick={() => setLogout(true)}
               >
-                <img src="/logout.svg" alt="Logout" className="w-6 h-6" />
+                <img src={assetUrl("logout.svg")} alt="Logout" className="w-6 h-6" />
                 <span className="font-medium">Logout</span>
               </button>
             </div>
@@ -214,7 +216,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                   <img
                     src={
                       buildMediaUrl((user as UserProfile)?.avatar) ||
-                      "/userPfp2.jpg"
+                      userPfp2Url
                     }
                     alt="pfp"
                     className="rounded-full object-cover bg-green-100 h-14 w-14 border-6 border-white"
@@ -316,7 +318,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 }`}
               >
                 <div className="bg-(--div-active) p-1.5 rounded-full">
-                  <img src="/profile.svg" alt="Edit profile" className="w-5 h-5" />
+                  <img src={assetUrl("profile.svg")} alt="Edit profile" className="w-5 h-5" />
                 </div>
                 <span>Edit profile</span>
               </button>
@@ -355,7 +357,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                   }`}
                 >
                   <div className="bg-(--div-active) p-1.5 rounded-full">
-                    <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                    <img
+                      src={assetUrl(item.icon.replace(/^\//, ""))}
+                      alt={item.label}
+                      className="w-5 h-5"
+                    />
                   </div>
                   <span>{item.label}</span>
                 </button>
@@ -386,7 +392,11 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                   }`}
                 >
                   <div className="bg-(--div-active) p-1.5 rounded-full">
-                    <img src={item.icon} alt={item.label} className="w-5 h-5" />
+                    <img
+                      src={assetUrl(item.icon.replace(/^\//, ""))}
+                      alt={item.label}
+                      className="w-5 h-5"
+                    />
                   </div>
                   <span>{item.label}</span>
                 </button>
@@ -401,7 +411,7 @@ const ProfileSidebar = ({ items = MENU_ITEMS, active, onSelect }: Props) => {
                 className="flex text-gray-700 items-center gap-3 w-full px-3 py-2 rounded-lg text-base transition-all hover:bg-red-50"
               >
                 <div className="bg-(--div-active) p-1.5 rounded-full">
-                  <img className="h-5 w-5" src="/bin-svg.svg" alt="x" />
+                  <img className="h-5 w-5" src={assetUrl("bin-svg.svg")} alt="x" />
                 </div>
                 <span>Delete my account</span>
               </button>

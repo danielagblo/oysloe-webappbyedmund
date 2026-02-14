@@ -11,6 +11,7 @@ import useApplyCoupon from "../features/coupons/useApplyCoupon";
 import useRedeemPoints from "../features/redeem/useRedeemPoints";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import type { Level } from "../types/UserProfile";
+import { assetUrl } from "../assets/publicAssets";
 const ReferPage = () => {
   const [how, setHow] = useState(false);
   const [redraw, setRedraw] = useState(false);
@@ -120,7 +121,7 @@ const ReferPage = () => {
         <div className="bg-white w-full h-20 rounded-2xl p-5 flex justify-between items-center shadow-sm self-end">
           <div className="flex gap-2 my-2 sm:items-center ">
             <img
-              src="/star green.svg"
+              src={assetUrl("star green.svg")}
               alt=""
               className="w-4 h-4 sm:w-7 sm:h-7 lg:w-[1.2vw] lg:h-[1.2vw] my-auto"
             />
@@ -137,7 +138,7 @@ const ReferPage = () => {
               }}
             >
               <span className="text-xl">{points.toLocaleString()}</span>
-              <img className="" src="/arrowright.svg" alt="" />
+              <img className="" src={assetUrl("arrowright.svg")} alt="" />
             </div>
             <span className="-m-3 pt-2 pr-8.5 text-xs text-gray-400">
               {`= GH₵${equivalentGhcExact.toFixed(2)}`}
@@ -158,13 +159,13 @@ const ReferPage = () => {
         >
           <div className="flex flex-col items-center justify-between gap-2">
             <img
-              src="/earn.svg"
+              src={assetUrl("earn.svg")}
               className="w-5 h-5 sm:h-7 sm:w-7 lg:w-[2vw] lg:h-[2vw] md:mx-2"
               alt="earn"
             />
             <span className="text-sm sm:text-base lg:text-[1vw]">Earn</span>
           </div>
-          <img src="/arrowright.svg" alt="" />
+          <img src={assetUrl("arrowright.svg")} alt="" />
         </div>
         <div
           className="bg-white shadow-sm w-full h-20 rounded-2xl p-3 flex justify-between items-center gap-2"
@@ -177,13 +178,13 @@ const ReferPage = () => {
         >
           <div className="flex flex-col items-center justify-between gap-2">
             <img
-              src="/Redeem.svg"
+              src={assetUrl("Redeem.svg")}
               className="w-5 h-5 sm:w-7 sm:h-7 lg:w-[2vw] lg:h-[2vw] md:mx-1"
               alt="redeem"
             />
             <span className="text-sm sm:text-base lg:text-[1vw]">Redeem</span>
           </div>
-          <img src="/arrowright.svg" alt="" />
+          <img src={assetUrl("arrowright.svg")} alt="" />
         </div>
       </div>
       <div
@@ -204,7 +205,7 @@ const ReferPage = () => {
             <ProgressBar percent={displayPercent} />
           </div>
         </div>
-        <img className="mb-9" src="/arrowright.svg" alt="" />
+        <img className="mb-9" src={assetUrl("arrowright.svg")} alt="" />
       </div>
       <div className="bg-white w-full max-sm:w-[96%] max-sm:mx-auto max-lg:h-fit h-full shadom-sm rounded-2xl p-3 flex flex-col md:justify-between items-start px-4 pt-6 max-sm:pb-0 pb-18">
         <div className="w-full flex flex-col justify-center gap-2">
@@ -286,14 +287,14 @@ const ReferPage = () => {
         </h2>
       </div>
       <div className="w-full flex -ml-13 justify-start gap-4 p-12">
-        <img src="/steps.svg" alt="" className="w-10 h-auto ml-5" />
+        <img src={assetUrl("steps.svg")} alt="" className="w-10 h-auto ml-5" />
         <div className="flex flex-col justify-evenly gap-6 mb-0">
           <div className="inline whitespace-nowrap">
             <h2 className="text-xs inline text-gray-600 md:text-[1vw]">
               Share your code{" "}
             </h2>
             <img
-              src="/copy.svg"
+              src={assetUrl("copy.svg")}
               className="inline w-3 h-auto copy"
               alt=""
               onClick={() => {
@@ -319,7 +320,7 @@ const ReferPage = () => {
       <div className="flex flex-col gap-4">
         <div className="flex gap-8 justify-start items-center">
           <img
-            src="/earn.svg"
+            src={assetUrl("earn.svg")}
             alt=""
             className="w-6 h-6 md:w-[2vw] md:h-[2vw]"
           />
@@ -330,7 +331,7 @@ const ReferPage = () => {
         </div>
         <div className="flex gap-8 justify-start items-center">
           <img
-            src="/Redeem.svg"
+            src={assetUrl("Redeem.svg")}
             alt=""
             className="w-6 h-6 md:w-[2vw] md:h-[2vw]"
           />
@@ -421,7 +422,7 @@ const ReferPage = () => {
       <div className="h-full md:h-[93vh] w-full rounded-2xl flex flex-col gap-2">
         <div className="bg-white w-full shadom-sm h-56 rounded-2xl pt-8 p-5 flex flex-col justify-between items-start gap-6 lg:overflow-auto no-scrollbar">
           <div className="flex gap-2 text-sm">
-            <img src="/Redeem.svg" alt="" className="w-5 h-5" />
+            <img src={assetUrl("Redeem.svg")} alt="" className="w-5 h-5" />
             <h2 className="inline">Apply Coupon</h2>
           </div>
           <div className="flex justify-between w-full text-xs sm:text-sm lg:text-xs text-gray-600">
@@ -513,7 +514,7 @@ const ReferPage = () => {
               }}
               className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
             >
-              <img src="/arrowleft.svg" alt="back" className="w-5 h-5" />
+              <img src={assetUrl("arrowleft.svg")} alt="back" className="w-5 h-5" />
               <span className="text-sm font-medium">Back</span>
             </button>
           </div>

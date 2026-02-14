@@ -6,6 +6,7 @@ import { useAlertsQuery } from "../features/alerts/useAlertsQuery";
 import chatService from "../services/chatService";
 // import { useRef, useLayoutEffect } from "react";
 import { useScrollDirectionOnContainer } from "../hooks/useScrollDirectionOnContainer";
+import { assetUrl } from "../assets/publicAssets";
 
 type RouteKey = "home" | "alerts" | "post" | "inbox" | "profile";
 
@@ -26,11 +27,11 @@ const profileSubPages = [
 ];
 
 const icons: Record<RouteKey, string> = {
-  home: "/home.svg",
-  alerts: "/Alert.svg",
-  post: "/Post.svg",
-  inbox: "/inbox.svg",
-  profile: "/profile.svg",
+  home: assetUrl("home.svg"),
+  alerts: assetUrl("Alert.svg"),
+  post: assetUrl("Post.svg"),
+  inbox: assetUrl("inbox.svg"),
+  profile: assetUrl("profile.svg"),
 };
 
 const NavButton = ({

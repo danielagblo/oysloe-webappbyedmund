@@ -1,4 +1,5 @@
 import React from "react";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface QuickChatProps {
   quickChatInput: string;
@@ -14,7 +15,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
   <div className="w-full">
     <div className="pt-4 w-full bg-white sm:bg-(--div-active) sm:rounded-2xl sm:py-4 sm:px-1 lg:p-6 sm:shadow-none">
       <div className="flex items-center gap-2 mb-3">
-        <img src="/quick chat.svg" alt="" loading="lazy" decoding="async" className="w-5 h-5" />
+        <img src={assetUrl("quick chat.svg")} alt="" loading="lazy" decoding="async" className="w-5 h-5" />
         <h6 className="font-semibold text-xs sm:text-6 lg:text-[1vw]">Quick Chat</h6>
       </div>
       <div
@@ -71,7 +72,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
               setQuickChatInput("");
             }}
           >
-            <img src="/send.svg" alt="Send" loading="lazy" decoding="async" className="w-5 h-5" />
+            <img src={assetUrl("send.svg")} alt="Send" loading="lazy" decoding="async" className="w-5 h-5" />
           </button>
         </div>
 
@@ -116,7 +117,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
             Chat is secured
           </h4>
           <img
-            src="/lock-on-svgrepo-com.svg"
+            src={assetUrl("lock-on-svgrepo-com.svg")}
             alt=""
             loading="lazy"
             decoding="async"
@@ -125,7 +126,7 @@ const QuickChat: React.FC<QuickChatProps> = ({
         </div>
         <div className="flex items-center gap-1 sm:text-4 lg:text-[0.8vw]">
           <img
-            src="/shield.svg"
+            src={assetUrl("shield.svg")}
             alt=""
             loading="lazy"
             decoding="async"

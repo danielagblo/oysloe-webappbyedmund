@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ProgressiveImage from "../../../components/ProgressiveImage";
+import { noImageUrl } from "../../../assets/images";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface ImageGalleryProps {
   images: string[];
@@ -27,7 +29,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   businessName,
 }) => {
   const galleryImages = useMemo(
-    () => (images.length > 0 ? images : ["/no-image.jpeg"]),
+    () => (images.length > 0 ? images : [noImageUrl]),
     [images],
   );
   const max = galleryImages.length;
@@ -75,7 +77,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     }
   };
 
-  const getMainImage = () => galleryImages[currentIndex] ?? "/no-image.jpeg";
+  const getMainImage = () => galleryImages[currentIndex] ?? noImageUrl;
 
   // determine watermark size: use larger watermark on small and large screens for readability
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
@@ -91,7 +93,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             className="absolute left-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
             aria-label="Previous image"
           >
-            <img src="/arrowleft.svg" alt="Previous" loading="lazy" decoding="async" />
+            <img src={assetUrl("arrowleft.svg")} alt="Previous" loading="lazy" decoding="async" />
           </button>
         )}
 
@@ -116,6 +118,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
                 <div className="relative w-full h-full">
                   <ProgressiveImage
                     src={src}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 27vw"
                     alt={`Image ${i + 1}`}
                     containerClassName="relative w-full h-full"
                     imgClassName="object-cover w-full h-full relative z-10"
@@ -135,7 +138,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
             className="absolute right-2 top-1/2 bg-white rounded-full -translate-y-1/2 z-20 px-2 py-2 shadow hover:bg-gray-100"
             aria-label="Next image"
           >
-            <img src="/arrowright.svg" alt="Next" loading="lazy" decoding="async" />
+            <img src={assetUrl("arrowright.svg")} alt="Next" loading="lazy" decoding="async" />
           </button>
         )}
       </div>
@@ -155,6 +158,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         />
         <ProgressiveImage
           src={getMainImage()}
+          sizes="100vw"
           alt="Ad main"
           containerClassName="relative w-full h-full"
           imgClassName="object-cover w-full h-full relative z-10"

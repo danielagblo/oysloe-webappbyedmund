@@ -2,6 +2,8 @@ import React, { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { formatMoney } from "../../../utils/formatMoney";
 import ProgressiveImage from "../../../components/ProgressiveImage";
+import { noImageUrl, nothingToShowUrl } from "../../../assets/images";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface SimilarAdsProps {
   relatedProducts: any[];
@@ -83,7 +85,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
               >
                 <img
                   className="h-7 w-7"
-                  src="/grid-3-svgrepo-com.svg"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
                   alt="mason"
                   loading="lazy"
                   decoding="async"
@@ -99,7 +101,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
           >
             <img
               className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
-              src="/grid-svgrepo-com.svg"
+              src={assetUrl("grid-svgrepo-com.svg")}
               alt="grid"
               loading="lazy"
               decoding="async"
@@ -115,7 +117,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
               >
                 <img
                   className="h-5.5 w-5.5"
-                  src="/grid-3-svgrepo-com.svg"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
                   alt="mason"
                   loading="lazy"
                   decoding="async"
@@ -136,7 +138,8 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
     ) : availableAds.length === 0 ? (
       <div className="flex items-center flex-col justify-center w-full gap-2">
         <img
-          src="/nothing-to-show.png"
+          src={nothingToShowUrl}
+          sizes="100px"
           className="w-25 h-25"
           alt="nothing to show"
           loading="lazy"
@@ -174,7 +177,8 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   }`}
                 >
                   <ProgressiveImage
-                    src={ad.image || "/no-image.jpeg"}
+                    src={ad.image || noImageUrl}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 12rem, 13rem"
                     alt={ad.name.slice(0, 10)}
                     containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85 max-sm:min-h-[140px]" : "h-40 sm:h-48"}`}
                     imgClassName="w-full h-full object-cover rounded-md"
@@ -184,7 +188,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img
-                      src="/location.svg"
+                      src={assetUrl("location.svg")}
                       alt=""
                       loading="lazy"
                       decoding="async"

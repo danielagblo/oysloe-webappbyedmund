@@ -9,6 +9,7 @@ import type { ChatRoom } from "../services/chatService";
 import { getCaseId, getCaseStatus } from "../utils/chatFilters";
 import { formatReviewDate } from "../utils/formatReviewDate";
 import MobileBanner from "./MobileBanner";
+import { nothingToShowUrl } from "../assets/images";
 type SupportAndCasesProps = {
   onSelectCase?: (caseId: string) => void;
   onSelectChat?: (chatId: string) => void;
@@ -210,7 +211,7 @@ export default function SupportAndCases({
       return (
         <div>
           <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
-            <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+            <img className="h-40 w-40" src={nothingToShowUrl} sizes="160px" alt="" />
             <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no active chat rooms</p>
           </div>
         </div>
@@ -459,7 +460,7 @@ export default function SupportAndCases({
         <div>
           <h3 className="text-xl md:text-2xl lg:text-[1.5vw] text-(--dark-def) font-medium mb-2">Open Case</h3>
           <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 items-center justify-center mt-6 md:mt-10">
-            <img className="h-40 w-40" src="/nothing-to-show.png" alt="" />
+            <img className="h-40 w-40" src={nothingToShowUrl} sizes="160px" alt="" />
             <p className="text-base md:text-xl lg:text-[1.1vw] text-gray-500">You have no support cases</p>
           </div>
         </div>

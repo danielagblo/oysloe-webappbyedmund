@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
+import { noImageUrl } from "../../assets/images";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   products: Product[];
@@ -39,7 +41,8 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
               onClick={(e) => handleAdClick(ad, e)}
             >
               <ProgressiveImage
-                src={ad.image || "/no-image.jpeg"}
+                src={ad.image || noImageUrl}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 30vw, 18vw"
                 alt={ad.name}
                 containerClassName="relative inline-block w-full"
                 imgClassName="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
@@ -49,7 +52,7 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
               />
               <div className="flex items-center gap-1 px-2 py-1">
                 <img
-                  src="/location.svg"
+                  src={assetUrl("location.svg")}
                   alt=""
                   loading="lazy"
                   decoding="async"

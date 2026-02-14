@@ -12,6 +12,7 @@ import PrivacyPage from "./PrivacyPage";
 import ReferPage from "./ReferPage";
 import SubscriptionPage from "./SubscriptionPage";
 import TermsAndConditionsPage from "./TermsAndConditionsPage";
+import { assetUrl } from "../assets/publicAssets";
 
 const tabLabels: Record<string, string> = {
   profile: "Profile",
@@ -109,7 +110,7 @@ const ProfilePage = () => {
             onClick={handleBackClick}
             className="text-sm whitespace-nowrap font-medium text-gray-700 hover:text-gray-900"
           >
-            <img className="inline" src="/arrowleft.svg" alt="<" />
+            <img className="inline" src={assetUrl("arrowleft.svg")} alt="<" />
             Back
           </button>
           <p className="font-semibold text-gray-800 text-base">

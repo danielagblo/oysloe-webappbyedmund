@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
+import { noImageUrl, nothingToShowUrl } from "../../assets/images";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   products: Product[];
@@ -41,7 +43,8 @@ const LazyAdCard = React.memo(function LazyAdCard({
       }`}
     >
       <ProgressiveImage
-        src={ad.image || "/no-image.jpeg"}
+        src={ad.image || noImageUrl}
+        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 18vw"
         alt={ad.name}
         containerClassName={`relative w-full ${layout === "mason" ? "max-sm:min-h-[140px]" : ""}`}
         imgClassName={`w-full max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md ${
@@ -54,7 +57,7 @@ const LazyAdCard = React.memo(function LazyAdCard({
       <div className="w-full mt-1">
         <div className="flex items-center gap-1 px-2 py-0.5">
           <img
-            src="/location.svg"
+            src={assetUrl("location.svg")}
             alt=""
             loading="lazy"
             decoding="async"
@@ -146,7 +149,8 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
       return (
         <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
           <img
-            src="/nothing-to-show.png"
+            src={nothingToShowUrl}
+            sizes="(max-width: 640px) 50vw, 200px"
             alt="Nothing to show"
             loading="lazy"
             decoding="async"
@@ -178,7 +182,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
               >
                 <img
                   className="h-7 w-7"
-                  src="/grid-3-svgrepo-com.svg"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
                   alt="mason"
                   loading="lazy"
                   decoding="async"
@@ -193,7 +197,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
           >
             <img
               className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
-              src="/grid-svgrepo-com.svg"
+              src={assetUrl("grid-svgrepo-com.svg")}
               alt="grid"
               loading="lazy"
               decoding="async"
@@ -208,7 +212,7 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
               >
                 <img
                   className="h-5.5 w-5.5"
-                  src="/grid-3-svgrepo-com.svg"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
                   alt="mason"
                   loading="lazy"
                   decoding="async"

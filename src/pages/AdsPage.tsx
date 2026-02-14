@@ -7,6 +7,7 @@ import MenuButton from "../components/MenuButton";
 import PostAdForm from "../components/PostAdForm";
 import SkeletonLoader from "../components/SkeletonLoader";
 import Watermark from "../components/ImageWithWatermark";
+import { noImageUrl, nothingToShowUrl } from "../assets/images";
 import {
   useConfirmMarkAsTaken,
   useDeleteProduct,
@@ -15,6 +16,8 @@ import {
 } from "../features/products/useProducts";
 import useUserProfile from "../features/userProfile/useUserProfile";
 import { formatMoney } from "../utils/formatMoney";
+import { buildCloudinarySrcSet } from "../utils/cloudinary";
+import { assetUrl } from "../assets/publicAssets";
 
 const AdsPage = () => {
   const isSmall = useIsSmallScreen();
@@ -63,7 +66,7 @@ const AdsPage = () => {
                 }`}
               >
                 <img
-                  src={`/${status.toLowerCase()}.svg`}
+                  src={assetUrl(`${status.toLowerCase()}.svg`)}
                   alt={status}
                   className="w-4 h-4 rounded-full"
                 />
@@ -79,7 +82,8 @@ const AdsPage = () => {
             <div className="flex-1 overflow-y-auto px-4 pb-20">
               <div className="flex flex-col gap-4 justify-center items-center h-full">
                 <img
-                  src="/nothing-to-show.png"
+                  src={nothingToShowUrl}
+                  sizes="160px"
                   alt="Nothing to show here"
                   className="h-40 w-auto"
                 />
@@ -103,9 +107,15 @@ const AdsPage = () => {
                         ad.image ||
                         (ad.images?.[0] as any)?.url ||
                         (ad.images?.[0] as any)?.src ||
-                        "/no-image.jpeg"
+                        noImageUrl
                       }
+                      srcSet={buildCloudinarySrcSet(ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src)}
+                      sizes="96px"
                       alt={ad.name}
+                      width={96}
+                      height={80}
+                      loading="lazy"
+                      decoding="async"
                     />
 
                     {/* Name and Price */}
@@ -150,7 +160,7 @@ const AdsPage = () => {
                   }`}
               >
                 <img
-                  src={`/${status.toLowerCase()}.svg`}
+                  src={assetUrl(`${status.toLowerCase()}.svg`)}
                   alt={status}
                   className="w-10 h-auto hidden md:block bg-[#f3f4f6] rounded-full p-2.5"
                 />
@@ -197,7 +207,8 @@ const AdsPage = () => {
           ) : filteredAds.length < 1 ? (
             <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
               <img
-                src="/nothing-to-show.png"
+                src={nothingToShowUrl}
+                sizes="200px"
                 alt="Nothing to show here"
                 className="h-40 lg:h-50 w-auto"
               />
@@ -220,9 +231,15 @@ const AdsPage = () => {
                           ad.image ||
                           (ad.images?.[0] as any)?.url ||
                           (ad.images?.[0] as any)?.src ||
-                          "/no-image.jpeg"
+                          noImageUrl
                         }
+                        srcSet={buildCloudinarySrcSet(ad.image || (ad.images?.[0] as any)?.url || (ad.images?.[0] as any)?.src)}
+                        sizes="160px"
                         alt={ad.name}
+                        width={160}
+                        height={80}
+                        loading="lazy"
+                        decoding="async"
                         onContextMenu={(e) => e.preventDefault()}
                       />
                       <Watermark businessName={ad.owner?.business_name} size="sm" />

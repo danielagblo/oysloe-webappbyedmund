@@ -3,6 +3,7 @@ import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import ScrollableAdRow from "./ScrollableAdRow";
 import LoadingDots from "../../components/LoadingDots";
+import { nothingToShowUrl } from "../../assets/images";
 
 type Props = {
   categories: Category[];
@@ -25,7 +26,8 @@ const ScrollableAds = ({
     return (
       <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
         <img
-          src="/nothing-to-show.png"
+          src={nothingToShowUrl}
+          sizes="(max-width: 640px) 50vw, 200px"
           alt="Nothing to show"
           className="max-w-[50vw] sm:max-w-50"
         />
@@ -54,7 +56,8 @@ const ScrollableAds = ({
     return (
       <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
         <img
-          src="/nothing-to-show.png"
+          src={nothingToShowUrl}
+          sizes="(max-width: 640px) 50vw, 200px"
           alt="Nothing to show"
           className="max-w-[50vw] sm:max-w-50"
         />

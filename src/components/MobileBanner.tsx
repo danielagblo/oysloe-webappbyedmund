@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { assetUrl } from "../assets/publicAssets";
 
 interface MobileBannerProps {
   backto?: string;
@@ -35,7 +36,7 @@ export const MobileBanner: React.FC<MobileBannerProps> = ({
             onClick={handleBack}
             className="absolute left-2 top-1/2 -translate-y-1/2 flex items-center gap-1 z-50 py-2 px-1"
           >
-            <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
+            <img src={assetUrl("arrowleft.svg")} alt="Back" className="w-5 h-5" />
             <span className="text-sm">{backto}</span>
           </button>
           <h2 className="absolute w-full flex justify-center items-center text-sm font-medium rounded-2xl py-1 px-2">

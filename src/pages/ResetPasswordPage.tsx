@@ -7,6 +7,7 @@ import PhoneInput from "../components/PhoneInput";
 import { ResetDropdown } from "../components/ResetDropdown";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { resetPassword } from "../services/authService";
+import { assetUrl } from "../assets/publicAssets";
 
 const ResetPasswordPage = () => {
   const location = useLocation();
@@ -123,7 +124,7 @@ const ResetPasswordPage = () => {
               className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition max-sm:fixed max-sm:top-4 max-sm:right-4 max-sm:bg-transparent max-sm:hover:bg-transparent"
             >
               Skip &nbsp;
-              <img className="inline h-4 w-4" src="/skip.svg" alt=">" />
+              <img className="inline h-4 w-4" src={assetUrl("skip.svg")} alt=">" />
             </button>
           </div>
           <h2 className="text-2xl max-sm:text-[28px]">Create New Password</h2>
@@ -144,7 +145,7 @@ const ResetPasswordPage = () => {
                   
                 />
                 <img
-                  src="/phone.svg"
+                  src={assetUrl("phone.svg")}
                   alt="phone"
                   className="absolute h-6 w-6 left-2 top-3 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
                 />
@@ -163,7 +164,7 @@ const ResetPasswordPage = () => {
                   className="border-gray-100 border-2 px-8 py-2 pl-10 w-full rounded-lg focus:border-gray-400 outline-0 max-sm:h-[60px] max-sm:w-[85vw] max-sm:bg-white max-sm:border-gray-300 max-sm:rounded-2xl max-sm:text-[16px] max-sm:pl-12 pr-10"
                 />
                 <img
-                  src="/Passwordkey.svg"
+                  src={assetUrl("Passwordkey.svg")}
                   alt="Password"
                   className="absolute left-2 max-sm:left-4 top-3 max-sm:top-5 h-5 max-sm:h-6 max-sm:w-6 w-5"
                 />
@@ -219,7 +220,7 @@ const ResetPasswordPage = () => {
                   className="border-gray-100 border-2 px-8 py-2 pl-10 w-full rounded-lg focus:border-gray-400 outline-0 max-sm:h-[60px] max-sm:w-[85vw] max-sm:bg-white max-sm:border-gray-300 max-sm:rounded-2xl max-sm:text-[16px] max-sm:pl-12 pr-10"
                 />
                 <img
-                  src="/Passwordkey.svg"
+                  src={assetUrl("Passwordkey.svg")}
                   alt="Password"
                   className="absolute left-2 max-sm:left-4 top-3 max-sm:top-5 h-5 max-sm:h-6 max-sm:w-6 w-5"
                 />

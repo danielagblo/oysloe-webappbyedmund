@@ -2,9 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import Loader from "../../components/LoadingDots";
+import { noImageUrl, nothingToShowUrl } from "../../assets/images";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   category: Category;
@@ -47,7 +49,7 @@ const ScrollableAdRow = ({
             className="bg-gray-200 p-2 rounded-full shrink-0"
           >
             <img
-              src="/arrowleft.svg"
+              src={assetUrl("arrowleft.svg")}
               alt="Left"
               loading="lazy"
               decoding="async"
@@ -59,7 +61,7 @@ const ScrollableAdRow = ({
             className="bg-gray-200 p-2 rounded-full shrink-0"
           >
             <img
-              src="/arrowright.svg"
+              src={assetUrl("arrowright.svg")}
               alt="Right"
               loading="lazy"
               decoding="async"
@@ -85,7 +87,8 @@ const ScrollableAdRow = ({
                 className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52 lg:w-[17.5vw]"
               >
                 <ProgressiveImage
-                  src={ad.image || "/no-image.jpeg"}
+                  src={ad.image || noImageUrl}
+                  sizes="(max-width: 640px) 38vw, (max-width: 1024px) 12rem, 17.5vw"
                   alt={ad.name}
                   containerClassName="relative inline-block w-full"
                   imgClassName="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
@@ -95,7 +98,7 @@ const ScrollableAdRow = ({
                 />
                 <div className="flex items-center gap-1 px-2 py-0.5">
                   <img
-                    src="/location.svg"
+                    src={assetUrl("location.svg")}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -117,7 +120,8 @@ const ScrollableAdRow = ({
         ) : (
           <div className="flex flex-col items-center justify-center">
             <img
-              src="/nothing-to-show.png"
+              src={nothingToShowUrl}
+              sizes="28px"
               alt="nothing to show"
               loading="lazy"
               decoding="async"

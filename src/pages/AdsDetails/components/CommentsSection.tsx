@@ -2,6 +2,8 @@ import React from "react";
 import { formatReviewDate } from "../../../utils/formatReviewDate";
 import { formatReviewerName } from "../../../utils/formatReviewerName";
 import type { Review } from "../../../types/Review";
+import { userPfp2Url } from "../../../assets/images";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface CommentsSectionProps {
   thisProductsReviews: Review[];
@@ -39,7 +41,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <img
-                  src={review.user.avatar || "/userPfp2.jpg"}
+                  src={review.user.avatar || userPfp2Url}
                   alt=""
                   className="w-10 h-10 rounded-lg"
                 />
@@ -79,7 +81,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
                 >
                   <div className="flex items-center gap-2 justify-center px-2 py-1 bg-white rounded-xl hover:bg-gray-100 transition cursor-pointer">
                     <img
-                      src="/like.svg"
+                      src={assetUrl("like.svg")}
                       alt=""
                       className={`w-5 h-5 md:h-[1.2vw] md:w-[1.2vw] transition-opacity ${review?.liked ? "opacity-100" : "opacity-60"}`}
                     />

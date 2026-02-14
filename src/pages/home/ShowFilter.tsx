@@ -7,6 +7,7 @@ import {
 import { getSubcategories } from "../../services/subcategoryService";
 import useLocations from "../../features/locations/useLocations";
 import type { Category } from "../../types/Category";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   selectedCategoryId: number | null;
@@ -430,7 +431,7 @@ const ShowFilter = ({
                       : "Select a Category First"}
                 </span>
                 <img
-                  src="/arrowright.svg"
+                  src={assetUrl("arrowright.svg")}
                   alt=">"
                   className="w-4 h-4 rotate-90"
                 />
@@ -575,13 +576,13 @@ const ShowFilter = ({
                 className="w-full flex items-center gap-2 text-lg font-semibold mb-3 hover:opacity-70 transition"
               >
                 <img
-                  src="/circle-quarter-svgrepo-com.svg"
+                  src={assetUrl("circle-quarter-svgrepo-com.svg")}
                   alt="Features"
                   className="h-5 w-5"
                 />
                 Features
                 <img
-                  src="/arrowright.svg"
+                  src={assetUrl("arrowright.svg")}
                   alt="toggle"
                   className={`w-4 h-4 ml-auto transition-transform ${showFeaturesSection ? "rotate-90" : ""}`}
                 />
@@ -628,7 +629,7 @@ const ShowFilter = ({
           {/* Location Section */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-              <img src="/location.svg" alt="Location" className="w-5 h-5" />
+              <img src={assetUrl("location.svg")} alt="Location" className="w-5 h-5" />
               Location
             </h3>
             <button
@@ -679,7 +680,7 @@ const ShowFilter = ({
                   : "Select a Region"}
               </span>
               <img
-                src="/arrowright.svg"
+                src={assetUrl("arrowright.svg")}
                 alt=">"
                 className="w-4 h-4 rotate-90"
               />
@@ -764,7 +765,7 @@ const ShowFilter = ({
                       className="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium"
                     >
                       <img
-                        src="/arrowright.svg"
+                        src={assetUrl("arrowright.svg")}
                         alt="<"
                         className="w-4 h-4 rotate-180"
                       />
@@ -910,7 +911,7 @@ const ShowFilter = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <img
-                src="/boxes-svgrepo-com.svg"
+                src={assetUrl("boxes-svgrepo-com.svg")}
                 alt="Ad Type"
                 className="w-5 h-5"
               />
@@ -941,7 +942,7 @@ const ShowFilter = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <img
-                src="/time-svgrepo-com.svg"
+                src={assetUrl("time-svgrepo-com.svg")}
                 alt="Timeframe"
                 className="w-5 h-5"
               />
@@ -973,7 +974,7 @@ const ShowFilter = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <img
-                src="/price-tag-svgrepo-com.svg"
+                src={assetUrl("price-tag-svgrepo-com.svg")}
                 alt="Price Sort"
                 className="w-5 h-5"
               />
@@ -1004,7 +1005,7 @@ const ShowFilter = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <img
-                src="/date-range-svgrepo-com.svg"
+                src={assetUrl("date-range-svgrepo-com.svg")}
                 alt="Timeframe Sort"
                 className="w-5 h-5"
               />
@@ -1035,7 +1036,7 @@ const ShowFilter = ({
           <div className="mb-8">
             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
               <img
-                src="/filter-svgrepo.svg"
+                src={assetUrl("filter-svgrepo.svg")}
                 alt="Price Filter"
                 className="w-5 h-5"
               />

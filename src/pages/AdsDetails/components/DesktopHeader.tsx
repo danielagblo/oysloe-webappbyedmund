@@ -1,5 +1,6 @@
 import React from "react";
 import type { Product } from "../../../types/Product";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface DesktopHeaderProps {
   currentAdData?: Product | any;
@@ -18,7 +19,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
     <div className="hidden sm:flex sticky top-0 left-0 z-40 mt-10 bg-white p-2 lg:py-2 items-center justify-evenly gap-4 w-full font-light text-xs">
       <div className="flex items-center gap-2">
         <img
-          src="/location.svg"
+          src={assetUrl("location.svg")}
           alt=""
           loading="lazy"
           decoding="async"
@@ -31,7 +32,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
 
       <div className="flex items-center gap-2">
         <img
-          src="/star.svg"
+          src={assetUrl("star.svg")}
           alt=""
           loading="lazy"
           decoding="async"
@@ -47,7 +48,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
       </div>
       <div className="flex items-center gap-2">
         <img
-          src="/flag.svg"
+          src={assetUrl("flag.svg")}
           alt=""
           loading="lazy"
           decoding="async"
@@ -59,7 +60,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
       </div>
       <div className="flex items-center gap-2">
         <img
-          src="/favorited.svg"
+          src={assetUrl("favorited.svg")}
           alt=""
           loading="lazy"
           decoding="async"
@@ -88,7 +89,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
           aria-label="Previous ad"
         >
           <img
-            src="/arrowleft.svg"
+            src={assetUrl("arrowleft.svg")}
             alt=""
             loading="lazy"
             decoding="async"
@@ -100,7 +101,7 @@ const DesktopHeader: React.FC<DesktopHeaderProps> = ({
           aria-label="Next ad"
         >
           <img
-            src="/arrowright.svg"
+            src={assetUrl("arrowright.svg")}
             alt=""
             loading="lazy"
             decoding="async"

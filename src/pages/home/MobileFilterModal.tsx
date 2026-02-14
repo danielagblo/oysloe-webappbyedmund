@@ -5,8 +5,10 @@ import {
   getFeatures,
   getPossibleFeatureValues,
 } from "../../services/featureService";
+import { nothingToShowUrl } from "../../assets/images";
 import normalizePossibleFeatureValues from "../../hooks/normalizearrayfeatures";
 import Loader from "../../components/LoadingDots";
+import { assetUrl } from "../../assets/publicAssets";
 
 interface Category {
   id: number;
@@ -403,7 +405,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
-    return `/${cleanName}.png`;
+    return assetUrl(`${cleanName}.png`);
   };
 
   if (!isOpen) return null;
@@ -450,7 +452,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               onClick={() => setCurrentPanel("main")}
               className="flex items-center gap-2 text-gray-900 w-full text-left pl-2"
             >
-              <img src="/arrowleft.svg" alt="<" className="w-5 h-5" />
+              <img src={assetUrl("arrowleft.svg")} alt="<" className="w-5 h-5" />
               <span className="text-lg font-semibold">Category</span>
             </button>
           ) : currentPanel === "subcategories" ? (
@@ -458,7 +460,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               onClick={() => setCurrentPanel("main")}
               className="flex items-center gap-2 text-gray-900 w-full text-left pl-2"
             >
-              <img src="/arrowleft.svg" alt="<" className="w-5 h-5" />
+              <img src={assetUrl("arrowleft.svg")} alt="<" className="w-5 h-5" />
               <span className="text-lg font-semibold">
                 {selectedCategoryName}
               </span>
@@ -468,7 +470,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               onClick={() => setCurrentPanel("main")}
               className="flex items-center gap-2 text-gray-900 w-full text-left pl-2"
             >
-              <img src="/arrowleft.svg" alt="<" className="w-5 h-5" />
+              <img src={assetUrl("arrowleft.svg")} alt="<" className="w-5 h-5" />
               <span className="text-lg font-semibold">Select Region</span>
             </button>
           ) : currentPanel === "locations" && selectedRegion ? (
@@ -476,7 +478,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
               onClick={() => setCurrentPanel("main")}
               className="flex items-center gap-2 text-gray-900 w-full text-left pl-2"
             >
-              <img src="/arrowleft.svg" alt="<" className="w-5 h-5" />
+              <img src={assetUrl("arrowleft.svg")} alt="<" className="w-5 h-5" />
               <span className="text-lg font-semibold">{selectedRegion}</span>
             </button>
           ) : null}
@@ -501,7 +503,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                       {selectedCategoryName}
                     </span>
                     <img
-                      src="/arrowright.svg"
+                      src={assetUrl("arrowright.svg")}
                       alt="open"
                       className="w-4 h-4 shrink-0"
                     />
@@ -537,7 +539,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                                 : "Select Subcategory"}
                           </span>
                           <img
-                            src="/arrowright.svg"
+                            src={assetUrl("arrowright.svg")}
                             alt="open"
                             className="w-4 h-4 shrink-0"
                           />
@@ -570,7 +572,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           : "Select Location"}
                     </span>
                     <img
-                      src="/arrowright.svg"
+                      src={assetUrl("arrowright.svg")}
                       alt="open"
                       className="w-4 h-4 shrink-0"
                     />
@@ -591,7 +593,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                         Features
                       </h3>
                       <img
-                        src="/arrowright.svg"
+                        src={assetUrl("arrowright.svg")}
                         alt="toggle"
                         className={`w-4 h-4 shrink-0 transition-transform ${
                           isFeaturesExpanded ? "rotate-90" : ""
@@ -819,7 +821,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                           {category.name}
                         </span>
                         <img
-                          src="/arrowright.svg"
+                          src={assetUrl("arrowright.svg")}
                           alt="open"
                           className="w-4 h-4 shrink-0"
                         />
@@ -967,7 +969,8 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                 ) : (
                   <div className="flex flex-col items-center justify-center py-8">
                     <img
-                      src="/nothing-to-show.png"
+                      src={nothingToShowUrl}
+                      sizes="96px"
                       alt="Nothing to show"
                       className="w-24 h-24 mb-3"
                     />
@@ -1000,7 +1003,7 @@ const MobileFilterModal: React.FC<MobileFilterModalProps> = ({
                       >
                         <span className="text-gray-800 text-sm">{region}</span>
                         <img
-                          src="/arrowright.svg"
+                          src={assetUrl("arrowright.svg")}
                           alt="open"
                           className="w-4 h-4 shrink-0"
                         />

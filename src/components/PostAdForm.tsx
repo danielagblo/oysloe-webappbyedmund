@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import subscriptionOffer from "../assets/50Off.json";
 import submittedGif from "../assets/Submitted.gif";
 import uploadImg from "../assets/upload.png";
+import { assetUrl } from "../assets/publicAssets";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
@@ -254,7 +255,7 @@ export default function PostAdForm({
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
-    return `/${cleanName}.png`;
+    return assetUrl(`${cleanName}.png`);
   };
 
   // Fetch subcategories whenever categoryId changes

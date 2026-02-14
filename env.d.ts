@@ -4,3 +4,15 @@ declare namespace NodeJS {
     REACT_APP_USE_MOCKS?: string;
   }
 }
+
+/// <reference types="vite-imagetools" />
+
+declare module "*?url" {
+  const src: string;
+  export default src;
+}
+
+declare module "*?w=*&format=*&as=srcset" {
+  const srcset: string;
+  export default srcset;
+}

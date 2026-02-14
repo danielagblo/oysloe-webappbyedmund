@@ -9,6 +9,7 @@ import MobileBanner from "../components/MobileBanner";
 import ProfileStats from "../components/ProfileStats";
 import useReviews from "../features/reviews/useReviews";
 import useUserProfile from "../features/userProfile/useUserProfile";
+import { nothingToShowUrl, userPfp2Url } from "../assets/images";
 import {
   createReview,
   likeReview,
@@ -16,6 +17,7 @@ import {
 } from "../services/reviewService";
 import type { Review, ReviewPayload } from "../types/Review";
 import { formatReviewDate } from "../utils/formatReviewDate";
+import { assetUrl } from "../assets/publicAssets";
 
 const ReviewPage = () => {
   const [sendSuccess, setSendSuccess] = useState(false);
@@ -181,7 +183,7 @@ const ReviewPage = () => {
                 onClick={() => setRatingFilter(null)}
                 className={`flex items-center justify-center gap-1 px-3 py-2 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
               >
-                <img src="/star.svg" alt="" className="w-4 h-4" /> All
+                <img src={assetUrl("star.svg")} alt="" className="w-4 h-4" /> All
               </button>
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -189,7 +191,7 @@ const ReviewPage = () => {
                   onClick={() => setRatingFilter(star)}
                   className={`flex justify-center items-center gap-1 rounded-full px-3 py-2 h-auto ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
                 >
-                  <img src="/star.svg" alt="" className="w-4 h-4" />
+                  <img src={assetUrl("star.svg")} alt="" className="w-4 h-4" />
                   {star}
                 </button>
               ))}
@@ -214,12 +216,12 @@ const ReviewPage = () => {
               ))
             ) : reviews.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 py-8">
-                <img src="/nothing-to-show.png" alt="Nothing to show" className="w-32 h-32 object-contain" />
+                <img src={nothingToShowUrl} sizes="128px" alt="Nothing to show" className="w-32 h-32 object-contain" />
                 <p className="text-center text-gray-500">This ad has no reviews.</p>
               </div>
             ) : displayedReviews.length === 0 ? (
               <div className="flex flex-col items-center justify-center gap-3 py-8">
-                <img src="/nothing-to-show.png" alt="Nothing to show" className="w-32 h-32 object-contain" />
+                <img src={nothingToShowUrl} sizes="128px" alt="Nothing to show" className="w-32 h-32 object-contain" />
                 <p className="text-center text-gray-500">No reviews with {ratingFilter} star rating{ratingFilter === 1 ? '' : 's'}.</p>
               </div>
             ) : (
@@ -231,7 +233,7 @@ const ReviewPage = () => {
                   <div className="flex items-center gap-3 justify-between">
                     <div className="flex items-center gap-3">
                       <img
-                        src={rev.user?.avatar || "/userPfp2.jpg"}
+                        src={rev.user?.avatar || userPfp2Url}
                         alt=""
                         className="w-10 h-10 rounded-lg"
                       />
@@ -250,7 +252,7 @@ const ReviewPage = () => {
                           {Array.from({ length: 5 }).map((_, j) => (
                             <img
                               key={j}
-                              src="/star.svg"
+                              src={assetUrl("star.svg")}
                               alt=""
                               className={`w-3 h-3 ${j < rev.rating ? "opacity-100" : "opacity-30"}`}
                             />
@@ -293,7 +295,7 @@ const ReviewPage = () => {
                         aria-label={rev.liked ? "Unlike review" : "Like review"}
                       >
                         <img
-                          src="/like.svg"
+                          src={assetUrl("like.svg")}
                           alt=""
                           className={`w-4 h-4 transition-opacity ${
                             animatingLikes.has(rev.id)
@@ -326,7 +328,7 @@ const ReviewPage = () => {
             {[1, 2, 3, 4, 5].map((star) => (
               <img
                 key={star}
-                src="/star.svg"
+                src={assetUrl("star.svg")}
                 alt=""
                 className={`w-10 h-10 cursor-pointer transition ${
                   star <= selectedStars ? "opacity-100" : "opacity-40"
@@ -412,7 +414,7 @@ const ReviewPage = () => {
               onClick={() => setRatingFilter(null)}
               className={`flex items-center justify-center gap-1 p-2.5 rounded-full whitespace-nowrap ${ratingFilter === null ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
             >
-              <img src="/star.svg" alt="" className="w-4 h-4" /> All
+              <img src={assetUrl("star.svg")} alt="" className="w-4 h-4" /> All
             </button>
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -420,7 +422,7 @@ const ReviewPage = () => {
                 onClick={() => setRatingFilter(star)}
                 className={`flex justify-center items-center gap-1 rounded-full p-2.5 text-sm ${ratingFilter === star ? "bg-(--div-active) text-(--dark-def)" : "bg-gray-100"}`}
               >
-                <img src="/star.svg" alt="" className="w-4 h-4" />
+                <img src={assetUrl("star.svg")} alt="" className="w-4 h-4" />
                 {star}
               </button>
             ))}
@@ -441,12 +443,12 @@ const ReviewPage = () => {
             ))
           ) : reviews.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-8">
-              <img src="/nothing-to-show.png" alt="Nothing to show" className="w-24 h-24 object-contain" />
+              <img src={nothingToShowUrl} sizes="96px" alt="Nothing to show" className="w-24 h-24 object-contain" />
               <p className="text-center text-gray-500">This ad has no reviews.</p>
             </div>
           ) : displayedReviews.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-8">
-              <img src="/nothing-to-show.png" alt="Nothing to show" className="w-24 h-24 object-contain" />
+              <img src={nothingToShowUrl} sizes="96px" alt="Nothing to show" className="w-24 h-24 object-contain" />
               <p className="text-center text-gray-500">No reviews with {ratingFilter} star rating{ratingFilter === 1 ? '' : 's'}.</p>
             </div>
           ) : (
@@ -457,7 +459,7 @@ const ReviewPage = () => {
                     <div className="flex items-center gap-3 justify-between">
                       <div className="flex items-center gap-3">
                         <img
-                          src={rev.user?.avatar || "/userPfp2.jpg"}
+                          src={rev.user?.avatar || userPfp2Url}
                           alt=""
                           className="w-8 h-8 rounded-lg"
                         />
@@ -526,7 +528,7 @@ const ReviewPage = () => {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <img
                     key={star}
-                    src="/star.svg"
+                    src={assetUrl("star.svg")}
                     alt=""
                     className={`w-7 h-7 cursor-pointer transition ${
                       star <= selectedStars ? "opacity-100" : "opacity-40"

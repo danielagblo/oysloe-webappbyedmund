@@ -1,4 +1,5 @@
 import type { Category } from "../../types/Category";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   selectedCategoryId: number | null;
@@ -75,35 +76,35 @@ const CategoryFilters = ({
   if (selectedCategoryName) {
     activeFilters.push({
       label: selectedCategoryName,
-      icon: "/cancel.svg",
+      icon: assetUrl("cancel.svg"),
       onClear: handleBackToHome,
     });
   }
   if (selectedLocation) {
     activeFilters.push({
       label: selectedLocation,
-      icon: "/location.svg",
+      icon: assetUrl("location.svg"),
       onClear: () => setSelectedLocation(null),
     });
   }
   if (selectedTimeframe !== "anytime") {
     activeFilters.push({
       label: timeframeLabels[selectedTimeframe],
-      icon: "/time-svgrepo-com.svg",
+      icon: assetUrl("time-svgrepo-com.svg"),
       onClear: () => setSelectedTimeframe("anytime"),
     });
   }
   if (priceSort !== "none") {
     activeFilters.push({
       label: priceSortLabels[priceSort],
-      icon: "/price-tag-svgrepo-com.svg",
+      icon: assetUrl("price-tag-svgrepo-com.svg"),
       onClear: () => setPriceSort("none"),
     });
   }
   if (timeframeSort !== "none") {
     activeFilters.push({
       label: dateSortLabels[timeframeSort],
-      icon: "/date-range-svgrepo-com.svg",
+      icon: assetUrl("date-range-svgrepo-com.svg"),
       onClear: () => setTimeframeSort("none"),
     });
   }
@@ -111,7 +112,7 @@ const CategoryFilters = ({
   if (priceFilterLabel)
     activeFilters.push({
       label: priceFilterLabel,
-      icon: "/filter-svgrepo.svg",
+      icon: assetUrl("filter-svgrepo.svg"),
       onClear: () => setPriceFilter({ mode: "none" }),
     });
 

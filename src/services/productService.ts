@@ -1,4 +1,3 @@
-import mockProductsRaw from "../assets/mocks/products.json";
 // NOTE: AdMetadata import removed because this helper accepts metadata that may include File objects
 import type { Product, ProductPayload, ProductStatus } from "../types/Product";
 import { apiClient } from "./apiClient";
@@ -34,25 +33,12 @@ const uploadToCloudinary = async (file: File) => {
 };
 
 const products = endpoints.products;
-const useMocks = import.meta.env.VITE_USE_MOCKS === "true";
-export const mockProducts: Product[] = mockProductsRaw as unknown as Product[];
 
 // LIST (with ordering + search)
 export const getProducts = async (params?: {
   ordering?: string;
   search?: string;
 }): Promise<Product[]> => {
-  if (useMocks) {
-    let results = [...mockProducts];
-    if (params?.search) {
-      results = results.filter((p) =>
-        p.name.toLowerCase().includes(params.search!.toLowerCase()),
-      );
-    }
-
-    return results;
-  }
-
   const qs = new URLSearchParams();
   if (params?.ordering) qs.append("ordering", params.ordering);
   if (params?.search) qs.append("search", params.search);
@@ -63,12 +49,6 @@ export const getProducts = async (params?: {
 
 // RETRIEVE
 export const getProduct = async (id: number | string): Promise<Product> => {
-  if (useMocks) {
-    const product = mockProducts.find((p) => p.id === +id);
-    if (!product) throw new Error("Mock product not found");
-    return product;
-  }
-
   return apiClient.get<Product>(products.detail(id));
 };
 
@@ -101,14 +81,6 @@ export const patchProduct = async (
 // DELETE
 // ---------------------
 export const deleteProduct = async (id: number | string): Promise<void> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    mockProducts.splice(idx, 1);
-    console.log("Mock deleteProduct id:", id);
-    return;
-  }
-
   await apiClient.delete(products.delete(id));
 };
 
@@ -119,14 +91,6 @@ export const markProductAsTaken = async (
   id: number | string,
   body: Record<string, unknown> = {},
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    // mark-as-taken endpoint should only notify the owner (create alert + sms)
-    // It does NOT set `is_taken` — confirmation endpoint actually performs that.
-    console.log("Mock markProductAsTaken (notify owner):", mockProducts[idx]);
-    return mockProducts[idx];
-  }
 
   // Ensure payload includes `product` field if backend requires it
   const payload = { ...(body || {}) } as Record<string, unknown>;
@@ -142,17 +106,6 @@ export const confirmMarkProductAsTaken = async (
   id: number | string,
   body: Record<string, unknown> = {},
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    mockProducts[idx].is_taken = true;
-    console.log(
-      "Mock confirmMarkProductAsTaken (marked taken):",
-      mockProducts[idx],
-    );
-    return mockProducts[idx];
-  }
-
   const payload = { ...(body || {}) } as Record<string, unknown>;
   if (payload.product == null) payload.product = Number(id);
 
@@ -166,29 +119,6 @@ export const repostProduct = async (
   id: number | string,
   body: unknown = {},
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    const original = mockProducts[idx];
-    if (!original.is_taken)
-      throw new Error("Original product must be marked taken to repost");
-
-    // shallow clone core fields, images and features; do not carry likes/favourites/reports
-    const clone: any = {
-      ...original,
-      id: Math.max(...mockProducts.map((m) => m.id)) + 1,
-      pid: `ad_${Date.now()}`,
-      is_taken: false,
-      status: "PENDING",
-      // reset engagement fields
-      likes: 0,
-      favourites: 0,
-      reports: 0,
-    };
-    mockProducts.push(clone as Product);
-    return clone as Product;
-  }
-
   // Normalize body: allow callers to pass the product id directly (number|string)
   let payload: Record<string, unknown>;
   if (body == null) {
@@ -213,13 +143,6 @@ export const reportProduct = async (
   id: number | string,
   body: ProductPayload | Record<string, unknown> = {},
 ): Promise<Product> => {
-  if (useMocks) {
-    const product = mockProducts.find((p) => p.id === +id);
-    if (!product) throw new Error("Mock product not found");
-    // In mocks just return the product unchanged (report metadata not stored)
-    console.log("Mock reportProduct for:", id, body);
-    return product;
-  }
 
   return apiClient.post<Product>(products.report(id), body);
 };
@@ -230,10 +153,6 @@ export const reportProduct = async (
 export const getProductReports = async (
   id: number | string,
 ): Promise<unknown> => {
-  if (useMocks) {
-    // No stored reports in mock; return empty array
-    return [];
-  }
 
   // Some backends may not accept filtering via query params on the viewset
   // and could return server errors for unknown filters. To be robust we
@@ -279,14 +198,6 @@ export const setProductStatus = async (
   id: number | string,
   body: { status: ProductStatus },
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    mockProducts[idx].status = body.status;
-    console.log("Mock setProductStatus:", mockProducts[idx]);
-    return mockProducts[idx];
-  }
-
   return apiClient.put<Product>(products.setStatus(id), body);
 };
 
@@ -318,9 +229,6 @@ export const getRelatedProducts = async (
     }
   };
 
-  if (useMocks) {
-    return sortByMultiplier([...mockProducts]);
-  }
 
   const qs = new URLSearchParams();
   if (productId != null) qs.append("product_id", String(productId));
@@ -336,24 +244,13 @@ export const getRelatedProducts = async (
 // FAVOURITES
 // ---------------------
 export const getFavourites = async (): Promise<Product[]> => {
-  if (useMocks) {
-    return mockProducts.filter((p) => Boolean((p as any).favourited_by_user));
-  }
-
   return apiClient.get<Product[]>(endpoints.products.favouritesList());
 };
 
 export const toggleFavourite = async (
   id: number | string,
 ): Promise<Product> => {
-  if (useMocks) {
-    const idx = mockProducts.findIndex((p) => p.id === +id);
-    if (idx === -1) throw new Error("Mock product not found");
-    // toggle favourited flag
-    const curr = (mockProducts[idx] as any).favourited_by_user;
-    (mockProducts[idx] as any).favourited_by_user = !curr;
-    return mockProducts[idx];
-  }
+
   return apiClient.post<Product>(endpoints.products.favourite(id), {});
 };
 
@@ -514,23 +411,6 @@ export const createProductFromAd = async (metadata: any) => {
       } catch {
         firstFile = null;
       }
-    }
-
-    // If using mocks, keep existing mock flow but set mock image for
-    // the created product when we have a first file.
-    if (useMocks) {
-      const createdMock = await createProduct(payload);
-      // set a convenience `image` field on the mock product so UI can
-      // read from it (use a blob URL when we have a File)
-      if (firstFile) {
-        try {
-          // createObjectURL is available in browser runtime
-          (createdMock as any).image = URL.createObjectURL(firstFile as Blob);
-        } catch {
-          (createdMock as any).image = (firstFile as any).name ?? null;
-        }
-      }
-      return createdMock;
     }
 
     // For real server: when there's a first file, prefer uploading it to

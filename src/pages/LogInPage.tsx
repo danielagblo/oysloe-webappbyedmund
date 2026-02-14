@@ -9,6 +9,7 @@ import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
 import { useLogin } from "../features/Auth/useAuth";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
+import { assetUrl } from "../assets/publicAssets";
 
 const LogInPage = () => {
   const navigate = useNavigate();
@@ -157,7 +158,7 @@ const LogInPage = () => {
               className="text-sm px-2 py-1 pl-3 cursor-pointer text-gray-500 bg-(--div-active) rounded-full hover:bg-gray-100 transition max-sm:fixed max-sm:top-4 max-sm:right-4 max-sm:bg-transparent max-sm:hover:bg-transparent"
             >
               Skip &nbsp;
-              <img className="inline h-4 w-4" src="/skip.svg" alt=">" />
+              <img className="inline h-4 w-4" src={assetUrl("skip.svg")} alt=">" />
             </button>
           </div>
           <h2 className="text-2xl max-sm:text-[28px]">Welcome!</h2>
@@ -173,7 +174,7 @@ const LogInPage = () => {
                   className="border-gray-100 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
                 <img
-                  src="/mailbox-svgrepo-com.svg"
+                  src={assetUrl("mailbox-svgrepo-com.svg")}
                   alt="Email"
                   className="absolute left-2 max-sm:left-4 top-3 max-sm:top-5 h-5 max-sm:h-6 max-sm:w-6 w-5"
                 />
@@ -188,7 +189,7 @@ const LogInPage = () => {
                   className="border-gray-100 max-sm:bg-white max-sm:text-[16px] max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl border-2 max-sm:border-gray-300 px-8 max-sm:pl-12 py-2 w-full rounded-lg focus:border-gray-400 outline-0 pr-10"
                 />
                 <img
-                  src="/Passwordkey.svg"
+                  src={assetUrl("Passwordkey.svg")}
                   alt="Password"
                   className="absolute left-2 top-3 h-5 max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:w-6 w-5"
                 />

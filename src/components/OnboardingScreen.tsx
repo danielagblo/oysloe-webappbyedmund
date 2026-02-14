@@ -5,6 +5,7 @@ import LottieUserSafetyGuarantee from "./LottieUserSafetyGuarantee";
 import LottieSecurityStatusSafe from "./LottieSecurityStatusSafe";
 import LottieScaleToSuccessMobile from "./LottieScaleToSuccessMobile";
 import LottieJourneyBeginsNowMobile from "./LottieJourneyBeginsNowMobile";
+import { assetUrl } from "../assets/publicAssets";
 
 type Props = {
   overlay?: boolean;
@@ -71,7 +72,7 @@ const OnboardingScreen = ({ overlay = false, onFinish }: Props) => {
         <div className={`flex flex-col items-center justify-center h-screen w-screen overflow-hidden bg-[var(--green)] transition-all duration-800 ${
           !splashInitialized ? "opacity-0" : splashAnimating ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"
         }`}>
-          <img src="/Logo1.svg" alt="Oysloe" className="w-[242px] h-[242px] object-contain" />
+          <img src={assetUrl("Logo1.svg")} alt="Oysloe" className="w-[242px] h-[242px] object-contain" />
           <div className="absolute bottom-10 text-center">
             <p className="text-5xl font-medium text-(--dark-def)">Oysloe</p>
           </div>
