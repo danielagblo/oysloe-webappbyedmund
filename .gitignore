@@ -28,3 +28,5 @@ Api.ts
 *.sw?
 .env
 .env
+export-images.js
+downloads
