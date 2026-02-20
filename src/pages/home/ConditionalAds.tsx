@@ -1,9 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Watermark from "../../components/ImageWithWatermark";
+import { noImageUrl, nothingToShowUrl } from "../../assets/images";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { buildCloudinarySrcSet } from "../../utils/cloudinary";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   selectedCategory: Category | null;
@@ -38,7 +41,9 @@ const ConditionalAds = ({
               >
                 <div className="relative inline-block w-full max-sm:max-w-52">
                   <img
-                    src={ad.image || "/no-image.jpeg"}
+                    src={ad.image || noImageUrl}
+                    srcSet={buildCloudinarySrcSet(ad.image)}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 22vw, 22vw"
                     alt={ad.name}
                     className="w-full h-[120px] sm:h-52 lg:h-[17.5vw] max-sm:max-w-52 object-cover rounded-2xl lg:rounded-[1vw]"
                     onContextMenu={(e) => e.preventDefault()}
@@ -47,7 +52,7 @@ const ConditionalAds = ({
                 </div>
                 <div className="max-sm:flex max-sm:flex-col max-sm:w-10/12">
                   <div className="flex items-center gap-1 px-2 py-1">
-                    <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
+                    <img src={assetUrl("location.svg")} alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
                     <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-600 truncate">
                       {
                         ad.location?.name ??
@@ -69,7 +74,8 @@ const ConditionalAds = ({
         ) : (
           <div className="flex flex-col items-center justify-start col-span-full w-full">
             <img
-              src="/nothing-to-show.png"
+              src={nothingToShowUrl}
+              sizes="(max-width: 640px) 40px, 160px"
               alt="nothing to show"
               className="h-10 w-10 lg:h-[10vw] lg:w-[10vw]"
             />

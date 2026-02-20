@@ -8,6 +8,7 @@ import PhoneInput from "../components/PhoneInput";
 import { useVerifyOTP } from "../features/verifyOTP/useVerifyOTP";
 import { toast } from "sonner";
 import { ResetDropdown } from "../components/ResetDropdown";
+import { assetUrl } from "../assets/publicAssets";
 
 const ResetPasswordWithPhonePage = ({
   page = "Reset Password",
@@ -72,7 +73,7 @@ const ResetPasswordWithPhonePage = ({
                 className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-gray-100 border-2 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
               <img
-                src="/phone.svg"
+                src={assetUrl("phone.svg")}
                 alt="phone"
                 className="absolute top-4 left-2 h-6 w-6 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
               />

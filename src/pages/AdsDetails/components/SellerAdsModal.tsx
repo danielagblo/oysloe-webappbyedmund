@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Watermark from "../../../components/ImageWithWatermark";
+import { noImageUrl, nothingToShowUrl } from "../../../assets/images";
 import type { Product } from "../../../types/Product";
 import { formatMoney } from "../../../utils/formatMoney";
+import { buildCloudinarySrcSet } from "../../../utils/cloudinary";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface SellerAdsModalProps {
   isSellerAdsModalOpen: boolean;
@@ -114,7 +117,9 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
               >
                 <div className="relative shrink-0">
                   <img
-                    src={ad.image || "/no-image.jpeg"}
+                    src={ad.image || noImageUrl}
+                    srcSet={buildCloudinarySrcSet(ad.image)}
+                    sizes="80px"
                     alt={ad.name}
                     className="w-20 h-20 object-cover rounded-lg"
                     onContextMenu={(e) => e.preventDefault()}
@@ -126,7 +131,7 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
                     {ad.name}
                   </h3>
                   <p className="text-gray-600 text-xs md:text-sm">
-                    <img className="inline h-3 w-3" src="/location.svg" alt="" />
+                    <img className="inline h-3 w-3" src={assetUrl("location.svg")} alt="" />
                     &nbsp;
                     {(ad.location?.name || "") +
                       (ad.location?.name && ad.location?.region ? ", " : "") +
@@ -144,7 +149,8 @@ const SellerAdsModal: React.FC<SellerAdsModalProps> = ({
         ) : (
           <div className="flex flex-col items-center justify-center py-8 gap-3">
             <img
-              src="/nothing-to-show.png"
+              src={nothingToShowUrl}
+              sizes="64px"
               className="w-16 h-16"
               alt="no ads"
             />

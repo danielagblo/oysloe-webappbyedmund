@@ -1,6 +1,7 @@
 import React from "react";
 import { formatMoney } from "../../../utils/formatMoney";
 import type { Product } from "../../../types/Product";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface TitleAndPriceProps {
   currentAdData?: Product | any;
@@ -15,7 +16,7 @@ const TitleAndPrice: React.FC<TitleAndPriceProps> = ({
   return (
     <div className="bg-white px-4 sm:px-0 py-2 w-full text-left rounded-lg">
       <div className="flex items-center gap-2">
-        <img src="/location.svg" alt="" className="w-3 h-3 sm:w-4 sm:h-4 lg:w-[1.2vw] lg:h-[1.2vw]" />
+        <img src={assetUrl("location.svg")} alt="" className="w-3 h-3 sm:w-4 sm:h-4 lg:w-[1.2vw] lg:h-[1.2vw]" />
         <h2 className="text-sm sm:text-5 lg:text-[1.1vw]">
           {currentAdData?.location?.name && currentAdData?.location?.region
             ? `${currentAdData?.location?.name}, ${currentAdData?.location?.region} Region`

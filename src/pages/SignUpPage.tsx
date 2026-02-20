@@ -13,6 +13,7 @@ import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import { apiClient } from "../services/apiClient";
 import { endpoints } from "../services/endpoints";
 import type { RegisterRequest } from "../types/Auth";
+import { assetUrl } from "../assets/publicAssets";
 
 const SignInPage = () => {
   const isSmall = useIsSmallScreen();
@@ -251,7 +252,7 @@ const SignInPage = () => {
                   className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
                 <img
-                  src="/name.svg"
+                  src={assetUrl("name.svg")}
                   alt="Name"
                   className="absolute left-2  max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5"
                 />
@@ -268,7 +269,7 @@ const SignInPage = () => {
                   className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400  outline-0"
                 />
                 <img
-                  src="/email.svg"
+                  src={assetUrl("email.svg")}
                   alt="Email"
                   className="absolute  max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:text-[16px] max-sm:w-6 left-2 top-3 h-5 w-5"
                 />
@@ -283,7 +284,7 @@ const SignInPage = () => {
                   
                 />
                 <img
-                  src="/phone.svg"
+                  src={assetUrl("phone.svg")}
                   alt="Phone"
                   className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5"
                 />
@@ -300,7 +301,7 @@ const SignInPage = () => {
                   className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0 pr-10"
                 />
                 <img
-                  src="/Passwordkey.svg"
+                  src={assetUrl("Passwordkey.svg")}
                   alt="Password"
                   className="absolute left-2 top-3 max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:text-[16px] max-sm:w-6 h-5 w-5"
                 />
@@ -359,7 +360,7 @@ const SignInPage = () => {
                   className="max-sm:border-gray-300 max-sm:text-[16px] max-sm:pl-12 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:rounded-2xl border-gray-100 border-2 px-8 py-2 w-full rounded-lg focus:border-gray-400 outline-0 pr-10"
                 />
                 <img
-                  src="/Passwordkey.svg"
+                  src={assetUrl("Passwordkey.svg")}
                   alt="Password"
                   className="absolute left-2 max-sm:h-6 max-sm:left-4 max-sm:top-5 max-sm:text-[16px] max-sm:w-6 top-3 h-5 w-5"
                 />

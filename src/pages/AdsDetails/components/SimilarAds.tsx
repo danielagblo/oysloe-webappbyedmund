@@ -2,6 +2,8 @@ import React, { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { formatMoney } from "../../../utils/formatMoney";
 import ProgressiveImage from "../../../components/ProgressiveImage";
+import { noImageUrl, nothingToShowUrl } from "../../../assets/images";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface SimilarAdsProps {
   relatedProducts: any[];
@@ -65,7 +67,7 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
   const hasMoreFallback = fallbackStartIndex > 0 && displayedFallbackCount < fallbackAds.length;
 
   return (
-  <div className="bg-white sm:bg-(--div-active) max-sm:p-4 sm:py-6 w-screen md:px-12">
+  <div className="bg-(--div-active) max-sm:bg-gray-100 max-sm:p-4 sm:py-6 w-screen md:px-12">
     <div className="flex items-center justify-between mb-6 px-2 md:px-20">
       <h2
         className="text-xl font-bold lg:text-2xl"
@@ -73,21 +75,57 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
       >
         Similar Ads
       </h2>
-      <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          onClick={() => setLayout("grid")}
-          className="py-1 rounded"
-          aria-label="Grid view"
-        >
-          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-svgrepo-com.svg" alt="grid" />
-        </button>
-        <button
-          onClick={() => setLayout("mason")}
-          className="py-1 rounded"
-          aria-label="Masonry view"
-        >
-          <img className="h-7 w-7 sm:h-8 sm:w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
-        </button>
+      <div className="flex sm:hidden items-center gap-3 sm:gap-4">
+          {
+            layout === "mason" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
+                aria-label="Mason View"
+              >
+                <img
+                  className="h-7 w-7"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+              </button>
+            )
+          }
+          <button
+            onClick={() => setLayout("grid")}
+            className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
+            aria-label="Grid View"
+          >
+            <img
+              className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
+              src={assetUrl("grid-svgrepo-com.svg")}
+              alt="grid"
+              loading="lazy"
+              decoding="async"
+            />
+
+          </button>
+          {
+            layout === "grid" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`py-1 rounded`}
+                aria-label="Mason View"
+              >
+                <img
+                  className="h-5.5 w-5.5"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+              </button>
+            )
+          }
       </div>
     </div>
 
@@ -100,9 +138,12 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
     ) : availableAds.length === 0 ? (
       <div className="flex items-center flex-col justify-center w-full gap-2">
         <img
-          src="/nothing-to-show.png"
+          src={nothingToShowUrl}
+          sizes="100px"
           className="w-25 h-25"
           alt="nothing to show"
+          loading="lazy"
+          decoding="async"
         />
         <p className="text-gray-500 text-sm sm:text-xl lg:text-[1.2vw] w-full text-center">
           No similar ads to show.
@@ -131,14 +172,15 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   to={`/ads/${ad.id}`}
                   state={{ adData: ad }}
                   onClick={markReturnTarget}
-                  className={`inline-block rounded-md overflow-hidden shrink-0 w-full sm:w-48 md:w-52 ${
-                    layout === "mason" ? "mb-8" : "mb-2"
+                  className={`inline-block rounded-md overflow-hidden max-sm:bg-white max-sm:p-2 shrink-0 w-full sm:w-48 md:w-52 ${
+                    layout === "mason" ? "mb-2" : "mb-2"
                   }`}
                 >
                   <ProgressiveImage
-                    src={ad.image || "/no-image.jpeg"}
+                    src={ad.image || noImageUrl}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 12rem, 13rem"
                     alt={ad.name.slice(0, 10)}
-                    containerClassName={`relative w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85" : "h-[120px] sm:h-48"}`}
+                    containerClassName={`relative max-sm:max-h-85 w-full ${layout === "mason" ? "max-sm:break-inside-avoid max-h-85 max-sm:min-h-[140px]" : "h-40 sm:h-48"}`}
                     imgClassName="w-full h-full object-cover rounded-md"
                     watermarkBusinessName={ad.owner?.business_name}
                     watermarkSize="sm"
@@ -146,8 +188,10 @@ const SimilarAds: React.FC<SimilarAdsProps> = ({
                   />
                   <div className="flex items-center gap-1 px-2 py-1">
                     <img
-                      src="/location.svg"
+                      src={assetUrl("location.svg")}
                       alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="w-3 sm:w-4 h-3 sm:h-4 md:h-[1.2vw] md:w-[1.2vw]"
                     />
                     <p className="text-[10px] sm:text-xs md:text-[0.9vw] text-gray-500 truncate">

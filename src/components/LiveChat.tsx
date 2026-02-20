@@ -4,6 +4,8 @@ import { type UseWsChatReturn } from "../features/chat/useWsChat";
 import type { Message as ChatMessage } from "../services/chatService";
 import * as productService from "../services/productService";
 import userProfileService from "../services/userProfileService";
+import { userPfp2Url } from "../assets/images";
+import { assetImage, assetUrl } from "../assets/publicAssets";
 import type { Product } from "../types/Product";
 import type { UserProfile } from "../types/UserProfile";
 import { formatReviewDate } from "../utils/formatReviewDate";
@@ -203,7 +205,7 @@ function ChatInput({
               aria-label="Send recording"
               className={`p-2 rounded-2xl hover:bg-gray-300 sm:bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <img src="/send.svg" alt="Send" className="w-6 h-6" />
+              <img src={assetUrl("send.svg")} alt="Send" className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -261,7 +263,13 @@ function ChatInput({
                 className="absolute bottom-3 left-3"
                 type="button"
               >
-                <img src="/image.png" alt="Attach" className="w-5 lg:w-[1.75vw] h-auto" />
+                <img
+                  src={assetImage("image.png").src}
+                  srcSet={assetImage("image.png").srcSet}
+                  sizes="20px"
+                  alt="Attach"
+                  className="w-5 lg:w-[1.75vw] h-auto"
+                />
               </button>
             )}
           </div>
@@ -286,7 +294,7 @@ function ChatInput({
               disabled={disabled}
               className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <img src="/send.svg" alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
+              <img src={assetUrl("send.svg")} alt="Send" className="w-6 lg:w-[1.75vw] h-auto" />
             </button>
             <button
               onClick={() => startRecording()}
@@ -295,7 +303,7 @@ function ChatInput({
               disabled={disabled}
               className={`p-2 lg:p-3 rounded-2xl lg:rounded-[0.75vw] border-2 lg:border outline-0 border-gray-300 hover:bg-gray-300 bg-white flex items-center justify-center ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              <img src="/audio.svg" alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
+              <img src={assetUrl("audio.svg")} alt="Record" className="w-6 lg:w-[1.75vw] h-6 lg:h-[1.75vw]" />
             </button>
           </div>
         </div>
@@ -1418,7 +1426,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
               aria-label="Back"
               className="p-2 hover:bg-gray-100 curosor-pointer rounded-full ml-2"
             >
-              <img src='/skip.svg' className="transform scale-x-[-1] w-3 h-3 lg:w-[1.25vw] lg:h-[1.25vw] lg:mr-[1vw]" />
+              <img src={assetUrl("skip.svg")} className="transform scale-x-[-1] w-3 h-3 lg:w-[1.25vw] lg:h-[1.25vw] lg:mr-[1vw]" />
             </button>
 
             {(() => {
@@ -1440,6 +1448,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                     <img
                       src={headerProductImage}
                       alt={headerProduct?.name ?? "Product"}
+                      loading="eager"
+                      decoding="async"
+                      width={40}
+                      height={40}
                       onError={(e) => {
                         try {
                           const el = e.target as HTMLImageElement;
@@ -1455,7 +1467,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                           // ignore
                         }
                         try {
-                          (e.target as HTMLImageElement).src = "/userPfp2.jpg";
+                          (e.target as HTMLImageElement).src = userPfp2Url;
                         } catch {
                           // ignore
                         }
@@ -1494,6 +1506,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                 <img
                   src={headerAvatar}
                   alt={(roomInfo as any)?.other_user ?? "User"}
+                  loading="eager"
+                  decoding="async"
+                  width={40}
+                  height={40}
                   onError={(e) => {
                     try {
                       const el = e.target as HTMLImageElement;
@@ -1509,7 +1525,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                       // ignore
                     }
                     try {
-                      (e.target as HTMLImageElement).src = "/userPfp2.jpg";
+                      (e.target as HTMLImageElement).src = userPfp2Url;
                     } catch {
                       // ignore
                     }
@@ -1686,7 +1702,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
 
               }
               const delivery = getMessageDelivery(msg as unknown);
-              const DEFAULT_AVATAR = "/userPfp2.jpg";
+              const DEFAULT_AVATAR = userPfp2Url;
 
               // avatar resolution completed
 
@@ -1726,6 +1742,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                               <img
                                 src={String(maybeImageSrc)}
                                 alt="attachment"
+                                loading="lazy"
+                                decoding="async"
                                 className="max-w-full max-h-60 object-contain rounded cursor-pointer"
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
@@ -1741,6 +1759,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                           <img
                             src={normAvatar || DEFAULT_AVATAR}
                             alt={msg.sender?.name ?? "You"}
+                            loading="lazy"
+                            decoding="async"
+                            width={40}
+                            height={40}
                             onError={(e) => {
                               try {
                                 const el = e.target as HTMLImageElement;
@@ -1799,6 +1821,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                               <img
                                 src={String(maybeImageSrc)}
                                 alt="attachment"
+                                loading="lazy"
+                                decoding="async"
                                 className="max-w-full max-h-60 object-contain rounded cursor-pointer"
                                 onClick={() => openImage(String(maybeImageSrc))}
                                 role="button"
@@ -1814,6 +1838,10 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
                           <img
                             src={normAvatar || DEFAULT_AVATAR}
                             alt={msg.sender?.name ?? "User"}
+                            loading="lazy"
+                            decoding="async"
+                            width={40}
+                            height={40}
                             onError={(e) => {
                               try {
                                 const el = e.target as HTMLImageElement;
@@ -1915,7 +1943,7 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
             return null;
           })()
         }
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-sm:mb-14">
           <input
             ref={fileInputRef}
             type="file"
@@ -1968,6 +1996,8 @@ export default function LiveChat({ caseId, onClose, ws }: LiveChatProps) {
               <img
                 src={lightboxSrc}
                 alt="preview"
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-contain rounded"
               />
             </div>

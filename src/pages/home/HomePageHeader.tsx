@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { assetUrl } from "../../assets/publicAssets";
 
 type HomePageHeaderProps = {
   searchValue: string;
@@ -47,7 +48,7 @@ const HomePageHeader = ({
               />
 
               <img
-                src="/search.svg"
+                src={assetUrl("search.svg")}
                 className="search-icon absolute flex top-3.5 md:top-4.5 -left-3 max-md:left-2.5 max-sm:left-[9%] w-5 h-5 z-40"
               />
             </div>

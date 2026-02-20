@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import LoadingDots from "./LoadingDots";
 import Watermark from "./ImageWithWatermark";
+import { buildCloudinarySrcSet } from "../utils/cloudinary";
 
 type WatermarkSize = "xxs" | "xs" | "sm" | "md" | "lg";
 
@@ -12,6 +13,14 @@ type Props = {
   watermarkBusinessName?: string | null;
   watermarkSize?: WatermarkSize;
   onContextMenu?: (e: React.MouseEvent) => void;
+  loading?: "lazy" | "eager";
+  decoding?: "async" | "sync" | "auto";
+  fetchPriority?: "high" | "low" | "auto";
+  width?: number | string;
+  height?: number | string;
+  srcSet?: string;
+  sizes?: string;
+  autoCloudinary?: boolean;
 };
 
 const ProgressiveImage: React.FC<Props> = ({
@@ -22,15 +31,30 @@ const ProgressiveImage: React.FC<Props> = ({
   watermarkBusinessName,
   watermarkSize,
   onContextMenu,
+  loading = "lazy",
+  decoding = "async",
+  fetchPriority,
+  width,
+  height,
+  srcSet,
+  sizes,
+  autoCloudinary = true,
 }) => {
   const [loaded, setLoaded] = useState(false);
+  const resolvedSrcSet = srcSet || (autoCloudinary ? buildCloudinarySrcSet(src) : undefined);
 
   return (
     <div className={"relative overflow-hidden " + (containerClassName || "")}> 
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={loading}
+        decoding={decoding}
+        fetchPriority={fetchPriority}
+        width={width}
+        height={height}
+        srcSet={resolvedSrcSet}
+        sizes={sizes}
         onLoad={() => setLoaded(true)}
         onError={() => setLoaded(true)}
         onContextMenu={onContextMenu}

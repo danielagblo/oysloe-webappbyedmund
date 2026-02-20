@@ -5,6 +5,8 @@ import MenuButton from "../components/MenuButton";
 import ProfileStats from "../components/ProfileStats";
 import { useUserProfile } from "../features/userProfile/useUserProfile";
 import { createJobApplication } from "../services/jobService";
+import { nothingToShowUrl } from "../assets/images";
+import { assetUrl } from "../assets/publicAssets";
 
 interface ApplicationFormData {
   name: string;
@@ -234,7 +236,7 @@ function ServiceApplicationPage() {
               className="flex items-center gap-1 sm:gap-2 text-xs sm:text-base font-medium text-(--dark-def) disabled:opacity-50 disabled:cursor-not-allowed hover:opacity-80"
             >
               <img
-                src="/arrowleft.svg"
+                src={assetUrl("arrowleft.svg")}
                 alt=""
                 className="h-4 w-4 sm:h-5 sm:w-5"
               />
@@ -422,7 +424,7 @@ function ServiceApplicationPage() {
                             <div className="flex items-center gap-3">
                               <span className="text-2xl">
                                 <img
-                                  src="/resume.svg"
+                                  src={assetUrl("resume.svg")}
                                   className="h-6 w-6"
                                   alt="resume"
                                 />
@@ -444,7 +446,7 @@ function ServiceApplicationPage() {
                               className="text-red-500 hover:text-red-700 text-xl cursor-pointer"
                             >
                               <img
-                                src="/bin-svg.svg"
+                                src={assetUrl("bin-svg.svg")}
                                 className="h-6 w-6"
                                 alt="delete"
                               />
@@ -568,7 +570,7 @@ function ServiceApplicationPage() {
                           <div className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg w-fit">
                             <span className="text-xl">
                               <img
-                                src="/resume.svg"
+                                src={assetUrl("resume.svg")}
                                 className="h-6 w-6"
                                 alt="resume"
                               />
@@ -583,8 +585,9 @@ function ServiceApplicationPage() {
                           </div>
                         ) : (
                           <div className="flex items-center flex-col justify-center">
-                            <img
-                              src="/nothing-to-show.png"
+                              <img
+                                src={nothingToShowUrl}
+                                sizes="60px"
                               className="h-15 w-15"
                               alt="nothing to show"
                             />

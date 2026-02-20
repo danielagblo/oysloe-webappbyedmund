@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useOnline } from "../context/ConnectivityStatusContext";
 import LottieNoNetwork from "./LottieNoNetwork";
+// import { assetUrl } from "../assets/publicAssets";
 
 const OfflineModal = () => {
   const isOnline = useOnline();
@@ -41,7 +42,7 @@ const OfflineModal = () => {
       
       <div className="bg-white p-6 rounded-lg shadow-lg text-center px-15 max-sm:px-8">
         {/* <img
-          src="/no-internet.png"
+          src={assetUrl("no-internet.png")}
           alt="No internet connection"
           className="mx-auto mb-4 w-40 h-40 lg:w-50 lg:h-50"
         /> */}

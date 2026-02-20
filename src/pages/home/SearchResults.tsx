@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
+import { noImageUrl } from "../../assets/images";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   products: Product[];
@@ -39,7 +41,8 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
               onClick={(e) => handleAdClick(ad, e)}
             >
               <ProgressiveImage
-                src={ad.image || "/no-image.jpeg"}
+                src={ad.image || noImageUrl}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 30vw, 18vw"
                 alt={ad.name}
                 containerClassName="relative inline-block w-full"
                 imgClassName="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
@@ -48,7 +51,13 @@ const SearchResults = ({ products, applyFilters, handleAdClick }: Props) => {
                 onContextMenu={(e) => e.preventDefault()}
               />
               <div className="flex items-center gap-1 px-2 py-1">
-                <img src="/location.svg" alt="" className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]" />
+                <img
+                  src={assetUrl("location.svg")}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
+                />
                 <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-600 truncate">
                   {
                     ad.location?.name ??

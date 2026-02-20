@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import type { UserProfile } from "../types/UserProfile";
+import { assetUrl } from "../assets/publicAssets";
 
 interface CompleteStepsModalProps {
   isOpen: boolean;
@@ -133,7 +134,7 @@ const CompleteStepsModal = ({ isOpen, onClose, userProfile }: CompleteStepsModal
           <div className="flex items-start gap-4 mt-4">
             <div className="flex flex-col items-center">
               <div className="h-12 w-12 rounded-full bg-[#DDF59B] flex items-center justify-center">
-                <img className="p-2" src="/subecribe.svg" alt="subscribe" />
+                <img className="p-2" src={assetUrl("subecribe.svg")} alt="subscribe" />
               </div>
               <div className="w-px flex-1 bg-gray-300 my-2" />
             </div>
@@ -149,7 +150,7 @@ const CompleteStepsModal = ({ isOpen, onClose, userProfile }: CompleteStepsModal
           <div className="flex items-start gap-4 mt-4">
             <div className="flex flex-col items-center">
               <div className="h-12 w-12 rounded-full bg-[#F2D19B] flex items-center justify-center">
-                <img className="p-2.5" src="/Post.svg" alt="post" />
+                <img className="p-2.5" src={assetUrl("Post.svg")} alt="post" />
               </div>
             </div>
             <div className="flex-1">

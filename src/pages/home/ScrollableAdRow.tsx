@@ -2,9 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
 import Loader from "../../components/LoadingDots";
+import { noImageUrl, nothingToShowUrl } from "../../assets/images";
 import type { Category } from "../../types/Category";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   category: Category;
@@ -46,13 +48,25 @@ const ScrollableAdRow = ({
             onClick={() => handleArrowClick("left", category.id)}
             className="bg-gray-200 p-2 rounded-full shrink-0"
           >
-            <img src="/arrowleft.svg" alt="Left" className="w-3 sm:w-8" />
+            <img
+              src={assetUrl("arrowleft.svg")}
+              alt="Left"
+              loading="lazy"
+              decoding="async"
+              className="w-3 sm:w-8"
+            />
           </button>
           <button
             onClick={() => handleArrowClick("right", category.id)}
             className="bg-gray-200 p-2 rounded-full shrink-0"
           >
-            <img src="/arrowright.svg" alt="Right" className="w-3 sm:w-8" />
+            <img
+              src={assetUrl("arrowright.svg")}
+              alt="Right"
+              loading="lazy"
+              decoding="async"
+              className="w-3 sm:w-8"
+            />
           </button>
         </div>
       </div>
@@ -73,7 +87,8 @@ const ScrollableAdRow = ({
                 className="inline-block rounded-2xl overflow-hidden shrink-0 w-[38vw] sm:w-48 md:w-52 lg:w-[17.5vw]"
               >
                 <ProgressiveImage
-                  src={ad.image || "/no-image.jpeg"}
+                  src={ad.image || noImageUrl}
+                  sizes="(max-width: 640px) 38vw, (max-width: 1024px) 12rem, 17.5vw"
                   alt={ad.name}
                   containerClassName="relative inline-block w-full"
                   imgClassName="w-full h-[120px] sm:h-52 lg:h-[17.5vw] object-cover rounded-2xl lg:rounded-[1vw]"
@@ -83,8 +98,10 @@ const ScrollableAdRow = ({
                 />
                 <div className="flex items-center gap-1 px-2 py-0.5">
                   <img
-                    src="/location.svg"
+                    src={assetUrl("location.svg")}
                     alt=""
+                    loading="lazy"
+                    decoding="async"
                     className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
                   />
                   <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
@@ -102,7 +119,14 @@ const ScrollableAdRow = ({
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center">
-            <img src="/nothing-to-show.png" alt="nothing to show" className="h-7 w-7" />
+            <img
+              src={nothingToShowUrl}
+              sizes="28px"
+              alt="nothing to show"
+              loading="lazy"
+              decoding="async"
+              className="h-7 w-7"
+            />
             <p className="px-2 text-sm text-gray-500">No ads to show here...</p>
           </div>
         )}

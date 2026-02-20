@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import Subscription from "../assets/Subscription.png";
+import { getOptimizedAsset } from "../assets/optimizedImages";
 import {
   useCreateUserSubscription,
   useSubscriptions,
@@ -161,7 +161,7 @@ const SubscriptionPage = () => {
   if (isSmall) {
     return (
       <>
-        <div className="flex flex-col w-full h-screen w-screen bg-gray-50 px-4 py-8 sm:pb-0 max-lg:py-20 overflow-y-auto">
+        <div className="flex flex-col w-screen h-screen bg-gray-50 px-4 py-8 sm:pb-0 max-lg:py-20 overflow-y-auto">
           {activeUserSub && (
             <div className="bg-(--div-active) max-lg:bg-white flex p-4 rounded-2xl justify-between items-center gap-2 w-full mb-6">
               <div className="w-full flex flex-col justify-start items-start gap-4">
@@ -178,7 +178,13 @@ const SubscriptionPage = () => {
                   </p>
                 </div>
               </div>
-              <img src={Subscription} alt="subscription" className="w-16" />
+              <img
+                src={getOptimizedAsset("Subscription.png").src}
+                srcSet={getOptimizedAsset("Subscription.png").srcSet}
+                sizes="64px"
+                alt="subscription"
+                className="w-16"
+              />
             </div>
           )}
 
@@ -288,7 +294,9 @@ const SubscriptionPage = () => {
                     )}
                   </div>
                   <img
-                    src={Subscription}
+                    src={getOptimizedAsset("Subscription.png").src}
+                    srcSet={getOptimizedAsset("Subscription.png").srcSet}
+                    sizes="20vw"
                     alt="subscription"
                     className="w-[20%] z-200"
                   />

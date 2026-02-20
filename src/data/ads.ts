@@ -1,4 +1,6 @@
-import adPlaceholderImg from "../assets/ad-placeholder.png";
+import { getOptimizedAsset } from "../assets/optimizedImages";
+
+const adPlaceholderImg = getOptimizedAsset("ad-placeholder.png").src;
 
 export const ads = [
   {

@@ -1,5 +1,7 @@
 import React from "react";
 import ProgressiveImage from "../../../components/ProgressiveImage";
+import { noImageUrl } from "../../../assets/images";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface PictureModalProps {
   pageImages: string[];
@@ -21,7 +23,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
   businessName,
 }) => {
   if (!isPictureModalOpen) return null;
-  const imgs = pageImages.length > 0 ? pageImages : ["/no-image.jpeg"];
+  const imgs = pageImages.length > 0 ? pageImages : [noImageUrl];
   const max = imgs.length;
 
   const prev = (e?: React.MouseEvent) => {
@@ -74,26 +76,22 @@ const PictureModal: React.FC<PictureModalProps> = ({
             }}
             aria-label="Previous"
           >
-            <img src="/arrowleft.svg" alt="Prev" />
+            <img src={assetUrl("arrowleft.svg")} alt="Prev" loading="lazy" decoding="async" />
           </button>
         )}
 
         <div className="relative flex items-center justify-center w-full">
-          <div
-            className="absolute inset-0 bg-cover bg-center blur-md opacity-40 rounded"
-            style={{
-              backgroundImage: `url(${imgs[pictureModalIndex] ?? "/no-image.jpeg"})`,
-            }}
-          />
           <div className="relative">
             <ProgressiveImage
-              src={imgs[pictureModalIndex] ?? "/no-image.jpeg"}
+              src={imgs[pictureModalIndex] ?? noImageUrl}
+              sizes="(max-width: 640px) 90vw, 70vw"
               alt={`Modal image ${pictureModalIndex + 1}`}
               containerClassName="relative"
               imgClassName="max-h-[60vh] sm:max-h-[70vh] object-contain w-full  relative z-10"
               watermarkBusinessName={businessName}
               watermarkSize="lg"
               onContextMenu={(e) => e.preventDefault()}
+              loading="eager"
             />
           </div>
         </div>
@@ -108,7 +106,7 @@ const PictureModal: React.FC<PictureModalProps> = ({
             }}
             aria-label="Next"
           >
-            <img src="/arrowright.svg" alt="Next" />
+            <img src={assetUrl("arrowright.svg")} alt="Next" loading="lazy" decoding="async" />
           </button>
         )}
 
@@ -127,6 +125,8 @@ const PictureModal: React.FC<PictureModalProps> = ({
                 watermarkBusinessName={businessName}
                 watermarkSize="xxs"
                 onContextMenu={(e) => e.preventDefault()}
+                width={80}
+                height={80}
               />
             </button>
           ))}

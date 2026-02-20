@@ -6,6 +6,7 @@ import LottieSuccess from "../components/LottieSuccess";
 import OnboardingScreen from "../components/OnboardingScreen";
 import OTPLogin from "../components/OTPLogin";
 import { ResetDropdown } from "../components/ResetDropdown";
+import { assetUrl } from "../assets/publicAssets";
 
 const ResetPasswordWithEmailPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +30,7 @@ const ResetPasswordWithEmailPage = () => {
                 className="max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl border-2 max-sm:border-gray-300 max-sm:pl-12 border-gray-100 px-8 py-3 pl-10 w-full rounded-lg focus:border-gray-400  outline-0"
               />
               <img
-                src="/email.svg"
+                src={assetUrl("email.svg")}
                 alt="email"
                 className="absolute h-6 w-6 left-2 max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
               />

@@ -6,6 +6,9 @@ import SkeletonLoader from "../components/SkeletonLoader";
 import type { Product } from "../types/Product";
 import { formatMoney } from "../utils/formatMoney";
 import { useNavigate } from "react-router-dom";
+import { noImageUrl, nothingToShowUrl } from "../assets/images";
+import { buildCloudinarySrcSet } from "../utils/cloudinary";
+import { assetUrl } from "../assets/publicAssets";
 
 const FavouritesPage = () => {
   const isSmall = useIsSmallScreen(1023);
@@ -28,7 +31,7 @@ const FavouritesPage = () => {
           {/* <div className="px-4 py-4">
             <div className="flex items-center gap-3">
               <img
-                src="/favorited.svg"
+                src={assetUrl("favorited.svg")}
                 alt="Favourites"
                 className="w-10 h-10 bg-[#f3f4f6] rounded-full p-2"
               />
@@ -50,7 +53,8 @@ const FavouritesPage = () => {
             ) : favourites.length === 0 ? (
               <div className="flex flex-col gap-4 justify-center items-center h-full">
                 <img
-                  src="/nothing-to-show.png"
+                  src={nothingToShowUrl}
+                  sizes="160px"
                   alt="Nothing to show here"
                   className="h-40 w-auto"
                 />
@@ -69,7 +73,9 @@ const FavouritesPage = () => {
                     {/* Image on left */}
                     <img
                       className="h-20 w-24 sm:h-24 sm:w-32 rounded-lg object-cover flex-shrink-0"
-                      src={ad.image ?? "/no-image.jpeg"}
+                      src={ad.image ?? noImageUrl}
+                      srcSet={buildCloudinarySrcSet(ad.image)}
+                      sizes="128px"
                       alt={ad.name ?? "Favourite"}
                     />
 
@@ -87,7 +93,7 @@ const FavouritesPage = () => {
                       className="flex-shrink-0 p-2"
                     >
                       <img
-                        src="/favorited.svg"
+                        src={assetUrl("favorited.svg")}
                         alt="favourite"
                         className="w-6 h-6"
                       />
@@ -106,7 +112,7 @@ const FavouritesPage = () => {
         <div className="w-full flex flex-col h-full lg:max-h-[97vh] items-center gap-2 relative lg:overflow-auto no-scrollbar max-sm:pt-14">
           <div className="hidden sticky top-3 bg-white w-full mt-3 sm:flex items-center px-8 py-3 md:py-5 rounded-2xl z-50">
             <img
-              src="/favorited.svg"
+              src={assetUrl("favorited.svg")}
               alt="Favourites"
               className="w-10 md:w-[3vw] h-auto bg-[#f3f4f6] rounded-full p-2.5"
             />
@@ -118,7 +124,7 @@ const FavouritesPage = () => {
 
           <div className="sm:hidden fixed top-14 left-0 py-4 w-full flex justify-center items-center bg-[#ededed] z-20">
             <img
-              src="/favorited.svg"
+              src={assetUrl("favorited.svg")}
               alt="Favourites"
               className="w-10 max-lg:w-20 h-auto bg-[#f3f4f6] rounded-full p-2.5"
             />
@@ -141,7 +147,8 @@ const FavouritesPage = () => {
             ) : favourites.length === 0 ? (
               <div className="text-center col-span-full h-full min-h-[55vh] w-full flex flex-col gap-4 justify-center items-center overflow-hidden">
                 <img
-                  src="/nothing-to-show.png"
+                  src={nothingToShowUrl}
+                  sizes="200px"
                   alt="Nothing to show here"
                   className="h-40 lg:h-50 w-auto"
                 />
@@ -159,7 +166,9 @@ const FavouritesPage = () => {
                     <div className="flex flex-row justify-between items-center mb-2">
                       <img
                         className="bg-gray-200 h-20 w-auto rounded-lg object-cover max-w-40 min-w-20"
-                        src={ad.image ?? "/no-image.jpeg"}
+                        src={ad.image ?? noImageUrl}
+                        srcSet={buildCloudinarySrcSet(ad.image)}
+                        sizes="160px"
                         alt={ad.name ?? "Favourite"}
                       />
                       <p

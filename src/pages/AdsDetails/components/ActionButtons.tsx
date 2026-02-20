@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import SafetyTips from "./SafetyTips";
 import type { Product } from "../../../types/Product";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface ActionButtonsProps {
   currentAdData?: Product | any;
@@ -73,7 +74,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           onClick={() => setShowCallSheet(true)}
           className=" bg-[#74ffa7] text-[#1C274C] font-semibold py-4 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-green-300 active:scale-95 transition"
         >
-          <img src="/outgoing call.svg" alt="" className="w-6 h-6" />
+          <img src={assetUrl("outgoing call.svg")} alt="" loading="lazy" decoding="async" className="w-6 h-6" />
           <span>Call Seller</span>
         </button>
 
@@ -91,8 +92,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             }`}
           >
             <img
-              src={isTaken ? "/check.svg" : "/mark as taken.svg"}
+              src={assetUrl(isTaken ? "check.svg" : "mark as taken.svg")}
               alt={isTaken ? "Taken" : "Mark as taken"}
+              loading="lazy"
+              decoding="async"
               className="w-5 h-5"
             />
             <span>{isTaken ? "Taken" : "Mark as taken"}</span>
@@ -107,8 +110,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-[#F3F3F3] rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-10 active:scale-95 transition disabled:opacity-50"
           >
             <img
-              src={isFavourited ? "/favorited.svg" : "/heart-outline.svg"}
+              src={assetUrl(isFavourited ? "favorited.svg" : "heart-outline.svg")}
               alt="<3"
+              loading="lazy"
+              decoding="async"
               className="w-5 h-5"
             />
             <span>{isFavourited ? "Liked" : "Like"}</span>
@@ -119,7 +124,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             onClick={onReportAd}
             className="flex-1 flex items-center justify-center gap-1 py-3 px-2 bg-red-100/70 rounded-lg text-sm font-medium text-gray-700 hover:bg-red-100 active:scale-95 transition"
           >
-            <img src="/flag.svg" alt="report" className="w-5 h-5" />
+            <img src={assetUrl("flag.svg")} alt="report" loading="lazy" decoding="async" className="w-5 h-5" />
             <span>Report user</span>
           </button>
       </div>
@@ -170,10 +175,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 {label === "Favorites" ? (
                   <>
                     <img
-                      src={
-                        isFavourited ? "/favorited.svg" : "/heart-outline.svg"
-                      }
+                      src={assetUrl(isFavourited ? "favorited.svg" : "heart-outline.svg")}
                       alt=""
+                      loading="lazy"
+                      decoding="async"
                       className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
                     />
                     <p className="whitespace-nowrap">
@@ -185,8 +190,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     {label === "Mark as taken" && isTaken ? (
                       <>
                         <img
-                          src="/check.svg"
+                          src={assetUrl("check.svg")}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-4 h-4 md:h-[1.125vw] md:w-[1.125vw]"
                         />
                         <p className="whitespace-nowrap">Taken</p>
@@ -194,8 +201,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     ) : (
                       <>
                         <img
-                          src={`/${icon}`}
+                          src={assetUrl(icon)}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-4 h-4 sm:h-5 sm:w-5 lg:h-[1.125vw] lg:w-[1.125vw]"
                         />
                         <p className="whitespace-nowrap">{label}</p>
@@ -217,8 +226,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     <div className="flex flex-col items-center gap-4">
                       <div className="font-semibold flex items-center gap-2">
                         <img
-                          src="/outgoing call.svg"
+                          src={assetUrl("outgoing call.svg")}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-4 h-auto"
                         />
                         <span className="text-sm">Caller 1</span>
@@ -252,7 +263,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <div 
                           className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
                         >
-                          <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                          <img src={assetUrl("outgoing call.svg")} alt="" loading="lazy" decoding="async" className="w-5 h-5" />
                         </div>
                       </a>
                       <div className="w-full flex justify-end">
@@ -280,8 +291,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     <div className="flex flex-col items-center gap-3">
                       <div className="flex items-center gap-2 text-xs font-semibold">
                         <img
-                          src="/Make an offer.svg"
+                          src={assetUrl("Make an offer.svg")}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-4 h-auto lg:w-[1.5vw]"
                         />
                         <span className="text-xs sm:text-sm lg:text-[1.2vw]">
@@ -326,8 +339,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                             }}
                           >
                             <img
-                              src="/send.svg"
+                              src={assetUrl("send.svg")}
                               alt="Send"
+                              loading="lazy"
+                              decoding="async"
                               className="w-8 h-8"
                             />
                           </button>
@@ -350,8 +365,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                     <div className="flex flex-col items-center gap-4">
                       <div className="font-semibold flex items-center gap-2">
                         <img
-                          src="/outgoing call.svg"
+                          src={assetUrl("outgoing call.svg")}
                           alt=""
+                          loading="lazy"
+                          decoding="async"
                           className="w-4 h-auto"
                         />
                         <span className="text-sm">Caller 2</span>
@@ -385,7 +402,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                         <div 
                           className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
                         >
-                          <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                          <img src={assetUrl("outgoing call.svg")} alt="" loading="lazy" decoding="async" className="w-5 h-5" />
                         </div>
                       </a>
                       <div className="w-full flex justify-end">
@@ -428,7 +445,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 <div 
                   className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0"
                 >
-                  <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                  <img src={assetUrl("outgoing call.svg")} alt="" loading="lazy" decoding="async" className="w-5 h-5" />
                 </div>
               </a>
             )}
@@ -445,7 +462,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   {caller2}
                 </span>
                 <div className="w-10 h-10 bg-[#74ffa7] rounded-full flex items-center justify-center flex-shrink-0">
-                  <img src="/outgoing call.svg" alt="" className="w-5 h-5" />
+                  <img src={assetUrl("outgoing call.svg")} alt="" loading="lazy" decoding="async" className="w-5 h-5" />
                 </div>
               </a>
             )}
@@ -469,7 +486,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               }}
               className="flex-1 py-3 px-4 border border-red-400 font-semibold rounded-xl hover:bg-red-50 active:scale-95 transition flex items-center justify-center gap-2"
             >
-              <img src="/flag.svg" alt="" className="w-4 h-4" />
+              <img src={assetUrl("flag.svg")} alt="" loading="lazy" decoding="async" className="w-4 h-4" />
               Report user
             </button>
             <button
@@ -486,9 +503,11 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                   : "border border-red-400 hover:bg-red-50"
               }`}
             >
-              <img
-                src={isTaken ? "/check.svg" : "/mark as taken.svg"}
+                <img
+                  src={assetUrl(isTaken ? "check.svg" : "mark as taken.svg")}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="w-4 h-4"
               />
               {isTaken ? "Marked Taken" : "Mark as taken"}

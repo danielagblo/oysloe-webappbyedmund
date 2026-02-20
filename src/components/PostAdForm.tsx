@@ -5,7 +5,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import subscriptionOffer from "../assets/50Off.json";
 import submittedGif from "../assets/Submitted.gif";
-import uploadImg from "../assets/upload.png";
+import { getOptimizedAsset } from "../assets/optimizedImages";
+import { getCategoryIcon as getCategoryIconAsset } from "../assets/categoryIcons";
 import usePostAd from "../features/ad/usePostAd";
 import useCategories from "../features/categories/useCategories";
 import useLocations from "../features/locations/useLocations";
@@ -249,13 +250,8 @@ export default function PostAdForm({
     Record<number, string[]>
   >({});
 
-  const getCategoryIcon = (categoryName: string) => {
-    const cleanName = categoryName
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    return `/${cleanName}.png`;
-  };
+  const getCategoryIcon = (categoryName: string) =>
+    getCategoryIconAsset(categoryName).src;
 
   // Fetch subcategories whenever categoryId changes
   useEffect(() => {
@@ -1863,7 +1859,9 @@ export default function PostAdForm({
                   Upload Images
                 </p>
                 <img
-                  src={uploadImg}
+                  src={getOptimizedAsset("upload.png").src}
+                  srcSet={getOptimizedAsset("upload.png").srcSet}
+                  sizes="20px"
                   alt="upload"
                   className="w-5 h-5 md:w-[1.2vw] md:h-[1.2vw] text-gray-500"
                 />

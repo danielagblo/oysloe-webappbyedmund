@@ -7,6 +7,7 @@ import OnboardingScreen from "../components/OnboardingScreen";
 import { useRegister } from "../features/Auth/useAuth";
 import useIsSmallScreen from "../hooks/useIsSmallScreen";
 import type { RegisterRequest } from "../types/Auth";
+import { assetUrl } from "../assets/publicAssets";
 
 const ReferalVerificationPage = () => {
   const isSmall = useIsSmallScreen();
@@ -153,7 +154,7 @@ const ReferalVerificationPage = () => {
                 className="border-gray-100 max-sm:bg-white max-sm:h-[60px] max-sm:w-[85vw] max-sm:text-[16px] max-sm:rounded-2xl max-sm:border-gray-300 max-sm:pl-12 border-2 px-7 py-2 w-full rounded-lg focus:border-gray-200  outline-0"
               />
               <img
-                src="/Referral.svg"
+                src={assetUrl("Referral.svg")}
                 alt="Referral Icon"
                 className="absolute h-5 w-5 left-2 top-3  max-sm:left-4 max-sm:top-5 max-sm:h-6 max-sm:w-6"
               />

@@ -1,4 +1,5 @@
 import React from "react";
+import { assetUrl } from "../../../assets/publicAssets";
 
 interface MobileHeaderProps {
   imageCount: number;
@@ -20,7 +21,7 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
   return (
     <div className="w-screen flex sm:hidden justify-between items-center px-2 py-3 bg-(--div-active) fixed top-0 z-50">
       <button onClick={onBack} className="flex items-center gap-1">
-        <img src="/arrowleft.svg" alt="Back" className="w-5 h-5" />
+        <img src={assetUrl("arrowleft.svg")} alt="Back" loading="lazy" decoding="async" className="w-5 h-5" />
         <span className="text-sm">Back</span>
       </button>
       <h2 className="text-sm font-medium some-gray] rounded-2xl py-1 px-2">
@@ -30,11 +31,11 @@ const MobileHeader: React.FC<MobileHeaderProps> = ({
       </h2>
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1">
-          <img src="/flag.svg" alt="" className="w-4 h-4" />
+          <img src={assetUrl("flag.svg")} alt="" loading="lazy" decoding="async" className="w-4 h-4" />
           <span className="text-xs">{totalReports ?? 0}</span>
         </div>
         <div className="flex items-center gap-1">
-          <img src="/favorited.svg" alt="" className="w-4 h-4" />
+          <img src={assetUrl("favorited.svg")} alt="" loading="lazy" decoding="async" className="w-4 h-4" />
           <span className="text-xs">{totalFavourites ?? 0}</span>
         </div>
         {multiplierLabel && (

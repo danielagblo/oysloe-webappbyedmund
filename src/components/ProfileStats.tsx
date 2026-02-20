@@ -4,6 +4,7 @@ import { buildMediaUrl } from "../services/media";
 import type { UserProfile } from "../types/UserProfile";
 import LevelProgress from "./LevelProgress";
 import ProgressBar from "./ProgressBar";
+import { userPfp2Url } from "../assets/images";
 
 export default function ProfileStats() {
   const { profile: user, loading, error } = useUserProfile();
@@ -20,7 +21,7 @@ export default function ProfileStats() {
     <div className="flex flex-col items-center pb-6 md:pb-4">
       <div className="bg-green-300 rounded-full h-18 w-18 md:h-[9vw] md:w-[9vw] flex items-center justify-center max-md:mb-3">
         <img
-          src={buildMediaUrl((user as UserProfile)?.avatar) || "/userPfp2.jpg"}
+          src={buildMediaUrl((user as UserProfile)?.avatar) || userPfp2Url}
           alt="pfp"
           className="rounded-full object-cover bg-green-100 h-16 w-16 md:h-[8vw] md:w-[8vw] border-[0.5vw] border-white"
         />

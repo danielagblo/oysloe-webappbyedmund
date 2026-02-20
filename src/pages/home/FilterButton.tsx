@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { assetUrl } from "../../assets/publicAssets";
 import MobileFilterModal from "./MobileFilterModal";
 
 interface Category {
@@ -98,7 +99,7 @@ const FilterButton = ({
             </div>
           )}
           <p className="text-base">Filter</p>
-          <img src="/filter-svgrepo.svg" alt="Filter" className="w-7 h-7" />
+          <img src={assetUrl("filter-svgrepo.svg")} alt="Filter" className="w-7 h-7" />
         </div>
       </button>
 
@@ -117,7 +118,7 @@ const FilterButton = ({
           )}
           <p className="text-[1.25vw] max-lg:text-2xl">Filter</p>
           <img
-            src="/filter-svgrepo.svg"
+            src={assetUrl("filter-svgrepo.svg")}
             alt="Filter"
             className="w-[2.1vw] h-[2.1vw]"
           />

@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ProgressiveImage from "../../components/ProgressiveImage";
+import { noImageUrl, nothingToShowUrl } from "../../assets/images";
 import type { Product } from "../../types/Product";
 import { formatMoney } from "../../utils/formatMoney";
+import { assetUrl } from "../../assets/publicAssets";
 
 type Props = {
   products: Product[];
@@ -37,15 +39,16 @@ const LazyAdCard = React.memo(function LazyAdCard({
       to={`/ads/${ad.id}`}
       state={{ adData: ad }}
       onClick={(e) => handleAdClick(ad, e)}
-      className={`inline-flex rounded-md overflow-hidden w-full flex-col ${layout === "mason" ? "mb-10" : "mb-2"} items-center justify-center
+      className={`inline-flex max-sm:bg-white max-sm:p-2 rounded-md overflow-hidden w-full flex-col ${layout === "mason" ? "mb-2" : "mb-2"} items-center justify-center
       }`}
     >
       <ProgressiveImage
-        src={ad.image || "/no-image.jpeg"}
+        src={ad.image || noImageUrl}
+        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 18vw"
         alt={ad.name}
-        containerClassName="relative w-full"
+        containerClassName={`relative w-full ${layout === "mason" ? "max-sm:min-h-[140px]" : ""}`}
         imgClassName={`w-full max-sm:max-h-85 max-w-62 sm:h-52 object-cover rounded-md ${
-          layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-52"
+          layout === "mason" ? "max-sm:break-inside-avoid" : "max-sm:h-40"
         }`}
         watermarkBusinessName={ad.owner?.business_name}
         watermarkSize="md"
@@ -54,8 +57,10 @@ const LazyAdCard = React.memo(function LazyAdCard({
       <div className="w-full mt-1">
         <div className="flex items-center gap-1 px-2 py-0.5">
           <img
-            src="/location.svg"
+            src={assetUrl("location.svg")}
             alt=""
+            loading="lazy"
+            decoding="async"
             className="w-3 sm:w-5 h-3 sm:h-5 lg:h-[1vw] lg:w-[1vw]"
           />
           <p className="text-xs sm:text-sm lg:text-[0.9vw] text-gray-500 truncate">
@@ -143,7 +148,14 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
     if (!active || active.length === 0) {
       return (
         <div className="text-xl mt-5 w-full flex flex-col items-center justify-center gap-4">
-          <img src="/nothing-to-show.png" alt="Nothing to show" className="max-w-[50vw] sm:max-w-50" />
+          <img
+            src={nothingToShowUrl}
+            sizes="(max-width: 640px) 50vw, 200px"
+            alt="Nothing to show"
+            loading="lazy"
+            decoding="async"
+            className="max-w-[50vw] sm:max-w-50"
+          />
           <p>No ads to show right now.</p>
         </div>
       );
@@ -162,20 +174,53 @@ const MobileGridAds = ({ products, productsLoading, handleAdClick }: Props) => {
     <div className="px-2 py-3">
       <div className="flex justify-end items-center p-2">
         <div className="flex justify-end gap-4 mr-2 items-center">
+          {
+            layout === "mason" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`bg-white p-2 rounded-lg border border-gray-200 hover:scale-105`}
+              >
+                <img
+                  className="h-7 w-7"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
+
+              </button>
+            )
+          }
           <button
             onClick={() => setLayout("grid")}
-            className={`py-1 rounded`}
+            className={`rounded ${layout === "grid" ? "bg-white p-2 rounded-lg border border-gray-200 hover:scale-105" : "py-1 "}`}
           >
-            <img className="h-8 w-8" src="/grid-svgrepo-com.svg" alt="grid" />
+            <img
+              className={`${layout === "grid" ? "h-7 w-7" : "h-5.5 w-5.5 "}`}
+              src={assetUrl("grid-svgrepo-com.svg")}
+              alt="grid"
+              loading="lazy"
+              decoding="async"
+            />
 
           </button>
-          <button
-            onClick={() => setLayout("mason")}
-            className={`py-1 rounded`}
-          >
-            <img className="h-8 w-8" src="/grid-3-svgrepo-com.svg" alt="mason" />
+          {
+            layout === "grid" && (
+              <button
+                onClick={() => setLayout("mason")}
+                className={`py-1 rounded`}
+              >
+                <img
+                  className="h-5.5 w-5.5"
+                  src={assetUrl("grid-3-svgrepo-com.svg")}
+                  alt="mason"
+                  loading="lazy"
+                  decoding="async"
+                />
 
-          </button>
+              </button>
+            )
+          }
         </div>
       </div>
       <div className={`${layout === "grid" ? "grid grid-cols-2" : "columns-2"} gap-2 sm:gap-3`}>
