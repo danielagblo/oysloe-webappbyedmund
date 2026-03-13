@@ -6,6 +6,8 @@ import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import MenuButton from "../components/MenuButton";
 
+import { getOptimizedAsset } from "../assets/optimizedImages";
+
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 
@@ -38,6 +40,7 @@ const HomePage = () => {
     null,
   );
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [showAppDownloadPopup, setShowAppDownloadPopup] = useState(false);
 
   // Filter states
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -107,6 +110,12 @@ const HomePage = () => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm.trim()), 300);
     return () => clearTimeout(t);
   }, [searchTerm]);
+
+  // Show app download popup 2 seconds after page load
+  useEffect(() => {
+    const timer = setTimeout(() => setShowAppDownloadPopup(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const { data: products = [], isLoading, isPlaceholderData } = useProducts({
     search: debouncedSearch || undefined,
@@ -359,6 +368,26 @@ const HomePage = () => {
       </Helmet>
 
       <AdLoadingOverlay isVisible={isAdLoading} />
+      {showAppDownloadPopup && (
+        <div className="fixed top-0 left-0 z-40 w-full bg-white border-b border-(--div-border)">
+          <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-center gap-3 text-sm sm:text-base">
+            <span className="text-gray-800 font-medium">
+              Download android app?
+            </span>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.bricksy.oysloemobile"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center"
+            >
+              <span className="text-base sm:text-lg font-semibold text-black underline underline-offset-2">
+                click
+              </span>
+            </a>
+          </div>
+        </div>
+      )}
+      {showAppDownloadPopup && <div className="h-12 sm:h-14" />}
       <HomePageHeader searchValue={searchTerm} setSearchValue={setSearchTerm} />
       <div className="flex flex-col items-center justify-center">
         <div className="bg-(--div-active) w-screen">
