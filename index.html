@@ -61,6 +61,17 @@
 </head>
 
 <body>
+  <script>
+    (function () {
+      var host = window.location.host.replace(/^www\./, "");
+      var isRootIndex =
+        window.location.pathname === "/index.html" ||
+        window.location.pathname === "/index.htm";
+      if (isRootIndex) {
+        window.location.replace(window.location.protocol + "//" + host + "/");
+      }
+    })();
+  </script>
   <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P32HM7RX"
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
