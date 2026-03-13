@@ -6,8 +6,6 @@ import "../App.css";
 import AdLoadingOverlay from "../components/AdLoadingOverlay";
 import MenuButton from "../components/MenuButton";
 
-import { getOptimizedAsset } from "../assets/optimizedImages";
-
 import useCategories from "../features/categories/useCategories";
 import { useProducts } from "../features/products/useProducts";
 
